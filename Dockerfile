@@ -19,7 +19,6 @@ COPY .git ./.git
 COPY cmd ./cmd
 COPY internal ./internal
 COPY meta.json .
-RUN ls -A
 RUN \
   VERSION="$(jq -r .version meta.json)-$(TZ=UTC git --no-pager show --quiet --abbrev=12 --date='format-local:%Y%m%d%H%M%S' --format='%cd-%h')" ;\
   go build \
@@ -36,6 +35,5 @@ USER appuser
 WORKDIR /app
 COPY --from=go-builder /build/bin/miasma .
 COPY --from=vue-builder /build/dist dashboard
-RUN ls -A dashboard
 EXPOSE 3000
 CMD ["./miasma"]

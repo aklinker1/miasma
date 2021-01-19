@@ -8,5 +8,4 @@ run: build
 watch:
 	@modd
 swagger:
-	@rm -rf internal/gen/*
 	swagger generate server -t internal/gen -f ./api/swagger.yml --exclude-main -A miasma
