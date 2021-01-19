@@ -5,9 +5,9 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/aklinker1/miasma/internal/gen/models"
-	"github.com/aklinker1/miasma/internal/utils/mappers"
-	"github.com/aklinker1/miasma/internal/utils/types"
+	"github.com/aklinker1/miasma/internal/server/gen/models"
+	"github.com/aklinker1/miasma/internal/server/utils/mappers"
+	"github.com/aklinker1/miasma/internal/server/utils/types"
 
 	"gopkg.in/yaml.v2"
 )

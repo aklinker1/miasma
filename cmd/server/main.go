@@ -1,7 +1,7 @@
 package main
 
 import (
-	server "github.com/aklinker1/miasma/internal"
+	"github.com/aklinker1/miasma/internal/server"
 )
 
 func main() {

@@ -1,8 +1,8 @@
 package mappers
 
 import (
-	"github.com/aklinker1/miasma/internal/gen/models"
-	"github.com/aklinker1/miasma/internal/utils/types"
+	"github.com/aklinker1/miasma/internal/server/gen/models"
+	"github.com/aklinker1/miasma/internal/server/utils/types"
 )
 
 type app struct{}

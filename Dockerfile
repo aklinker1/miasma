@@ -16,15 +16,15 @@ COPY go.mod go.sum ./
 RUN go mod download
 # Cached layer for source code
 COPY .git ./.git
-COPY cmd ./cmd
-COPY internal ./internal
+COPY cmd/server ./cmd/server
+COPY internal/server ./internal/server
 COPY meta.json .
 RUN \
   VERSION="$(jq -r .version meta.json)-$(TZ=UTC git --no-pager show --quiet --abbrev=12 --date='format-local:%Y%m%d%H%M%S' --format='%cd-%h')" ;\
   go build \
-    -ldflags "-X github.com/aklinker1/miasma/internal/utils/constants.VERSION=$VERSION" \
-    -o bin/miasma \
-    cmd/miasma/main.go
+    -ldflags "-X github.com/aklinker1/miasma/internal/server/utils/constants.VERSION=$VERSION" \
+    -o bin/server \
+    cmd/server/main.go
 
 # Make the final image with just the go binary and dashboard dist
 FROM alpine
@@ -33,7 +33,7 @@ RUN mkdir -p /data/miasma
 RUN chown -R appuser /data/miasma
 USER appuser
 WORKDIR /app
-COPY --from=go-builder /build/bin/miasma .
+COPY --from=go-builder /build/bin/server .
 COPY --from=vue-builder /build/dist dashboard
 EXPOSE 3000
-CMD ["./miasma"]
+CMD ["./server"]

@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"github.com/aklinker1/miasma/internal/gen/restapi/operations"
-	"github.com/aklinker1/miasma/internal/services"
+	"github.com/aklinker1/miasma/internal/server/gen/restapi/operations"
+	"github.com/aklinker1/miasma/internal/server/services"
 	"github.com/go-openapi/runtime/middleware"
 )
 

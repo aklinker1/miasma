@@ -1,4 +1,4 @@
-package internal
+package server
 
 import (
 	"flag"
@@ -6,9 +6,9 @@ import (
 
 	"github.com/go-openapi/loads"
 
-	"github.com/aklinker1/miasma/internal/controllers"
-	"github.com/aklinker1/miasma/internal/gen/restapi"
-	"github.com/aklinker1/miasma/internal/gen/restapi/operations"
+	"github.com/aklinker1/miasma/internal/server/controllers"
+	"github.com/aklinker1/miasma/internal/server/gen/restapi"
+	"github.com/aklinker1/miasma/internal/server/gen/restapi/operations"
 )
 
 func Start() {

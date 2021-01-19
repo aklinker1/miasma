@@ -11,9 +11,9 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 
-	"github.com/aklinker1/miasma/internal/gen/restapi/operations"
-	customMiddleware "github.com/aklinker1/miasma/internal/middleware"
-	"github.com/aklinker1/miasma/internal/utils"
+	"github.com/aklinker1/miasma/internal/server/gen/restapi/operations"
+	customMiddleware "github.com/aklinker1/miasma/internal/server/middleware"
+	"github.com/aklinker1/miasma/internal/server/utils"
 )
 
 //go:generate swagger generate server --target ../../gen --name Miasma --spec ../../../api/swagger.yml --principal interface{} --exclude-main
