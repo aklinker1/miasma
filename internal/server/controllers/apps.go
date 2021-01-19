@@ -16,7 +16,7 @@ func UseAppsController(api *operations.MiasmaAPI) {
 var getApps = operations.GetAppsHandlerFunc(
 	func(params operations.GetAppsParams) middleware.Responder {
 		showHidden := params.Hidden != nil && *params.Hidden
-		apps, err := services.Files.ReadApps(showHidden)
+		apps, err := services.App.GetAll(showHidden)
 		if err != nil {
 			return operations.NewGetAppsDefault(500).WithPayload(err.Error())
 		}
@@ -25,14 +25,14 @@ var getApps = operations.GetAppsHandlerFunc(
 
 // var createApp = operations.CreateAppHandlerFunc(
 // 	func(params operations.CreateAppParams) middleware.Responder {
-// 		app, err := services.Files.ReadApp()
+// 		_, err := services.Apps.Get()
 
 // 		return *operations.NewCreateAppCreated().WithPayload(app)
 // 	})
 
 var getApp = operations.GetAppHandlerFunc(
 	func(params operations.GetAppParams) middleware.Responder {
-		app, err := services.Files.ReadApp(params.AppName)
+		app, err := services.App.Get(params.AppName)
 		if err != nil {
 			return operations.NewGetAppNotFound().WithPayload(err.Error())
 		}
