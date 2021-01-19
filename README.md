@@ -14,7 +14,7 @@ To get started, install docker on the device you plan on being the main node (pi
 
 The CLI manages a file system structure:
 
-- `services/`
+- `apps/`
   - `app-name/`
     - **`docker-compose.yml`** - Generated file for each swarm command
     - **`meta.yml`** - Used to generate the docker compose before each swarm command, and store all application info
@@ -47,7 +47,7 @@ miasma app:create <app-name> --image <registry/image>
 
 > Generates the following data structure, then executes the docker-compose file:
 > 
-> - `services/`
+> - `apps/`
 >   - `app-name/`
 >     - **`docker-compose.yml`** - Generated file for each swarm command
 >     - **`meta.yml`** - Used to generate the docker compose before each swarm command, and store all application info

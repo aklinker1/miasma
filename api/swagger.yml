@@ -1,0 +1,94 @@
+---
+swagger: '2.0'
+info:
+  version: 0.0.0
+  title: Miasma
+
+consumes:
+  - application/json
+produces:
+  - application/json
+
+paths:
+  /api/health:
+    get:
+      summary: Standard health check endpoint that checks all the service's statuses
+      operationId: getHealthCheck
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              version:
+                type: string
+                description: Miasma's current version
+            required:
+              - version
+  /api/apps:
+    get:
+      summary: List all the running applications
+      operationId: getApps
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/App'
+    post:
+      operationId: createApp
+      responses:
+        201:
+          description: Created
+          schema:
+            $ref: '#/definitions/App'
+  /api/apps/{appName}:
+    get:
+      operationId: getApp
+      parameters:
+        - in: path
+          name: appName
+          required: true
+          type: string
+          description: App name from the `-a|--app` flag
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/App'
+        404:
+          description: Not Found
+          schema:
+            type: string
+    delete:
+      operationId: deleteApp
+      parameters:
+        - name: appName
+          in: path
+          required: true
+          type: string
+          description: App name from the `-a|--app` flag
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/App'
+        404:
+          description: Not Found
+          schema:
+            type: string
+
+definitions:
+  App:
+    type: object
+    properties:
+      name:
+        type: string
+        description: The apps name, used in the CLI with the `-a|--app` flag
+      image:
+        type: string
+        description: The image the app is based off of
+    required:
+      - name
+      - image

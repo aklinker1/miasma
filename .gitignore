@@ -1,0 +1,8 @@
+/bin
+/data
+/scratch
+
+*.log
+TODO.md
+.env
+.env.*
