@@ -30,7 +30,7 @@ func RequestLogger() func(http.Handler) http.Handler {
 			}
 			fmt.Printf("<<<<<< %s %s\n", r.Method, r.URL.Path)
 			next.ServeHTTP(recorder, r)
-			fmt.Printf(">>>>>> %d (%s)", recorder.Status, w.Header().Get("X-Response-Time"))
+			fmt.Printf(">>>>>> %d (%s)\n", recorder.Status, w.Header().Get("X-Response-Time"))
 		})
 	}
 }
