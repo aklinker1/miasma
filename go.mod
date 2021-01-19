@@ -3,6 +3,7 @@ module github.com/aklinker1/miasma
 go 1.14
 
 require (
+	github.com/dre1080/recovr v1.0.3
 	github.com/go-openapi/errors v0.19.6
 	github.com/go-openapi/loads v0.19.5
 	github.com/go-openapi/runtime v0.19.26
