@@ -29,6 +29,7 @@ func Start() {
 	server.Port = *portFlag
 
 	// Use handlers
+	server.ConfigureAPI()
 	useControllers(api)
 
 	// Serve API
