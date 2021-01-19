@@ -1,5 +1,6 @@
 package types
 
 type AppMetaData struct {
-	Image *string
+	Image  *string
+	Hidden *bool
 }

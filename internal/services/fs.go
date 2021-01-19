@@ -76,6 +76,29 @@ func (files *fileService) ReadApp(appName string) (*models.App, error) {
 	return mappers.App.FromMeta(appName, metaYml), err
 }
 
+func (files *fileService) ReadApps(showHidden bool) ([]*models.App, error) {
+	appsDir, err := files.AppsDir()
+	if err != nil {
+		return nil, err
+	}
+	appDirs, err := ioutil.ReadDir(appsDir)
+	if err != nil {
+		return nil, err
+	}
+
+	result := []*models.App{}
+	for _, appDir := range appDirs {
+		app, err := files.ReadApp(appDir.Name())
+		if err != nil {
+			return nil, err
+		}
+		if showHidden || !app.Hidden {
+			result = append(result, app)
+		}
+	}
+	return result, nil
+}
+
 func (files *fileService) GenerateAppComposeFile(appName string) {
 
 }

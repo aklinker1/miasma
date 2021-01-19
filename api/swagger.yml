@@ -29,6 +29,12 @@ paths:
     get:
       summary: List all the running applications
       operationId: getApps
+      parameters:
+        - in: query
+          name: hidden
+          required: false
+          type: boolean
+          description: Whether or not to show hidden apps
       responses:
         200:
           description: OK
@@ -36,6 +42,10 @@ paths:
             type: array
             items:
               $ref: '#/definitions/App'
+        default:
+          description: Unknown Error
+          schema:
+            type: string
     post:
       operationId: createApp
       responses:
@@ -89,6 +99,9 @@ definitions:
       image:
         type: string
         description: The image the app is based off of
+      hidden:
+        type: boolean
+        description: Wether or not the app is hidden during regular requests
     required:
       - name
       - image

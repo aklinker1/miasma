@@ -34,6 +34,14 @@ func init() {
       "get": {
         "summary": "List all the running applications",
         "operationId": "getApps",
+        "parameters": [
+          {
+            "type": "boolean",
+            "description": "Whether or not to show hidden apps",
+            "name": "hidden",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -42,6 +50,12 @@ func init() {
               "items": {
                 "$ref": "#/definitions/App"
               }
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
             }
           }
         }
@@ -144,6 +158,10 @@ func init() {
         "image"
       ],
       "properties": {
+        "hidden": {
+          "description": "Wether or not the app is hidden during regular requests",
+          "type": "boolean"
+        },
         "image": {
           "description": "The image the app is based off of",
           "type": "string"
@@ -173,6 +191,14 @@ func init() {
       "get": {
         "summary": "List all the running applications",
         "operationId": "getApps",
+        "parameters": [
+          {
+            "type": "boolean",
+            "description": "Whether or not to show hidden apps",
+            "name": "hidden",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -181,6 +207,12 @@ func init() {
               "items": {
                 "$ref": "#/definitions/App"
               }
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
             }
           }
         }
@@ -283,6 +315,10 @@ func init() {
         "image"
       ],
       "properties": {
+        "hidden": {
+          "description": "Wether or not the app is hidden during regular requests",
+          "type": "boolean"
+        },
         "image": {
           "description": "The image the app is based off of",
           "type": "string"

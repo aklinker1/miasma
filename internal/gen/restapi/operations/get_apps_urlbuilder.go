@@ -9,11 +9,17 @@ import (
 	"errors"
 	"net/url"
 	golangswaggerpaths "path"
+
+	"github.com/go-openapi/swag"
 )
 
 // GetAppsURL generates an URL for the get apps operation
 type GetAppsURL struct {
+	Hidden *bool
+
 	_basePath string
+	// avoid unkeyed usage
+	_ struct{}
 }
 
 // WithBasePath sets the base path for this url builder, only required when it's different from the
@@ -39,6 +45,18 @@ func (o *GetAppsURL) Build() (*url.URL, error) {
 
 	_basePath := o._basePath
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
+
+	qs := make(url.Values)
+
+	var hiddenQ string
+	if o.Hidden != nil {
+		hiddenQ = swag.FormatBool(*o.Hidden)
+	}
+	if hiddenQ != "" {
+		qs.Set("hidden", hiddenQ)
+	}
+
+	_result.RawQuery = qs.Encode()
 
 	return &_result, nil
 }

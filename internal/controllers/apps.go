@@ -7,18 +7,21 @@ import (
 )
 
 func UseAppsController(api *operations.MiasmaAPI) {
-	// api.GetAppsHandler = getApps
+	api.GetAppsHandler = getApps
 	// api.CreateAppHandler = createApp
 	api.GetAppHandler = getApp
 	// api.DeleteAppHandler = deleteApp
 }
 
-// var getApps = operations.GetAppsHandlerFunc(
-// 	func(params operations.GetAppsParams) middleware.Responder {
-// 		app, err := services.Files.ReadApp(params.)
-// 		if ()
-// 		return operations.NewGetAppsOK().WithPayload()
-// 	})
+var getApps = operations.GetAppsHandlerFunc(
+	func(params operations.GetAppsParams) middleware.Responder {
+		showHidden := params.Hidden != nil && *params.Hidden
+		apps, err := services.Files.ReadApps(showHidden)
+		if err != nil {
+			return operations.NewGetAppsDefault(500).WithPayload(err.Error())
+		}
+		return operations.NewGetAppsOK().WithPayload(apps)
+	})
 
 // var createApp = operations.CreateAppHandlerFunc(
 // 	func(params operations.CreateAppParams) middleware.Responder {

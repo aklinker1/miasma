@@ -11,7 +11,8 @@ var App = &app{}
 
 func (a *app) FromMeta(appName string, meta *types.AppMetaData) *models.App {
 	return &models.App{
-		Name:  &appName,
-		Image: meta.Image,
+		Name:   &appName,
+		Image:  meta.Image,
+		Hidden: meta.Hidden != nil && *meta.Hidden,
 	}
 }
