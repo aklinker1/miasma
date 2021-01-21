@@ -19,12 +19,7 @@ paths:
           description: OK
           schema:
             type: object
-            properties:
-              version:
-                type: string
-                description: Miasma's current version
-            required:
-              - version
+            $ref: '#/definitions/Health'
   /api/apps:
     get:
       summary: List all the running applications
@@ -110,6 +105,37 @@ paths:
             type: string
 
 definitions:
+  Health:
+    type: object
+    properties:
+      version:
+        type: string
+        description: Miasma's current version
+      dockerVersion:
+        type: string
+        description: The version of docker running on the host, or null if docker is not running
+      swarm:
+        type: object
+        description: 
+          The info about the docker swarm if the host running miasma is apart of
+          one. If it is not apart of a swarm, it returns `null`
+        properties:
+          id:
+            type: string
+            description: The swarm's ID
+          joinCommand:
+            type: string
+            description: The command for a node to run to join the swarm
+          createdAt:
+            type: string
+            description: UTC timestamps when the swarm was created
+          updatedAt:
+            type: string
+            description: UTC timestamps when the swarm was last updated
+    required:
+      - version
+      - dockerVersion
+      - swarm
   App:
     type: object
     properties:

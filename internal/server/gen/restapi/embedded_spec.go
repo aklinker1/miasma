@@ -165,15 +165,7 @@ func init() {
             "description": "OK",
             "schema": {
               "type": "object",
-              "required": [
-                "version"
-              ],
-              "properties": {
-                "version": {
-                  "description": "Miasma's current version",
-                  "type": "string"
-                }
-              }
+              "$ref": "#/definitions/Health"
             }
           }
         }
@@ -198,6 +190,46 @@ func init() {
         },
         "name": {
           "description": "The apps name, used in the CLI with the ` + "`" + `-a|--app` + "`" + ` flag",
+          "type": "string"
+        }
+      }
+    },
+    "Health": {
+      "type": "object",
+      "required": [
+        "version",
+        "dockerVersion",
+        "swarm"
+      ],
+      "properties": {
+        "dockerVersion": {
+          "description": "The version of docker running on the host, or null if docker is not running",
+          "type": "string"
+        },
+        "swarm": {
+          "description": "The info about the docker swarm if the host running miasma is apart of one. If it is not apart of a swarm, it returns ` + "`" + `null` + "`" + `",
+          "type": "object",
+          "properties": {
+            "createdAt": {
+              "description": "UTC timestamps when the swarm was created",
+              "type": "string"
+            },
+            "id": {
+              "description": "The swarm's ID",
+              "type": "string"
+            },
+            "joinCommand": {
+              "description": "The command for a node to run to join the swarm",
+              "type": "string"
+            },
+            "updatedAt": {
+              "description": "UTC timestamps when the swarm was last updated",
+              "type": "string"
+            }
+          }
+        },
+        "version": {
+          "description": "Miasma's current version",
           "type": "string"
         }
       }
@@ -352,15 +384,7 @@ func init() {
             "description": "OK",
             "schema": {
               "type": "object",
-              "required": [
-                "version"
-              ],
-              "properties": {
-                "version": {
-                  "description": "Miasma's current version",
-                  "type": "string"
-                }
-              }
+              "$ref": "#/definitions/Health"
             }
           }
         }
@@ -385,6 +409,68 @@ func init() {
         },
         "name": {
           "description": "The apps name, used in the CLI with the ` + "`" + `-a|--app` + "`" + ` flag",
+          "type": "string"
+        }
+      }
+    },
+    "Health": {
+      "type": "object",
+      "required": [
+        "version",
+        "dockerVersion",
+        "swarm"
+      ],
+      "properties": {
+        "dockerVersion": {
+          "description": "The version of docker running on the host, or null if docker is not running",
+          "type": "string"
+        },
+        "swarm": {
+          "description": "The info about the docker swarm if the host running miasma is apart of one. If it is not apart of a swarm, it returns ` + "`" + `null` + "`" + `",
+          "type": "object",
+          "properties": {
+            "createdAt": {
+              "description": "UTC timestamps when the swarm was created",
+              "type": "string"
+            },
+            "id": {
+              "description": "The swarm's ID",
+              "type": "string"
+            },
+            "joinCommand": {
+              "description": "The command for a node to run to join the swarm",
+              "type": "string"
+            },
+            "updatedAt": {
+              "description": "UTC timestamps when the swarm was last updated",
+              "type": "string"
+            }
+          }
+        },
+        "version": {
+          "description": "Miasma's current version",
+          "type": "string"
+        }
+      }
+    },
+    "HealthSwarm": {
+      "description": "The info about the docker swarm if the host running miasma is apart of one. If it is not apart of a swarm, it returns ` + "`" + `null` + "`" + `",
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "description": "UTC timestamps when the swarm was created",
+          "type": "string"
+        },
+        "id": {
+          "description": "The swarm's ID",
+          "type": "string"
+        },
+        "joinCommand": {
+          "description": "The command for a node to run to join the swarm",
+          "type": "string"
+        },
+        "updatedAt": {
+          "description": "UTC timestamps when the swarm was last updated",
           "type": "string"
         }
       }

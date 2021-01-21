@@ -8,11 +8,7 @@ package operations
 import (
 	"net/http"
 
-	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/go-openapi/strfmt"
-	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // GetHealthCheckHandlerFunc turns a function with the right signature into a get health check handler
@@ -59,55 +55,4 @@ func (o *GetHealthCheck) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
-}
-
-// GetHealthCheckOKBody get health check o k body
-//
-// swagger:model GetHealthCheckOKBody
-type GetHealthCheckOKBody struct {
-
-	// Miasma's current version
-	// Required: true
-	Version *string `json:"version"`
-}
-
-// Validate validates this get health check o k body
-func (o *GetHealthCheckOKBody) Validate(formats strfmt.Registry) error {
-	var res []error
-
-	if err := o.validateVersion(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (o *GetHealthCheckOKBody) validateVersion(formats strfmt.Registry) error {
-
-	if err := validate.Required("getHealthCheckOK"+"."+"version", "body", o.Version); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (o *GetHealthCheckOKBody) MarshalBinary() ([]byte, error) {
-	if o == nil {
-		return nil, nil
-	}
-	return swag.WriteJSON(o)
-}
-
-// UnmarshalBinary interface implementation
-func (o *GetHealthCheckOKBody) UnmarshalBinary(b []byte) error {
-	var res GetHealthCheckOKBody
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*o = res
-	return nil
 }
