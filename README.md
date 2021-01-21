@@ -1,6 +1,6 @@
 # Miasma
 
-Miasma is a docker-swarm based PasS (Platform as a Service) tool for managing docker deployments to a Raspberry Pi Cluster.
+Miasma is a docker-swarm based PasS (Platform as a Service) tool for applications to a Raspberry Pi Cluster.
 
 ## Get Started
 
