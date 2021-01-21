@@ -14,6 +14,7 @@ func UseAppsController(api *operations.MiasmaAPI) {
 	api.GetAppHandler = getApp
 	api.DeleteAppHandler = deleteApp
 	api.StartAppHandler = startApp
+	api.StopAppHandler = stopApp
 }
 
 var getApps = operations.GetAppsHandlerFunc(
@@ -81,5 +82,20 @@ var startApp = operations.StartAppHandlerFunc(
 			return operations.NewStartAppDefault(500).WithPayload(err.Error())
 		}
 		return operations.NewStartAppOK()
+	},
+)
+
+var stopApp = operations.StopAppHandlerFunc(
+	func(params operations.StopAppParams) middleware.Responder {
+		app, _ := services.App.Get(params.AppName)
+		if app == nil {
+			return operations.NewStopAppNotFound().WithPayload(fmt.Sprintf("%s does not exist", params.AppName))
+		}
+
+		err := services.Docker.StopApp(app)
+		if err != nil {
+			return operations.NewStopAppDefault(500).WithPayload(err.Error())
+		}
+		return operations.NewStopAppOK()
 	},
 )

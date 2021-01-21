@@ -173,6 +173,31 @@ func init() {
         }
       }
     },
+    "/api/apps/{appName}/stop": {
+      "post": {
+        "summary": "stop the application",
+        "operationId": "stopApp",
+        "parameters": [
+          {
+            "$ref": "#/parameters/appName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stopped"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/unknown"
+          }
+        }
+      }
+    },
     "/api/health": {
       "get": {
         "summary": "Standard health check endpoint that checks all the service's statuses",
@@ -425,6 +450,38 @@ func init() {
         "responses": {
           "200": {
             "description": "Started"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/apps/{appName}/stop": {
+      "post": {
+        "summary": "stop the application",
+        "operationId": "stopApp",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",
+            "name": "appName",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stopped"
           },
           "404": {
             "description": "Not Found",

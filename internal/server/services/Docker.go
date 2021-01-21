@@ -6,6 +6,7 @@ import (
 
 	dockerLib "docker.io/go-docker"
 	dockerTypes "docker.io/go-docker/api/types"
+	"docker.io/go-docker/api/types/filters"
 	dockerSwarmTypes "docker.io/go-docker/api/types/swarm"
 
 	"github.com/aklinker1/miasma/internal/server/gen/models"
@@ -47,23 +48,44 @@ func (service *dockerService) SwarmInfo() *dockerSwarmTypes.Swarm {
 	return &swarmInfo
 }
 
-func (service *dockerService) StartAppName(appName string) error {
-	app, err := App.Get(appName)
+func (service *dockerService) GetRunningService(appName string) (*dockerSwarmTypes.Service, error) {
+	filter := filters.NewArgs(
+		filters.KeyValuePair{Key: "name", Value: appName},
+	)
+	services, err := docker.ServiceList(ctx, dockerTypes.ServiceListOptions{
+		Filters: filter,
+	})
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return service.StartApp(app)
+	for _, s := range services {
+		if s.Spec.Annotations.Name == appName {
+			return &s, nil
+		}
+	}
+	return nil, fmt.Errorf("%s is not running", appName)
 }
 
 func (service *dockerService) StartApp(app *models.App) error {
+	existingService, _ := service.GetRunningService(*app.Name)
+	if existingService != nil {
+		return fmt.Errorf("%s is already started", *app.Name)
+	}
 	newService := mappers.App.ToService(app)
 	options := dockerTypes.ServiceCreateOptions{
 		QueryRegistry: true,
 	}
-	createdService, err := docker.ServiceCreate(ctx, *newService, options)
+	_, err := docker.ServiceCreate(ctx, *newService, options)
 	if err != nil {
 		return err
 	}
-	fmt.Println(createdService)
 	return nil
+}
+
+func (service *dockerService) StopApp(app *models.App) error {
+	runningService, err := service.GetRunningService(*app.Name)
+	if err != nil {
+		return err
+	}
+	return docker.ServiceRemove(ctx, runningService.ID)
 }

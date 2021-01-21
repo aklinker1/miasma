@@ -60,6 +60,9 @@ func NewMiasmaAPI(spec *loads.Document) *MiasmaAPI {
 		StartAppHandler: StartAppHandlerFunc(func(params StartAppParams) middleware.Responder {
 			return middleware.NotImplemented("operation StartApp has not yet been implemented")
 		}),
+		StopAppHandler: StopAppHandlerFunc(func(params StopAppParams) middleware.Responder {
+			return middleware.NotImplemented("operation StopApp has not yet been implemented")
+		}),
 	}
 }
 
@@ -106,6 +109,8 @@ type MiasmaAPI struct {
 	GetHealthCheckHandler GetHealthCheckHandler
 	// StartAppHandler sets the operation handler for the start app operation
 	StartAppHandler StartAppHandler
+	// StopAppHandler sets the operation handler for the stop app operation
+	StopAppHandler StopAppHandler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -199,6 +204,9 @@ func (o *MiasmaAPI) Validate() error {
 	}
 	if o.StartAppHandler == nil {
 		unregistered = append(unregistered, "StartAppHandler")
+	}
+	if o.StopAppHandler == nil {
+		unregistered = append(unregistered, "StopAppHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -312,6 +320,10 @@ func (o *MiasmaAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/api/apps/{appName}/start"] = NewStartApp(o.context, o.StartAppHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/api/apps/{appName}/stop"] = NewStopApp(o.context, o.StopAppHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

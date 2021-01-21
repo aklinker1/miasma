@@ -110,6 +110,21 @@ paths:
             type: string
         default:
           $ref: '#/responses/unknown'
+  /api/apps/{appName}/stop:
+    post:
+      summary: stop the application
+      operationId: stopApp
+      parameters:
+        - $ref: '#/parameters/appName'
+      responses:
+        200:
+          description: Stopped
+        404:
+          description: Not Found
+          schema:
+            type: string
+        default:
+          $ref: '#/responses/unknown'
 
 parameters:
   appName:
