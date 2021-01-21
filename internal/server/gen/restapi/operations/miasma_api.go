@@ -57,6 +57,9 @@ func NewMiasmaAPI(spec *loads.Document) *MiasmaAPI {
 		GetHealthCheckHandler: GetHealthCheckHandlerFunc(func(params GetHealthCheckParams) middleware.Responder {
 			return middleware.NotImplemented("operation GetHealthCheck has not yet been implemented")
 		}),
+		StartAppHandler: StartAppHandlerFunc(func(params StartAppParams) middleware.Responder {
+			return middleware.NotImplemented("operation StartApp has not yet been implemented")
+		}),
 	}
 }
 
@@ -101,6 +104,8 @@ type MiasmaAPI struct {
 	GetAppsHandler GetAppsHandler
 	// GetHealthCheckHandler sets the operation handler for the get health check operation
 	GetHealthCheckHandler GetHealthCheckHandler
+	// StartAppHandler sets the operation handler for the start app operation
+	StartAppHandler StartAppHandler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -191,6 +196,9 @@ func (o *MiasmaAPI) Validate() error {
 	}
 	if o.GetHealthCheckHandler == nil {
 		unregistered = append(unregistered, "GetHealthCheckHandler")
+	}
+	if o.StartAppHandler == nil {
+		unregistered = append(unregistered, "StartAppHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -300,6 +308,10 @@ func (o *MiasmaAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/api/health"] = NewGetHealthCheck(o.context, o.GetHealthCheckHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/api/apps/{appName}/start"] = NewStartApp(o.context, o.StartAppHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

@@ -100,11 +100,7 @@ func init() {
         "operationId": "getApp",
         "parameters": [
           {
-            "type": "string",
-            "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",
-            "name": "appName",
-            "in": "path",
-            "required": true
+            "$ref": "#/parameters/appName"
           }
         ],
         "responses": {
@@ -127,11 +123,7 @@ func init() {
         "operationId": "deleteApp",
         "parameters": [
           {
-            "type": "string",
-            "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",
-            "name": "appName",
-            "in": "path",
-            "required": true
+            "$ref": "#/parameters/appName"
           }
         ],
         "responses": {
@@ -152,6 +144,31 @@ func init() {
             "schema": {
               "type": "string"
             }
+          }
+        }
+      }
+    },
+    "/api/apps/{appName}/start": {
+      "post": {
+        "summary": "start the application",
+        "operationId": "startApp",
+        "parameters": [
+          {
+            "$ref": "#/parameters/appName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Started"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/unknown"
           }
         }
       }
@@ -232,6 +249,23 @@ func init() {
           "description": "Miasma's current version",
           "type": "string"
         }
+      }
+    }
+  },
+  "parameters": {
+    "appName": {
+      "type": "string",
+      "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",
+      "name": "appName",
+      "in": "path",
+      "required": true
+    }
+  },
+  "responses": {
+    "unknown": {
+      "description": "Unknown Error",
+      "schema": {
+        "type": "string"
       }
     }
   }
@@ -375,6 +409,38 @@ func init() {
         }
       }
     },
+    "/api/apps/{appName}/start": {
+      "post": {
+        "summary": "start the application",
+        "operationId": "startApp",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",
+            "name": "appName",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Started"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
     "/api/health": {
       "get": {
         "summary": "Standard health check endpoint that checks all the service's statuses",
@@ -473,6 +539,23 @@ func init() {
           "description": "UTC timestamps when the swarm was last updated",
           "type": "string"
         }
+      }
+    }
+  },
+  "parameters": {
+    "appName": {
+      "type": "string",
+      "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",
+      "name": "appName",
+      "in": "path",
+      "required": true
+    }
+  },
+  "responses": {
+    "unknown": {
+      "description": "Unknown Error",
+      "schema": {
+        "type": "string"
       }
     }
   }

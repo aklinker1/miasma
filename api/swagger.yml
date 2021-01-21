@@ -67,11 +67,7 @@ paths:
       summary: Get an application by name
       operationId: getApp
       parameters:
-        - in: path
-          name: appName
-          required: true
-          type: string
-          description: App name from the `-a|--app` flag
+        - $ref: '#/parameters/appName'
       responses:
         200:
           description: OK
@@ -85,11 +81,7 @@ paths:
       summary: Stop and delete an application
       operationId: deleteApp
       parameters:
-        - name: appName
-          in: path
-          required: true
-          type: string
-          description: App name from the `-a|--app` flag
+        - $ref: '#/parameters/appName'
       responses:
         200:
           description: OK
@@ -103,6 +95,34 @@ paths:
           description: Unknown Error
           schema:
             type: string
+  /api/apps/{appName}/start:
+    post:
+      summary: start the application
+      operationId: startApp
+      parameters:
+        - $ref: '#/parameters/appName'
+      responses:
+        200:
+          description: Started
+        404:
+          description: Not Found
+          schema:
+            type: string
+        default:
+          $ref: '#/responses/unknown'
+
+parameters:
+  appName:
+    name: appName
+    in: path
+    required: true
+    type: string
+    description: App name from the `-a|--app` flag
+responses:
+  unknown:
+    description: Unknown Error
+    schema:
+      type: string
 
 definitions:
   Health:
