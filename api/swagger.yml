@@ -104,6 +104,10 @@ paths:
           description: Not Found
           schema:
             type: string
+        default:
+          description: Unknown Error
+          schema:
+            type: string
 
 definitions:
   App:

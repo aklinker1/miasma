@@ -12,7 +12,7 @@ func UseAppsController(api *operations.MiasmaAPI) {
 	api.GetAppsHandler = getApps
 	api.CreateAppHandler = createApp
 	api.GetAppHandler = getApp
-	// api.DeleteAppHandler = deleteApp
+	api.DeleteAppHandler = deleteApp
 }
 
 var getApps = operations.GetAppsHandlerFunc(
@@ -53,7 +53,17 @@ var getApp = operations.GetAppHandlerFunc(
 		return operations.NewGetAppOK().WithPayload(app)
 	})
 
-// var deleteApp = operations.DeleteAppHandlerFunc(
-// 	func(params operations.DeleteAppParams) middleware.Responder {
-// 		return operations.NewDeleteAppOK().WithPayload()
-// 	})
+var deleteApp = operations.DeleteAppHandlerFunc(
+	func(params operations.DeleteAppParams) middleware.Responder {
+		app, _ := services.App.Get(params.AppName)
+		if app == nil {
+			return operations.NewDeleteAppNotFound().WithPayload(fmt.Sprintf("%s does not exist", params.AppName))
+		}
+
+		err := services.App.Delete(app)
+		if err != nil {
+			return operations.NewDeleteAppDefault(500).WithPayload(err.Error())
+		}
+
+		return operations.NewDeleteAppOK().WithPayload(app)
+	})

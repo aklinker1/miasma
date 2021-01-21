@@ -98,3 +98,59 @@ func (o *DeleteAppNotFound) WriteResponse(rw http.ResponseWriter, producer runti
 		panic(err) // let the recovery middleware deal with this
 	}
 }
+
+/*DeleteAppDefault Unknown Error
+
+swagger:response deleteAppDefault
+*/
+type DeleteAppDefault struct {
+	_statusCode int
+
+	/*
+	  In: Body
+	*/
+	Payload string `json:"body,omitempty"`
+}
+
+// NewDeleteAppDefault creates DeleteAppDefault with default headers values
+func NewDeleteAppDefault(code int) *DeleteAppDefault {
+	if code <= 0 {
+		code = 500
+	}
+
+	return &DeleteAppDefault{
+		_statusCode: code,
+	}
+}
+
+// WithStatusCode adds the status to the delete app default response
+func (o *DeleteAppDefault) WithStatusCode(code int) *DeleteAppDefault {
+	o._statusCode = code
+	return o
+}
+
+// SetStatusCode sets the status to the delete app default response
+func (o *DeleteAppDefault) SetStatusCode(code int) {
+	o._statusCode = code
+}
+
+// WithPayload adds the payload to the delete app default response
+func (o *DeleteAppDefault) WithPayload(payload string) *DeleteAppDefault {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the delete app default response
+func (o *DeleteAppDefault) SetPayload(payload string) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *DeleteAppDefault) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(o._statusCode)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
+}

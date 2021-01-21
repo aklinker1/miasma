@@ -97,19 +97,17 @@ func (service *appService) Create(app models.App) (*models.App, error) {
 	return service.Get(*app.Name)
 }
 
-func (service *appService) Delete(appName string) (*models.App, error) {
+func (service *appService) Delete(app *models.App) error {
 	appsDir, err := service.AppsDir()
 	if err != nil {
-		return nil, err
+		return err
 	}
-	appDir := fmt.Sprintf("%s/%s", appsDir, appName)
-	app, err := service.Get(appName)
-	if err != nil {
-		return nil, err
-	}
+
+	appDir := fmt.Sprintf("%s/%s", appsDir, *app.Name)
 	err = os.RemoveAll(appDir)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return app, nil
+
+	return nil
 }

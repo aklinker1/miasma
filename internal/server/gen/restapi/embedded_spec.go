@@ -96,6 +96,7 @@ func init() {
     },
     "/api/apps/{appName}": {
       "get": {
+        "summary": "Get an application by name",
         "operationId": "getApp",
         "parameters": [
           {
@@ -122,6 +123,7 @@ func init() {
         }
       },
       "delete": {
+        "summary": "Stop and delete an application",
         "operationId": "deleteApp",
         "parameters": [
           {
@@ -141,6 +143,12 @@ func init() {
           },
           "404": {
             "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
             "schema": {
               "type": "string"
             }
@@ -275,6 +283,7 @@ func init() {
     },
     "/api/apps/{appName}": {
       "get": {
+        "summary": "Get an application by name",
         "operationId": "getApp",
         "parameters": [
           {
@@ -301,6 +310,7 @@ func init() {
         }
       },
       "delete": {
+        "summary": "Stop and delete an application",
         "operationId": "deleteApp",
         "parameters": [
           {
@@ -320,6 +330,12 @@ func init() {
           },
           "404": {
             "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
             "schema": {
               "type": "string"
             }
