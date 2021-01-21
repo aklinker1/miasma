@@ -16,12 +16,10 @@ The CLI manages a file system structure:
 
 - `apps/`
   - `app-name/`
-    - **`docker-compose.yml`** - Generated file for each swarm command
     - **`meta.yml`** - Used to generate the docker compose before each swarm command, and store all application info
     - **`.env`** - Stores all env variables for the application
 - `plugins/`
   - `plugin-name/`
-    - **`docker-compose.yml`** - Generated file for each swarm command
     - **`meta.yml`** - Contains information about the 
     - **`.env`** - Stores all env variables necessary for a connected application to function
 
@@ -49,7 +47,6 @@ miasma app:create <app-name> --image <registry/image>
 > 
 > - `apps/`
 >   - `app-name/`
->     - **`docker-compose.yml`** - Generated file for each swarm command
 >     - **`meta.yml`** - Used to generate the docker compose before each swarm command, and store all application info
 >     - **`.env`** - Stores all env variables for the application
 > 
