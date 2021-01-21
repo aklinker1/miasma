@@ -31,7 +31,7 @@ func NewCreateApp(ctx *middleware.Context, handler CreateAppHandler) *CreateApp 
 
 /*CreateApp swagger:route POST /api/apps createApp
 
-CreateApp create app API
+Create and start a new application
 
 */
 type CreateApp struct {

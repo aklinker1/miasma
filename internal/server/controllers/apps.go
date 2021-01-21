@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"fmt"
+
 	"github.com/aklinker1/miasma/internal/server/gen/restapi/operations"
 	"github.com/aklinker1/miasma/internal/server/services"
 	"github.com/go-openapi/runtime/middleware"
@@ -8,7 +10,7 @@ import (
 
 func UseAppsController(api *operations.MiasmaAPI) {
 	api.GetAppsHandler = getApps
-	// api.CreateAppHandler = createApp
+	api.CreateAppHandler = createApp
 	api.GetAppHandler = getApp
 	// api.DeleteAppHandler = deleteApp
 }
@@ -23,12 +25,24 @@ var getApps = operations.GetAppsHandlerFunc(
 		return operations.NewGetAppsOK().WithPayload(apps)
 	})
 
-// var createApp = operations.CreateAppHandlerFunc(
-// 	func(params operations.CreateAppParams) middleware.Responder {
-// 		_, err := services.Apps.Get()
+var createApp = operations.CreateAppHandlerFunc(
+	func(params operations.CreateAppParams) middleware.Responder {
+		if params.App == nil {
+			return operations.NewCreateAppBadRequest().WithPayload("Request body is required")
+		}
+		inputApp := *params.App
+		existingApp, _ := services.App.Get(*inputApp.Name)
+		if existingApp != nil {
+			return operations.NewCreateAppBadRequest().WithPayload(fmt.Sprintf("%s already exists", *inputApp.Name))
+		}
 
-// 		return *operations.NewCreateAppCreated().WithPayload(app)
-// 	})
+		newApp, err := services.App.Create(inputApp)
+		if err != nil {
+			return operations.NewCreateAppDefault(500).WithPayload(err.Error())
+		}
+
+		return operations.NewCreateAppCreated().WithPayload(newApp)
+	})
 
 var getApp = operations.GetAppHandlerFunc(
 	func(params operations.GetAppParams) middleware.Responder {

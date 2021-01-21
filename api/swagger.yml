@@ -47,14 +47,29 @@ paths:
           schema:
             type: string
     post:
+      summary: Create and start a new application
       operationId: createApp
+      parameters:
+        - in: body
+          name: app
+          schema:
+            $ref: '#/definitions/App'
       responses:
         201:
           description: Created
           schema:
             $ref: '#/definitions/App'
+        400:
+          description: Bad Request
+          schema:
+            type: string
+        default:
+          description: Unknown Error
+          schema:
+            type: string
   /api/apps/{appName}:
     get:
+      summary: Get an application by name
       operationId: getApp
       parameters:
         - in: path
@@ -72,6 +87,7 @@ paths:
           schema:
             type: string
     delete:
+      summary: Stop and delete an application
       operationId: deleteApp
       parameters:
         - name: appName
@@ -101,7 +117,7 @@ definitions:
         description: The image the app is based off of
       hidden:
         type: boolean
-        description: Wether or not the app is hidden during regular requests
+        description: Whether or not the app is hidden during regular requests
     required:
       - name
       - image

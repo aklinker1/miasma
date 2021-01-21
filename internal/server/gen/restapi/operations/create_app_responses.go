@@ -56,3 +56,101 @@ func (o *CreateAppCreated) WriteResponse(rw http.ResponseWriter, producer runtim
 		}
 	}
 }
+
+// CreateAppBadRequestCode is the HTTP code returned for type CreateAppBadRequest
+const CreateAppBadRequestCode int = 400
+
+/*CreateAppBadRequest Bad Request
+
+swagger:response createAppBadRequest
+*/
+type CreateAppBadRequest struct {
+
+	/*
+	  In: Body
+	*/
+	Payload string `json:"body,omitempty"`
+}
+
+// NewCreateAppBadRequest creates CreateAppBadRequest with default headers values
+func NewCreateAppBadRequest() *CreateAppBadRequest {
+
+	return &CreateAppBadRequest{}
+}
+
+// WithPayload adds the payload to the create app bad request response
+func (o *CreateAppBadRequest) WithPayload(payload string) *CreateAppBadRequest {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the create app bad request response
+func (o *CreateAppBadRequest) SetPayload(payload string) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *CreateAppBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(400)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
+}
+
+/*CreateAppDefault Unknown Error
+
+swagger:response createAppDefault
+*/
+type CreateAppDefault struct {
+	_statusCode int
+
+	/*
+	  In: Body
+	*/
+	Payload string `json:"body,omitempty"`
+}
+
+// NewCreateAppDefault creates CreateAppDefault with default headers values
+func NewCreateAppDefault(code int) *CreateAppDefault {
+	if code <= 0 {
+		code = 500
+	}
+
+	return &CreateAppDefault{
+		_statusCode: code,
+	}
+}
+
+// WithStatusCode adds the status to the create app default response
+func (o *CreateAppDefault) WithStatusCode(code int) *CreateAppDefault {
+	o._statusCode = code
+	return o
+}
+
+// SetStatusCode sets the status to the create app default response
+func (o *CreateAppDefault) SetStatusCode(code int) {
+	o._statusCode = code
+}
+
+// WithPayload adds the payload to the create app default response
+func (o *CreateAppDefault) WithPayload(payload string) *CreateAppDefault {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the create app default response
+func (o *CreateAppDefault) SetPayload(payload string) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *CreateAppDefault) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(o._statusCode)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
+}

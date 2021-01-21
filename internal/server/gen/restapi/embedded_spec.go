@@ -61,12 +61,34 @@ func init() {
         }
       },
       "post": {
+        "summary": "Create and start a new application",
         "operationId": "createApp",
+        "parameters": [
+          {
+            "name": "app",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/App"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "Created",
             "schema": {
               "$ref": "#/definitions/App"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
             }
           }
         }
@@ -159,7 +181,7 @@ func init() {
       ],
       "properties": {
         "hidden": {
-          "description": "Wether or not the app is hidden during regular requests",
+          "description": "Whether or not the app is hidden during regular requests",
           "type": "boolean"
         },
         "image": {
@@ -218,12 +240,34 @@ func init() {
         }
       },
       "post": {
+        "summary": "Create and start a new application",
         "operationId": "createApp",
+        "parameters": [
+          {
+            "name": "app",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/App"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "Created",
             "schema": {
               "$ref": "#/definitions/App"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
             }
           }
         }
@@ -316,7 +360,7 @@ func init() {
       ],
       "properties": {
         "hidden": {
-          "description": "Wether or not the app is hidden during regular requests",
+          "description": "Whether or not the app is hidden during regular requests",
           "type": "boolean"
         },
         "image": {

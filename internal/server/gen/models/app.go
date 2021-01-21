@@ -17,7 +17,7 @@ import (
 // swagger:model App
 type App struct {
 
-	// Wether or not the app is hidden during regular requests
+	// Whether or not the app is hidden during regular requests
 	Hidden bool `json:"hidden,omitempty"`
 
 	// The image the app is based off of

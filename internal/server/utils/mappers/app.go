@@ -16,3 +16,10 @@ func (a *app) FromMeta(appName string, meta *types.AppMetaData) *models.App {
 		Hidden: meta.Hidden != nil && *meta.Hidden,
 	}
 }
+
+func (a *app) ToMeta(app *models.App) *types.AppMetaData {
+	return &types.AppMetaData{
+		Image:  app.Image,
+		Hidden: &app.Hidden,
+	}
+}

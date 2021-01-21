@@ -22,7 +22,7 @@ func (service *appService) AppsDir() (dir string, err error) {
 	dir = "/data/miasma/apps"
 	if exists, _ := Files.dirExists(dir); !exists {
 		// https://stackoverflow.com/questions/14249467/os-mkdir-and-os-mkdirall-permission-value
-		err = os.MkdirAll(dir, 0777)
+		err = os.MkdirAll(dir, 0755)
 	}
 	return dir, err
 }
@@ -72,4 +72,44 @@ func (service *appService) GetAll(showHidden bool) ([]*models.App, error) {
 		}
 	}
 	return result, nil
+}
+
+func (service *appService) Create(app models.App) (*models.App, error) {
+	appsDir, err := service.AppsDir()
+	if err != nil {
+		return nil, err
+	}
+	appDir := fmt.Sprintf("%s/%s", appsDir, *app.Name)
+	err = os.MkdirAll(appDir, 0755)
+	if err != nil {
+		return nil, err
+	}
+	metaPath := fmt.Sprintf("%s/meta.yml", appDir)
+	metaData, err := yaml.Marshal(mappers.App.ToMeta(&app))
+	if err != nil {
+		return nil, err
+	}
+	err = ioutil.WriteFile(metaPath, metaData, 0755)
+	if err != nil {
+		return nil, err
+	}
+
+	return service.Get(*app.Name)
+}
+
+func (service *appService) Delete(appName string) (*models.App, error) {
+	appsDir, err := service.AppsDir()
+	if err != nil {
+		return nil, err
+	}
+	appDir := fmt.Sprintf("%s/%s", appsDir, appName)
+	app, err := service.Get(appName)
+	if err != nil {
+		return nil, err
+	}
+	err = os.RemoveAll(appDir)
+	if err != nil {
+		return nil, err
+	}
+	return app, nil
 }
