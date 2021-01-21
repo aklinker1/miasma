@@ -27,6 +27,10 @@ type App struct {
 	// The apps name, used in the CLI with the `-a|--app` flag
 	// Required: true
 	Name *string `json:"name"`
+
+	// running
+	// Required: true
+	Running *bool `json:"running"`
 }
 
 // Validate validates this app
@@ -38,6 +42,10 @@ func (m *App) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateName(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateRunning(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -59,6 +67,15 @@ func (m *App) validateImage(formats strfmt.Registry) error {
 func (m *App) validateName(formats strfmt.Registry) error {
 
 	if err := validate.Required("name", "body", m.Name); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *App) validateRunning(formats strfmt.Registry) error {
+
+	if err := validate.Required("running", "body", m.Running); err != nil {
 		return err
 	}
 

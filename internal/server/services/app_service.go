@@ -48,7 +48,7 @@ func (service *appService) Get(appName string) (*models.App, error) {
 		return nil, err
 	}
 
-	return mappers.App.FromMeta(appName, metaYml), err
+	return mappers.App.FromMeta(appName, metaYml, Docker.IsAppServiceRunning(appName)), err
 }
 
 func (service *appService) GetAll(showHidden bool) ([]*models.App, error) {

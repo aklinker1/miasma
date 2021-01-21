@@ -183,6 +183,9 @@ definitions:
       hidden:
         type: boolean
         description: Whether or not the app is hidden during regular requests
+      running:
+        type: boolean
     required:
       - name
       - image
+      - running

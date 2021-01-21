@@ -11,11 +11,12 @@ type app struct{}
 
 var App = &app{}
 
-func (a *app) FromMeta(appName string, meta *types.AppMetaData) *models.App {
+func (a *app) FromMeta(appName string, meta *types.AppMetaData, isRunning bool) *models.App {
 	return &models.App{
-		Name:   &appName,
-		Image:  meta.Image,
-		Hidden: meta.Hidden != nil && *meta.Hidden,
+		Name:    &appName,
+		Image:   meta.Image,
+		Hidden:  meta.Hidden != nil && *meta.Hidden,
+		Running: &isRunning,
 	}
 }
 

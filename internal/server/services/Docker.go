@@ -66,6 +66,11 @@ func (service *dockerService) GetRunningService(appName string) (*dockerSwarmTyp
 	return nil, fmt.Errorf("%s is not running", appName)
 }
 
+func (service *dockerService) IsAppServiceRunning(appName string) bool {
+	runningService, _ := service.GetRunningService(appName)
+	return runningService != nil
+}
+
 func (service *dockerService) StartApp(app *models.App) error {
 	existingService, _ := service.GetRunningService(*app.Name)
 	if existingService != nil {

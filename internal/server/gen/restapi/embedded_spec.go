@@ -219,7 +219,8 @@ func init() {
       "type": "object",
       "required": [
         "name",
-        "image"
+        "image",
+        "running"
       ],
       "properties": {
         "hidden": {
@@ -233,6 +234,9 @@ func init() {
         "name": {
           "description": "The apps name, used in the CLI with the ` + "`" + `-a|--app` + "`" + ` flag",
           "type": "string"
+        },
+        "running": {
+          "type": "boolean"
         }
       }
     },
@@ -519,7 +523,8 @@ func init() {
       "type": "object",
       "required": [
         "name",
-        "image"
+        "image",
+        "running"
       ],
       "properties": {
         "hidden": {
@@ -533,6 +538,9 @@ func init() {
         "name": {
           "description": "The apps name, used in the CLI with the ` + "`" + `-a|--app` + "`" + ` flag",
           "type": "string"
+        },
+        "running": {
+          "type": "boolean"
         }
       }
     },
