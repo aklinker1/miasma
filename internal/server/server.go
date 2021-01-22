@@ -8,7 +8,7 @@ import (
 	"github.com/aklinker1/miasma/internal/server/controllers"
 	"github.com/aklinker1/miasma/internal/server/gen/restapi"
 	"github.com/aklinker1/miasma/internal/server/gen/restapi/operations"
-	"github.com/aklinker1/miasma/internal/server/utils/log"
+	"github.com/aklinker1/miasma/internal/shared/log"
 )
 
 func Start() {

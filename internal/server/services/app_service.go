@@ -8,6 +8,7 @@ import (
 	"github.com/aklinker1/miasma/internal/server/gen/models"
 	"github.com/aklinker1/miasma/internal/server/utils/mappers"
 	"github.com/aklinker1/miasma/internal/server/utils/types"
+	"github.com/aklinker1/miasma/internal/shared/log"
 
 	"gopkg.in/yaml.v2"
 )

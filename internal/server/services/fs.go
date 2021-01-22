@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/aklinker1/miasma/internal/server/utils/log"
+	"github.com/aklinker1/miasma/internal/shared/log"
 )
 
 type fileService struct{}

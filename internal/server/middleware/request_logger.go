@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/aklinker1/miasma/internal/server/utils/env"
-	"github.com/aklinker1/miasma/internal/server/utils/log"
+	"github.com/aklinker1/miasma/internal/shared/log"
 )
 
 type StatusRecorder struct {

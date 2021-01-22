@@ -10,8 +10,8 @@ import (
 	dockerSwarmTypes "docker.io/go-docker/api/types/swarm"
 
 	"github.com/aklinker1/miasma/internal/server/gen/models"
-	"github.com/aklinker1/miasma/internal/server/utils/log"
 	"github.com/aklinker1/miasma/internal/server/utils/mappers"
+	"github.com/aklinker1/miasma/internal/shared/log"
 )
 
 type dockerService struct{}

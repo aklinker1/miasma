@@ -28,6 +28,7 @@ RUN go mod download
 COPY meta.json .
 COPY .git ./.git
 COPY cmd/server ./cmd/server
+COPY internal/shared ./internal/shared
 COPY internal/server ./internal/server
 RUN \
   VERSION="$(jq -r .version meta.json)-$(TZ=UTC git --no-pager show --quiet --abbrev=12 --date='format-local:%Y%m%d%H%M%S' --format='%cd-%h')" ;\
