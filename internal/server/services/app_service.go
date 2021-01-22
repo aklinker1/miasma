@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/aklinker1/miasma/internal/server/gen/models"
 	"github.com/aklinker1/miasma/internal/server/utils/mappers"
@@ -33,11 +34,7 @@ func (service *appService) Get(appName string) (*models.App, error) {
 	if err != nil {
 		return nil, err
 	}
-	appDir := fmt.Sprintf("%s/%s", appsDir, appName)
-	if exists, _ := Files.dirExists(appDir); !exists {
-		return nil, fmt.Errorf("%s is not an application. Have you ran `miasma app:create %s`?", appName, appName)
-	}
-	metaFilePath := fmt.Sprintf("%s/%s", appDir, "meta.yml")
+	metaFilePath := fmt.Sprintf("%s/%s.yml", appsDir, appName)
 
 	metaFile, err := ioutil.ReadFile(metaFilePath)
 	if err != nil {
@@ -57,14 +54,16 @@ func (service *appService) GetAll(showHidden bool) ([]*models.App, error) {
 	if err != nil {
 		return nil, err
 	}
-	appDirs, err := ioutil.ReadDir(appsDir)
+	metaFiles, err := ioutil.ReadDir(appsDir)
 	if err != nil {
 		return nil, err
 	}
 
 	result := []*models.App{}
-	for _, appDir := range appDirs {
-		app, err := service.Get(appDir.Name())
+	for _, metaFile := range metaFiles {
+		appName := strings.Replace(metaFile.Name(), ".yml", "", 1)
+		log.V("%s > %s", metaFile.Name(), appName)
+		app, err := service.Get(appName)
 		if err != nil {
 			return nil, err
 		}
@@ -80,12 +79,7 @@ func (service *appService) Create(app models.AppInput) (*models.App, error) {
 	if err != nil {
 		return nil, err
 	}
-	appDir := fmt.Sprintf("%s/%s", appsDir, *app.Name)
-	err = os.MkdirAll(appDir, 0755)
-	if err != nil {
-		return nil, err
-	}
-	metaPath := fmt.Sprintf("%s/meta.yml", appDir)
+	metaPath := fmt.Sprintf("%s/%s.yml", appsDir, *app.Name)
 	metaData, err := yaml.Marshal(mappers.App.ToMeta(&app))
 	if err != nil {
 		return nil, err
@@ -104,8 +98,8 @@ func (service *appService) Delete(app *models.App) error {
 		return err
 	}
 
-	appDir := fmt.Sprintf("%s/%s", appsDir, *app.Name)
-	err = os.RemoveAll(appDir)
+	metaPath := fmt.Sprintf("%s/%s.yml", appsDir, *app.Name)
+	err = os.RemoveAll(metaPath)
 	if err != nil {
 		return err
 	}
