@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	dockerLib "docker.io/go-docker"
@@ -12,6 +11,7 @@ import (
 
 	"github.com/aklinker1/miasma/internal/server/gen/models"
 	"github.com/aklinker1/miasma/internal/server/utils/mappers"
+	"github.com/aklinker1/miasma/internal/server/utils/types"
 	"github.com/aklinker1/miasma/internal/shared/log"
 )
 
@@ -72,12 +72,12 @@ func (service *dockerService) IsAppServiceRunning(appName string) bool {
 	return runningService != nil
 }
 
-func (service *dockerService) StartApp(app *models.App) error {
-	existingService, _ := service.GetRunningService(*app.Name)
+func (service *dockerService) StartApp(app *types.AppMetaData) error {
+	existingService, _ := service.GetRunningService(app.Name)
 	if existingService != nil {
-		return fmt.Errorf("%s is already running", *app.Name)
+		return fmt.Errorf("%s is already running", app.Name)
 	}
-	newService, err := mappers.App.ToService(app, service.GetNextAvailablePort)
+	newService, err := mappers.App.ToService(app, service.GetNextAvailablePorts)
 	if err != nil {
 		return err
 	}
@@ -99,10 +99,10 @@ func (service *dockerService) StopApp(app *models.App) error {
 	return docker.ServiceRemove(ctx, runningService.ID)
 }
 
-func (service *dockerService) GetNextAvailablePort() (uint32, error) {
+func (service *dockerService) GetNextAvailablePorts(count int) ([]uint32, error) {
 	services, err := docker.ServiceList(ctx, dockerTypes.ServiceListOptions{})
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	filledPorts := map[uint32]bool{}
 	for _, service := range services {
@@ -110,11 +110,15 @@ func (service *dockerService) GetNextAvailablePort() (uint32, error) {
 			filledPorts[port.PublishedPort] = true
 		}
 	}
+	results := []uint32{}
 	var port uint32
-	for port = 3001; port <= 4000; port++ {
+	for port = 3001; port <= 4000 && len(results) < count; port++ {
 		if _, ok := filledPorts[port]; !ok {
-			return port, nil
+			results = append(results, port)
 		}
 	}
-	return 0, errors.New("No ports available (999 ports are taken)")
+	if len(results) < count {
+		return nil, fmt.Errorf("Not enough available ports to start the service (required=%d, available=%d)", count, len(results))
+	}
+	return results, nil
 }

@@ -73,7 +73,7 @@ var deleteApp = operations.DeleteAppHandlerFunc(
 
 var startApp = operations.StartAppHandlerFunc(
 	func(params operations.StartAppParams) middleware.Responder {
-		app, _ := services.App.Get(params.AppName)
+		app, _ := services.App.GetAppMeta(params.AppName)
 		if app == nil {
 			return operations.NewStartAppNotFound().WithPayload(fmt.Sprintf("%s does not exist", params.AppName))
 		}

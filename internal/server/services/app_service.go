@@ -45,6 +45,7 @@ func (service *appService) GetAppMeta(appName string) (*types.AppMetaData, error
 	if err := yaml.Unmarshal(metaFile, metaYml); err != nil {
 		return nil, err
 	}
+	metaYml.Name = appName
 	return metaYml, nil
 }
 
