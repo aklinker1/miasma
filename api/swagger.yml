@@ -48,7 +48,7 @@ paths:
         - in: body
           name: app
           schema:
-            $ref: '#/definitions/App'
+            $ref: '#/definitions/AppInput'
       responses:
         201:
           description: Created
@@ -189,3 +189,18 @@ definitions:
       - name
       - image
       - running
+  AppInput:
+    type: object
+    properties:
+      name:
+        type: string
+        description: The apps name, used in the CLI with the `-a|--app` flag
+      image:
+        type: string
+        description: The image the app is based off of
+      hidden:
+        type: boolean
+        description: Whether or not the app is hidden during regular requests
+    required:
+      - name
+      - image

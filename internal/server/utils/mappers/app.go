@@ -20,7 +20,7 @@ func (a *app) FromMeta(appName string, meta *types.AppMetaData, isRunning bool) 
 	}
 }
 
-func (a *app) ToMeta(app *models.App) *types.AppMetaData {
+func (a *app) ToMeta(app *models.AppInput) *types.AppMetaData {
 	return &types.AppMetaData{
 		Image:  app.Image,
 		Hidden: &app.Hidden,

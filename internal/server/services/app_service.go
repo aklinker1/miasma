@@ -74,7 +74,7 @@ func (service *appService) GetAll(showHidden bool) ([]*models.App, error) {
 	return result, nil
 }
 
-func (service *appService) Create(app models.App) (*models.App, error) {
+func (service *appService) Create(app models.AppInput) (*models.App, error) {
 	appsDir, err := service.AppsDir()
 	if err != nil {
 		return nil, err

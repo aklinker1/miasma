@@ -68,7 +68,7 @@ func init() {
             "name": "app",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/App"
+              "$ref": "#/definitions/AppInput"
             }
           }
         ],
@@ -237,6 +237,27 @@ func init() {
         },
         "running": {
           "type": "boolean"
+        }
+      }
+    },
+    "AppInput": {
+      "type": "object",
+      "required": [
+        "name",
+        "image"
+      ],
+      "properties": {
+        "hidden": {
+          "description": "Whether or not the app is hidden during regular requests",
+          "type": "boolean"
+        },
+        "image": {
+          "description": "The image the app is based off of",
+          "type": "string"
+        },
+        "name": {
+          "description": "The apps name, used in the CLI with the ` + "`" + `-a|--app` + "`" + ` flag",
+          "type": "string"
         }
       }
     },
@@ -350,7 +371,7 @@ func init() {
             "name": "app",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/App"
+              "$ref": "#/definitions/AppInput"
             }
           }
         ],
@@ -541,6 +562,27 @@ func init() {
         },
         "running": {
           "type": "boolean"
+        }
+      }
+    },
+    "AppInput": {
+      "type": "object",
+      "required": [
+        "name",
+        "image"
+      ],
+      "properties": {
+        "hidden": {
+          "description": "Whether or not the app is hidden during regular requests",
+          "type": "boolean"
+        },
+        "image": {
+          "description": "The image the app is based off of",
+          "type": "string"
+        },
+        "name": {
+          "description": "The apps name, used in the CLI with the ` + "`" + `-a|--app` + "`" + ` flag",
+          "type": "string"
         }
       }
     },

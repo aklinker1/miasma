@@ -34,7 +34,7 @@ type CreateAppParams struct {
 	/*
 	  In: body
 	*/
-	App *models.App
+	App *models.AppInput
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -48,7 +48,7 @@ func (o *CreateAppParams) BindRequest(r *http.Request, route *middleware.Matched
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body models.App
+		var body models.AppInput
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("app", "body", "", err))
 		} else {

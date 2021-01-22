@@ -23,89 +23,101 @@ The CLI manages a file system structure:
     - **`meta.yml`** - Contains information about the 
     - **`.env`** - Stores all env variables necessary for a connected application to function
 
-## `app`
+## `apps`
 
-Manage applications running on the swarm
+Applications management
 
-### `app:list`
+### `apps`
 
 List applications
 
 ```
-miasma app:list
+miasma apps
 ```
 
-### `app:create`
+### `apps:create`
 
 Create an app for a given image
 
 ```
-miasma app:create <app-name> --image <registry/image>
+miasma apps:create <app-name> -i|--image <registry/image:tag>
 ```
 
-> Generates the following data structure, then executes the docker-compose file:
-> 
-> - `apps/`
->   - `app-name/`
->     - **`meta.yml`** - Used to generate the docker compose before each swarm command, and store all application info
->     - **`.env`** - Stores all env variables for the application
-> 
+### `apps:update`
 
-### `app:update`
-
-Pulls and deploys the `:miasma` tag for the app's image
+Pulls and deploys the tag for the app's image
 
 ```
-miasma app:update <app-name>
+miasma apps:update <app-name>
 ```
 
-### `app:destroy`
+### `apps:configure`
 
-Destroy the application. Not recoverable.
+Configure the application's deployment information
+
+```
+miasma apps:configure <app-name> [...flags]
+```
+
+- `-h|--hide <true|false>`: Set if the application is hidden
+- `-n|--networks <app-name,plugin-name,...>`: Update the list networks the application has access to. Each application/plugin gets their own network with the same name.
+- `-p|--placement <labelName=value,otherKey=otherValue>`: Comma separated list of all placement rules for what node the application goes on
+
+### `apps:destroy`
+
+Destroy the application
 
 ```bash
-miasma app:destroy <app-name>
+miasma apps:destroy <app-name>
 ```
 
-> This kills the service in docker and moves the compose file to the trash
-
-### `app:hide`
-
-Hide's the application from all the lists and the dashboard.
-
-```bash
-miasma app:hide <app-name>
-```
+> This operation cannot be undone
 
 ## `env`
 
-Manage the environment variables for the application
+Environment variable management
+
+### `env`
+
+List an application's environment variables
+
+```bash
+miasma env -a|--app <app-name>
+```
+
+### `env:edit`
+
+Open your `editor` for an interactive way of updating an app's environment variables
+
+```bash
+miasma env:edit -a|--app <app-name>
+```
 
 ### `env:set`
 
+Set environment variables for an app without using an editor
+
 ```bash
-miasma env:set -a|--app <app-name> <ENV_VAR>=<ENV_VALUE>
+miasma env:set -a|--app <app-name> <key1=value1> <key2=value2> ...
 ```
 
 ### `env:remove`
 
-```bash
-miasma env:remove -a|--app <app-name> <ENV_VAR>
-```
-
-### `env:list`
+Remove environment variables from an app
 
 ```bash
-miasma env:list -a|--app <app-name>
+miasma env:remove -a|--app <app-name> <key1> <key2> ...
 ```
 
 ## `plugin`
 
 Manage plugins tied to given applications. Plugins provide additional access to resources such as `PostgreSQL` and `MongoDB`.
 
+> Plugins are just special apps. Custom plugins can be created by simply modifying application config, and putting them on the same network
+
 ### `plugin:install`
 
-Install a plugin for use.
+Install one of the bundled plugins
 
 ```bash
 miasma plugin:remove <plugin-name>
@@ -113,18 +125,18 @@ miasma plugin:remove <plugin-name>
 
 ### `plugin:add`
 
-Add a plugin to link the application to another resource.
+Give an application access to a plugin
 
 ```bash
-miasma plugin:add -a|--app <app-name> <postgres|mongo> <plugin-name>
+miasma plugin:add <postgres|mongo> -a|--app <app-name>
 ```
 
 > Simply add the application to the the plugin's network
 
 ### `plugin:remove`
 
-Remove a plugin from an application
+Remove an application's access from a plugin
 
 ```bash
-miasma plugin:remove -a|--app <app-name> <plugin-name>
+miasma plugin:remove <plugin-name> -a|--app <app-name>
 ```
