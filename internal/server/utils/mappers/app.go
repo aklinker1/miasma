@@ -26,8 +26,20 @@ func (a *app) FromMeta(appName string, meta *types.AppMetaData, isRunning bool) 
 
 func (a *app) ToMeta(app *models.AppInput) *types.AppMetaData {
 	return &types.AppMetaData{
-		Image:  app.Image,
-		Hidden: &app.Hidden,
+		Image:       app.Image,
+		Hidden:      &app.Hidden,
+		TargetPorts: []uint32{},
+		Networks:    []string{},
+		Plugins:     []string{},
+		Env:         map[string]string{},
+	}
+}
+
+func (a *app) ToConfig(app *types.AppMetaData) *models.AppConfig {
+	return &models.AppConfig{
+		TargetPorts: shared.ConvertUInt32ArrayToInt64Array(app.TargetPorts),
+		// Networks: ,
+		// Plugins: ,
 	}
 }
 

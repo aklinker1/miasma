@@ -148,6 +148,37 @@ func init() {
         }
       }
     },
+    "/api/apps/{appName}/config": {
+      "get": {
+        "summary": "get application's current configuration",
+        "operationId": "getAppConfig",
+        "parameters": [
+          {
+            "$ref": "#/parameters/appName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AppConfig"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
     "/api/apps/{appName}/start": {
       "post": {
         "summary": "start the application",
@@ -237,6 +268,22 @@ func init() {
         },
         "running": {
           "type": "boolean"
+        }
+      }
+    },
+    "AppConfig": {
+      "type": "object",
+      "required": [
+        "targetPorts"
+      ],
+      "properties": {
+        "targetPorts": {
+          "description": "The ports that the application is listening to inside the container. If this list is empty, then the container should respect the ` + "`" + `PORT` + "`" + ` env var. Miasma manages the published ports for each port listed here.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer"
+          }
         }
       }
     },
@@ -459,6 +506,41 @@ func init() {
         }
       }
     },
+    "/api/apps/{appName}/config": {
+      "get": {
+        "summary": "get application's current configuration",
+        "operationId": "getAppConfig",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",
+            "name": "appName",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AppConfig"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
     "/api/apps/{appName}/start": {
       "post": {
         "summary": "start the application",
@@ -562,6 +644,22 @@ func init() {
         },
         "running": {
           "type": "boolean"
+        }
+      }
+    },
+    "AppConfig": {
+      "type": "object",
+      "required": [
+        "targetPorts"
+      ],
+      "properties": {
+        "targetPorts": {
+          "description": "The ports that the application is listening to inside the container. If this list is empty, then the container should respect the ` + "`" + `PORT` + "`" + ` env var. Miasma manages the published ports for each port listed here.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer"
+          }
         }
       }
     },

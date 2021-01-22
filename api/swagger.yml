@@ -125,6 +125,26 @@ paths:
             type: string
         default:
           $ref: '#/responses/unknown'
+  /api/apps/{appName}/config:
+    get:
+      summary: get application's current configuration
+      operationId: getAppConfig
+      parameters:
+        - $ref: '#/parameters/appName'
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/AppConfig'
+        404:
+          description: Not Found
+          schema:
+            type: string
+        default:
+          description: Unknown Error
+          schema:
+            type: string
+    # put:
 
 parameters:
   appName:
@@ -204,3 +224,17 @@ definitions:
     required:
       - name
       - image
+  AppConfig:
+    type: object
+    properties:
+      targetPorts:
+        description: 
+          The ports that the application is listening to inside the container. If this list is
+          empty, then the container should respect the `PORT` env var. Miasma manages the published
+          ports for each port listed here. 
+        type: array
+        items:
+          type: integer
+        uniqueItems: true
+    required:
+      - targetPorts

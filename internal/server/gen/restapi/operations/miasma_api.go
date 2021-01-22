@@ -51,6 +51,9 @@ func NewMiasmaAPI(spec *loads.Document) *MiasmaAPI {
 		GetAppHandler: GetAppHandlerFunc(func(params GetAppParams) middleware.Responder {
 			return middleware.NotImplemented("operation GetApp has not yet been implemented")
 		}),
+		GetAppConfigHandler: GetAppConfigHandlerFunc(func(params GetAppConfigParams) middleware.Responder {
+			return middleware.NotImplemented("operation GetAppConfig has not yet been implemented")
+		}),
 		GetAppsHandler: GetAppsHandlerFunc(func(params GetAppsParams) middleware.Responder {
 			return middleware.NotImplemented("operation GetApps has not yet been implemented")
 		}),
@@ -103,6 +106,8 @@ type MiasmaAPI struct {
 	DeleteAppHandler DeleteAppHandler
 	// GetAppHandler sets the operation handler for the get app operation
 	GetAppHandler GetAppHandler
+	// GetAppConfigHandler sets the operation handler for the get app config operation
+	GetAppConfigHandler GetAppConfigHandler
 	// GetAppsHandler sets the operation handler for the get apps operation
 	GetAppsHandler GetAppsHandler
 	// GetHealthCheckHandler sets the operation handler for the get health check operation
@@ -195,6 +200,9 @@ func (o *MiasmaAPI) Validate() error {
 	}
 	if o.GetAppHandler == nil {
 		unregistered = append(unregistered, "GetAppHandler")
+	}
+	if o.GetAppConfigHandler == nil {
+		unregistered = append(unregistered, "GetAppConfigHandler")
 	}
 	if o.GetAppsHandler == nil {
 		unregistered = append(unregistered, "GetAppsHandler")
@@ -308,6 +316,10 @@ func (o *MiasmaAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/api/apps/{appName}"] = NewGetApp(o.context, o.GetAppHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/api/apps/{appName}/config"] = NewGetAppConfig(o.context, o.GetAppConfigHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

@@ -29,7 +29,7 @@ func (service *appService) AppsDir() (dir string, err error) {
 	return dir, err
 }
 
-func (service *appService) Get(appName string) (*models.App, error) {
+func (service *appService) GetAppMeta(appName string) (*types.AppMetaData, error) {
 	appsDir, err := service.AppsDir()
 	if err != nil {
 		return nil, err
@@ -45,8 +45,15 @@ func (service *appService) Get(appName string) (*models.App, error) {
 	if err := yaml.Unmarshal(metaFile, metaYml); err != nil {
 		return nil, err
 	}
+	return metaYml, nil
+}
 
-	return mappers.App.FromMeta(appName, metaYml, Docker.IsAppServiceRunning(appName)), err
+func (service *appService) Get(appName string) (*models.App, error) {
+	metaYml, err := service.GetAppMeta(appName)
+	if err != nil {
+		return nil, err
+	}
+	return mappers.App.FromMeta(appName, metaYml, Docker.IsAppServiceRunning(appName)), nil
 }
 
 func (service *appService) GetAll(showHidden bool) ([]*models.App, error) {
@@ -112,4 +119,12 @@ func (service *appService) Delete(app *models.App) error {
 	}
 
 	return nil
+}
+
+func (service *appService) GetConfig(appName string) (*models.AppConfig, error) {
+	metaYml, err := service.GetAppMeta(appName)
+	if err != nil {
+		return nil, err
+	}
+	return mappers.App.ToConfig(metaYml), nil
 }
