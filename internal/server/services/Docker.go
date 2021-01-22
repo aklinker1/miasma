@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	dockerLib "docker.io/go-docker"
@@ -76,11 +77,14 @@ func (service *dockerService) StartApp(app *models.App) error {
 	if existingService != nil {
 		return fmt.Errorf("%s is already running", *app.Name)
 	}
-	newService := mappers.App.ToService(app)
+	newService, err := mappers.App.ToService(app, service.GetNextAvailablePort)
+	if err != nil {
+		return err
+	}
 	options := dockerTypes.ServiceCreateOptions{
 		QueryRegistry: true,
 	}
-	_, err := docker.ServiceCreate(ctx, *newService, options)
+	_, err = docker.ServiceCreate(ctx, *newService, options)
 	if err != nil {
 		return err
 	}
@@ -93,4 +97,24 @@ func (service *dockerService) StopApp(app *models.App) error {
 		return err
 	}
 	return docker.ServiceRemove(ctx, runningService.ID)
+}
+
+func (service *dockerService) GetNextAvailablePort() (uint32, error) {
+	services, err := docker.ServiceList(ctx, dockerTypes.ServiceListOptions{})
+	if err != nil {
+		return 0, err
+	}
+	filledPorts := map[uint32]bool{}
+	for _, service := range services {
+		for _, port := range service.Endpoint.Ports {
+			filledPorts[port.PublishedPort] = true
+		}
+	}
+	var port uint32
+	for port = 3001; port <= 4000; port++ {
+		if _, ok := filledPorts[port]; !ok {
+			return port, nil
+		}
+	}
+	return 0, errors.New("No ports available (999 ports are taken)")
 }
