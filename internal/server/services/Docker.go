@@ -10,6 +10,7 @@ import (
 	dockerSwarmTypes "docker.io/go-docker/api/types/swarm"
 
 	"github.com/aklinker1/miasma/internal/server/gen/models"
+	"github.com/aklinker1/miasma/internal/server/utils/log"
 	"github.com/aklinker1/miasma/internal/server/utils/mappers"
 )
 
@@ -18,7 +19,6 @@ type dockerService struct{}
 var Docker = &dockerService{}
 
 var docker *dockerLib.Client
-var swarm *dockerLib.SwarmAPIClient
 var ctx = context.Background()
 
 func init() {
@@ -32,7 +32,7 @@ func init() {
 func (service *dockerService) Version() *string {
 	version, err := docker.ServerVersion(ctx)
 	if err != nil {
-		fmt.Println(err)
+		log.E("%v", err)
 		return nil
 	}
 	versionString := fmt.Sprintf("%s-%s", version.Version, version.GitCommit)
@@ -42,7 +42,7 @@ func (service *dockerService) Version() *string {
 func (service *dockerService) SwarmInfo() *dockerSwarmTypes.Swarm {
 	swarmInfo, err := docker.SwarmInspect(ctx)
 	if err != nil {
-		fmt.Println(err)
+		log.E("%v", err)
 		return nil
 	}
 	return &swarmInfo

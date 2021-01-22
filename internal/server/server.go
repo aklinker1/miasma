@@ -2,24 +2,25 @@ package server
 
 import (
 	"flag"
-	"log"
 
 	"github.com/go-openapi/loads"
 
 	"github.com/aklinker1/miasma/internal/server/controllers"
 	"github.com/aklinker1/miasma/internal/server/gen/restapi"
 	"github.com/aklinker1/miasma/internal/server/gen/restapi/operations"
+	"github.com/aklinker1/miasma/internal/server/utils/log"
 )
 
 func Start() {
 	// Load embedded swagger file
 	swaggerSpec, err := loads.Analyzed(restapi.SwaggerJSON, "")
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal("%v", err)
 	}
 
 	// Create new service API
 	api := operations.NewMiasmaAPI(swaggerSpec)
+	api.Logger = log.I
 	server := restapi.NewServer(api)
 	defer server.Shutdown()
 
@@ -34,7 +35,7 @@ func Start() {
 
 	// Serve API
 	if err := server.Serve(); err != nil {
-		log.Fatalln(err)
+		log.Fatal("%v", err)
 	}
 }
 

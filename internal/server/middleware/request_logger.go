@@ -1,10 +1,10 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/aklinker1/miasma/internal/server/utils/env"
+	"github.com/aklinker1/miasma/internal/server/utils/log"
 )
 
 type StatusRecorder struct {
@@ -28,9 +28,9 @@ func RequestLogger() func(http.Handler) http.Handler {
 				ResponseWriter: w,
 				Status:         200,
 			}
-			fmt.Printf("<<<<<< %s %s\n", r.Method, r.URL.Path)
+			log.V("<<<<<< %s %s", r.Method, r.URL.Path)
 			next.ServeHTTP(recorder, r)
-			fmt.Printf(">>>>>> %d (%s)\n", recorder.Status, w.Header().Get("X-Response-Time"))
+			log.V(">>>>>> %d (%s)", recorder.Status, w.Header().Get("X-Response-Time"))
 		})
 	}
 }
