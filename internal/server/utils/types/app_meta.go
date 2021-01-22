@@ -7,7 +7,7 @@ type AppMetaData struct {
 	Hidden *bool
 
 	// Config
-	TargetPorts []uint32
+	TargetPorts []uint32 `yaml:"targetPorts"`
 	Networks    []string
 	Plugins     []string
 

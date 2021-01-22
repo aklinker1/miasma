@@ -127,7 +127,7 @@ paths:
           $ref: '#/responses/unknown'
   /api/apps/{appName}/config:
     get:
-      summary: get application's current configuration
+      summary: get an application's current config
       operationId: getAppConfig
       parameters:
         - $ref: '#/parameters/appName'
@@ -144,7 +144,28 @@ paths:
           description: Unknown Error
           schema:
             type: string
-    # put:
+    put:
+      summary: update an application's config
+      operationId: updateAppConfig
+      parameters:
+        - $ref: '#/parameters/appName'
+        - in: body
+          name: newAppConfig
+          schema:
+            $ref: '#/definitions/AppConfig'
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/AppConfig'
+        404:
+          description: Not Found
+          schema:
+            type: string
+        default:
+          description: Unknown Error
+          schema:
+            type: string
 
 parameters:
   appName:

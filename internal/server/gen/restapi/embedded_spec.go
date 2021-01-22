@@ -150,11 +150,47 @@ func init() {
     },
     "/api/apps/{appName}/config": {
       "get": {
-        "summary": "get application's current configuration",
+        "summary": "get an application's current config",
         "operationId": "getAppConfig",
         "parameters": [
           {
             "$ref": "#/parameters/appName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AppConfig"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "update an application's config",
+        "operationId": "updateAppConfig",
+        "parameters": [
+          {
+            "$ref": "#/parameters/appName"
+          },
+          {
+            "name": "newAppConfig",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/AppConfig"
+            }
           }
         ],
         "responses": {
@@ -508,7 +544,7 @@ func init() {
     },
     "/api/apps/{appName}/config": {
       "get": {
-        "summary": "get application's current configuration",
+        "summary": "get an application's current config",
         "operationId": "getAppConfig",
         "parameters": [
           {
@@ -517,6 +553,46 @@ func init() {
             "name": "appName",
             "in": "path",
             "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AppConfig"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "update an application's config",
+        "operationId": "updateAppConfig",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",
+            "name": "appName",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "newAppConfig",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/AppConfig"
+            }
           }
         ],
         "responses": {

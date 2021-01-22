@@ -9,6 +9,7 @@ import (
 	"github.com/aklinker1/miasma/internal/server/gen/models"
 	"github.com/aklinker1/miasma/internal/server/utils/mappers"
 	"github.com/aklinker1/miasma/internal/server/utils/types"
+	"github.com/aklinker1/miasma/internal/shared"
 	"github.com/aklinker1/miasma/internal/shared/log"
 
 	"gopkg.in/yaml.v2"
@@ -47,6 +48,25 @@ func (service *appService) GetAppMeta(appName string) (*types.AppMetaData, error
 	}
 	metaYml.Name = appName
 	return metaYml, nil
+}
+
+func (service *appService) WriteAppMeta(appMeta *types.AppMetaData) error {
+	appsDir, err := service.AppsDir()
+	if err != nil {
+		return err
+	}
+	metaFilePath := fmt.Sprintf("%s/%s.yml", appsDir, appMeta.Name)
+
+	data, err := yaml.Marshal(appMeta)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(metaFilePath, data, 0755)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (service *appService) Get(appName string) (*models.App, error) {
@@ -128,4 +148,23 @@ func (service *appService) GetConfig(appName string) (*models.AppConfig, error) 
 		return nil, err
 	}
 	return mappers.App.ToConfig(metaYml), nil
+}
+
+func (service *appService) UpdateConfig(appName string, newAppConfig *models.AppConfig) (*models.AppConfig, error) {
+	existingMeta, err := service.GetAppMeta(appName)
+	if err != nil {
+		return nil, err
+	}
+
+	updatedMeta := existingMeta
+	updatedMeta.TargetPorts = shared.ConvertInt64ArrayToUInt32Array(newAppConfig.TargetPorts)
+	// updatedMeta.Networks = newAppConfig.Networks
+	// updatedMeta.Plugins = newAppConfig.Plugins
+
+	err = service.WriteAppMeta(updatedMeta)
+	if err != nil {
+		return nil, err
+	}
+
+	return newAppConfig, nil
 }
