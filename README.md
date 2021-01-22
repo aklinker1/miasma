@@ -2,141 +2,62 @@
 
 Miasma is a docker-swarm based PasS (Platform as a Service) tool for applications to a Raspberry Pi Cluster.
 
+Miasma consists of two parts:
+
+- `miasma-server` - Docker container ran on the main node of the docker swarm, in charge of orchestrating the applications running in the swarm
+- `miasma-cli` - Used on any computer you want to manage and deploy applications
+
 ## Get Started
 
-To get started, install docker on the device you plan on being the main node (pi) of the docker swarm. This node will be in charge of orchestration.
+### Miasma Server
+
+> Eventually this process will just be an install script you curl down and run in a single line
+
+First, install docker on the device you plan on being the main node (pi) and initialize the swarm. This node will be running the miasma server.
 
 ```bash
+# Install Docker
+# TODO...
 
+# Initialize the swarm
+docker swarm init
 ```
 
-# CLI
+Take note of the worker join token, it will be used later on to add more Pis to the swarm.
 
-The CLI manages a file system structure:
-
-- `apps/`
-  - `app-name/`
-    - **`meta.yml`** - Used to generate the docker compose before each swarm command, and store all application info
-    - **`.env`** - Stores all env variables for the application
-- `plugins/`
-  - `plugin-name/`
-    - **`meta.yml`** - Contains information about the 
-    - **`.env`** - Stores all env variables necessary for a connected application to function
-
-## `apps`
-
-Applications management
-
-### `apps`
-
-List applications
-
-```
-miasma apps
-```
-
-### `apps:create`
-
-Create an app for a given image
-
-```
-miasma apps:create <app-name> -i|--image <registry/image:tag>
-```
-
-### `apps:update`
-
-Pulls and deploys the tag for the app's image
-
-```
-miasma apps:update <app-name>
-```
-
-### `apps:configure`
-
-Configure the application's deployment information
-
-```
-miasma apps:configure <app-name> [...flags]
-```
-
-- `-h|--hide <true|false>`: Set if the application is hidden
-- `-n|--networks <app-name,plugin-name,...>`: Update the list networks the application has access to. Each application/plugin gets their own network with the same name.
-- `-p|--placement <labelName=value,otherKey=otherValue>`: Comma separated list of all placement rules for what node the application goes on
-
-### `apps:destroy`
-
-Destroy the application
+Finally, spin up the `miasma-server`:
 
 ```bash
-miasma apps:destroy <app-name>
+docker run -d --restart unless-stopped -P aklinker1/miasma
 ```
 
-> This operation cannot be undone
+> `-d` starts the container in the daemon, 
+>
+> `--restart unless-stopped` will make sure miasma is restarted on error or if the pi is power cycled. If you stop this image
+>
+> `-P` exposes the server's ports. By default, it runs on port 3000
 
-## `env`
+At this point, you can move on to installing the CLI on your other computers.
 
-Environment variable management
-
-### `env`
-
-List an application's environment variables
+If you have more devices you would like to add to the swarm, install `docker` on the other devices (the same way you did on the main node), then run the below command to join the swarm.
 
 ```bash
-miasma env -a|--app <app-name>
+docker swarm join --token <worker-join-token> <miasma-server-ip:3000>
 ```
 
-### `env:edit`
+> You can do this at any point after starting the miasma server. Miasma works with any number of nodes and will automatically balance the applications accross the available nodes as more are added to the swarm
 
-Open your `editor` for an interactive way of updating an app's environment variables
+That's it! Once a node is apart of the swarm, the basic setup is done.
+
+### Miasma CLI
 
 ```bash
-miasma env:edit -a|--app <app-name>
+# Install and make sure it's working
+go get -u github.com/aklinker1/miasma
+miasma version
+
+# Connect to the server
+miasma connect <miasma-server-ip:3000>
 ```
 
-### `env:set`
-
-Set environment variables for an app without using an editor
-
-```bash
-miasma env:set -a|--app <app-name> <key1=value1> <key2=value2> ...
-```
-
-### `env:remove`
-
-Remove environment variables from an app
-
-```bash
-miasma env:remove -a|--app <app-name> <key1> <key2> ...
-```
-
-## `plugin`
-
-Manage plugins tied to given applications. Plugins provide additional access to resources such as `PostgreSQL` and `MongoDB`.
-
-> Plugins are just special apps. Custom plugins can be created by simply modifying application config, and putting them on the same network
-
-### `plugin:install`
-
-Install one of the bundled plugins
-
-```bash
-miasma plugin:remove <plugin-name>
-```
-
-### `plugin:add`
-
-Give an application access to a plugin
-
-```bash
-miasma plugin:add <postgres|mongo> -a|--app <app-name>
-```
-
-> Simply add the application to the the plugin's network
-
-### `plugin:remove`
-
-Remove an application's access from a plugin
-
-```bash
-miasma plugin:remove <plugin-name> -a|--app <app-name>
-```
+After you've connected the CLI to a miasma instance, you can start deploying applications!
