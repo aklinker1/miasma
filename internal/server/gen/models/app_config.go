@@ -17,6 +17,10 @@ import (
 // swagger:model AppConfig
 type AppConfig struct {
 
+	// The placement constraints specifying which nodes the application will be ran on. Any valid value for the [`--constraint` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints) is valid item in this list
+	// Unique: true
+	Placement []string `json:"placement"`
+
 	// The ports that the application is listening to inside the container. If this list is empty, then the container should respect the `PORT` env var. Miasma manages the published ports for each port listed here.
 	// Required: true
 	// Unique: true
@@ -27,6 +31,10 @@ type AppConfig struct {
 func (m *AppConfig) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validatePlacement(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateTargetPorts(formats); err != nil {
 		res = append(res, err)
 	}
@@ -34,6 +42,19 @@ func (m *AppConfig) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *AppConfig) validatePlacement(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Placement) { // not required
+		return nil
+	}
+
+	if err := validate.UniqueItems("placement", "body", m.Placement); err != nil {
+		return err
+	}
+
 	return nil
 }
 

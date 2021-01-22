@@ -313,6 +313,14 @@ func init() {
         "targetPorts"
       ],
       "properties": {
+        "placement": {
+          "description": "The placement constraints specifying which nodes the application will be ran on. Any valid value for the [` + "`" + `--constraint` + "`" + ` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints) is valid item in this list",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
         "targetPorts": {
           "description": "The ports that the application is listening to inside the container. If this list is empty, then the container should respect the ` + "`" + `PORT` + "`" + ` env var. Miasma manages the published ports for each port listed here.",
           "type": "array",
@@ -729,6 +737,14 @@ func init() {
         "targetPorts"
       ],
       "properties": {
+        "placement": {
+          "description": "The placement constraints specifying which nodes the application will be ran on. Any valid value for the [` + "`" + `--constraint` + "`" + ` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints) is valid item in this list",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
         "targetPorts": {
           "description": "The ports that the application is listening to inside the container. If this list is empty, then the container should respect the ` + "`" + `PORT` + "`" + ` env var. Miasma manages the published ports for each port listed here.",
           "type": "array",

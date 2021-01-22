@@ -8,6 +8,7 @@ type AppMetaData struct {
 
 	// Config
 	TargetPorts []uint32 `yaml:"targetPorts"`
+	Placement   []string
 	Networks    []string
 	Plugins     []string
 

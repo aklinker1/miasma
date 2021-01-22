@@ -257,5 +257,15 @@ definitions:
         items:
           type: integer
         uniqueItems: true
+      placement:
+        description: 
+          The placement constraints specifying which nodes the application will be ran on. Any valid
+          value for the
+          [`--constraint` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints)
+          is valid item in this list
+        type: array
+        items:
+          type: string
+        uniqueItems: true
     required:
       - targetPorts

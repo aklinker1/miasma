@@ -38,6 +38,7 @@ func (a *app) ToMeta(app *models.AppInput) *types.AppMetaData {
 func (a *app) ToConfig(app *types.AppMetaData) *models.AppConfig {
 	return &models.AppConfig{
 		TargetPorts: shared.ConvertUInt32ArrayToInt64Array(app.TargetPorts),
+		Placement:   app.Placement,
 		// Networks: ,
 		// Plugins: ,
 	}
@@ -85,7 +86,7 @@ func (a *app) ToService(app *types.AppMetaData, getNextPorts func(int) ([]uint32
 		},
 		TaskTemplate: dockerSwarmTypes.TaskSpec{
 			Placement: &dockerSwarmTypes.Placement{
-				Constraints: []string{},
+				Constraints: app.Placement,
 			},
 			ContainerSpec: &dockerSwarmTypes.ContainerSpec{
 				Image: *app.Image,
