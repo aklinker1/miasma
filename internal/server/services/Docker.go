@@ -74,7 +74,7 @@ func (service *dockerService) IsAppServiceRunning(appName string) bool {
 func (service *dockerService) StartApp(app *models.App) error {
 	existingService, _ := service.GetRunningService(*app.Name)
 	if existingService != nil {
-		return fmt.Errorf("%s is already started", *app.Name)
+		return fmt.Errorf("%s is already running", *app.Name)
 	}
 	newService := mappers.App.ToService(app)
 	options := dockerTypes.ServiceCreateOptions{
