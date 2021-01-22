@@ -93,6 +93,13 @@ func (service *appService) Create(app models.AppInput) (*models.App, error) {
 }
 
 func (service *appService) Delete(app *models.App) error {
+	err := Docker.StopApp(app)
+	if err != nil {
+		log.V("%s is not running, no need to stop it (%v)", *app.Name, err)
+	} else {
+		log.V("Stopped %s before deleting", *app.Name)
+	}
+
 	appsDir, err := service.AppsDir()
 	if err != nil {
 		return err
