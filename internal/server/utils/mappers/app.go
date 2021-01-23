@@ -54,7 +54,7 @@ func (a *app) ToService(app *types.AppMetaData, getNextPorts func(int) ([]uint32
 		targetPorts = append(targetPorts, defaultPort)
 	}
 	envPorts := []string{fmt.Sprintf("PORT=%d", targetPorts[0])}
-	publishedPorts, err := getNextPorts(len(app.TargetPorts))
+	publishedPorts, err := getNextPorts(len(targetPorts))
 	if err != nil {
 		return nil, err
 	}
