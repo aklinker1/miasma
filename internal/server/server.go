@@ -42,4 +42,5 @@ func Start() {
 func useControllers(api *operations.MiasmaAPI) {
 	controllers.UseHealthController(api)
 	controllers.UseAppsController(api)
+	controllers.UsePluginsController(api)
 }

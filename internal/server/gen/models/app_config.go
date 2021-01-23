@@ -25,6 +25,9 @@ type AppConfig struct {
 	// Unique: true
 	Placement []string `json:"placement"`
 
+	// route
+	Route *AppConfigRoute `json:"route,omitempty"`
+
 	// The ports that the application is listening to inside the container. If this list is empty, then the container should respect the `PORT` env var. Miasma manages the published ports for each port listed here.
 	// Unique: true
 	TargetPorts []int64 `json:"targetPorts"`
@@ -39,6 +42,10 @@ func (m *AppConfig) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validatePlacement(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateRoute(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -78,6 +85,24 @@ func (m *AppConfig) validatePlacement(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *AppConfig) validateRoute(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Route) { // not required
+		return nil
+	}
+
+	if m.Route != nil {
+		if err := m.Route.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("route")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (m *AppConfig) validateTargetPorts(formats strfmt.Registry) error {
 
 	if swag.IsZero(m.TargetPorts) { // not required
@@ -102,6 +127,44 @@ func (m *AppConfig) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (m *AppConfig) UnmarshalBinary(b []byte) error {
 	var res AppConfig
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// AppConfigRoute When the Traefik plugin is installed, the route describes where the app can be accessed from.
+//
+// swagger:model AppConfigRoute
+type AppConfigRoute struct {
+
+	// Describes the hostname the application is served at ("test.domain.com")
+	Host *string `json:"host,omitempty"`
+
+	// The path at a given host the application can be reached from ("/api"). It should start with a "/"
+	Path *string `json:"path,omitempty"`
+
+	// Instead of using `host` and/or `path`, you can specify the exact rule Traefik will use to route to the application. See [Traefik's documentation]() for how to use this field. This field takes priority over `host` and `path`
+	TraefikRule *string `json:"traefikRule,omitempty"`
+}
+
+// Validate validates this app config route
+func (m *AppConfigRoute) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *AppConfigRoute) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *AppConfigRoute) UnmarshalBinary(b []byte) error {
+	var res AppConfigRoute
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

@@ -279,6 +279,106 @@ func init() {
           }
         }
       }
+    },
+    "/api/plugins": {
+      "get": {
+        "summary": "List all available plugins and if they are installed",
+        "operationId": "listPlugins",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Plugin"
+              }
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/plugins/{pluginName}": {
+      "get": {
+        "summary": "Get a plugin",
+        "operationId": "getPlugin",
+        "parameters": [
+          {
+            "$ref": "#/parameters/pluginName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Plugin"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Install (and start) a plugin",
+        "operationId": "installPlugin",
+        "parameters": [
+          {
+            "$ref": "#/parameters/pluginName"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Plugin"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Stop and uninstall a plugin",
+        "operationId": "uninstallPlugin",
+        "parameters": [
+          {
+            "$ref": "#/parameters/pluginName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Plugin"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -325,6 +425,28 @@ func init() {
           "items": {
             "type": "string"
           }
+        },
+        "route": {
+          "description": "When the Traefik plugin is installed, the route describes where the app can be accessed from.",
+          "type": "object",
+          "properties": {
+            "host": {
+              "description": "Describes the hostname the application is served at (\"test.domain.com\")",
+              "type": "string",
+              "x-nullable": true
+            },
+            "path": {
+              "description": "The path at a given host the application can be reached from (\"/api\"). It should start with a \"/\"",
+              "type": "string",
+              "x-nullable": true
+            },
+            "traefikRule": {
+              "description": "Instead of using ` + "`" + `host` + "`" + ` and/or ` + "`" + `path` + "`" + `, you can specify the exact rule Traefik will use to route to the application. See [Traefik's documentation]() for how to use this field. This field takes priority over ` + "`" + `host` + "`" + ` and ` + "`" + `path` + "`" + `",
+              "type": "string",
+              "x-nullable": true
+            }
+          },
+          "x-nullable": true
         },
         "targetPorts": {
           "description": "The ports that the application is listening to inside the container. If this list is empty, then the container should respect the ` + "`" + `PORT` + "`" + ` env var. Miasma manages the published ports for each port listed here.",
@@ -396,6 +518,33 @@ func init() {
           "type": "string"
         }
       }
+    },
+    "Plugin": {
+      "type": "object",
+      "required": [
+        "name",
+        "installed"
+      ],
+      "properties": {
+        "installCommand": {
+          "description": "Command to run to install the plugin",
+          "type": "string",
+          "x-nullable": true
+        },
+        "installed": {
+          "description": "Whether or not the plugin is installed",
+          "type": "boolean"
+        },
+        "name": {
+          "description": "The plugin's name. It can be used to install a plugin",
+          "type": "string"
+        },
+        "uninstallCommand": {
+          "description": "Command to run to uninstall the plugin",
+          "type": "string",
+          "x-nullable": true
+        }
+      }
     }
   },
   "parameters": {
@@ -403,6 +552,12 @@ func init() {
       "type": "string",
       "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",
       "name": "appName",
+      "in": "path",
+      "required": true
+    },
+    "pluginName": {
+      "type": "string",
+      "name": "pluginName",
       "in": "path",
       "required": true
     }
@@ -708,6 +863,115 @@ func init() {
           }
         }
       }
+    },
+    "/api/plugins": {
+      "get": {
+        "summary": "List all available plugins and if they are installed",
+        "operationId": "listPlugins",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Plugin"
+              }
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/plugins/{pluginName}": {
+      "get": {
+        "summary": "Get a plugin",
+        "operationId": "getPlugin",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "pluginName",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Plugin"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Install (and start) a plugin",
+        "operationId": "installPlugin",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "pluginName",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Plugin"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Stop and uninstall a plugin",
+        "operationId": "uninstallPlugin",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "pluginName",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Plugin"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -755,6 +1019,28 @@ func init() {
             "type": "string"
           }
         },
+        "route": {
+          "description": "When the Traefik plugin is installed, the route describes where the app can be accessed from.",
+          "type": "object",
+          "properties": {
+            "host": {
+              "description": "Describes the hostname the application is served at (\"test.domain.com\")",
+              "type": "string",
+              "x-nullable": true
+            },
+            "path": {
+              "description": "The path at a given host the application can be reached from (\"/api\"). It should start with a \"/\"",
+              "type": "string",
+              "x-nullable": true
+            },
+            "traefikRule": {
+              "description": "Instead of using ` + "`" + `host` + "`" + ` and/or ` + "`" + `path` + "`" + `, you can specify the exact rule Traefik will use to route to the application. See [Traefik's documentation]() for how to use this field. This field takes priority over ` + "`" + `host` + "`" + ` and ` + "`" + `path` + "`" + `",
+              "type": "string",
+              "x-nullable": true
+            }
+          },
+          "x-nullable": true
+        },
         "targetPorts": {
           "description": "The ports that the application is listening to inside the container. If this list is empty, then the container should respect the ` + "`" + `PORT` + "`" + ` env var. Miasma manages the published ports for each port listed here.",
           "type": "array",
@@ -764,6 +1050,28 @@ func init() {
           }
         }
       }
+    },
+    "AppConfigRoute": {
+      "description": "When the Traefik plugin is installed, the route describes where the app can be accessed from.",
+      "type": "object",
+      "properties": {
+        "host": {
+          "description": "Describes the hostname the application is served at (\"test.domain.com\")",
+          "type": "string",
+          "x-nullable": true
+        },
+        "path": {
+          "description": "The path at a given host the application can be reached from (\"/api\"). It should start with a \"/\"",
+          "type": "string",
+          "x-nullable": true
+        },
+        "traefikRule": {
+          "description": "Instead of using ` + "`" + `host` + "`" + ` and/or ` + "`" + `path` + "`" + `, you can specify the exact rule Traefik will use to route to the application. See [Traefik's documentation]() for how to use this field. This field takes priority over ` + "`" + `host` + "`" + ` and ` + "`" + `path` + "`" + `",
+          "type": "string",
+          "x-nullable": true
+        }
+      },
+      "x-nullable": true
     },
     "AppInput": {
       "type": "object",
@@ -847,6 +1155,33 @@ func init() {
           "type": "string"
         }
       }
+    },
+    "Plugin": {
+      "type": "object",
+      "required": [
+        "name",
+        "installed"
+      ],
+      "properties": {
+        "installCommand": {
+          "description": "Command to run to install the plugin",
+          "type": "string",
+          "x-nullable": true
+        },
+        "installed": {
+          "description": "Whether or not the plugin is installed",
+          "type": "boolean"
+        },
+        "name": {
+          "description": "The plugin's name. It can be used to install a plugin",
+          "type": "string"
+        },
+        "uninstallCommand": {
+          "description": "Command to run to uninstall the plugin",
+          "type": "string",
+          "x-nullable": true
+        }
+      }
     }
   },
   "parameters": {
@@ -854,6 +1189,12 @@ func init() {
       "type": "string",
       "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",
       "name": "appName",
+      "in": "path",
+      "required": true
+    },
+    "pluginName": {
+      "type": "string",
+      "name": "pluginName",
       "in": "path",
       "required": true
     }

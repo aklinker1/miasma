@@ -10,6 +10,8 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 )
 
+var StartingMiasma = true
+
 func UseHealthController(api *operations.MiasmaAPI) {
 	api.GetHealthCheckHandler = getHealthCheck
 }

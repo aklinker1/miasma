@@ -5,6 +5,7 @@ go 1.14
 require (
 	docker.io/go-docker v1.0.0
 	github.com/Microsoft/go-winio v0.4.16 // indirect
+	github.com/containerd/containerd v1.4.3
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/dre1080/recovr v1.0.3

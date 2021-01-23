@@ -99,19 +99,46 @@ func (service *dockerService) StartApp(app *types.AppMetaData) error {
 	options := dockerTypes.ServiceCreateOptions{
 		QueryRegistry: true,
 	}
-	_, err = docker.ServiceCreate(ctx, *newService, options)
-	if err != nil {
-		return err
-	}
-	return nil
+
+	return service.StartService(*newService, options)
 }
 
-func (service *dockerService) StopApp(app *models.App) error {
-	runningService, err := service.GetRunningService(*app.Name)
+func (service *dockerService) StartService(serviceSpec dockerSwarmTypes.ServiceSpec, options dockerTypes.ServiceCreateOptions) error {
+	_, err := docker.ServiceCreate(ctx, serviceSpec, options)
+	return err
+}
+
+func (service *dockerService) StopService(serviceName string) error {
+	runningService, err := service.GetRunningService(serviceName)
 	if err != nil {
 		return err
 	}
 	return docker.ServiceRemove(ctx, runningService.ID)
+}
+
+func (service *dockerService) StopApp(app *models.App) error {
+	return service.StopService(*app.Name)
+}
+
+func (service *dockerService) UpdateService(serviceName string, newServiceSpec *dockerSwarmTypes.ServiceSpec) error {
+	existingService, err := service.GetRunningService(serviceName)
+	if err != nil {
+		return err
+	}
+	_, err = docker.ServiceUpdate(
+		ctx,
+		existingService.ID,
+		existingService.Version,
+		*newServiceSpec,
+		dockerTypes.ServiceUpdateOptions{
+			QueryRegistry: false,
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (service *dockerService) GetNextAvailablePorts(count int) ([]uint32, error) {
@@ -127,7 +154,7 @@ func (service *dockerService) GetNextAvailablePorts(count int) ([]uint32, error)
 	}
 	results := []uint32{}
 	var port uint32
-	for port = 3001; port <= 4000 && len(results) < count; port++ {
+	for port = 3001; port < 4000 && len(results) < count; port++ {
 		if _, ok := filledPorts[port]; !ok {
 			results = append(results, port)
 		}

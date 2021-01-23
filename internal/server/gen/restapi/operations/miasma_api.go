@@ -60,11 +60,23 @@ func NewMiasmaAPI(spec *loads.Document) *MiasmaAPI {
 		GetHealthCheckHandler: GetHealthCheckHandlerFunc(func(params GetHealthCheckParams) middleware.Responder {
 			return middleware.NotImplemented("operation GetHealthCheck has not yet been implemented")
 		}),
+		GetPluginHandler: GetPluginHandlerFunc(func(params GetPluginParams) middleware.Responder {
+			return middleware.NotImplemented("operation GetPlugin has not yet been implemented")
+		}),
+		InstallPluginHandler: InstallPluginHandlerFunc(func(params InstallPluginParams) middleware.Responder {
+			return middleware.NotImplemented("operation InstallPlugin has not yet been implemented")
+		}),
+		ListPluginsHandler: ListPluginsHandlerFunc(func(params ListPluginsParams) middleware.Responder {
+			return middleware.NotImplemented("operation ListPlugins has not yet been implemented")
+		}),
 		StartAppHandler: StartAppHandlerFunc(func(params StartAppParams) middleware.Responder {
 			return middleware.NotImplemented("operation StartApp has not yet been implemented")
 		}),
 		StopAppHandler: StopAppHandlerFunc(func(params StopAppParams) middleware.Responder {
 			return middleware.NotImplemented("operation StopApp has not yet been implemented")
+		}),
+		UninstallPluginHandler: UninstallPluginHandlerFunc(func(params UninstallPluginParams) middleware.Responder {
+			return middleware.NotImplemented("operation UninstallPlugin has not yet been implemented")
 		}),
 		UpdateAppConfigHandler: UpdateAppConfigHandlerFunc(func(params UpdateAppConfigParams) middleware.Responder {
 			return middleware.NotImplemented("operation UpdateAppConfig has not yet been implemented")
@@ -115,10 +127,18 @@ type MiasmaAPI struct {
 	GetAppsHandler GetAppsHandler
 	// GetHealthCheckHandler sets the operation handler for the get health check operation
 	GetHealthCheckHandler GetHealthCheckHandler
+	// GetPluginHandler sets the operation handler for the get plugin operation
+	GetPluginHandler GetPluginHandler
+	// InstallPluginHandler sets the operation handler for the install plugin operation
+	InstallPluginHandler InstallPluginHandler
+	// ListPluginsHandler sets the operation handler for the list plugins operation
+	ListPluginsHandler ListPluginsHandler
 	// StartAppHandler sets the operation handler for the start app operation
 	StartAppHandler StartAppHandler
 	// StopAppHandler sets the operation handler for the stop app operation
 	StopAppHandler StopAppHandler
+	// UninstallPluginHandler sets the operation handler for the uninstall plugin operation
+	UninstallPluginHandler UninstallPluginHandler
 	// UpdateAppConfigHandler sets the operation handler for the update app config operation
 	UpdateAppConfigHandler UpdateAppConfigHandler
 	// ServeError is called when an error is received, there is a default handler
@@ -215,11 +235,23 @@ func (o *MiasmaAPI) Validate() error {
 	if o.GetHealthCheckHandler == nil {
 		unregistered = append(unregistered, "GetHealthCheckHandler")
 	}
+	if o.GetPluginHandler == nil {
+		unregistered = append(unregistered, "GetPluginHandler")
+	}
+	if o.InstallPluginHandler == nil {
+		unregistered = append(unregistered, "InstallPluginHandler")
+	}
+	if o.ListPluginsHandler == nil {
+		unregistered = append(unregistered, "ListPluginsHandler")
+	}
 	if o.StartAppHandler == nil {
 		unregistered = append(unregistered, "StartAppHandler")
 	}
 	if o.StopAppHandler == nil {
 		unregistered = append(unregistered, "StopAppHandler")
+	}
+	if o.UninstallPluginHandler == nil {
+		unregistered = append(unregistered, "UninstallPluginHandler")
 	}
 	if o.UpdateAppConfigHandler == nil {
 		unregistered = append(unregistered, "UpdateAppConfigHandler")
@@ -336,6 +368,18 @@ func (o *MiasmaAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/api/health"] = NewGetHealthCheck(o.context, o.GetHealthCheckHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/api/plugins/{pluginName}"] = NewGetPlugin(o.context, o.GetPluginHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/api/plugins/{pluginName}"] = NewInstallPlugin(o.context, o.InstallPluginHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/api/plugins"] = NewListPlugins(o.context, o.ListPluginsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -344,6 +388,10 @@ func (o *MiasmaAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/api/apps/{appName}/stop"] = NewStopApp(o.context, o.StopAppHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/api/plugins/{pluginName}"] = NewUninstallPlugin(o.context, o.UninstallPluginHandler)
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}

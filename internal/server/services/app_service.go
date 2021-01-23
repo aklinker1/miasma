@@ -61,12 +61,7 @@ func (service *appService) WriteAppMeta(appMeta *types.AppMetaData) error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(metaFilePath, data, 0755)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return ioutil.WriteFile(metaFilePath, data, 0755)
 }
 
 func (service *appService) Get(appName string) (*models.App, error) {
@@ -166,11 +161,57 @@ func (service *appService) UpdateConfig(appName string, newAppConfig *models.App
 	updatedMeta := existingMeta
 	updatedMeta.TargetPorts = shared.ConvertInt64ArrayToUInt32Array(newAppConfig.TargetPorts)
 	updatedMeta.Networks = newAppConfig.Networks
+	updatedMeta.Placement = newAppConfig.Placement
+	// TODO: Move to mapper
+	if newAppConfig.Route != nil {
+		host := ""
+		path := ""
+		rule := ""
+		if newAppConfig.Route.Host != nil {
+			host = *newAppConfig.Route.Host
+		}
+		if newAppConfig.Route.Path != nil {
+			path = *newAppConfig.Route.Path
+		}
+		if newAppConfig.Route.TraefikRule != nil {
+			rule = *newAppConfig.Route.TraefikRule
+		}
+		updatedMeta.Route = &types.Route{
+			Host:        host,
+			Path:        path,
+			TraefikRule: rule,
+		}
+	} else {
+		newAppConfig.Route = nil
+	}
+
+	newServiceSpec, err := mappers.App.ToService(updatedMeta, func(count int) ([]uint32, error) {
+		// TODO: Move to validation
+		// newPublishedPortsCount := len(updatedMeta.PublishedPorts)
+		// newTargetPortsCount := len(updatedMeta.TargetPorts)
+		// if newPublishedPortsCount != 0 && newPublishedPortsCount != newTargetPortsCount {
+		// 	return nil, errors.New("Published ports were provided, but had a different length than the target ports")
+		// }
+		oldTargetPortsCount := len(existingMeta.TargetPorts)
+		additionalPortCount := count - oldTargetPortsCount
+		nextAvailablePorts, err := Docker.GetNextAvailablePorts(additionalPortCount)
+		if err != nil {
+			return nil, err
+		}
+		return append(existingMeta.TargetPorts, nextAvailablePorts...), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	err = Docker.UpdateService(appName, newServiceSpec)
+	if err != nil {
+		return nil, err
+	}
 
 	err = service.WriteAppMeta(updatedMeta)
 	if err != nil {
 		return nil, err
 	}
 
-	return newAppConfig, nil
+	return service.GetConfig(appName)
 }
