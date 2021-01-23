@@ -112,6 +112,10 @@ func (service *appService) Create(app models.AppInput) (*models.App, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = Docker.CreateNetwork(*app.Name)
+	if err != nil {
+		return nil, err
+	}
 	err = ioutil.WriteFile(metaPath, metaData, 0755)
 	if err != nil {
 		return nil, err
@@ -121,6 +125,9 @@ func (service *appService) Create(app models.AppInput) (*models.App, error) {
 }
 
 func (service *appService) Delete(app *models.App) error {
+	if err := Docker.DestroyNetwork(*app.Name); err != nil {
+		log.W("Failed to destroy network: %v", err)
+	}
 	err := Docker.StopApp(app)
 	if err != nil {
 		log.V("%s is not running, no need to stop it (%v)", *app.Name, err)
@@ -158,8 +165,7 @@ func (service *appService) UpdateConfig(appName string, newAppConfig *models.App
 
 	updatedMeta := existingMeta
 	updatedMeta.TargetPorts = shared.ConvertInt64ArrayToUInt32Array(newAppConfig.TargetPorts)
-	// updatedMeta.Networks = newAppConfig.Networks
-	// updatedMeta.Plugins = newAppConfig.Plugins
+	updatedMeta.Networks = newAppConfig.Networks
 
 	err = service.WriteAppMeta(updatedMeta)
 	if err != nil {

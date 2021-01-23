@@ -267,5 +267,12 @@ definitions:
         items:
           type: string
         uniqueItems: true
-    required:
-      - targetPorts
+      networks:
+        description: 
+          A list of other apps that the service communicates with using their service name and
+          docker's internal DNS. Services don't have to be two way; only the service that accesses
+          the other needs the other network added
+        type: array
+        items:
+          type: string
+        uniqueItems: true

@@ -309,10 +309,15 @@ func init() {
     },
     "AppConfig": {
       "type": "object",
-      "required": [
-        "targetPorts"
-      ],
       "properties": {
+        "networks": {
+          "description": "A list of other apps that the service communicates with using their service name and docker's internal DNS. Services don't have to be two way; only the service that accesses the other needs the other network added",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
         "placement": {
           "description": "The placement constraints specifying which nodes the application will be ran on. Any valid value for the [` + "`" + `--constraint` + "`" + ` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints) is valid item in this list",
           "type": "array",
@@ -733,10 +738,15 @@ func init() {
     },
     "AppConfig": {
       "type": "object",
-      "required": [
-        "targetPorts"
-      ],
       "properties": {
+        "networks": {
+          "description": "A list of other apps that the service communicates with using their service name and docker's internal DNS. Services don't have to be two way; only the service that accesses the other needs the other network added",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
         "placement": {
           "description": "The placement constraints specifying which nodes the application will be ran on. Any valid value for the [` + "`" + `--constraint` + "`" + ` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints) is valid item in this list",
           "type": "array",

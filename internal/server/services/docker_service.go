@@ -72,6 +72,21 @@ func (service *dockerService) IsAppServiceRunning(appName string) bool {
 	return runningService != nil
 }
 
+func (service *dockerService) CreateNetwork(appName string) error {
+	_, err := docker.NetworkCreate(ctx, appName, dockerTypes.NetworkCreate{
+		Driver: "overlay",
+		Scope:  "swarm",
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (service *dockerService) DestroyNetwork(appName string) error {
+	return docker.NetworkRemove(ctx, appName)
+}
+
 func (service *dockerService) StartApp(app *types.AppMetaData) error {
 	existingService, _ := service.GetRunningService(app.Name)
 	if existingService != nil {

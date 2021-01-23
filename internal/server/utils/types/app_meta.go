@@ -10,7 +10,6 @@ type AppMetaData struct {
 	TargetPorts []uint32 `yaml:"targetPorts"`
 	Placement   []string
 	Networks    []string
-	Plugins     []string
 
 	// Env
 	Env map[string]string

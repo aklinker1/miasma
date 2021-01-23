@@ -30,7 +30,6 @@ func (a *app) ToMeta(app *models.AppInput) *types.AppMetaData {
 		Hidden:      &app.Hidden,
 		TargetPorts: []uint32{},
 		Networks:    []string{},
-		Plugins:     []string{},
 		Env:         map[string]string{},
 	}
 }
@@ -39,8 +38,7 @@ func (a *app) ToConfig(app *types.AppMetaData) *models.AppConfig {
 	return &models.AppConfig{
 		TargetPorts: shared.ConvertUInt32ArrayToInt64Array(app.TargetPorts),
 		Placement:   app.Placement,
-		// Networks: ,
-		// Plugins: ,
+		Networks:    app.Networks,
 	}
 }
 
@@ -77,6 +75,19 @@ func (a *app) ToService(app *types.AppMetaData, getNextPorts func(int) ([]uint32
 		}
 	}
 
+	// Setup Networks
+	networks := []dockerSwarmTypes.NetworkAttachmentConfig{
+		{
+			Target: app.Name,
+		},
+	}
+	for _, network := range app.Networks {
+		log.V("Additional network: %s", network)
+		networks = append(networks, dockerSwarmTypes.NetworkAttachmentConfig{
+			Target: network,
+		})
+	}
+
 	// Setup env variables
 	env := append(envPorts, []string{}...)
 
@@ -92,10 +103,7 @@ func (a *app) ToService(app *types.AppMetaData, getNextPorts func(int) ([]uint32
 				Image: *app.Image,
 				Env:   env,
 			},
-			// Networks: ,
-			RestartPolicy: &dockerSwarmTypes.RestartPolicy{
-				Condition: dockerSwarmTypes.RestartPolicyConditionOnFailure,
-			},
+			Networks: networks,
 		},
 		EndpointSpec: &dockerSwarmTypes.EndpointSpec{
 			Ports: portConfigs,

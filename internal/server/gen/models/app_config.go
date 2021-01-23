@@ -17,12 +17,15 @@ import (
 // swagger:model AppConfig
 type AppConfig struct {
 
+	// A list of other apps that the service communicates with using their service name and docker's internal DNS. Services don't have to be two way; only the service that accesses the other needs the other network added
+	// Unique: true
+	Networks []string `json:"networks"`
+
 	// The placement constraints specifying which nodes the application will be ran on. Any valid value for the [`--constraint` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints) is valid item in this list
 	// Unique: true
 	Placement []string `json:"placement"`
 
 	// The ports that the application is listening to inside the container. If this list is empty, then the container should respect the `PORT` env var. Miasma manages the published ports for each port listed here.
-	// Required: true
 	// Unique: true
 	TargetPorts []int64 `json:"targetPorts"`
 }
@@ -30,6 +33,10 @@ type AppConfig struct {
 // Validate validates this app config
 func (m *AppConfig) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateNetworks(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.validatePlacement(formats); err != nil {
 		res = append(res, err)
@@ -42,6 +49,19 @@ func (m *AppConfig) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *AppConfig) validateNetworks(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Networks) { // not required
+		return nil
+	}
+
+	if err := validate.UniqueItems("networks", "body", m.Networks); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -60,8 +80,8 @@ func (m *AppConfig) validatePlacement(formats strfmt.Registry) error {
 
 func (m *AppConfig) validateTargetPorts(formats strfmt.Registry) error {
 
-	if err := validate.Required("targetPorts", "body", m.TargetPorts); err != nil {
-		return err
+	if swag.IsZero(m.TargetPorts) { // not required
+		return nil
 	}
 
 	if err := validate.UniqueItems("targetPorts", "body", m.TargetPorts); err != nil {
