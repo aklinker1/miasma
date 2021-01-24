@@ -426,6 +426,14 @@ func init() {
             "type": "string"
           }
         },
+        "publishedPorts": {
+          "description": "The ports that you access the application through in the swarm. This field can, and should be left empty. Miasma automatically manages assigning published ports between 3001-4999. If you need to specify a port, make sure it's outside that range or the port has not been taken. Plugins have set ports starting with 4000, so avoid 4000-4020 if you want to add a plugin at a later date.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer"
+          }
+        },
         "route": {
           "description": "When the Traefik plugin is installed, the route describes where the app can be accessed from.",
           "type": "object",
@@ -449,7 +457,7 @@ func init() {
           "x-nullable": true
         },
         "targetPorts": {
-          "description": "The ports that the application is listening to inside the container. If this list is empty, then the container should respect the ` + "`" + `PORT` + "`" + ` env var. Miasma manages the published ports for each port listed here.",
+          "description": "The ports that the application is listening to inside the container. If no target ports are specified, then the container should respect the ` + "`" + `PORT` + "`" + ` env var.",
           "type": "array",
           "uniqueItems": true,
           "items": {
@@ -1019,6 +1027,14 @@ func init() {
             "type": "string"
           }
         },
+        "publishedPorts": {
+          "description": "The ports that you access the application through in the swarm. This field can, and should be left empty. Miasma automatically manages assigning published ports between 3001-4999. If you need to specify a port, make sure it's outside that range or the port has not been taken. Plugins have set ports starting with 4000, so avoid 4000-4020 if you want to add a plugin at a later date.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer"
+          }
+        },
         "route": {
           "description": "When the Traefik plugin is installed, the route describes where the app can be accessed from.",
           "type": "object",
@@ -1042,7 +1058,7 @@ func init() {
           "x-nullable": true
         },
         "targetPorts": {
-          "description": "The ports that the application is listening to inside the container. If this list is empty, then the container should respect the ` + "`" + `PORT` + "`" + ` env var. Miasma manages the published ports for each port listed here.",
+          "description": "The ports that the application is listening to inside the container. If no target ports are specified, then the container should respect the ` + "`" + `PORT` + "`" + ` env var.",
           "type": "array",
           "uniqueItems": true,
           "items": {

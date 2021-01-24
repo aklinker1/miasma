@@ -164,6 +164,7 @@ func (service *appService) UpdateConfig(appName string, newAppConfig *models.App
 
 	updatedMeta := existingMeta
 	updatedMeta.TargetPorts = shared.ConvertInt64ArrayToUInt32Array(newAppConfig.TargetPorts)
+	updatedMeta.PublishedPorts = shared.ConvertInt64ArrayToUInt32Array(newAppConfig.PublishedPorts)
 	updatedMeta.Networks = newAppConfig.Networks
 	updatedMeta.Placement = newAppConfig.Placement
 	// TODO: Move to mapper
@@ -189,32 +190,8 @@ func (service *appService) UpdateConfig(appName string, newAppConfig *models.App
 		newAppConfig.Route = nil
 	}
 
-	newServiceSpec, err := mappers.App.ToService(updatedMeta, pluginMeta, func(count int) ([]uint32, error) {
-		// TODO: Move to validation
-		// newPublishedPortsCount := len(updatedMeta.PublishedPorts)
-		// newTargetPortsCount := len(updatedMeta.TargetPorts)
-		// if newPublishedPortsCount != 0 && newPublishedPortsCount != newTargetPortsCount {
-		// 	return nil, errors.New("Published ports were provided, but had a different length than the target ports")
-		// }
-		existingService, _ := Docker.GetRunningService(appName)
-		oldPublishedPorts := []uint32{}
-		if existingService == nil {
-			oldPublishedPorts = append(oldPublishedPorts, updatedMeta.PublishedPorts...)
-		} else {
-			for _, port := range existingService.Spec.EndpointSpec.Ports {
-				log.V("Old port: -p %d:%d", port.PublishedPort, port.TargetPort)
-				oldPublishedPorts = append(oldPublishedPorts, port.PublishedPort)
-			}
-		}
-		numberOfAdditionalPortsNeeded := count - len(oldPublishedPorts)
-		nextAvailablePorts, err := Docker.GetNextAvailablePorts(numberOfAdditionalPortsNeeded)
-		if err != nil {
-			return nil, err
-		}
-		portsAfterUpdate := append(oldPublishedPorts, nextAvailablePorts...)[0:count]
-		log.V("Ports after update: %v", portsAfterUpdate)
-		return portsAfterUpdate, nil
-	})
+	// TODO! Reset ports to be generated if the published ports have changed
+	newServiceSpec, err := mappers.App.ToService(updatedMeta, pluginMeta, service.getNextPorts(updatedMeta))
 	if err != nil {
 		return nil, err
 	}
@@ -236,4 +213,42 @@ func (service *appService) UpdateConfig(appName string, newAppConfig *models.App
 	}
 
 	return service.GetConfig(appName)
+}
+
+func (service *appService) getNextPorts(appMeta *types.AppMetaData) func(int) ([]uint32, error) {
+	return func(portCountNeeded int) ([]uint32, error) {
+		// We have published ports and they are enough to meet the request, return them
+		if len(appMeta.PublishedPorts) > 0 && len(appMeta.PublishedPorts) >= portCountNeeded {
+			return appMeta.PublishedPorts, nil
+		}
+
+		// otherwise start the final list of ports with the published ports, adding any additional
+		// ports from the existing service, and finally get the next open ones if more are necessary
+		newPublishedPorts := appMeta.PublishedPorts
+
+		existingService, _ := Docker.GetRunningService(appMeta.Name)
+		existingPublishedPorts := []uint32{}
+		if existingService != nil {
+			for _, port := range existingService.Spec.EndpointSpec.Ports {
+				log.V("Old port: -p %d:%d", port.PublishedPort, port.TargetPort)
+				existingPublishedPorts = append(existingPublishedPorts, port.PublishedPort)
+			}
+		}
+		// Adding only extra, already published ports so those stay the same
+		if len(existingPublishedPorts) > len(newPublishedPorts) {
+			newPublishedPorts = append(newPublishedPorts, existingPublishedPorts[len(newPublishedPorts):]...)
+		}
+
+		// if more are still needed, find the next set of open ports
+		if len(newPublishedPorts) < portCountNeeded {
+			numberOfAdditionalPortsNeeded := portCountNeeded - len(newPublishedPorts)
+			nextOpenPorts, err := Docker.GetNextAvailablePorts(numberOfAdditionalPortsNeeded)
+			if err != nil {
+				return nil, err
+			}
+			newPublishedPorts = append(newPublishedPorts, nextOpenPorts...)
+		}
+		log.V("Ports after update: %v", newPublishedPorts)
+		return newPublishedPorts, nil
+	}
 }

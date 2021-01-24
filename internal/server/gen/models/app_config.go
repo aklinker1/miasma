@@ -25,10 +25,14 @@ type AppConfig struct {
 	// Unique: true
 	Placement []string `json:"placement"`
 
+	// The ports that you access the application through in the swarm. This field can, and should be left empty. Miasma automatically manages assigning published ports between 3001-4999. If you need to specify a port, make sure it's outside that range or the port has not been taken. Plugins have set ports starting with 4000, so avoid 4000-4020 if you want to add a plugin at a later date.
+	// Unique: true
+	PublishedPorts []int64 `json:"publishedPorts"`
+
 	// route
 	Route *AppConfigRoute `json:"route,omitempty"`
 
-	// The ports that the application is listening to inside the container. If this list is empty, then the container should respect the `PORT` env var. Miasma manages the published ports for each port listed here.
+	// The ports that the application is listening to inside the container. If no target ports are specified, then the container should respect the `PORT` env var.
 	// Unique: true
 	TargetPorts []int64 `json:"targetPorts"`
 }
@@ -42,6 +46,10 @@ func (m *AppConfig) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validatePlacement(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePublishedPorts(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -79,6 +87,19 @@ func (m *AppConfig) validatePlacement(formats strfmt.Registry) error {
 	}
 
 	if err := validate.UniqueItems("placement", "body", m.Placement); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *AppConfig) validatePublishedPorts(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.PublishedPorts) { // not required
+		return nil
+	}
+
+	if err := validate.UniqueItems("publishedPorts", "body", m.PublishedPorts); err != nil {
 		return err
 	}
 

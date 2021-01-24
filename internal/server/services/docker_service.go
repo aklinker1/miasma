@@ -112,7 +112,7 @@ func (service *dockerService) StartApp(app *types.AppMetaData) error {
 	if err != nil {
 		return err
 	}
-	newService, err := mappers.App.ToService(app, pluginMeta, service.GetNextAvailablePorts)
+	newService, err := mappers.App.ToService(app, pluginMeta, App.getNextPorts(app))
 	if err != nil {
 		return err
 	}

@@ -50,10 +50,11 @@ func (a *app) ToConfig(app *types.AppMetaData) *models.AppConfig {
 		}
 	}
 	return &models.AppConfig{
-		TargetPorts: shared.ConvertUInt32ArrayToInt64Array(app.TargetPorts),
-		Placement:   app.Placement,
-		Networks:    app.Networks,
-		Route:       route,
+		TargetPorts:    shared.ConvertUInt32ArrayToInt64Array(app.TargetPorts),
+		PublishedPorts: shared.ConvertUInt32ArrayToInt64Array(app.PublishedPorts),
+		Placement:      app.Placement,
+		Networks:       app.Networks,
+		Route:          route,
 	}
 }
 
