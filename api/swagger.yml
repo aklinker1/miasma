@@ -186,14 +186,10 @@ paths:
           name: newEnv
           schema:
             type: object
-            # additionalProperties: {}
-            # items:
-            #   type: integer
-            # additionalProperties:
-            #   type: string
-            # example:
-            #   KEY: value
-            #   SOME_BOOLEAN: false
+            additionalProperties: {}
+            example:
+              KEY: value
+              SOME_BOOLEAN: false
       responses:
         200:
           description: OK

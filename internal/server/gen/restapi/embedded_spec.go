@@ -244,7 +244,12 @@ func init() {
             "name": "newEnv",
             "in": "body",
             "schema": {
-              "type": "object"
+              "type": "object",
+              "additionalProperties": false,
+              "example": {
+                "KEY": "value",
+                "SOME_BOOLEAN": false
+              }
             }
           }
         ],
@@ -894,7 +899,12 @@ func init() {
             "name": "newEnv",
             "in": "body",
             "schema": {
-              "type": "object"
+              "type": "object",
+              "additionalProperties": false,
+              "example": {
+                "KEY": "value",
+                "SOME_BOOLEAN": false
+              }
             }
           }
         ],
