@@ -57,6 +57,48 @@ func (o *UpdateAppConfigOK) WriteResponse(rw http.ResponseWriter, producer runti
 	}
 }
 
+// UpdateAppConfigBadRequestCode is the HTTP code returned for type UpdateAppConfigBadRequest
+const UpdateAppConfigBadRequestCode int = 400
+
+/*UpdateAppConfigBadRequest Bad Request
+
+swagger:response updateAppConfigBadRequest
+*/
+type UpdateAppConfigBadRequest struct {
+
+	/*
+	  In: Body
+	*/
+	Payload string `json:"body,omitempty"`
+}
+
+// NewUpdateAppConfigBadRequest creates UpdateAppConfigBadRequest with default headers values
+func NewUpdateAppConfigBadRequest() *UpdateAppConfigBadRequest {
+
+	return &UpdateAppConfigBadRequest{}
+}
+
+// WithPayload adds the payload to the update app config bad request response
+func (o *UpdateAppConfigBadRequest) WithPayload(payload string) *UpdateAppConfigBadRequest {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the update app config bad request response
+func (o *UpdateAppConfigBadRequest) SetPayload(payload string) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *UpdateAppConfigBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(400)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
+}
+
 // UpdateAppConfigNotFoundCode is the HTTP code returned for type UpdateAppConfigNotFound
 const UpdateAppConfigNotFoundCode int = 404
 

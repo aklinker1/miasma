@@ -53,6 +53,48 @@ func (o *UpdateAppEnvOK) WriteResponse(rw http.ResponseWriter, producer runtime.
 	}
 }
 
+// UpdateAppEnvBadRequestCode is the HTTP code returned for type UpdateAppEnvBadRequest
+const UpdateAppEnvBadRequestCode int = 400
+
+/*UpdateAppEnvBadRequest Bad Request
+
+swagger:response updateAppEnvBadRequest
+*/
+type UpdateAppEnvBadRequest struct {
+
+	/*
+	  In: Body
+	*/
+	Payload string `json:"body,omitempty"`
+}
+
+// NewUpdateAppEnvBadRequest creates UpdateAppEnvBadRequest with default headers values
+func NewUpdateAppEnvBadRequest() *UpdateAppEnvBadRequest {
+
+	return &UpdateAppEnvBadRequest{}
+}
+
+// WithPayload adds the payload to the update app env bad request response
+func (o *UpdateAppEnvBadRequest) WithPayload(payload string) *UpdateAppEnvBadRequest {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the update app env bad request response
+func (o *UpdateAppEnvBadRequest) SetPayload(payload string) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *UpdateAppEnvBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(400)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
+}
+
 // UpdateAppEnvNotFoundCode is the HTTP code returned for type UpdateAppEnvNotFound
 const UpdateAppEnvNotFoundCode int = 404
 

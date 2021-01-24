@@ -188,6 +188,12 @@ func init() {
               "$ref": "#/definitions/AppConfig"
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "string"
+            }
+          },
           "404": {
             "description": "Not Found",
             "schema": {
@@ -247,6 +253,12 @@ func init() {
             "description": "OK",
             "schema": {
               "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "string"
             }
           },
           "404": {
@@ -812,6 +824,12 @@ func init() {
               "$ref": "#/definitions/AppConfig"
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "string"
+            }
+          },
           "404": {
             "description": "Not Found",
             "schema": {
@@ -885,6 +903,12 @@ func init() {
             "description": "OK",
             "schema": {
               "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "string"
             }
           },
           "404": {

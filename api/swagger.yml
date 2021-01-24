@@ -150,6 +150,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/AppConfig'
+        400:
+          description: Bad Request
+          schema:
+            type: string
         404:
           description: Not Found
           schema:
@@ -195,6 +199,10 @@ paths:
           description: OK
           schema:
             type: object
+        400:
+          description: Bad Request
+          schema:
+            type: string
         404:
           description: Not Found
           schema:

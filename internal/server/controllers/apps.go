@@ -5,6 +5,7 @@ import (
 
 	"github.com/aklinker1/miasma/internal/server/gen/restapi/operations"
 	"github.com/aklinker1/miasma/internal/server/services"
+	"github.com/aklinker1/miasma/internal/shared/validation"
 	"github.com/go-openapi/runtime/middleware"
 )
 
@@ -37,6 +38,10 @@ var createApp = operations.CreateAppHandlerFunc(
 			return operations.NewCreateAppBadRequest().WithPayload("Request body is required")
 		}
 		inputApp := *params.App
+		err := validation.AppName(*inputApp.Name)
+		if err != nil {
+			return operations.NewCreateAppBadRequest().WithPayload(err.Error())
+		}
 		existingApp, _ := services.App.Get(*inputApp.Name)
 		if existingApp != nil {
 			return operations.NewCreateAppBadRequest().WithPayload(fmt.Sprintf("%s already exists", *inputApp.Name))
@@ -117,6 +122,10 @@ var updateAppConfig = operations.UpdateAppConfigHandlerFunc(
 		if err != nil {
 			return operations.NewUpdateAppConfigNotFound().WithPayload(err.Error())
 		}
+		err = validation.AppConfig(params.NewAppConfig)
+		if err != nil {
+			return operations.NewUpdateAppConfigBadRequest().WithPayload(err.Error())
+		}
 		appConfig, err := services.App.UpdateConfig(params.AppName, params.NewAppConfig)
 		if err != nil {
 			return operations.NewUpdateAppConfigDefault(500).WithPayload(err.Error())
@@ -138,6 +147,10 @@ var updateAppEnv = operations.UpdateAppEnvHandlerFunc(
 		_, err := services.App.GetConfig(params.AppName)
 		if err != nil {
 			return operations.NewUpdateAppEnvNotFound().WithPayload(err.Error())
+		}
+		err = validation.AppEnv(params.NewEnv.(map[string]interface{}))
+		if err != nil {
+			return operations.NewUpdateAppEnvBadRequest().WithPayload(err.Error())
 		}
 		env, err := services.App.UpdateEnv(params.AppName, params.NewEnv.(map[string]interface{}))
 		if err != nil {
