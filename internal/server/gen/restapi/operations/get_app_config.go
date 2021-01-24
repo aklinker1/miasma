@@ -31,7 +31,7 @@ func NewGetAppConfig(ctx *middleware.Context, handler GetAppConfigHandler) *GetA
 
 /*GetAppConfig swagger:route GET /api/apps/{appName}/config getAppConfig
 
-get an application's current config
+get an app's current config
 
 */
 type GetAppConfig struct {

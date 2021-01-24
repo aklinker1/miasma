@@ -31,7 +31,7 @@ func NewGetApps(ctx *middleware.Context, handler GetAppsHandler) *GetApps {
 
 /*GetApps swagger:route GET /api/apps getApps
 
-List all the running applications
+List all the running apps
 
 */
 type GetApps struct {

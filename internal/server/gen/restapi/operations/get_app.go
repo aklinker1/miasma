@@ -31,7 +31,7 @@ func NewGetApp(ctx *middleware.Context, handler GetAppHandler) *GetApp {
 
 /*GetApp swagger:route GET /api/apps/{appName} getApp
 
-Get an application by name
+Get an app by name
 
 */
 type GetApp struct {

@@ -21,18 +21,18 @@ type AppConfig struct {
 	// Unique: true
 	Networks []string `json:"networks"`
 
-	// The placement constraints specifying which nodes the application will be ran on. Any valid value for the [`--constraint` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints) is valid item in this list
+	// The placement constraints specifying which nodes the app will be ran on. Any valid value for the [`--constraint` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints) is valid item in this list
 	// Unique: true
 	Placement []string `json:"placement"`
 
-	// The ports that you access the application through in the swarm. This field can, and should be left empty. Miasma automatically manages assigning published ports between 3001-4999. If you need to specify a port, make sure it's outside that range or the port has not been taken. Plugins have set ports starting with 4000, so avoid 4000-4020 if you want to add a plugin at a later date. If these ports are ever cleared, the app will continue using the same ports it was published to before, so that the ports don't change unnecessarily. If you removed it to clear a port for another app/plugin, make sure to restart the app and a new, random port will be allocated for the app, freeing the old port
+	// The ports that you access the app through in the swarm. This field can, and should be left empty. Miasma automatically manages assigning published ports between 3001-4999. If you need to specify a port, make sure it's outside that range or the port has not been taken. Plugins have set ports starting with 4000, so avoid 4000-4020 if you want to add a plugin at a later date. If these ports are ever cleared, the app will continue using the same ports it was published to before, so that the ports don't change unnecessarily. If you removed it to clear a port for another app/plugin, make sure to restart the app and a new, random port will be allocated for the app, freeing the old port
 	// Unique: true
 	PublishedPorts []int64 `json:"publishedPorts"`
 
 	// route
 	Route *AppConfigRoute `json:"route,omitempty"`
 
-	// The ports that the application is listening to inside the container. If no target ports are specified, then the container should respect the `PORT` env var.
+	// The ports that the app is listening to inside the container. If no target ports are specified, then the container should respect the `PORT` env var.
 	// Unique: true
 	TargetPorts []int64 `json:"targetPorts"`
 }
@@ -160,13 +160,13 @@ func (m *AppConfig) UnmarshalBinary(b []byte) error {
 // swagger:model AppConfigRoute
 type AppConfigRoute struct {
 
-	// Describes the hostname the application is served at ("test.domain.com")
+	// Describes the hostname the app is served at ("test.domain.com")
 	Host *string `json:"host,omitempty"`
 
-	// The path at a given host the application can be reached from ("/api"). It should start with a "/"
+	// The path at a given host the app can be reached from ("/api"). It should start with a "/"
 	Path *string `json:"path,omitempty"`
 
-	// Instead of using `host` and/or `path`, you can specify the exact rule Traefik will use to route to the application. See [Traefik's documentation]() for how to use this field. This field takes priority over `host` and `path`
+	// Instead of using `host` and/or `path`, you can specify the exact rule Traefik will use to route to the app. See [Traefik's documentation]() for how to use this field. This field takes priority over `host` and `path`
 	TraefikRule *string `json:"traefikRule,omitempty"`
 }
 

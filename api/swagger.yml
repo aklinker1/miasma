@@ -22,7 +22,7 @@ paths:
             $ref: '#/definitions/Health'
   /api/apps:
     get:
-      summary: List all the running applications
+      summary: List all the running apps
       operationId: getApps
       parameters:
         - in: query
@@ -40,7 +40,7 @@ paths:
         default:
           $ref: '#/responses/unknown'
     post:
-      summary: Create and start a new application
+      summary: Create and start a new app
       operationId: createApp
       parameters:
         - in: body
@@ -60,7 +60,7 @@ paths:
           $ref: '#/responses/unknown'
   /api/apps/{appName}:
     get:
-      summary: Get an application by name
+      summary: Get an app by name
       operationId: getApp
       parameters:
         - $ref: '#/parameters/appName'
@@ -74,7 +74,7 @@ paths:
           schema:
             type: string
     delete:
-      summary: Stop and delete an application
+      summary: Stop and delete an app
       operationId: deleteApp
       parameters:
         - $ref: '#/parameters/appName'
@@ -91,7 +91,7 @@ paths:
           $ref: '#/responses/unknown'
   /api/apps/{appName}/start:
     post:
-      summary: start the application
+      summary: start the app
       operationId: startApp
       parameters:
         - $ref: '#/parameters/appName'
@@ -106,7 +106,7 @@ paths:
           $ref: '#/responses/unknown'
   /api/apps/{appName}/stop:
     post:
-      summary: stop the application
+      summary: stop the app
       operationId: stopApp
       parameters:
         - $ref: '#/parameters/appName'
@@ -121,7 +121,7 @@ paths:
           $ref: '#/responses/unknown'
   /api/apps/{appName}/config:
     get:
-      summary: get an application's current config
+      summary: get an app's current config
       operationId: getAppConfig
       parameters:
         - $ref: '#/parameters/appName'
@@ -137,7 +137,7 @@ paths:
         default:
           $ref: '#/responses/unknown'
     put:
-      summary: update an application's config
+      summary: update an app's config
       operationId: updateAppConfig
       parameters:
         - $ref: '#/parameters/appName'
@@ -150,6 +150,51 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/AppConfig'
+        404:
+          description: Not Found
+          schema:
+            type: string
+        default:
+          $ref: '#/responses/unknown'
+  /api/apps/{appName}/env:
+    get:
+      summary: get an app's environment variables
+      operationId: getAppEnv
+      parameters:
+        - $ref: '#/parameters/appName'
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+        404:
+          description: Not Found
+          schema:
+            type: string
+        default:
+          $ref: '#/responses/unknown'
+    put:
+      summary: update an app's env
+      operationId: updateAppEnv
+      parameters:
+        - $ref: '#/parameters/appName'
+        - in: body
+          name: newEnv
+          schema:
+            type: object
+            # additionalProperties: {}
+            # items:
+            #   type: integer
+            # additionalProperties:
+            #   type: string
+            # example:
+            #   KEY: value
+            #   SOME_BOOLEAN: false
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
         404:
           description: Not Found
           schema:
@@ -299,7 +344,7 @@ definitions:
     properties:
       targetPorts:
         description: 
-          The ports that the application is listening to inside the container. If no target ports
+          The ports that the app is listening to inside the container. If no target ports
           are specified, then the container should respect the `PORT` env var.
         type: array
         items:
@@ -307,7 +352,7 @@ definitions:
         uniqueItems: true
       publishedPorts:
         description: 
-          The ports that you access the application through in the swarm. This field can, and should
+          The ports that you access the app through in the swarm. This field can, and should
           be left empty. Miasma automatically manages assigning published ports between 3001-4999.
           If you need to specify a port, make sure it's outside that range or the port has not been
           taken. Plugins have set ports starting with 4000, so avoid 4000-4020 if you want to add a
@@ -322,7 +367,7 @@ definitions:
         uniqueItems: true
       placement:
         description: 
-          The placement constraints specifying which nodes the application will be ran on. Any valid
+          The placement constraints specifying which nodes the app will be ran on. Any valid
           value for the
           [`--constraint` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints)
           is valid item in this list
@@ -347,19 +392,19 @@ definitions:
         x-nullable: true
         properties:
           host:
-            description: Describes the hostname the application is served at ("test.domain.com")
+            description: Describes the hostname the app is served at ("test.domain.com")
             type: string
             x-nullable: true
           path:
             description: 
-              The path at a given host the application can be reached from ("/api"). It should start
+              The path at a given host the app can be reached from ("/api"). It should start
               with a "/"
             type: string
             x-nullable: true
           traefikRule:
             description: 
               Instead of using `host` and/or `path`, you can specify the exact rule Traefik will use
-              to route to the application. See [Traefik's documentation]() for how to use this field.
+              to route to the app. See [Traefik's documentation]() for how to use this field.
               This field takes priority over `host` and `path`
             type: string
             x-nullable: true

@@ -31,7 +31,7 @@ func NewUpdateAppConfig(ctx *middleware.Context, handler UpdateAppConfigHandler)
 
 /*UpdateAppConfig swagger:route PUT /api/apps/{appName}/config updateAppConfig
 
-update an application's config
+update an app's config
 
 */
 type UpdateAppConfig struct {

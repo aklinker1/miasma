@@ -54,6 +54,9 @@ func NewMiasmaAPI(spec *loads.Document) *MiasmaAPI {
 		GetAppConfigHandler: GetAppConfigHandlerFunc(func(params GetAppConfigParams) middleware.Responder {
 			return middleware.NotImplemented("operation GetAppConfig has not yet been implemented")
 		}),
+		GetAppEnvHandler: GetAppEnvHandlerFunc(func(params GetAppEnvParams) middleware.Responder {
+			return middleware.NotImplemented("operation GetAppEnv has not yet been implemented")
+		}),
 		GetAppsHandler: GetAppsHandlerFunc(func(params GetAppsParams) middleware.Responder {
 			return middleware.NotImplemented("operation GetApps has not yet been implemented")
 		}),
@@ -80,6 +83,9 @@ func NewMiasmaAPI(spec *loads.Document) *MiasmaAPI {
 		}),
 		UpdateAppConfigHandler: UpdateAppConfigHandlerFunc(func(params UpdateAppConfigParams) middleware.Responder {
 			return middleware.NotImplemented("operation UpdateAppConfig has not yet been implemented")
+		}),
+		UpdateAppEnvHandler: UpdateAppEnvHandlerFunc(func(params UpdateAppEnvParams) middleware.Responder {
+			return middleware.NotImplemented("operation UpdateAppEnv has not yet been implemented")
 		}),
 	}
 }
@@ -123,6 +129,8 @@ type MiasmaAPI struct {
 	GetAppHandler GetAppHandler
 	// GetAppConfigHandler sets the operation handler for the get app config operation
 	GetAppConfigHandler GetAppConfigHandler
+	// GetAppEnvHandler sets the operation handler for the get app env operation
+	GetAppEnvHandler GetAppEnvHandler
 	// GetAppsHandler sets the operation handler for the get apps operation
 	GetAppsHandler GetAppsHandler
 	// GetHealthCheckHandler sets the operation handler for the get health check operation
@@ -141,6 +149,8 @@ type MiasmaAPI struct {
 	UninstallPluginHandler UninstallPluginHandler
 	// UpdateAppConfigHandler sets the operation handler for the update app config operation
 	UpdateAppConfigHandler UpdateAppConfigHandler
+	// UpdateAppEnvHandler sets the operation handler for the update app env operation
+	UpdateAppEnvHandler UpdateAppEnvHandler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -229,6 +239,9 @@ func (o *MiasmaAPI) Validate() error {
 	if o.GetAppConfigHandler == nil {
 		unregistered = append(unregistered, "GetAppConfigHandler")
 	}
+	if o.GetAppEnvHandler == nil {
+		unregistered = append(unregistered, "GetAppEnvHandler")
+	}
 	if o.GetAppsHandler == nil {
 		unregistered = append(unregistered, "GetAppsHandler")
 	}
@@ -255,6 +268,9 @@ func (o *MiasmaAPI) Validate() error {
 	}
 	if o.UpdateAppConfigHandler == nil {
 		unregistered = append(unregistered, "UpdateAppConfigHandler")
+	}
+	if o.UpdateAppEnvHandler == nil {
+		unregistered = append(unregistered, "UpdateAppEnvHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -363,6 +379,10 @@ func (o *MiasmaAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
+	o.handlers["GET"]["/api/apps/{appName}/env"] = NewGetAppEnv(o.context, o.GetAppEnvHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
 	o.handlers["GET"]["/api/apps"] = NewGetApps(o.context, o.GetAppsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
@@ -396,6 +416,10 @@ func (o *MiasmaAPI) initHandlerCache() {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
 	o.handlers["PUT"]["/api/apps/{appName}/config"] = NewUpdateAppConfig(o.context, o.UpdateAppConfigHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/api/apps/{appName}/env"] = NewUpdateAppEnv(o.context, o.UpdateAppEnvHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

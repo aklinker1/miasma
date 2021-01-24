@@ -17,6 +17,8 @@ func UseAppsController(api *operations.MiasmaAPI) {
 	api.StopAppHandler = stopApp
 	api.GetAppConfigHandler = getAppConfig
 	api.UpdateAppConfigHandler = updateAppConfig
+	api.GetAppEnvHandler = getAppEnv
+	api.UpdateAppEnvHandler = updateAppEnv
 }
 
 var getApps = operations.GetAppsHandlerFunc(
@@ -120,4 +122,26 @@ var updateAppConfig = operations.UpdateAppConfigHandlerFunc(
 			return operations.NewUpdateAppConfigDefault(500).WithPayload(err.Error())
 		}
 		return operations.NewUpdateAppConfigOK().WithPayload(appConfig)
+	})
+
+var getAppEnv = operations.GetAppEnvHandlerFunc(
+	func(params operations.GetAppEnvParams) middleware.Responder {
+		appEnv, err := services.App.GetEnv(params.AppName)
+		if err != nil {
+			return operations.NewGetAppEnvNotFound().WithPayload(err.Error())
+		}
+		return operations.NewGetAppEnvOK().WithPayload(appEnv)
+	})
+
+var updateAppEnv = operations.UpdateAppEnvHandlerFunc(
+	func(params operations.UpdateAppEnvParams) middleware.Responder {
+		_, err := services.App.GetConfig(params.AppName)
+		if err != nil {
+			return operations.NewUpdateAppEnvNotFound().WithPayload(err.Error())
+		}
+		env, err := services.App.UpdateEnv(params.AppName, params.NewEnv.(map[string]interface{}))
+		if err != nil {
+			return operations.NewUpdateAppEnvDefault(500).WithPayload(err.Error())
+		}
+		return operations.NewUpdateAppEnvOK().WithPayload(env)
 	})

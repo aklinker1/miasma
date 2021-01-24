@@ -31,7 +31,7 @@ func NewStartApp(ctx *middleware.Context, handler StartAppHandler) *StartApp {
 
 /*StartApp swagger:route POST /api/apps/{appName}/start startApp
 
-start the application
+start the app
 
 */
 type StartApp struct {

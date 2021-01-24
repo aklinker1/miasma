@@ -32,7 +32,7 @@ func init() {
   "paths": {
     "/api/apps": {
       "get": {
-        "summary": "List all the running applications",
+        "summary": "List all the running apps",
         "operationId": "getApps",
         "parameters": [
           {
@@ -58,7 +58,7 @@ func init() {
         }
       },
       "post": {
-        "summary": "Create and start a new application",
+        "summary": "Create and start a new app",
         "operationId": "createApp",
         "parameters": [
           {
@@ -90,7 +90,7 @@ func init() {
     },
     "/api/apps/{appName}": {
       "get": {
-        "summary": "Get an application by name",
+        "summary": "Get an app by name",
         "operationId": "getApp",
         "parameters": [
           {
@@ -113,7 +113,7 @@ func init() {
         }
       },
       "delete": {
-        "summary": "Stop and delete an application",
+        "summary": "Stop and delete an app",
         "operationId": "deleteApp",
         "parameters": [
           {
@@ -141,7 +141,7 @@ func init() {
     },
     "/api/apps/{appName}/config": {
       "get": {
-        "summary": "get an application's current config",
+        "summary": "get an app's current config",
         "operationId": "getAppConfig",
         "parameters": [
           {
@@ -167,7 +167,7 @@ func init() {
         }
       },
       "put": {
-        "summary": "update an application's config",
+        "summary": "update an app's config",
         "operationId": "updateAppConfig",
         "parameters": [
           {
@@ -200,9 +200,70 @@ func init() {
         }
       }
     },
+    "/api/apps/{appName}/env": {
+      "get": {
+        "summary": "get an app's environment variables",
+        "operationId": "getAppEnv",
+        "parameters": [
+          {
+            "$ref": "#/parameters/appName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/unknown"
+          }
+        }
+      },
+      "put": {
+        "summary": "update an app's env",
+        "operationId": "updateAppEnv",
+        "parameters": [
+          {
+            "$ref": "#/parameters/appName"
+          },
+          {
+            "name": "newEnv",
+            "in": "body",
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/unknown"
+          }
+        }
+      }
+    },
     "/api/apps/{appName}/start": {
       "post": {
-        "summary": "start the application",
+        "summary": "start the app",
         "operationId": "startApp",
         "parameters": [
           {
@@ -227,7 +288,7 @@ func init() {
     },
     "/api/apps/{appName}/stop": {
       "post": {
-        "summary": "stop the application",
+        "summary": "stop the app",
         "operationId": "stopApp",
         "parameters": [
           {
@@ -392,7 +453,7 @@ func init() {
           }
         },
         "placement": {
-          "description": "The placement constraints specifying which nodes the application will be ran on. Any valid value for the [` + "`" + `--constraint` + "`" + ` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints) is valid item in this list",
+          "description": "The placement constraints specifying which nodes the app will be ran on. Any valid value for the [` + "`" + `--constraint` + "`" + ` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints) is valid item in this list",
           "type": "array",
           "uniqueItems": true,
           "items": {
@@ -400,7 +461,7 @@ func init() {
           }
         },
         "publishedPorts": {
-          "description": "The ports that you access the application through in the swarm. This field can, and should be left empty. Miasma automatically manages assigning published ports between 3001-4999. If you need to specify a port, make sure it's outside that range or the port has not been taken. Plugins have set ports starting with 4000, so avoid 4000-4020 if you want to add a plugin at a later date. If these ports are ever cleared, the app will continue using the same ports it was published to before, so that the ports don't change unnecessarily. If you removed it to clear a port for another app/plugin, make sure to restart the app and a new, random port will be allocated for the app, freeing the old port",
+          "description": "The ports that you access the app through in the swarm. This field can, and should be left empty. Miasma automatically manages assigning published ports between 3001-4999. If you need to specify a port, make sure it's outside that range or the port has not been taken. Plugins have set ports starting with 4000, so avoid 4000-4020 if you want to add a plugin at a later date. If these ports are ever cleared, the app will continue using the same ports it was published to before, so that the ports don't change unnecessarily. If you removed it to clear a port for another app/plugin, make sure to restart the app and a new, random port will be allocated for the app, freeing the old port",
           "type": "array",
           "uniqueItems": true,
           "items": {
@@ -412,17 +473,17 @@ func init() {
           "type": "object",
           "properties": {
             "host": {
-              "description": "Describes the hostname the application is served at (\"test.domain.com\")",
+              "description": "Describes the hostname the app is served at (\"test.domain.com\")",
               "type": "string",
               "x-nullable": true
             },
             "path": {
-              "description": "The path at a given host the application can be reached from (\"/api\"). It should start with a \"/\"",
+              "description": "The path at a given host the app can be reached from (\"/api\"). It should start with a \"/\"",
               "type": "string",
               "x-nullable": true
             },
             "traefikRule": {
-              "description": "Instead of using ` + "`" + `host` + "`" + ` and/or ` + "`" + `path` + "`" + `, you can specify the exact rule Traefik will use to route to the application. See [Traefik's documentation]() for how to use this field. This field takes priority over ` + "`" + `host` + "`" + ` and ` + "`" + `path` + "`" + `",
+              "description": "Instead of using ` + "`" + `host` + "`" + ` and/or ` + "`" + `path` + "`" + `, you can specify the exact rule Traefik will use to route to the app. See [Traefik's documentation]() for how to use this field. This field takes priority over ` + "`" + `host` + "`" + ` and ` + "`" + `path` + "`" + `",
               "type": "string",
               "x-nullable": true
             }
@@ -430,7 +491,7 @@ func init() {
           "x-nullable": true
         },
         "targetPorts": {
-          "description": "The ports that the application is listening to inside the container. If no target ports are specified, then the container should respect the ` + "`" + `PORT` + "`" + ` env var.",
+          "description": "The ports that the app is listening to inside the container. If no target ports are specified, then the container should respect the ` + "`" + `PORT` + "`" + ` env var.",
           "type": "array",
           "uniqueItems": true,
           "items": {
@@ -567,7 +628,7 @@ func init() {
   "paths": {
     "/api/apps": {
       "get": {
-        "summary": "List all the running applications",
+        "summary": "List all the running apps",
         "operationId": "getApps",
         "parameters": [
           {
@@ -596,7 +657,7 @@ func init() {
         }
       },
       "post": {
-        "summary": "Create and start a new application",
+        "summary": "Create and start a new app",
         "operationId": "createApp",
         "parameters": [
           {
@@ -631,7 +692,7 @@ func init() {
     },
     "/api/apps/{appName}": {
       "get": {
-        "summary": "Get an application by name",
+        "summary": "Get an app by name",
         "operationId": "getApp",
         "parameters": [
           {
@@ -658,7 +719,7 @@ func init() {
         }
       },
       "delete": {
-        "summary": "Stop and delete an application",
+        "summary": "Stop and delete an app",
         "operationId": "deleteApp",
         "parameters": [
           {
@@ -693,7 +754,7 @@ func init() {
     },
     "/api/apps/{appName}/config": {
       "get": {
-        "summary": "get an application's current config",
+        "summary": "get an app's current config",
         "operationId": "getAppConfig",
         "parameters": [
           {
@@ -726,7 +787,7 @@ func init() {
         }
       },
       "put": {
-        "summary": "update an application's config",
+        "summary": "update an app's config",
         "operationId": "updateAppConfig",
         "parameters": [
           {
@@ -766,9 +827,84 @@ func init() {
         }
       }
     },
+    "/api/apps/{appName}/env": {
+      "get": {
+        "summary": "get an app's environment variables",
+        "operationId": "getAppEnv",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",
+            "name": "appName",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "update an app's env",
+        "operationId": "updateAppEnv",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",
+            "name": "appName",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "newEnv",
+            "in": "body",
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
     "/api/apps/{appName}/start": {
       "post": {
-        "summary": "start the application",
+        "summary": "start the app",
         "operationId": "startApp",
         "parameters": [
           {
@@ -800,7 +936,7 @@ func init() {
     },
     "/api/apps/{appName}/stop": {
       "post": {
-        "summary": "stop the application",
+        "summary": "stop the app",
         "operationId": "stopApp",
         "parameters": [
           {
@@ -993,7 +1129,7 @@ func init() {
           }
         },
         "placement": {
-          "description": "The placement constraints specifying which nodes the application will be ran on. Any valid value for the [` + "`" + `--constraint` + "`" + ` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints) is valid item in this list",
+          "description": "The placement constraints specifying which nodes the app will be ran on. Any valid value for the [` + "`" + `--constraint` + "`" + ` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints) is valid item in this list",
           "type": "array",
           "uniqueItems": true,
           "items": {
@@ -1001,7 +1137,7 @@ func init() {
           }
         },
         "publishedPorts": {
-          "description": "The ports that you access the application through in the swarm. This field can, and should be left empty. Miasma automatically manages assigning published ports between 3001-4999. If you need to specify a port, make sure it's outside that range or the port has not been taken. Plugins have set ports starting with 4000, so avoid 4000-4020 if you want to add a plugin at a later date. If these ports are ever cleared, the app will continue using the same ports it was published to before, so that the ports don't change unnecessarily. If you removed it to clear a port for another app/plugin, make sure to restart the app and a new, random port will be allocated for the app, freeing the old port",
+          "description": "The ports that you access the app through in the swarm. This field can, and should be left empty. Miasma automatically manages assigning published ports between 3001-4999. If you need to specify a port, make sure it's outside that range or the port has not been taken. Plugins have set ports starting with 4000, so avoid 4000-4020 if you want to add a plugin at a later date. If these ports are ever cleared, the app will continue using the same ports it was published to before, so that the ports don't change unnecessarily. If you removed it to clear a port for another app/plugin, make sure to restart the app and a new, random port will be allocated for the app, freeing the old port",
           "type": "array",
           "uniqueItems": true,
           "items": {
@@ -1013,17 +1149,17 @@ func init() {
           "type": "object",
           "properties": {
             "host": {
-              "description": "Describes the hostname the application is served at (\"test.domain.com\")",
+              "description": "Describes the hostname the app is served at (\"test.domain.com\")",
               "type": "string",
               "x-nullable": true
             },
             "path": {
-              "description": "The path at a given host the application can be reached from (\"/api\"). It should start with a \"/\"",
+              "description": "The path at a given host the app can be reached from (\"/api\"). It should start with a \"/\"",
               "type": "string",
               "x-nullable": true
             },
             "traefikRule": {
-              "description": "Instead of using ` + "`" + `host` + "`" + ` and/or ` + "`" + `path` + "`" + `, you can specify the exact rule Traefik will use to route to the application. See [Traefik's documentation]() for how to use this field. This field takes priority over ` + "`" + `host` + "`" + ` and ` + "`" + `path` + "`" + `",
+              "description": "Instead of using ` + "`" + `host` + "`" + ` and/or ` + "`" + `path` + "`" + `, you can specify the exact rule Traefik will use to route to the app. See [Traefik's documentation]() for how to use this field. This field takes priority over ` + "`" + `host` + "`" + ` and ` + "`" + `path` + "`" + `",
               "type": "string",
               "x-nullable": true
             }
@@ -1031,7 +1167,7 @@ func init() {
           "x-nullable": true
         },
         "targetPorts": {
-          "description": "The ports that the application is listening to inside the container. If no target ports are specified, then the container should respect the ` + "`" + `PORT` + "`" + ` env var.",
+          "description": "The ports that the app is listening to inside the container. If no target ports are specified, then the container should respect the ` + "`" + `PORT` + "`" + ` env var.",
           "type": "array",
           "uniqueItems": true,
           "items": {
@@ -1045,17 +1181,17 @@ func init() {
       "type": "object",
       "properties": {
         "host": {
-          "description": "Describes the hostname the application is served at (\"test.domain.com\")",
+          "description": "Describes the hostname the app is served at (\"test.domain.com\")",
           "type": "string",
           "x-nullable": true
         },
         "path": {
-          "description": "The path at a given host the application can be reached from (\"/api\"). It should start with a \"/\"",
+          "description": "The path at a given host the app can be reached from (\"/api\"). It should start with a \"/\"",
           "type": "string",
           "x-nullable": true
         },
         "traefikRule": {
-          "description": "Instead of using ` + "`" + `host` + "`" + ` and/or ` + "`" + `path` + "`" + `, you can specify the exact rule Traefik will use to route to the application. See [Traefik's documentation]() for how to use this field. This field takes priority over ` + "`" + `host` + "`" + ` and ` + "`" + `path` + "`" + `",
+          "description": "Instead of using ` + "`" + `host` + "`" + ` and/or ` + "`" + `path` + "`" + `, you can specify the exact rule Traefik will use to route to the app. See [Traefik's documentation]() for how to use this field. This field takes priority over ` + "`" + `host` + "`" + ` and ` + "`" + `path` + "`" + `",
           "type": "string",
           "x-nullable": true
         }

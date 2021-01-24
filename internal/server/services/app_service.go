@@ -157,10 +157,6 @@ func (service *appService) UpdateConfig(appName string, newAppConfig *models.App
 	if err != nil {
 		return nil, err
 	}
-	pluginMeta, err := Plugin.GetPluginMeta()
-	if err != nil {
-		return nil, err
-	}
 
 	updatedMeta := existingMeta
 	updatedMeta.TargetPorts = shared.ConvertInt64ArrayToUInt32Array(newAppConfig.TargetPorts)
@@ -191,20 +187,9 @@ func (service *appService) UpdateConfig(appName string, newAppConfig *models.App
 	}
 
 	// TODO! Reset ports to be generated if the published ports have changed
-	newServiceSpec, err := mappers.App.ToService(updatedMeta, pluginMeta, service.getNextPorts(updatedMeta))
+	err = service.ReloadApp(appName, updatedMeta)
 	if err != nil {
 		return nil, err
-	}
-
-	existingService, _ := Docker.GetRunningService(appName)
-	if existingService != nil {
-		log.V("Updating a running service: %s", appName)
-		err = Docker.UpdateService(existingService, newServiceSpec)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		log.V("%s is not running, do not need to update it", appName)
 	}
 
 	err = service.WriteAppMeta(updatedMeta)
@@ -213,6 +198,60 @@ func (service *appService) UpdateConfig(appName string, newAppConfig *models.App
 	}
 
 	return service.GetConfig(appName)
+}
+
+func (service *appService) GetEnv(appName string) (map[string]interface{}, error) {
+	metaYml, err := service.GetAppMeta(appName)
+	if err != nil {
+		return nil, err
+	}
+	return metaYml.Env, nil
+}
+
+func (service *appService) UpdateEnv(appName string, newEnv map[string]interface{}) (map[string]interface{}, error) {
+	existingMeta, err := service.GetAppMeta(appName)
+	if err != nil {
+		return nil, err
+	}
+
+	updatedMeta := existingMeta
+	updatedMeta.Env = newEnv
+
+	err = service.ReloadApp(appName, updatedMeta)
+	if err != nil {
+		return nil, err
+	}
+
+	err = service.WriteAppMeta(updatedMeta)
+	if err != nil {
+		return nil, err
+	}
+
+	return service.GetEnv(appName)
+}
+
+func (service *appService) ReloadApp(appName string, updatedMeta *types.AppMetaData) error {
+	pluginMeta, err := Plugin.GetPluginMeta()
+	if err != nil {
+		return err
+	}
+
+	newServiceSpec, err := mappers.App.ToService(updatedMeta, pluginMeta, service.getNextPorts(updatedMeta))
+	if err != nil {
+		return err
+	}
+
+	existingService, _ := Docker.GetRunningService(appName)
+	if existingService != nil {
+		log.V("Updating a running service: %s", appName)
+		err = Docker.UpdateService(existingService, newServiceSpec)
+		if err != nil {
+			return err
+		}
+	} else {
+		log.V("%s is not running, do not need to update it", appName)
+	}
+	return nil
 }
 
 func (service *appService) getNextPorts(appMeta *types.AppMetaData) func(int) ([]uint32, error) {

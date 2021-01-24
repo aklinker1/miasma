@@ -31,7 +31,7 @@ func NewDeleteApp(ctx *middleware.Context, handler DeleteAppHandler) *DeleteApp 
 
 /*DeleteApp swagger:route DELETE /api/apps/{appName} deleteApp
 
-Stop and delete an application
+Stop and delete an app
 
 */
 type DeleteApp struct {

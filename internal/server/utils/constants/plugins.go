@@ -37,7 +37,7 @@ var Plugins = predefinedPlugins{
 		Command:        []string{"-p 4001"},
 		Placement:      []string{"node.labels.postgres==true"},
 		Volumes:        []string{fmt.Sprintf("%s:/var/lib/postgresql/data", env.PLUGIN_POSTGRES_DATA_VOLUME)},
-		Env: map[string]string{
+		Env: map[string]interface{}{
 			"POSTGRES_PASSWORD": env.PLUGIN_POSTGRES_PASSWORD,
 			"POSTGRES_USER":     env.PLUGIN_POSTGRES_USER,
 			"POSTGRES_DB":       "miasma",

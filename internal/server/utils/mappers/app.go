@@ -123,8 +123,12 @@ func (a *app) ToService(app *types.AppMetaData, plugins *types.PluginMetaData, g
 
 	// Setup env variables
 	env := append(envPorts, []string{}...)
+	for key, value := range app.Env {
+		env = append(env, fmt.Sprintf("%s=%s", key, fmt.Sprint(value)))
+		log.V("Added env: %s", key)
+	}
 
-	// Setup vVolumes
+	// Setup volumes
 	volumes := []mount.Mount{}
 	for _, volume := range app.Volumes {
 		split := strings.Split(volume, ":")

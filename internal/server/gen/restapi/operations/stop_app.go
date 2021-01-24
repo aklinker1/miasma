@@ -31,7 +31,7 @@ func NewStopApp(ctx *middleware.Context, handler StopAppHandler) *StopApp {
 
 /*StopApp swagger:route POST /api/apps/{appName}/stop stopApp
 
-stop the application
+stop the app
 
 */
 type StopApp struct {

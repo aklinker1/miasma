@@ -22,5 +22,5 @@ type AppMetaData struct {
 	Route          *Route
 
 	// Env
-	Env map[string]string
+	Env map[string]interface{}
 }
