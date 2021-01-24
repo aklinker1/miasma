@@ -1,6 +1,7 @@
 package constants
 
 import (
+	"github.com/aklinker1/miasma/internal/server/gen/models"
 	"github.com/aklinker1/miasma/internal/server/utils/types"
 	"github.com/aklinker1/miasma/internal/shared"
 )
@@ -17,9 +18,10 @@ var Plugins = predefinedPlugins{
 		TargetPorts:    []uint32{80, 8080},
 		PublishedPorts: []uint32{80, 4000},
 		Placement:      []string{"node.labels.traefik==true"},
-		Volumes: []string{
-			"/var/run/docker.sock:/var/run/docker.sock",
-		},
+		Volumes: []*models.AppConfigVolumesItems0{{
+			Source: "/var/run/docker.sock",
+			Target: "/var/run/docker.sock",
+		}},
 		Command: []string{"traefik", "--api.insecure=true", "--providers.docker", "--providers.docker.swarmmode"},
 	},
 }

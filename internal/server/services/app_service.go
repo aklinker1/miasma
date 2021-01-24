@@ -166,17 +166,17 @@ func (service *appService) UpdateConfig(appName string, newAppConfig *models.App
 	updatedMeta.Volumes = newAppConfig.Volumes
 	// TODO: Move to mapper
 	if newAppConfig.Route != nil {
-		host := ""
-		path := ""
-		rule := ""
+		var host *string
+		var path *string
+		var rule *string
 		if newAppConfig.Route.Host != nil {
-			host = *newAppConfig.Route.Host
+			host = newAppConfig.Route.Host
 		}
 		if newAppConfig.Route.Path != nil {
-			path = *newAppConfig.Route.Path
+			path = newAppConfig.Route.Path
 		}
 		if newAppConfig.Route.TraefikRule != nil {
-			rule = *newAppConfig.Route.TraefikRule
+			rule = newAppConfig.Route.TraefikRule
 		}
 		updatedMeta.Route = &types.Route{
 			Host:        host,

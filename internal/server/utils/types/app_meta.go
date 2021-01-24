@@ -1,9 +1,11 @@
 package types
 
+import "github.com/aklinker1/miasma/internal/server/gen/models"
+
 type Route struct {
-	Host        string
-	Path        string
-	TraefikRule string `yaml:"traefikRule"`
+	Host        *string
+	Path        *string
+	TraefikRule *string `yaml:"traefikRule"`
 }
 
 type AppMetaData struct {

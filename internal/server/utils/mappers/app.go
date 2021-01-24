@@ -2,7 +2,6 @@ package mappers
 
 import (
 	"fmt"
-	"strings"
 
 	"docker.io/go-docker/api/types/mount"
 	dockerSwarmTypes "docker.io/go-docker/api/types/swarm"
@@ -38,15 +37,10 @@ func (a *app) ToConfig(app *types.AppMetaData) *models.AppConfig {
 	var route *models.AppConfigRoute
 	log.V("App route: %v", app.Route)
 	if app.Route != nil {
-		if app.Route.TraefikRule != "" {
-			route = &models.AppConfigRoute{
-				TraefikRule: &app.Route.TraefikRule,
-			}
-		} else {
-			route = &models.AppConfigRoute{
-				Host: &app.Route.Host,
-				Path: &app.Route.Path,
-			}
+		route = &models.AppConfigRoute{
+			Host:        app.Route.Host,
+			Path:        app.Route.Path,
+			TraefikRule: app.Route.TraefikRule,
 		}
 	}
 	return &models.AppConfig{
@@ -149,12 +143,12 @@ func (a *app) ToService(app *types.AppMetaData, plugins *types.PluginMetaData, g
 		labels[enabled] = "true"
 		labels[networkLabel] = constants.Plugins.Traefik.Name
 		labels[targetPort] = fmt.Sprint(targetPorts[0])
-		if app.Route.TraefikRule != "" {
-			labels[rulesLabel] = app.Route.TraefikRule
-		} else if app.Route.Path == "" {
-			labels[rulesLabel] = fmt.Sprintf("Host(`%s`)", app.Route.Host)
+		if app.Route.TraefikRule != nil {
+			labels[rulesLabel] = *app.Route.TraefikRule
+		} else if app.Route.Path == nil {
+			labels[rulesLabel] = fmt.Sprintf("Host(`%s`)", *app.Route.Host)
 		} else {
-			labels[rulesLabel] = fmt.Sprintf("(Host(`%s`) && PathPrefix(`%s`))", app.Route.Host, app.Route.Path)
+			labels[rulesLabel] = fmt.Sprintf("(Host(`%s`) && PathPrefix(`%s`))", *app.Route.Host, *app.Route.Path)
 		}
 	}
 
