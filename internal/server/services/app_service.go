@@ -163,6 +163,7 @@ func (service *appService) UpdateConfig(appName string, newAppConfig *models.App
 	updatedMeta.PublishedPorts = shared.ConvertInt64ArrayToUInt32Array(newAppConfig.PublishedPorts)
 	updatedMeta.Networks = newAppConfig.Networks
 	updatedMeta.Placement = newAppConfig.Placement
+	updatedMeta.Volumes = newAppConfig.Volumes
 	// TODO: Move to mapper
 	if newAppConfig.Route != nil {
 		host := ""

@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"strconv"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -35,6 +37,9 @@ type AppConfig struct {
 	// The ports that the app is listening to inside the container. If no target ports are specified, then the container should respect the `PORT` env var.
 	// Unique: true
 	TargetPorts []int64 `json:"targetPorts"`
+
+	// volume bindings for the app
+	Volumes []*AppConfigVolumesItems0 `json:"volumes"`
 }
 
 // Validate validates this app config
@@ -58,6 +63,10 @@ func (m *AppConfig) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateTargetPorts(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateVolumes(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -137,6 +146,31 @@ func (m *AppConfig) validateTargetPorts(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *AppConfig) validateVolumes(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Volumes) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Volumes); i++ {
+		if swag.IsZero(m.Volumes[i]) { // not required
+			continue
+		}
+
+		if m.Volumes[i] != nil {
+			if err := m.Volumes[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("volumes" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
 // MarshalBinary interface implementation
 func (m *AppConfig) MarshalBinary() ([]byte, error) {
 	if m == nil {
@@ -186,6 +220,41 @@ func (m *AppConfigRoute) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (m *AppConfigRoute) UnmarshalBinary(b []byte) error {
 	var res AppConfigRoute
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// AppConfigVolumesItems0 app config volumes items0
+//
+// swagger:model AppConfigVolumesItems0
+type AppConfigVolumesItems0 struct {
+
+	// The volume name or directory on the host that the data is stored in
+	Source string `json:"Source,omitempty"`
+
+	// The path inside the container that the data is served from
+	Target string `json:"Target,omitempty"`
+}
+
+// Validate validates this app config volumes items0
+func (m *AppConfigVolumesItems0) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *AppConfigVolumesItems0) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *AppConfigVolumesItems0) UnmarshalBinary(b []byte) error {
+	var res AppConfigVolumesItems0
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

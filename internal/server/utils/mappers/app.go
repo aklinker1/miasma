@@ -55,6 +55,7 @@ func (a *app) ToConfig(app *types.AppMetaData) *models.AppConfig {
 		Placement:      app.Placement,
 		Networks:       app.Networks,
 		Route:          route,
+		Volumes:        app.Volumes,
 	}
 }
 
@@ -131,12 +132,8 @@ func (a *app) ToService(app *types.AppMetaData, plugins *types.PluginMetaData, g
 	// Setup volumes
 	volumes := []mount.Mount{}
 	for _, volume := range app.Volumes {
-		split := strings.Split(volume, ":")
-		volumes = append(volumes, mount.Mount{
-			Source: split[0],
-			Target: split[1],
-			Type:   mount.TypeBind,
-		})
+		log.V("Added volume: %v", volume)
+		volumes = append(volumes, Volume.ToDocker(volume))
 	}
 
 	// Setup labels

@@ -17,7 +17,7 @@ type AppMetaData struct {
 	PublishedPorts []uint32 `yaml:"publishedPorts"`
 	Placement      []string
 	Networks       []string
-	Volumes        []string
+	Volumes        []*models.AppConfigVolumesItems0
 	Command        []string
 	Route          *Route
 

@@ -514,6 +514,23 @@ func init() {
           "items": {
             "type": "integer"
           }
+        },
+        "volumes": {
+          "description": "volume bindings for the app",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "Source": {
+                "description": "The volume name or directory on the host that the data is stored in",
+                "type": "string"
+              },
+              "Target": {
+                "description": "The path inside the container that the data is served from",
+                "type": "string"
+              }
+            }
+          }
         }
       }
     },
@@ -1207,6 +1224,13 @@ func init() {
           "items": {
             "type": "integer"
           }
+        },
+        "volumes": {
+          "description": "volume bindings for the app",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AppConfigVolumesItems0"
+          }
         }
       }
     },
@@ -1231,6 +1255,19 @@ func init() {
         }
       },
       "x-nullable": true
+    },
+    "AppConfigVolumesItems0": {
+      "type": "object",
+      "properties": {
+        "Source": {
+          "description": "The volume name or directory on the host that the data is stored in",
+          "type": "string"
+        },
+        "Target": {
+          "description": "The path inside the container that the data is served from",
+          "type": "string"
+        }
+      }
     },
     "AppInput": {
       "type": "object",

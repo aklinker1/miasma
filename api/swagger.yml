@@ -379,6 +379,24 @@ definitions:
         items:
           type: string
         uniqueItems: true
+      volumes:
+        description:
+          volume bindings for the app
+        type: array
+        items:
+          type: object
+          properties:
+            Source:
+              description: The volume name or directory on the host that the data is stored in
+              type: string
+            Target:
+              description: The path inside the container that the data is served from
+              type: string
+            # Type:
+            #   description:
+            #     The type of binding. Should be either "bind", "volume", "tmpfs", or "npipe".
+            #   type: string
+            #   x-nullable: true
       networks:
         description:
           A list of other apps that the service communicates with using their service name and
