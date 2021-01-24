@@ -25,7 +25,7 @@ type AppConfig struct {
 	// Unique: true
 	Placement []string `json:"placement"`
 
-	// The ports that you access the application through in the swarm. This field can, and should be left empty. Miasma automatically manages assigning published ports between 3001-4999. If you need to specify a port, make sure it's outside that range or the port has not been taken. Plugins have set ports starting with 4000, so avoid 4000-4020 if you want to add a plugin at a later date.
+	// The ports that you access the application through in the swarm. This field can, and should be left empty. Miasma automatically manages assigning published ports between 3001-4999. If you need to specify a port, make sure it's outside that range or the port has not been taken. Plugins have set ports starting with 4000, so avoid 4000-4020 if you want to add a plugin at a later date. If these ports are ever cleared, the app will continue using the same ports it was published to before, so that the ports don't change unnecessarily. If you removed it to clear a port for another app/plugin, make sure to restart the app and a new, random port will be allocated for the app, freeing the old port
 	// Unique: true
 	PublishedPorts []int64 `json:"publishedPorts"`
 

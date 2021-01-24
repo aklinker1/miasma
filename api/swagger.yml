@@ -38,9 +38,7 @@ paths:
             items:
               $ref: '#/definitions/App'
         default:
-          description: Unknown Error
-          schema:
-            type: string
+          $ref: '#/responses/unknown'
     post:
       summary: Create and start a new application
       operationId: createApp
@@ -59,9 +57,7 @@ paths:
           schema:
             type: string
         default:
-          description: Unknown Error
-          schema:
-            type: string
+          $ref: '#/responses/unknown'
   /api/apps/{appName}:
     get:
       summary: Get an application by name
@@ -92,9 +88,7 @@ paths:
           schema:
             type: string
         default:
-          description: Unknown Error
-          schema:
-            type: string
+          $ref: '#/responses/unknown'
   /api/apps/{appName}/start:
     post:
       summary: start the application
@@ -141,9 +135,7 @@ paths:
           schema:
             type: string
         default:
-          description: Unknown Error
-          schema:
-            type: string
+          $ref: '#/responses/unknown'
     put:
       summary: update an application's config
       operationId: updateAppConfig
@@ -163,9 +155,7 @@ paths:
           schema:
             type: string
         default:
-          description: Unknown Error
-          schema:
-            type: string
+          $ref: '#/responses/unknown'
   /api/plugins:
     get:
       summary: List all available plugins and if they are installed
@@ -178,9 +168,7 @@ paths:
             items:
               $ref: '#/definitions/Plugin'
         default:
-          description: Unknown Error
-          schema:
-            type: string
+          $ref: '#/responses/unknown'
   /api/plugins/{pluginName}:
     get:
       summary: Get a plugin
@@ -197,9 +185,7 @@ paths:
           schema:
             type: string
         default:
-          description: Unknown Error
-          schema:
-            type: string
+          $ref: '#/responses/unknown'
     post:
       summary: Install (and start) a plugin
       operationId: installPlugin
@@ -211,9 +197,7 @@ paths:
           schema:
             $ref: '#/definitions/Plugin'
         default:
-          description: Unknown Error
-          schema:
-            type: string
+          $ref: '#/responses/unknown'
     delete:
       summary: Stop and uninstall a plugin
       operationId: uninstallPlugin
@@ -225,9 +209,7 @@ paths:
           schema:
             $ref: '#/definitions/Plugin'
         default:
-          description: Unknown Error
-          schema:
-            type: string
+          $ref: '#/responses/unknown'
 
 parameters:
   appName:
