@@ -117,12 +117,12 @@ func (service *pluginService) Install(pluginName string) (plugin *models.Plugin,
 func (service *pluginService) installTreafik(pluginMeta *types.PluginMetaData) (*models.Plugin, error) {
 	pluginMeta.Traefik = true
 	traefik := constants.Plugins.Traefik
-	serviceSpec, _ := mappers.App.ToService(&traefik, func(i int) ([]uint32, error) {
+	serviceSpec, _ := mappers.App.ToService(&traefik, pluginMeta, func(i int) ([]uint32, error) {
 		return traefik.PublishedPorts, nil
 	})
 	serviceOptions := dockerTypes.ServiceCreateOptions{}
 
-	err := Docker.CreateNetwork(traefik.Name)
+	err := Docker.CreateNetworkIfNotAvailable(traefik.Name)
 	if err != nil {
 		return nil, err
 	}

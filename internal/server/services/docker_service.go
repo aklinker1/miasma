@@ -72,14 +72,30 @@ func (service *dockerService) IsAppServiceRunning(appName string) bool {
 	return runningService != nil
 }
 
-func (service *dockerService) CreateNetwork(appName string) error {
-	_, err := docker.NetworkCreate(ctx, appName, dockerTypes.NetworkCreate{
-		Driver: "overlay",
-		Scope:  "swarm",
+func (service *dockerService) CreateNetworkIfNotAvailable(networkName string) error {
+	networks, err := docker.NetworkList(ctx, dockerTypes.NetworkListOptions{
+		Filters: filters.NewArgs(filters.KeyValuePair{
+			Key: "name", Value: networkName,
+		}),
 	})
 	if err != nil {
 		return err
 	}
+	if len(networks) > 0 {
+		log.V("Network '%s' already exists, not creating", networkName)
+		return nil
+	}
+	_, err = docker.NetworkCreate(ctx, networkName, dockerTypes.NetworkCreate{
+		Driver: "overlay",
+		Scope:  "swarm",
+		Labels: map[string]string{
+			"miasma": "true",
+		},
+	})
+	if err != nil {
+		return err
+	}
+	log.V("Created network: %s", networkName)
 	return nil
 }
 
@@ -92,7 +108,11 @@ func (service *dockerService) StartApp(app *types.AppMetaData) error {
 	if existingService != nil {
 		return fmt.Errorf("%s is already running", app.Name)
 	}
-	newService, err := mappers.App.ToService(app, service.GetNextAvailablePorts)
+	pluginMeta, err := Plugin.GetPluginMeta()
+	if err != nil {
+		return err
+	}
+	newService, err := mappers.App.ToService(app, pluginMeta, service.GetNextAvailablePorts)
 	if err != nil {
 		return err
 	}
@@ -120,12 +140,8 @@ func (service *dockerService) StopApp(app *models.App) error {
 	return service.StopService(*app.Name)
 }
 
-func (service *dockerService) UpdateService(serviceName string, newServiceSpec *dockerSwarmTypes.ServiceSpec) error {
-	existingService, err := service.GetRunningService(serviceName)
-	if err != nil {
-		return err
-	}
-	_, err = docker.ServiceUpdate(
+func (service *dockerService) UpdateService(existingService *dockerSwarmTypes.Service, newServiceSpec *dockerSwarmTypes.ServiceSpec) error {
+	_, err := docker.ServiceUpdate(
 		ctx,
 		existingService.ID,
 		existingService.Version,

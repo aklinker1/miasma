@@ -57,7 +57,7 @@ func (a *app) ToConfig(app *types.AppMetaData) *models.AppConfig {
 	}
 }
 
-func (a *app) ToService(app *types.AppMetaData, getNextPorts func(int) ([]uint32, error)) (*dockerSwarmTypes.ServiceSpec, error) {
+func (a *app) ToService(app *types.AppMetaData, plugins *types.PluginMetaData, getNextPorts func(int) ([]uint32, error)) (*dockerSwarmTypes.ServiceSpec, error) {
 	// Setup ports
 	var targetPorts = []uint32{}
 	if len(app.TargetPorts) > 0 {
@@ -100,12 +100,25 @@ func (a *app) ToService(app *types.AppMetaData, getNextPorts func(int) ([]uint32
 			Target: network,
 		})
 	}
-	if app.Route != nil {
+	if plugins.Traefik && app.Route != nil {
 		log.V("Adding traefik network")
 		networks = append(networks, dockerSwarmTypes.NetworkAttachmentConfig{
 			Target: constants.Plugins.Traefik.Name,
 		})
 	}
+	// TODO: More plugins
+	// if plugins.Postgres {
+	// 	log.V("Adding postgres network")
+	// 	networks = append(networks, dockerSwarmTypes.NetworkAttachmentConfig{
+	// 		Target: constants.Plugins.Postgres.Name,
+	// 	})
+	// }
+	// if plugins.Mongo {
+	// 	log.V("Adding mongo network")
+	// 	networks = append(networks, dockerSwarmTypes.NetworkAttachmentConfig{
+	// 		Target: constants.Plugins.Mongo.Name,
+	// 	})
+	// }
 
 	// Setup env variables
 	env := append(envPorts, []string{}...)
@@ -127,11 +140,12 @@ func (a *app) ToService(app *types.AppMetaData, getNextPorts func(int) ([]uint32
 	}
 	if app.Route != nil {
 		enabled := "traefik.enable"
+		networkLabel := "traefik.docker.network"
 		targetPort := fmt.Sprintf("traefik.http.services.%s-service.loadbalancer.server.port", app.Name)
 		rulesLabel := fmt.Sprintf("traefik.http.routers.%s.rule", app.Name)
-		// TODO: traefik.http.routers.%s.entrypoints=web?
 
 		labels[enabled] = "true"
+		labels[networkLabel] = constants.Plugins.Traefik.Name
 		labels[targetPort] = fmt.Sprint(targetPorts[0])
 		if app.Route.TraefikRule != "" {
 			labels[rulesLabel] = app.Route.TraefikRule
