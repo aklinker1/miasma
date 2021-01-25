@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/aklinker1/miasma/internal/cli/config"
 	"github.com/aklinker1/miasma/internal/cli/flags"
 	"github.com/aklinker1/miasma/internal/shared/constants"
 	"github.com/spf13/cobra"
@@ -60,12 +61,10 @@ func initConfig() {
 		// Search config in home directory with name ".miasma" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".miasma")
+		viper.SetConfigType("yaml")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
 
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	}
+	config.ReadConfig()
 }
