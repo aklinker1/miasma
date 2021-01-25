@@ -6,7 +6,8 @@ import (
 	"github.com/aklinker1/miasma/internal/server/gen/models"
 	"github.com/aklinker1/miasma/internal/server/gen/restapi/operations"
 	"github.com/aklinker1/miasma/internal/server/services"
-	"github.com/aklinker1/miasma/internal/server/utils/constants"
+	"github.com/aklinker1/miasma/internal/shared"
+	"github.com/aklinker1/miasma/internal/shared/constants"
 	"github.com/go-openapi/runtime/middleware"
 )
 
@@ -22,7 +23,7 @@ var getHealthCheck = operations.GetHealthCheckHandlerFunc(
 		swarm := services.Docker.SwarmInfo()
 
 		return operations.NewGetHealthCheckOK().WithPayload(&models.Health{
-			Version:       &constants.VERSION,
+			Version:       shared.StringPtr(fmt.Sprintf("v%v-%v-%v", constants.VERSION, constants.BUILD_DATE, constants.BUILD_8)),
 			DockerVersion: dockerVersion,
 			Swarm: &models.HealthSwarm{
 				ID:          swarm.ID,

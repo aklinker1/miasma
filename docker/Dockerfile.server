@@ -23,6 +23,11 @@ COPY web/dashboard .
 
 # Build the server
 FROM go-builder-base as go-builder
+ARG VERSION
+ARG BUILD
+ARG BUILD_8
+ARG BUILD_DATE
+ARG BUILD_VAR_PATH="github.com/aklinker1/miasma/internal/shared/constants"
 COPY go.mod go.sum ./
 RUN go mod download
 COPY meta.json .
@@ -30,10 +35,9 @@ COPY .git ./.git
 COPY cmd/server ./cmd/server
 COPY internal/shared ./internal/shared
 COPY internal/server ./internal/server
-RUN \
-  VERSION="$(jq -r .version meta.json)-$(TZ=UTC git --no-pager show --quiet --abbrev=12 --date='format-local:%Y%m%d%H%M%S' --format='%cd-%h')" ;\
-  go build \
-    -ldflags "-X github.com/aklinker1/miasma/internal/server/utils/constants.VERSION=$VERSION" \
+RUN echo "${VERSION}, ${BUILD_VAR_PATH}"
+RUN go build \
+    -ldflags "-X $BUILD_VAR_PATH.VERSION=$VERSION -X $BUILD_VAR_PATH.BUILD=$BUILD -X $BUILD_VAR_PATH.BUILD_8=$BUILD_8 -X $BUILD_VAR_PATH.BUILD_DATE=$BUILD_DATE" \
     -o bin/server \
     cmd/server/main.go
 

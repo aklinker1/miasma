@@ -1,1 +1,2 @@
 server/gen/**/* linguist-generated=true
+/package/**/* linguist-generated=true
