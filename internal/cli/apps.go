@@ -1,7 +1,12 @@
 package cli
 
 import (
+	"fmt"
+	"os"
+
+	"github.com/aklinker1/miasma/internal/cli/config"
 	"github.com/aklinker1/miasma/internal/cli/flags"
+	"github.com/aklinker1/miasma/package/client/operations"
 	"github.com/spf13/cobra"
 )
 
@@ -19,5 +24,19 @@ func init() {
 }
 
 func listApps(includeHidden bool) {
-	panic("NOT IMPLEMENTED")
+	fmt.Println("List apps:")
+	client := config.Client()
+	apps, err := client.Operations.GetApps(operations.NewGetAppsParams())
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	for _, app := range apps.Payload {
+		running := ""
+		if !*app.Running {
+			running = " (stopped)"
+		}
+		fmt.Printf(" - %s%s\n", *app.Name, running)
+	}
+	fmt.Printf("(%d total)\n", len(apps.Payload))
 }

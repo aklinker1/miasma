@@ -5,6 +5,8 @@ import (
 	"os"
 
 	"github.com/spf13/viper"
+
+	miasmaAPI "github.com/aklinker1/miasma/package/client"
 )
 
 func ReadConfig() {
@@ -20,4 +22,13 @@ func ReadConfig() {
 		}
 		return
 	}
+}
+
+func Client() *miasmaAPI.Miasma {
+	host := viper.GetString("host")
+	if host == "" {
+		fmt.Println("Miasma CLI is not connected to a server yet. Run 'miasma connect <ip:port>'")
+		os.Exit(1)
+	}
+	return miasmaAPI.NewClientWith(host)
 }
