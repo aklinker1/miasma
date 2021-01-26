@@ -1,7 +1,12 @@
 package cli
 
 import (
+	"fmt"
+	"os"
+
+	"github.com/aklinker1/miasma/internal/cli/config"
 	"github.com/aklinker1/miasma/internal/cli/flags"
+	"github.com/aklinker1/miasma/package/client/operations"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +26,14 @@ func init() {
 }
 
 func destroyApp(appName string) {
-	panic("NOT IMPLEMENTED")
-	// Destroy
-	// Start
+	fmt.Printf("Destrying %s...\n", appName)
+	client := config.Client()
+	deleteParams := operations.NewDeleteAppParams()
+	deleteParams.AppName = appName
+	_, err := client.Operations.DeleteApp(deleteParams)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println("Done")
 }
