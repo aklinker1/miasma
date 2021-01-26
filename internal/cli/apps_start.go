@@ -1,7 +1,12 @@
 package cli
 
 import (
+	"fmt"
+	"os"
+
+	"github.com/aklinker1/miasma/internal/cli/config"
 	"github.com/aklinker1/miasma/internal/cli/flags"
+	"github.com/aklinker1/miasma/package/client/operations"
 	"github.com/spf13/cobra"
 )
 
@@ -20,6 +25,13 @@ func init() {
 }
 
 func startApp(appName string) {
-	panic("NOT IMPLEMENTED")
-	// Start
+	fmt.Printf("Starting %s...\n", appName)
+	startParams := operations.NewStartAppParams()
+	startParams.AppName = appName
+	_, err := config.Client().Operations.StartApp(startParams)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println("Done!")
 }
