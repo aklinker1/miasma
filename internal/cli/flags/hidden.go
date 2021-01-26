@@ -8,7 +8,7 @@ import (
 )
 
 func UseHiddenFlag(cmd *cobra.Command) {
-	cmd.Flags().BoolP("hidden", "h", false, "Whether or not the app is hidden")
+	cmd.Flags().Bool("hidden", false, "Whether or not the app is hidden")
 }
 
 func GetHiddenFlag(cmd *cobra.Command) bool {

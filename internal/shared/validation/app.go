@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	"github.com/aklinker1/miasma/internal/server/gen/models"
 )
 
 func AppName(appName string) error {
@@ -18,5 +20,16 @@ func AppName(appName string) error {
 		return fmt.Errorf("'%s' must match '%s'", appName, validCharsStr)
 	}
 
+	return nil
+}
+
+func AppInput(app *models.AppInput) error {
+	err := AppName(*app.Name)
+	if err != nil {
+		return nil
+	}
+	if len(*app.Image) == 0 {
+		return errors.New("'image' is required")
+	}
 	return nil
 }
