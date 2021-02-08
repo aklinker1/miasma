@@ -16,7 +16,10 @@ var appsDestroyCmd = &cobra.Command{
 	Long:  `Destroy an existing application. If the app is running, it is stopped first`,
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		destroyApp(flags.GetAppFlag(cmd))
+		appName, deferable := flags.GetAppFlag(cmd)
+		defer deferable()
+
+		destroyApp(appName)
 	},
 }
 

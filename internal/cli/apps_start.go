@@ -15,7 +15,10 @@ var appsStartCmd = &cobra.Command{
 	Short: "Start an application",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		startApp(flags.GetAppFlag(cmd))
+		appName, deferable := flags.GetAppFlag(cmd)
+		defer deferable()
+
+		startApp(appName)
 	},
 }
 

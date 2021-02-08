@@ -21,7 +21,10 @@ Only the properties specified in the flags will update be updated. To remove a p
   miasma app:configure --app app-name --ports ""`,
 	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		stopApp(flags.GetAppFlag(cmd))
+		appName, deferable := flags.GetAppFlag(cmd)
+		defer deferable()
+
+		stopApp(appName)
 	},
 }
 

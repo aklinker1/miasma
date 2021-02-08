@@ -15,7 +15,10 @@ var appsStopCmd = &cobra.Command{
 	Short: "Stop a running application",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		stopApp(flags.GetAppFlag(cmd))
+		appName, deferable := flags.GetAppFlag(cmd)
+		defer deferable()
+
+		stopApp(appName)
 	},
 }
 
