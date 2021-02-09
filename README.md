@@ -28,14 +28,23 @@ Take note of the worker join token, it will be used later on to add more Pis to 
 Finally, spin up the `miasma-server`:
 
 ```bash
-docker run -d --restart unless-stopped -P aklinker1/miasma
+docker run -d \
+    --restart unless-stopped \
+    -p 3000:3000 \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v $HOME/.miasma:/data/miasma \
+    aklinker1/miasma
 ```
 
-> `-d` starts the container in the daemon, 
+> `-d` starts the container in a daemon
 >
 > `--restart unless-stopped` will make sure miasma is restarted on error or if the pi is power cycled. If you stop this image
 >
-> `-P` exposes the server's ports. By default, it runs on port 3000
+> `-p 3000:3000` exposes the server's ports. By default, it runs on port 3000
+>
+> `-v /var/run/docker.sock:/var/run/docker.sock` gives miasma access to docker so it can manage the swarm
+>
+> `-v $HOME/.miasma:/data/miasma` sets the directory where all the data is stored to `~/.miasma`
 
 At this point, you can move on to installing the CLI on your other computers.
 
