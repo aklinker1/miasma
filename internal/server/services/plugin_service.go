@@ -25,7 +25,8 @@ var pluginMetaPath = "/data/miasma/plugins.yml"
 func (service *pluginService) GetPluginMeta() (*types.PluginMetaData, error) {
 	metaFile, err := ioutil.ReadFile(pluginMetaPath)
 	if err != nil {
-		return nil, fmt.Errorf("Could not find plugins.yml, was it deleted?", pluginMetaPath)
+		log.W("Could not find %s, was it deleted?", pluginMetaPath)
+		return &types.PluginMetaData{}, nil
 	}
 
 	var metaYml = &types.PluginMetaData{}
@@ -48,10 +49,10 @@ func (service *pluginService) Get(pluginName string, meta *types.PluginMetaData)
 	switch pluginName {
 	case "traefik":
 		installed = meta.Traefik
-	case "postgres":
-		installed = meta.Postgres
-	case "mongo":
-		installed = meta.Mongo
+		// case "postgres":
+		// 	installed = meta.Postgres
+		// case "mongo":
+		// 	installed = meta.Mongo
 	}
 
 	var installCommand *string
