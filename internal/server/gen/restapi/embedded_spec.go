@@ -461,6 +461,14 @@ func init() {
     "AppConfig": {
       "type": "object",
       "properties": {
+        "hidden": {
+          "description": "Whether or not the app shows up by default when listing the apps",
+          "type": "boolean"
+        },
+        "image": {
+          "description": "The docker image the app runs",
+          "type": "string"
+        },
         "networks": {
           "description": "A list of other apps that the service communicates with using their service name and docker's internal DNS. Services don't have to be two way; only the service that accesses the other needs the other network added",
           "type": "array",
@@ -1171,6 +1179,14 @@ func init() {
     "AppConfig": {
       "type": "object",
       "properties": {
+        "hidden": {
+          "description": "Whether or not the app shows up by default when listing the apps",
+          "type": "boolean"
+        },
+        "image": {
+          "description": "The docker image the app runs",
+          "type": "string"
+        },
         "networks": {
           "description": "A list of other apps that the service communicates with using their service name and docker's internal DNS. Services don't have to be two way; only the service that accesses the other needs the other network added",
           "type": "array",

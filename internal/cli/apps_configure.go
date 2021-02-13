@@ -1,7 +1,12 @@
 package cli
 
 import (
+	"fmt"
+	"os"
+
+	"github.com/aklinker1/miasma/internal/cli/config"
 	"github.com/aklinker1/miasma/internal/cli/flags"
+	"github.com/aklinker1/miasma/package/client/operations"
 	"github.com/spf13/cobra"
 )
 
@@ -14,26 +19,114 @@ flags for all the properties that can be set for an application.
 It is worth noting that for properties that are lists, there is no add or remove. Instead, include
 all the values for an array property you would like to change:
 
-  miasma app:configure --app app-name --ports 80,22
+  miasma apps:configure --app app-name --ports 80,22
 	
 Only the properties specified in the flags will update be updated. To remove a propterty, pass in an empty string for the value:
 
-  miasma app:configure --app app-name --ports ""`,
+  miasma apps:configure --app app-name --ports ""`,
 	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		appName, deferable := flags.GetAppFlag(cmd)
 		defer deferable()
+		newConfig := flags.GetConfigFlags(cmd)
 
-		stopApp(appName)
+		configureApp(appName, newConfig)
 	},
 }
 
 func init() {
 	RootCmd.AddCommand(appsConfigureCmd)
 	flags.UseAppFlag(appsConfigureCmd)
+	flags.UseConfigFlags(appsConfigureCmd)
 }
 
-func configureApp(appName string) {
-	panic("NOT IMPLEMENTED")
-	// Update
+func configureApp(appName string, newConfig *flags.AppUpdateConfig) {
+	fmt.Printf("Updating %s...\n", appName)
+
+	// Get current config
+	client := config.Client()
+	configResponse, err := client.Operations.GetAppConfig(
+		operations.NewGetAppConfigParams().WithAppName(appName),
+	)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	config := configResponse.Payload
+	existingTargetPortMap := map[int64]int{}
+	for index, port := range config.TargetPorts {
+		existingTargetPortMap[port] = index
+	}
+	existingPublishedPortMap := map[int64]int{}
+	for index, port := range config.PublishedPorts {
+		existingPublishedPortMap[port] = index
+	}
+	existingPlacementMap := map[string]int{}
+	for index, placement := range config.Placement {
+		existingPlacementMap[placement] = index
+	}
+
+	// Update config
+	if newConfig.Hidden {
+		config.Hidden = true
+	} else if newConfig.RMHidden {
+		config.Hidden = false
+	}
+	if newConfig.Image != nil {
+		config.Image = *newConfig.Image
+	}
+	for _, targetPort := range newConfig.AddTargetPorts {
+		if _, ok := existingTargetPortMap[targetPort]; !ok {
+			config.TargetPorts = append(config.TargetPorts, targetPort)
+			existingTargetPortMap[targetPort] = len(config.TargetPorts) - 1
+		}
+	}
+	for _, targetPort := range newConfig.RMTargetPorts {
+		if index, ok := existingTargetPortMap[targetPort]; ok {
+			config.TargetPorts = append(
+				config.TargetPorts[:index],
+				config.TargetPorts[index+1:]...,
+			)
+		}
+	}
+	for _, publishedPort := range newConfig.AddPublishedPorts {
+		if _, ok := existingPublishedPortMap[publishedPort]; !ok {
+			config.PublishedPorts = append(config.PublishedPorts, publishedPort)
+			existingPublishedPortMap[publishedPort] = len(config.PublishedPorts) - 1
+		}
+	}
+	for _, publishedPort := range newConfig.RMPublishedPorts {
+		if index, ok := existingPublishedPortMap[publishedPort]; ok {
+			config.PublishedPorts = append(
+				config.PublishedPorts[:index],
+				config.PublishedPorts[index+1:]...,
+			)
+		}
+	}
+	for _, placement := range newConfig.AddPlacementConstraint {
+		if _, ok := existingPlacementMap[placement]; !ok {
+			config.Placement = append(config.Placement, placement)
+			existingPlacementMap[placement] = len(config.Placement) - 1
+		}
+	}
+	for _, placement := range newConfig.RMPlacementConstraint {
+		if index, ok := existingPlacementMap[placement]; ok {
+			config.Placement = append(
+				config.Placement[:index],
+				config.Placement[index+1:]...,
+			)
+		}
+	}
+
+	// push config updates
+	_, err = client.Operations.UpdateAppConfig(
+		operations.NewUpdateAppConfigParams().
+			WithAppName(appName).
+			WithNewAppConfig(config),
+	)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println("Done!")
 }

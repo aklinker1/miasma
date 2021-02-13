@@ -20,22 +20,24 @@ var App = &app{}
 func (a *app) FromMeta(appName string, meta *types.AppMetaData, isRunning bool) *models.App {
 	return &models.App{
 		Name:    &appName,
-		Image:   meta.Image,
-		Hidden:  meta.Hidden != nil && *meta.Hidden,
+		Image:   &meta.Image,
+		Hidden:  meta.Hidden,
 		Running: &isRunning,
 	}
 }
 
 func (a *app) ToMeta(app *models.AppInput) *types.AppMetaData {
 	return &types.AppMetaData{
-		Image:  app.Image,
-		Hidden: &app.Hidden,
+		Name: *app.Name,
+		AppMetaDataWithoutName: types.AppMetaDataWithoutName{
+			Image:  *app.Image,
+			Hidden: app.Hidden,
+		},
 	}
 }
 
 func (a *app) ToConfig(app *types.AppMetaData) *models.AppConfig {
 	var route *models.AppConfigRoute
-	log.V("App route: %v", app.Route)
 	if app.Route != nil {
 		route = &models.AppConfigRoute{
 			Host:        app.Route.Host,
@@ -44,6 +46,8 @@ func (a *app) ToConfig(app *types.AppMetaData) *models.AppConfig {
 		}
 	}
 	return &models.AppConfig{
+		Image:          app.Image,
+		Hidden:         app.Hidden,
 		TargetPorts:    shared.ConvertUInt32ArrayToInt64Array(app.TargetPorts),
 		PublishedPorts: shared.ConvertUInt32ArrayToInt64Array(app.PublishedPorts),
 		Placement:      app.Placement,
@@ -53,7 +57,7 @@ func (a *app) ToConfig(app *types.AppMetaData) *models.AppConfig {
 	}
 }
 
-func (a *app) ToService(app *types.AppMetaData, plugins *types.PluginMetaData, getNextPorts func(int) ([]uint32, error)) (*dockerSwarmTypes.ServiceSpec, error) {
+func (a *app) ToService(app *types.AppMetaData, plugins *types.InstalledPlugins, getNextPorts func(int) ([]uint32, error)) (*dockerSwarmTypes.ServiceSpec, error) {
 	// Setup ports
 	var targetPorts = []uint32{}
 	if len(app.TargetPorts) > 0 {
@@ -162,7 +166,7 @@ func (a *app) ToService(app *types.AppMetaData, plugins *types.PluginMetaData, g
 				Constraints: app.Placement,
 			},
 			ContainerSpec: &dockerSwarmTypes.ContainerSpec{
-				Image:   *app.Image,
+				Image:   app.Image,
 				Env:     env,
 				Command: app.Command,
 				Mounts:  volumes,

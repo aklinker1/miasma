@@ -1,5 +1,10 @@
 package types
 
-type PluginMetaData struct {
+type InstalledPlugins struct {
 	Traefik bool
+}
+
+type PluginMetaData struct {
+	AppMetaData
+	Name string
 }

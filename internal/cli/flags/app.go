@@ -30,7 +30,6 @@ func GetAppFlag(cmd *cobra.Command) (appName string, deferable func()) {
 	}
 
 	return appName, func() {
-		fmt.Println("Writing config...")
 		viper.Set("app", appName)
 		err := viper.WriteConfig()
 		if err != nil {

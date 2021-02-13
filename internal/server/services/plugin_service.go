@@ -22,21 +22,21 @@ var Plugin = &pluginService{}
 
 var pluginMetaPath = "/data/miasma/plugins.yml"
 
-func (service *pluginService) GetPluginMeta() (*types.PluginMetaData, error) {
+func (service *pluginService) GetPluginMeta() (*types.InstalledPlugins, error) {
 	metaFile, err := ioutil.ReadFile(pluginMetaPath)
 	if err != nil {
 		log.W("Could not find %s, was it deleted?", pluginMetaPath)
-		return &types.PluginMetaData{}, nil
+		return &types.InstalledPlugins{}, nil
 	}
 
-	var metaYml = &types.PluginMetaData{}
+	var metaYml = &types.InstalledPlugins{}
 	if err := yaml.Unmarshal(metaFile, metaYml); err != nil {
 		return nil, err
 	}
 	return metaYml, nil
 }
 
-func (service *pluginService) WritePluginMeta(pluginMeta *types.PluginMetaData) error {
+func (service *pluginService) WritePluginMeta(pluginMeta *types.InstalledPlugins) error {
 	data, err := yaml.Marshal(pluginMeta)
 	if err != nil {
 		return err
@@ -44,7 +44,7 @@ func (service *pluginService) WritePluginMeta(pluginMeta *types.PluginMetaData) 
 	return ioutil.WriteFile(pluginMetaPath, data, 0755)
 }
 
-func (service *pluginService) Get(pluginName string, meta *types.PluginMetaData) (*models.Plugin, error) {
+func (service *pluginService) Get(pluginName string, meta *types.InstalledPlugins) (*models.Plugin, error) {
 	installed := false
 	switch pluginName {
 	case "traefik":
@@ -115,7 +115,7 @@ func (service *pluginService) Install(pluginName string) (plugin *models.Plugin,
 	return plugin, err
 }
 
-func (service *pluginService) installTreafik(pluginMeta *types.PluginMetaData) (*models.Plugin, error) {
+func (service *pluginService) installTreafik(pluginMeta *types.InstalledPlugins) (*models.Plugin, error) {
 	pluginMeta.Traefik = true
 	traefik := constants.Plugins.Traefik
 	serviceSpec, _ := mappers.App.ToService(&traefik, pluginMeta, func(i int) ([]uint32, error) {
@@ -160,7 +160,7 @@ func (service *pluginService) Uninstall(pluginName string) (plugin *models.Plugi
 	return plugin, err
 }
 
-func (service *pluginService) uninstallTreafik(pluginMeta *types.PluginMetaData) (*models.Plugin, error) {
+func (service *pluginService) uninstallTreafik(pluginMeta *types.InstalledPlugins) (*models.Plugin, error) {
 	pluginMeta.Traefik = false
 	traefik := constants.Plugins.Traefik
 

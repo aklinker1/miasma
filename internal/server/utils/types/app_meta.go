@@ -8,11 +8,10 @@ type Route struct {
 	TraefikRule *string `yaml:"traefikRule"`
 }
 
-type AppMetaData struct {
+type AppMetaDataWithoutName struct {
 	// App
-	Name   string
-	Image  *string
-	Hidden *bool
+	Image  string
+	Hidden bool
 
 	// Config
 	TargetPorts    []uint32 `yaml:"targetPorts"`
@@ -25,4 +24,9 @@ type AppMetaData struct {
 
 	// Env
 	Env map[string]interface{}
+}
+
+type AppMetaData struct {
+	AppMetaDataWithoutName
+	Name string
 }

@@ -19,6 +19,12 @@ import (
 // swagger:model AppConfig
 type AppConfig struct {
 
+	// Whether or not the app shows up by default when listing the apps
+	Hidden bool `json:"hidden,omitempty"`
+
+	// The docker image the app runs
+	Image string `json:"image,omitempty"`
+
 	// A list of other apps that the service communicates with using their service name and docker's internal DNS. Services don't have to be two way; only the service that accesses the other needs the other network added
 	// Unique: true
 	Networks []string `json:"networks"`

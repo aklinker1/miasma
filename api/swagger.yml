@@ -346,6 +346,12 @@ definitions:
   AppConfig:
     type: object
     properties:
+      image:
+        description: The docker image the app runs
+        type: string
+      hidden:
+        description: Whether or not the app shows up by default when listing the apps
+        type: boolean
       targetPorts:
         description: 
           The ports that the app is listening to inside the container. If no target ports

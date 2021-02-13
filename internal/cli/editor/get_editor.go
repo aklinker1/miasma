@@ -16,5 +16,4 @@ func getEditorUtil() (path string, err error) {
 		return path, nil
 	}
 	return "", errors.New("Could not find vim, nano, or vi in your $PATH")
-
 }

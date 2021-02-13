@@ -28,9 +28,9 @@ func RequestLogger() func(http.Handler) http.Handler {
 				ResponseWriter: w,
 				Status:         200,
 			}
-			log.V("<<<<<< %s %s", r.Method, r.URL.Path)
+			log.D("<<<<<< %s %s", r.Method, r.URL.Path)
 			next.ServeHTTP(recorder, r)
-			log.V(">>>>>> %d (%s)", recorder.Status, w.Header().Get("X-Response-Time"))
+			log.D(">>>>>> %d (%s)", recorder.Status, w.Header().Get("X-Response-Time"))
 		})
 	}
 }

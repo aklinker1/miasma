@@ -42,12 +42,14 @@ func (service *appService) GetAppMeta(appName string) (*types.AppMetaData, error
 		return nil, fmt.Errorf("Could not find data for %s, did %s get moved?", appName, metaFilePath)
 	}
 
-	var metaYml = &types.AppMetaData{}
-	if err := yaml.Unmarshal(metaFile, metaYml); err != nil {
+	var metaYml = types.AppMetaDataWithoutName{}
+	if err := yaml.Unmarshal(metaFile, &metaYml); err != nil {
 		return nil, err
 	}
-	metaYml.Name = appName
-	return metaYml, nil
+	return &types.AppMetaData{
+		Name:                   appName,
+		AppMetaDataWithoutName: metaYml,
+	}, nil
 }
 
 func (service *appService) WriteAppMeta(appMeta *types.AppMetaData) error {
@@ -57,7 +59,7 @@ func (service *appService) WriteAppMeta(appMeta *types.AppMetaData) error {
 	}
 	metaFilePath := fmt.Sprintf("%s/%s.yml", appsDir, appMeta.Name)
 
-	data, err := yaml.Marshal(appMeta)
+	data, err := yaml.Marshal(appMeta.AppMetaDataWithoutName)
 	if err != nil {
 		return err
 	}
@@ -159,6 +161,8 @@ func (service *appService) UpdateConfig(appName string, newAppConfig *models.App
 	}
 
 	updatedMeta := existingMeta
+	updatedMeta.Image = newAppConfig.Image
+	updatedMeta.Hidden = newAppConfig.Hidden
 	updatedMeta.TargetPorts = shared.ConvertInt64ArrayToUInt32Array(newAppConfig.TargetPorts)
 	updatedMeta.PublishedPorts = shared.ConvertInt64ArrayToUInt32Array(newAppConfig.PublishedPorts)
 	updatedMeta.Networks = newAppConfig.Networks

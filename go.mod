@@ -24,4 +24,5 @@ require (
 	github.com/spf13/viper v1.7.1
 	golang.org/x/net v0.0.0-20200602114024-627f9648deb9
 	gopkg.in/yaml.v2 v2.4.0
+	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
 )
