@@ -1,8 +1,8 @@
 module.exports = {
   title: 'Miasma',
   tagline: 'Open source, Docker Swarm based PaaS with ARM support',
-  url: 'https://your-docusaurus-test-site.com',
-  baseUrl: '/',
+  url: 'https://aklinker1.github.io',
+  baseUrl: '/miasma/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
