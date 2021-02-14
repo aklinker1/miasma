@@ -59,7 +59,7 @@ func (service *appService) WriteAppMeta(appMeta *types.AppMetaData) error {
 	}
 	metaFilePath := fmt.Sprintf("%s/%s.yml", appsDir, appMeta.Name)
 
-	data, err := yaml.Marshal(appMeta.AppMetaDataWithoutName)
+	data, err := yaml.Marshal(&appMeta.AppMetaDataWithoutName)
 	if err != nil {
 		return err
 	}

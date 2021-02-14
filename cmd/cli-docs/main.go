@@ -9,6 +9,19 @@ import (
 )
 
 func main() {
+	fmt.Println(strings.Join([]string{
+		"---",
+		"id: cli-usage",
+		"title: CLI Usage",
+		"description: CLI commands and documentation",
+		"slug: /cli",
+		"---",
+		"",
+		"The Misama CLI should be installed on any computer that you would deploy/manage application from. It's very similar to Heroku's CLI, but also takes inspiration from the Docker CLI.",
+		"",
+		"Checkout the [Get Started](/docs#install-cli) page to learn how to install the CLI",
+		"",
+	}, "\n"))
 	printCommand(cli.RootCmd, "##")
 }
 

@@ -39,9 +39,21 @@ cli:
 		-o bin/miasma \
 		cmd/cli/main.go
 	cp bin/miasma ${GOPATH}/bin
-docs:
+
+# Docs
+
+start-docs:
+	yarn --cwd web/docs start --port 8888
+build-cli-docs:
 	@echo 'Generate CLI Docs...'
-	go build -o bin/cli-docs cmd/cli-docs/main.go && ./bin/cli-docs > web/docs/cli.md
+	go build -o bin/cli-docs cmd/cli-docs/main.go && ./bin/cli-docs > web/docs/docs/cli/Usage.md
+build-server-docs:
+build-docs-site:
+	@echo 'Building docs site...'
+	yarn --cwd web/docs build
+build-docs: build-cli-docs, build-server-docs, build-docs-site
+publish-docs: build-docs
+	yarn --cwd web/docs deploy
 
 #  Aliases
 

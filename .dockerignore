@@ -5,3 +5,4 @@ bin/
 .env
 *.md
 modd.conf
+web/docs

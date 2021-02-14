@@ -1,2 +1,3 @@
 server/gen/**/* linguist-generated=true
 /package/**/* linguist-generated=true
+/web/docs/cli linguist-generated=true

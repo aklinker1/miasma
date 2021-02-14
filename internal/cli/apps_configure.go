@@ -13,8 +13,8 @@ import (
 var appsConfigureCmd = &cobra.Command{
 	Use:   "apps:configure",
 	Short: "Update an application's properties",
-	Long: `Update an application's properties such as target ports, networks, etc. See the list of
-flags for all the properties that can be set for an application.
+	Long: `Update an application's properties such as target ports. See the list of flags for all the properties
+that can be set for an application.
 
 It is worth noting that for properties that are lists, there is no add or remove. Instead, include
 all the values for an array property you would like to change:
