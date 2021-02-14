@@ -43,17 +43,19 @@ cli:
 # Docs
 
 start-docs:
-	yarn --cwd web/docs start --port 8888
+	yarn --cwd docs start --port 8888
 build-cli-docs:
 	@echo 'Generate CLI Docs...'
-	go build -o bin/cli-docs cmd/cli-docs/main.go && ./bin/cli-docs > web/docs/docs/cli/Usage.md
+	go build -o bin/cli-docs cmd/cli-docs/main.go && ./bin/cli-docs > docs/docs/cli/Usage.md
 build-server-docs:
+	@echo 'Generate Server Swagger Docs...'
+	@echo "---\nid: swagger\ntitle: Server API\nslug: /server\n---\n\nTODO" > docs/docs/server/Swagger.md
 build-docs-site:
 	@echo 'Building docs site...'
-	yarn --cwd web/docs build
-build-docs: build-cli-docs, build-server-docs, build-docs-site
+	yarn --cwd docs build
+build-docs: build-cli-docs build-server-docs build-docs-site
 publish-docs: build-docs
-	yarn --cwd web/docs deploy
+	yarn --cwd docs deploy
 
 #  Aliases
 

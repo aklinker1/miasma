@@ -1,3 +1,4 @@
 server/gen/**/* linguist-generated=true
 /package/**/* linguist-generated=true
-/web/docs/cli linguist-generated=true
+/docs/docs/cli/Usage.md linguist-generated=true
+/docs/docs/server/Swagger.md linguist-generated=true

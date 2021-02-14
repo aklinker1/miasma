@@ -90,7 +90,7 @@ module.exports = {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           editUrl:
-            'https://github.com/aklinker1/miasma/edit/main/web/docs/docs/',
+            'https://github.com/aklinker1/miasma/edit/main/docs/docs/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
