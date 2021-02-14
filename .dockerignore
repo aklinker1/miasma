@@ -1,8 +1,0 @@
-.vscode/
-.github/
-bin/
-.gitignore
-.env
-*.md
-modd.conf
-/docs
