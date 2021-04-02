@@ -169,7 +169,7 @@ var updateApp = operations.UpdateAppHandlerFunc(
 	func(params operations.UpdateAppParams) middleware.Responder {
 		appMeta, err := services.App.GetAppMeta(params.AppName)
 		if err != nil {
-			return operations.NewUpdateAppBadRequest().WithPayload(err.Error())
+			return operations.NewUpdateAppNotFound().WithPayload(err.Error())
 		}
 
 		var newImage string
