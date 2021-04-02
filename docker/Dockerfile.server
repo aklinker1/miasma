@@ -25,7 +25,7 @@ COPY web/dashboard .
 FROM go-builder-base as go-builder
 ARG VERSION
 ARG BUILD
-ARG BUILD_8
+ARG BUILD_HASH
 ARG BUILD_DATE
 ARG BUILD_VAR_PATH="github.com/aklinker1/miasma/internal/shared/constants"
 COPY go.mod go.sum ./
@@ -37,7 +37,7 @@ COPY internal/shared ./internal/shared
 COPY internal/server ./internal/server
 RUN echo "${VERSION}, ${BUILD_VAR_PATH}"
 RUN go build \
-    -ldflags "-X $BUILD_VAR_PATH.VERSION=$VERSION -X $BUILD_VAR_PATH.BUILD=$BUILD -X $BUILD_VAR_PATH.BUILD_8=$BUILD_8 -X $BUILD_VAR_PATH.BUILD_DATE=$BUILD_DATE" \
+    -ldflags "-X $BUILD_VAR_PATH.VERSION=$VERSION -X $BUILD_VAR_PATH.BUILD=$BUILD -X $BUILD_VAR_PATH.BUILD_HASH=$BUILD_HASH -X $BUILD_VAR_PATH.BUILD_DATE=$BUILD_DATE" \
     -o bin/server \
     cmd/server/main.go
 

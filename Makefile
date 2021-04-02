@@ -1,6 +1,6 @@
 VERSION := $(shell jq -r .version meta.json)
 BUILD := $(shell TZ=UTC git --no-pager show --quiet --abbrev=40 --format='%h')
-BUILD_8 := $(shell TZ=UTC git --no-pager show --quiet --abbrev=8 --format='%h')
+BUILD_HASH := $(shell TZ=UTC git --no-pager show --quiet --abbrev=8 --format='%h')
 BUILD_DATE := $(shell TZ=UTC git --no-pager show --quiet --date='format-local:%Y%m%d%H%M%S' --format='%cd')
 BUILD_VAR_PATH := github.com/aklinker1/miasma/internal/shared/constants
 
@@ -11,7 +11,7 @@ build:
 		-t aklinker1/miasma:dev \
 		--build-arg VERSION="$(VERSION)" \
 		--build-arg BUILD="$(BUILD)" \
-		--build-arg BUILD_8="$(BUILD_8)" \
+		--build-arg BUILD_HASH="$(BUILD_HASH)" \
 		--build-arg BUILD_DATE="$(BUILD_DATE)"
 run: build
 	@echo ""
@@ -35,7 +35,7 @@ publish:
 
 cli:
 	go build \
-		-ldflags "-X ${BUILD_VAR_PATH}.VERSION=${VERSION} -X ${BUILD_VAR_PATH}.BUILD=${BUILD} -X ${BUILD_VAR_PATH}.BUILD_8=${BUILD_8} -X ${BUILD_VAR_PATH}.BUILD_DATE=${BUILD_DATE}" \
+		-ldflags "-X ${BUILD_VAR_PATH}.VERSION=${VERSION} -X ${BUILD_VAR_PATH}.BUILD=${BUILD} -X ${BUILD_VAR_PATH}.BUILD_HASH=${BUILD_HASH} -X ${BUILD_VAR_PATH}.BUILD_DATE=${BUILD_DATE}" \
 		-o bin/miasma \
 		cmd/cli/main.go
 	cp bin/miasma ${GOPATH}/bin

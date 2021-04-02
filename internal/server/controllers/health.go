@@ -23,7 +23,7 @@ var getHealthCheck = operations.GetHealthCheckHandlerFunc(
 		swarm := services.Docker.SwarmInfo()
 
 		return operations.NewGetHealthCheckOK().WithPayload(&models.Health{
-			Version:       shared.StringPtr(fmt.Sprintf("v%v-%v-%v", constants.VERSION, constants.BUILD_DATE, constants.BUILD_8)),
+			Version:       shared.StringPtr(fmt.Sprintf("v%v-%v-%v", constants.VERSION, constants.BUILD_DATE, constants.BUILD_HASH)),
 			DockerVersion: dockerVersion,
 			Swarm: &models.HealthSwarm{
 				ID:          swarm.ID,

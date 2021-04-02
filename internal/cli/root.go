@@ -21,7 +21,7 @@ var RootCmd = &cobra.Command{
 	Short: "Manage and deploy dockerized applications to a docker swarm",
 	Run: func(cmd *cobra.Command, args []string) {
 		if flags.GetVersionFlag(cmd) {
-			fmt.Printf("Miasma CLI v%s, build %s\n", constants.VERSION, constants.BUILD_8)
+			fmt.Printf("Miasma CLI v%s, build %s\n", constants.VERSION, constants.BUILD_HASH)
 			os.Exit(0)
 		}
 	},
