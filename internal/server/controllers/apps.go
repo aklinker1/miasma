@@ -48,6 +48,11 @@ var createApp = operations.CreateAppHandlerFunc(
 			return operations.NewCreateAppBadRequest().WithPayload(fmt.Sprintf("%s already exists", *inputApp.Name))
 		}
 
+		err = services.Docker.PullImage(*inputApp.Image)
+		if err != nil {
+			return operations.NewCreateAppBadRequest().WithPayload(err.Error())
+		}
+
 		newApp, err := services.App.Create(inputApp)
 		if err != nil {
 			return operations.NewCreateAppDefault(500).WithPayload(err.Error())
