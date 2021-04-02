@@ -87,7 +87,7 @@ func (service *appService) GetAll(showHidden bool) ([]*models.App, error) {
 	result := []*models.App{}
 	for _, metaFile := range metaFiles {
 		appName := strings.Replace(metaFile.Name(), ".yml", "", 1)
-		log.V("%s > %s", metaFile.Name(), appName)
+		log.V("Getting app name from meta filename: '%s' > '%s'", metaFile.Name(), appName)
 		app, err := service.Get(appName)
 		if err != nil {
 			return nil, err

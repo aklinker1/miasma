@@ -26,7 +26,7 @@ func init() {
 func listApps(includeHidden bool) {
 	fmt.Println("List apps:")
 	client := config.Client()
-	apps, err := client.Operations.GetApps(operations.NewGetAppsParams())
+	apps, err := client.Operations.GetApps(operations.NewGetAppsParams().WithHidden(&includeHidden))
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
