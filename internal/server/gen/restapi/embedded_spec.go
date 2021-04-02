@@ -328,6 +328,46 @@ func init() {
         }
       }
     },
+    "/api/apps/{appName}/update": {
+      "put": {
+        "summary": "pull the app's image and restart it",
+        "operationId": "updateApp",
+        "parameters": [
+          {
+            "$ref": "#/parameters/appName"
+          },
+          {
+            "type": "string",
+            "description": "A new image to base the app off of",
+            "name": "newImage",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/unknown"
+          }
+        }
+      }
+    },
     "/api/health": {
       "get": {
         "summary": "Standard health check endpoint that checks all the service's statuses",
@@ -1009,6 +1049,53 @@ func init() {
         "responses": {
           "200": {
             "description": "Stopped"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/apps/{appName}/update": {
+      "put": {
+        "summary": "pull the app's image and restart it",
+        "operationId": "updateApp",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",
+            "name": "appName",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "A new image to base the app off of",
+            "name": "newImage",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "string"
+            }
           },
           "404": {
             "description": "Not Found",

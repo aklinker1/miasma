@@ -81,6 +81,9 @@ func NewMiasmaAPI(spec *loads.Document) *MiasmaAPI {
 		UninstallPluginHandler: UninstallPluginHandlerFunc(func(params UninstallPluginParams) middleware.Responder {
 			return middleware.NotImplemented("operation UninstallPlugin has not yet been implemented")
 		}),
+		UpdateAppHandler: UpdateAppHandlerFunc(func(params UpdateAppParams) middleware.Responder {
+			return middleware.NotImplemented("operation UpdateApp has not yet been implemented")
+		}),
 		UpdateAppConfigHandler: UpdateAppConfigHandlerFunc(func(params UpdateAppConfigParams) middleware.Responder {
 			return middleware.NotImplemented("operation UpdateAppConfig has not yet been implemented")
 		}),
@@ -147,6 +150,8 @@ type MiasmaAPI struct {
 	StopAppHandler StopAppHandler
 	// UninstallPluginHandler sets the operation handler for the uninstall plugin operation
 	UninstallPluginHandler UninstallPluginHandler
+	// UpdateAppHandler sets the operation handler for the update app operation
+	UpdateAppHandler UpdateAppHandler
 	// UpdateAppConfigHandler sets the operation handler for the update app config operation
 	UpdateAppConfigHandler UpdateAppConfigHandler
 	// UpdateAppEnvHandler sets the operation handler for the update app env operation
@@ -265,6 +270,9 @@ func (o *MiasmaAPI) Validate() error {
 	}
 	if o.UninstallPluginHandler == nil {
 		unregistered = append(unregistered, "UninstallPluginHandler")
+	}
+	if o.UpdateAppHandler == nil {
+		unregistered = append(unregistered, "UpdateAppHandler")
 	}
 	if o.UpdateAppConfigHandler == nil {
 		unregistered = append(unregistered, "UpdateAppConfigHandler")
@@ -412,6 +420,10 @@ func (o *MiasmaAPI) initHandlerCache() {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/api/plugins/{pluginName}"] = NewUninstallPlugin(o.context, o.UninstallPluginHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/api/apps/{appName}/update"] = NewUpdateApp(o.context, o.UpdateAppHandler)
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}

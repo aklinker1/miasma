@@ -35,7 +35,6 @@ COPY .git ./.git
 COPY cmd/server ./cmd/server
 COPY internal/shared ./internal/shared
 COPY internal/server ./internal/server
-RUN echo "${VERSION}, ${BUILD_VAR_PATH}"
 RUN go build \
     -ldflags "-X $BUILD_VAR_PATH.VERSION=$VERSION -X $BUILD_VAR_PATH.BUILD=$BUILD -X $BUILD_VAR_PATH.BUILD_HASH=$BUILD_HASH -X $BUILD_VAR_PATH.BUILD_DATE=$BUILD_DATE" \
     -o bin/server \

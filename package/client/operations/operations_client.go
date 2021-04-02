@@ -53,6 +53,8 @@ type ClientService interface {
 
 	UninstallPlugin(params *UninstallPluginParams) (*UninstallPluginOK, error)
 
+	UpdateApp(params *UpdateAppParams) (*UpdateAppOK, error)
+
 	UpdateAppConfig(params *UpdateAppConfigParams) (*UpdateAppConfigOK, error)
 
 	UpdateAppEnv(params *UpdateAppEnvParams) (*UpdateAppEnvOK, error)
@@ -488,6 +490,39 @@ func (a *Client) UninstallPlugin(params *UninstallPluginParams) (*UninstallPlugi
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*UninstallPluginDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  UpdateApp pulls the app s image and restart it
+*/
+func (a *Client) UpdateApp(params *UpdateAppParams) (*UpdateAppOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewUpdateAppParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "updateApp",
+		Method:             "PUT",
+		PathPattern:        "/api/apps/{appName}/update",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &UpdateAppReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*UpdateAppOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*UpdateAppDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
