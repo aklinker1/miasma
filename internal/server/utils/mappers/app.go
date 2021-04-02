@@ -2,6 +2,7 @@ package mappers
 
 import (
 	"fmt"
+	"strings"
 
 	"docker.io/go-docker/api/types/mount"
 	dockerSwarmTypes "docker.io/go-docker/api/types/swarm"
@@ -57,7 +58,7 @@ func (a *app) ToConfig(app *types.AppMetaData) *models.AppConfig {
 	}
 }
 
-func (a *app) ToService(app *types.AppMetaData, plugins *types.InstalledPlugins, getNextPorts func(int) ([]uint32, error)) (*dockerSwarmTypes.ServiceSpec, error) {
+func (a *app) ToService(app *types.AppMetaData, plugins *types.InstalledPlugins, getNextPorts func(int) ([]uint32, error), digest string) (*dockerSwarmTypes.ServiceSpec, error) {
 	// Setup ports
 	var targetPorts = []uint32{}
 	if len(app.TargetPorts) > 0 {
@@ -155,6 +156,14 @@ func (a *app) ToService(app *types.AppMetaData, plugins *types.InstalledPlugins,
 			labels[rulesLabel] = fmt.Sprintf("(Host(`%s`) && PathPrefix(`%s`))", *app.Route.Host, *app.Route.Path)
 		}
 	}
+	var imageRepo string
+	if strings.ContainsRune(app.Image, ':') {
+		imageRepo = app.Image[0:strings.LastIndex(app.Image, ":")]
+	} else {
+		imageRepo = app.Image
+	}
+	image := imageRepo + "@" + digest
+	log.V("Service will use '%s' instead of '%s'", image, app.Image)
 
 	return &dockerSwarmTypes.ServiceSpec{
 		Annotations: dockerSwarmTypes.Annotations{
@@ -166,7 +175,7 @@ func (a *app) ToService(app *types.AppMetaData, plugins *types.InstalledPlugins,
 				Constraints: app.Placement,
 			},
 			ContainerSpec: &dockerSwarmTypes.ContainerSpec{
-				Image:   app.Image,
+				Image:   image,
 				Env:     env,
 				Command: app.Command,
 				Mounts:  volumes,

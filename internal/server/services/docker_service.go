@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 
 	dockerLib "docker.io/go-docker"
 	dockerTypes "docker.io/go-docker/api/types"
@@ -112,7 +113,11 @@ func (service *dockerService) StartApp(app *types.AppMetaData) error {
 	if err != nil {
 		return err
 	}
-	newService, err := mappers.App.ToService(app, pluginMeta, App.getNextPorts(app))
+	digest, err := Docker.GetDigest(app.Image)
+	if err != nil {
+		return err
+	}
+	newService, err := mappers.App.ToService(app, pluginMeta, App.getNextPorts(app), digest)
 	if err != nil {
 		return err
 	}
@@ -151,6 +156,7 @@ func (service *dockerService) UpdateService(existingService *dockerSwarmTypes.Se
 		},
 	)
 	if err != nil {
+		log.E("Failed to update service: %v", err)
 		return err
 	}
 
@@ -179,4 +185,50 @@ func (service *dockerService) GetNextAvailablePorts(count int) ([]uint32, error)
 		return nil, fmt.Errorf("Not enough available ports to start the service (required=%d, available=%d)", count, len(results))
 	}
 	return results, nil
+}
+
+func (service *dockerService) PullImage(baseImage string) error {
+	log.V("Pulling %s...", baseImage)
+	ctx := context.Background()
+
+	stream, err := dockerLib.ImageAPIClient.ImagePull(docker, ctx, baseImage, dockerTypes.ImagePullOptions{})
+	if err != nil {
+		log.E("Failed to pull image: %v", err)
+		return err
+	}
+	defer stream.Close()
+
+	// Read 1 image at a time (if pulling more than 1)
+	// reader := bufio.NewReader(stream)
+	// for ok := true; ok; {
+	// 	line, _, err := reader.ReadLine()
+	// 	log.V("%s", string(line))
+	// 	if err != nil {
+	// 		if err != io.EOF {
+	// 			log.E("Failed to read line: %v", err)
+	// 		}
+	// 		ok = false
+	// 	}
+	// }
+	// Do it all
+	_, err = ioutil.ReadAll(stream)
+	if err != nil {
+		log.E("Failed to save pulled image: %v", err)
+		return err
+	}
+	log.V("Done!")
+	return nil
+}
+
+func (service *dockerService) GetDigest(baseImage string) (string, error) {
+	log.V("Inspecting %s...", baseImage)
+	ctx := context.Background()
+
+	info, _, err := dockerLib.ImageAPIClient.ImageInspectWithRaw(docker, ctx, baseImage)
+	if err != nil {
+		log.E("Failed to inspect image: %v", err)
+		return "", err
+	}
+	log.V("Digest: %s", info.ID)
+	return info.ID, nil
 }

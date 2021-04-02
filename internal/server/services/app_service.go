@@ -100,20 +100,12 @@ func (service *appService) GetAll(showHidden bool) ([]*models.App, error) {
 }
 
 func (service *appService) Create(app models.AppInput) (*models.App, error) {
-	appsDir, err := service.AppsDir()
+	err := Docker.CreateNetworkIfNotAvailable(*app.Name)
 	if err != nil {
 		return nil, err
 	}
-	metaPath := fmt.Sprintf("%s/%s.yml", appsDir, *app.Name)
-	metaData, err := yaml.Marshal(mappers.App.ToMeta(&app))
-	if err != nil {
-		return nil, err
-	}
-	err = Docker.CreateNetworkIfNotAvailable(*app.Name)
-	if err != nil {
-		return nil, err
-	}
-	err = ioutil.WriteFile(metaPath, metaData, 0755)
+
+	err = service.WriteAppMeta(mappers.App.ToMeta(&app))
 	if err != nil {
 		return nil, err
 	}
@@ -155,6 +147,7 @@ func (service *appService) GetConfig(appName string) (*models.AppConfig, error) 
 }
 
 func (service *appService) UpdateConfig(appName string, newAppConfig *models.AppConfig) (*models.AppConfig, error) {
+	log.V("Updating config for %s...", appName)
 	existingMeta, err := service.GetAppMeta(appName)
 	if err != nil {
 		return nil, err
@@ -241,7 +234,12 @@ func (service *appService) ReloadApp(appName string, updatedMeta *types.AppMetaD
 		return err
 	}
 
-	newServiceSpec, err := mappers.App.ToService(updatedMeta, pluginMeta, service.getNextPorts(updatedMeta))
+	digest, err := Docker.GetDigest(updatedMeta.Image)
+	if err != nil {
+		return err
+	}
+
+	newServiceSpec, err := mappers.App.ToService(updatedMeta, pluginMeta, service.getNextPorts(updatedMeta), digest)
 	if err != nil {
 		return err
 	}
@@ -295,4 +293,43 @@ func (service *appService) getNextPorts(appMeta *types.AppMetaData) func(int) ([
 		log.V("Ports after update: %v", newPublishedPorts)
 		return newPublishedPorts, nil
 	}
+}
+
+func (service *appService) UpdateAndReload(appMeta *types.AppMetaData, sameOrNewImage string) (bool, error) {
+	originalImage := appMeta.Image
+	log.V("Updating '%s' to '%s'", originalImage, sameOrNewImage)
+	// Pull and get the new digest
+	currentDigest, err := Docker.GetDigest(originalImage)
+	if err != nil {
+		return false, err
+	}
+	err = Docker.PullImage(sameOrNewImage)
+	if err != nil {
+		return false, err
+	}
+	newDigest, err := Docker.GetDigest(sameOrNewImage)
+	if err != nil {
+		return false, err
+	}
+
+	// Return if we aren't actually updating
+	if newDigest == currentDigest {
+		return false, nil
+	}
+
+	err = service.ReloadApp(appMeta.Name, appMeta)
+	if err != nil {
+		return false, err
+	}
+
+	// Update the app's image if the image changed
+	if originalImage != sameOrNewImage {
+		appMeta.Image = sameOrNewImage
+		err = service.WriteAppMeta(appMeta)
+		if err != nil {
+			log.W("Failed to save new app image after updating the app")
+		}
+	}
+
+	return true, nil
 }

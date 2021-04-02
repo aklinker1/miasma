@@ -205,6 +205,32 @@ paths:
             type: string
         default:
           $ref: '#/responses/unknown'
+  /api/apps/{appName}/update:
+    put:
+      summary: pull the app's image and restart it
+      operationId: updateApp
+      parameters:
+        - $ref: '#/parameters/appName'
+        - in: query
+          name: newImage
+          required: false
+          type: string
+          description: A new image to base the app off of
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+        400:
+          description: Bad Request
+          schema:
+            type: string
+        404:
+          description: Not Found
+          schema:
+            type: string
+        default:
+          $ref: '#/responses/unknown'
   /api/plugins:
     get:
       summary: List all available plugins and if they are installed

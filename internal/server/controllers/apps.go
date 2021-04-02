@@ -20,6 +20,7 @@ func UseAppsController(api *operations.MiasmaAPI) {
 	api.UpdateAppConfigHandler = updateAppConfig
 	api.GetAppEnvHandler = getAppEnv
 	api.UpdateAppEnvHandler = updateAppEnv
+	api.UpdateAppHandler = updateApp
 }
 
 var getApps = operations.GetAppsHandlerFunc(
@@ -45,6 +46,11 @@ var createApp = operations.CreateAppHandlerFunc(
 		existingApp, _ := services.App.Get(*inputApp.Name)
 		if existingApp != nil {
 			return operations.NewCreateAppBadRequest().WithPayload(fmt.Sprintf("%s already exists", *inputApp.Name))
+		}
+
+		err = services.Docker.PullImage(*inputApp.Image)
+		if err != nil {
+			return operations.NewCreateAppBadRequest().WithPayload(err.Error())
 		}
 
 		newApp, err := services.App.Create(inputApp)
@@ -157,4 +163,28 @@ var updateAppEnv = operations.UpdateAppEnvHandlerFunc(
 			return operations.NewUpdateAppEnvDefault(500).WithPayload(err.Error())
 		}
 		return operations.NewUpdateAppEnvOK().WithPayload(env)
+	})
+
+var updateApp = operations.UpdateAppHandlerFunc(
+	func(params operations.UpdateAppParams) middleware.Responder {
+		appMeta, err := services.App.GetAppMeta(params.AppName)
+		if err != nil {
+			return operations.NewUpdateAppNotFound().WithPayload(err.Error())
+		}
+
+		var newImage string
+		if params.NewImage == nil {
+			newImage = appMeta.Image
+		} else {
+			newImage = *params.NewImage
+		}
+		updated, err := services.App.UpdateAndReload(appMeta, newImage)
+
+		if err != nil {
+			return operations.NewUpdateAppDefault(500).WithPayload(err.Error())
+		}
+		if !updated {
+			return operations.NewUpdateAppBadRequest().WithPayload(fmt.Sprintf("No updates are available for %s!", newImage))
+		}
+		return operations.NewUpdateAppOK().WithPayload(nil)
 	})
