@@ -12,7 +12,8 @@ import (
 
 var appsUpdateCmd = &cobra.Command{
 	Use:   "apps:update",
-	Short: "Create and deploy a new application",
+	Short: "Pull the latest version of the application's image and reload the app",
+	Long:  "Pull the latest version of the application's image and reload the app. If a new image is passed, the app is updated to use that image instead of the current one",
 	Run: func(cmd *cobra.Command, args []string) {
 		appName, deferable := flags.GetAppFlag(cmd)
 		defer deferable()
