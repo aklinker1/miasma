@@ -100,20 +100,12 @@ func (service *appService) GetAll(showHidden bool) ([]*models.App, error) {
 }
 
 func (service *appService) Create(app models.AppInput) (*models.App, error) {
-	appsDir, err := service.AppsDir()
+	err := Docker.CreateNetworkIfNotAvailable(*app.Name)
 	if err != nil {
 		return nil, err
 	}
-	metaPath := fmt.Sprintf("%s/%s.yml", appsDir, *app.Name)
-	metaData, err := yaml.Marshal(mappers.App.ToMeta(&app))
-	if err != nil {
-		return nil, err
-	}
-	err = Docker.CreateNetworkIfNotAvailable(*app.Name)
-	if err != nil {
-		return nil, err
-	}
-	err = ioutil.WriteFile(metaPath, metaData, 0755)
+
+	err = service.WriteAppMeta(mappers.App.ToMeta(&app))
 	if err != nil {
 		return nil, err
 	}
