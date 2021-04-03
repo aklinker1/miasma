@@ -29,7 +29,8 @@ publish:
 		-f docker/Dockerfile.server \
 		--push \
 		--platform linux/arm/v7,linux/arm64/v8,linux/amd64 \
-		--tag aklinker1/miasma:nightly .
+		--tag aklinker1/miasma:nightly \
+		.
 
 # CLI
 
