@@ -2,8 +2,10 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
+	"strings"
 
 	dockerLib "docker.io/go-docker"
 	dockerTypes "docker.io/go-docker/api/types"
@@ -229,6 +231,12 @@ func (service *dockerService) GetDigest(baseImage string) (string, error) {
 		log.E("Failed to inspect image: %v", err)
 		return "", err
 	}
-	log.V("Digest: %s", info.ID)
-	return info.ID, nil
+	for _, digest := range info.RepoDigests {
+		if strings.Contains(digest, "@sha256:") {
+			digest := digest[strings.LastIndex(digest, "@")+1:]
+			log.V("Digest: %v", digest)
+			return digest, nil
+		}
+	}
+	return "", errors.New("Could not find digest with hash instead of tag")
 }
