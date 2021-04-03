@@ -313,6 +313,7 @@ func (service *appService) UpdateAndReload(appMeta *types.AppMetaData, sameOrNew
 	}
 
 	// Return if we aren't actually updating
+	appMeta.Image = sameOrNewImage
 	if newDigest == currentDigest {
 		return false, nil
 	}
@@ -324,7 +325,6 @@ func (service *appService) UpdateAndReload(appMeta *types.AppMetaData, sameOrNew
 
 	// Update the app's image if the image changed
 	if originalImage != sameOrNewImage {
-		appMeta.Image = sameOrNewImage
 		err = service.WriteAppMeta(appMeta)
 		if err != nil {
 			log.W("Failed to save new app image after updating the app")
