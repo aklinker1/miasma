@@ -12,7 +12,7 @@ func UseNewImageFlag(cmd *cobra.Command) {
 }
 
 func GetNewImageFlag(cmd *cobra.Command) *string {
-	image, err := cmd.Flags().GetString("new-image")
+	image, err := cmd.Flags().GetString("image")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
