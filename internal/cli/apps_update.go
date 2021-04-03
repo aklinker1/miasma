@@ -26,6 +26,7 @@ var appsUpdateCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(appsUpdateCmd)
 	flags.UseNewImageFlag(appsUpdateCmd)
+	flags.UseAppFlag(appsUpdateCmd)
 }
 
 func updateApp(appName string, image *string) {
