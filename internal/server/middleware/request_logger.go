@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/aklinker1/miasma/internal/server/utils/env"
 	"github.com/aklinker1/miasma/internal/shared/log"
@@ -24,13 +25,14 @@ func RequestLogger() func(http.Handler) http.Handler {
 		}
 
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			start := time.Now()
 			recorder := &StatusRecorder{
 				ResponseWriter: w,
 				Status:         200,
 			}
 			log.D("<<<<<< %s %s", r.Method, r.URL.Path)
 			next.ServeHTTP(recorder, r)
-			log.D(">>>>>> %d (%s)", recorder.Status, w.Header().Get("X-Response-Time"))
+			log.D(">>>>>> %d (%s)", recorder.Status, time.Since(start).String())
 		})
 	}
 }
