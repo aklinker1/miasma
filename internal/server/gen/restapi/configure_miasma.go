@@ -145,6 +145,6 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 		recovr.New(),
 		customMiddleware.UI(),
 		customMiddleware.RequestLogger(),
-		customMiddleware.XResponseTime(),
+		// customMiddleware.XResponseTime(),
 	)
 }
