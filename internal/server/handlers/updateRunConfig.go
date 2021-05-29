@@ -4,6 +4,8 @@ import (
 	"github.com/aklinker1/miasma/internal/server/database"
 	"github.com/aklinker1/miasma/internal/server/gen/restapi/operations"
 	"github.com/aklinker1/miasma/internal/server/services/app_service"
+	"github.com/aklinker1/miasma/internal/server/services/env_service"
+	"github.com/aklinker1/miasma/internal/server/services/plugin_service"
 	"github.com/aklinker1/miasma/internal/server/services/run_config_service"
 	"github.com/aklinker1/miasma/internal/shared/log"
 	"github.com/aklinker1/miasma/internal/shared/validation"
@@ -22,21 +24,43 @@ var UpdateRunConfig = operations.UpdateRunConfigHandlerFunc(
 				WithPayload(err.Error())
 		}
 
-		appId, err := app_service.GetAppID(tx, params.AppName)
+		appID, err := app_service.GetAppID(tx, params.AppName)
 		if err != nil {
 			return operations.NewUpdateRunConfigNotFound().WithPayload(err.Error())
 		}
 
-		err = run_config_service.Upsert(tx, params.NewRunConfig)
+		newRunConfig, err := run_config_service.Get(tx, appID)
+		newRunConfig.Command = params.NewRunConfig.Command
+		newRunConfig.Networks = params.NewRunConfig.Networks
+		newRunConfig.Placement = params.NewRunConfig.Placement
+		newRunConfig.PublishedPorts = params.NewRunConfig.PublishedPorts
+		newRunConfig.TargetPorts = params.NewRunConfig.TargetPorts
+		newRunConfig.Volumes = params.NewRunConfig.Volumes
+		err = run_config_service.Upsert(tx, newRunConfig)
 		if err != nil {
 			return operations.NewUpdateRunConfigDefault(500).WithPayload(err.Error())
 		}
 
-		runConfig, err := run_config_service.Get(tx, appId)
+		details, err := app_service.Details(tx, params.AppName)
 		if err != nil {
-			return operations.NewUpdateRunConfigDefault(500).WithPayload(err.Error())
+			return operations.NewUpdateRunConfigNotFound().WithPayload(err.Error())
 		}
 
-		return operations.NewUpdateRunConfigOK().WithPayload(runConfig)
+		env, err := env_service.Get(tx, appID)
+		if err != nil {
+			return operations.NewUpdateAppEnvDefault(500).WithPayload(err.Error())
+		}
+
+		plugins, err := plugin_service.GetAppPlugins(tx, appID)
+		if err != nil {
+			return operations.NewUpdateAppEnvDefault(500).WithPayload(err.Error())
+		}
+
+		err = app_service.Reload(details, env, plugins)
+		if err != nil {
+			return operations.NewUpdateAppEnvDefault(500).WithPayload(err.Error())
+		}
+
+		return operations.NewUpdateRunConfigOK().WithPayload(details.RunConfig)
 	},
 )

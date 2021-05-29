@@ -144,7 +144,7 @@ paths:
         - in: body
           name: newRunConfig
           schema:
-            $ref: "#/definitions/RunConfig"
+            $ref: "#/definitions/InputRunConfig"
       responses:
         200:
           description: OK
@@ -401,6 +401,20 @@ definitions:
       hidden:
         type: boolean
         description: Whether or not the app is hidden during regular requests
+  RunConfigVolume:
+    type: object
+    properties:
+      Source:
+        description: The volume name or directory on the host that the data is stored in
+        type: string
+      Target:
+        description: The path inside the container that the data is served from
+        type: string
+      # Type:
+      #   description:
+      #     The type of binding. Should be either "bind", "volume", "tmpfs", or "npipe".
+      #   type: string
+      #   x-nullable: true
   RunConfig:
     type: object
     description: All the properties that define how the application runs in docker
@@ -461,24 +475,47 @@ definitions:
         description: volume bindings for the app
         type: array
         items:
-          type: object
-          properties:
-            Source:
-              description: The volume name or directory on the host that the data is stored in
-              type: string
-            Target:
-              description: The path inside the container that the data is served from
-              type: string
-            # Type:
-            #   description:
-            #     The type of binding. Should be either "bind", "volume", "tmpfs", or "npipe".
-            #   type: string
-            #   x-nullable: true
+          $ref: "#/definitions/RunConfigVolume"
       networks:
         description:
           A list of other apps that the service communicates with using their service name and
           docker's internal DNS. Services don't have to be two way; only the service that accesses
           the other needs the other network added
+        type: array
+        items:
+          type: string
+        uniqueItems: true
+      command:
+        type: array
+        items:
+          type: string
+  InputRunConfig:
+    type: object
+    description: All the properties that define how the application runs in docker
+    properties:
+      targetPorts:
+        type: array
+        items:
+          type: integer
+          format: uint32
+        uniqueItems: true
+      publishedPorts:
+        type: array
+        items:
+          type: integer
+          format: uint32
+        uniqueItems: true
+      placement:
+        type: array
+        items:
+          type: string
+        uniqueItems: true
+      volumes:
+        description: volume bindings for the app
+        type: array
+        items:
+          $ref: "#/definitions/RunConfigVolume"
+      networks:
         type: array
         items:
           type: string

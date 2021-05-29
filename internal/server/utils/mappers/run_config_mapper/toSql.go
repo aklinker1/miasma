@@ -25,9 +25,9 @@ func ToSQL(model *models.RunConfig) *entities.SQLRunConfig {
 		Command:        model.Command,
 		ImageDigest:    model.ImageDigest,
 		Networks:       model.Networks,
-		Placement:      model.Networks,
+		Placement:      model.Placement,
 		PublishedPorts: model.PublishedPorts,
-		TargetPorts:    model.PublishedPorts,
+		TargetPorts:    model.TargetPorts,
 		Volumes:        volumeBytes,
 	}
 }

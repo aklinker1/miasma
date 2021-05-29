@@ -1,23 +1,15 @@
 package run_config_service
 
 import (
+	"github.com/aklinker1/miasma/internal/server/utils/mappers/run_config_mapper"
 	"github.com/aklinker1/miasma/internal/shared/log"
 	"github.com/aklinker1/miasma/package/models"
 	"gorm.io/gorm"
 )
 
 func Upsert(tx *gorm.DB, newRunConfig *models.RunConfig) error {
-	log.V("Updating config for %s...", newRunConfig.AppID)
-	panic("TODO: save new run config")
-	// existingRunConfig, err := app_service.GetAppMeta(appName)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	log.V("run_config_service.Upsert(%v)", newRunConfig)
 
-	// TODO! Reset ports to be generated if the published ports have changed
-	panic("TODO: Pull out reload into parent function")
-	// err = app_service.Reload(appName, updatedMeta)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	entity := run_config_mapper.ToSQL(newRunConfig)
+	return tx.Save(entity).Error
 }

@@ -8,17 +8,20 @@ import (
 )
 
 func FromSQL(sql *entities.SQLRunConfig) *models.RunConfig {
-	volumes := []*models.RunConfigVolumesItems0{}
+	volumes := []*models.RunConfigVolume{}
 	jsonVolumes := []*entities.SQLRunConfigVolume{}
 	err := json.Unmarshal(sql.Volumes, &jsonVolumes)
 	if err != nil {
 		panic(err)
 	}
 	for _, volume := range jsonVolumes {
-		volumes = append(volumes, &models.RunConfigVolumesItems0{
+		volumes = append(volumes, &models.RunConfigVolume{
 			Source: volume.Source,
 			Target: volume.Target,
 		})
+	}
+	if len(volumes) == 0 {
+		volumes = nil
 	}
 
 	return &models.RunConfig{
@@ -26,9 +29,9 @@ func FromSQL(sql *entities.SQLRunConfig) *models.RunConfig {
 		Command:        sql.Command,
 		ImageDigest:    sql.ImageDigest,
 		Networks:       sql.Networks,
-		Placement:      sql.Networks,
+		Placement:      sql.Placement,
 		PublishedPorts: sql.PublishedPorts,
-		TargetPorts:    sql.PublishedPorts,
+		TargetPorts:    sql.TargetPorts,
 		Volumes:        volumes,
 	}
 }

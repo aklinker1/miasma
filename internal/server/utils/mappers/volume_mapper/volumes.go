@@ -5,7 +5,7 @@ import (
 	"github.com/aklinker1/miasma/package/models"
 )
 
-func ToDocker(model *models.RunConfigVolumesItems0) mount.Mount {
+func ToDocker(model *models.RunConfigVolume) mount.Mount {
 	volumeType := mount.TypeBind
 	// if model.Type != nil {
 	// 	volumeType = mount.Type(*model.Type)

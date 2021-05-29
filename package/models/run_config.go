@@ -51,7 +51,7 @@ type RunConfig struct {
 	TargetPorts []uint32 `json:"targetPorts"`
 
 	// volume bindings for the app
-	Volumes []*RunConfigVolumesItems0 `json:"volumes"`
+	Volumes []*RunConfigVolume `json:"volumes"`
 }
 
 // Validate validates this run config
@@ -202,41 +202,6 @@ func (m *RunConfig) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (m *RunConfig) UnmarshalBinary(b []byte) error {
 	var res RunConfig
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*m = res
-	return nil
-}
-
-// RunConfigVolumesItems0 run config volumes items0
-//
-// swagger:model RunConfigVolumesItems0
-type RunConfigVolumesItems0 struct {
-
-	// The volume name or directory on the host that the data is stored in
-	Source string `json:"Source,omitempty"`
-
-	// The path inside the container that the data is served from
-	Target string `json:"Target,omitempty"`
-}
-
-// Validate validates this run config volumes items0
-func (m *RunConfigVolumesItems0) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (m *RunConfigVolumesItems0) MarshalBinary() ([]byte, error) {
-	if m == nil {
-		return nil, nil
-	}
-	return swag.WriteJSON(m)
-}
-
-// UnmarshalBinary interface implementation
-func (m *RunConfigVolumesItems0) UnmarshalBinary(b []byte) error {
-	var res RunConfigVolumesItems0
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

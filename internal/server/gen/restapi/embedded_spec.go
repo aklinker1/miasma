@@ -177,7 +177,7 @@ func init() {
             "name": "newRunConfig",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/RunConfig"
+              "$ref": "#/definitions/InputRunConfig"
             }
           }
         ],
@@ -602,6 +602,55 @@ func init() {
         }
       }
     },
+    "InputRunConfig": {
+      "description": "All the properties that define how the application runs in docker",
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "networks": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "placement": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "publishedPorts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "targetPorts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "volumes": {
+          "description": "volume bindings for the app",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RunConfigVolume"
+          }
+        }
+      }
+    },
     "Plugin": {
       "type": "object",
       "required": [
@@ -693,18 +742,21 @@ func init() {
           "description": "volume bindings for the app",
           "type": "array",
           "items": {
-            "type": "object",
-            "properties": {
-              "Source": {
-                "description": "The volume name or directory on the host that the data is stored in",
-                "type": "string"
-              },
-              "Target": {
-                "description": "The path inside the container that the data is served from",
-                "type": "string"
-              }
-            }
+            "$ref": "#/definitions/RunConfigVolume"
           }
+        }
+      }
+    },
+    "RunConfigVolume": {
+      "type": "object",
+      "properties": {
+        "Source": {
+          "description": "The volume name or directory on the host that the data is stored in",
+          "type": "string"
+        },
+        "Target": {
+          "description": "The path inside the container that the data is served from",
+          "type": "string"
         }
       }
     },
@@ -946,7 +998,7 @@ func init() {
             "name": "newRunConfig",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/RunConfig"
+              "$ref": "#/definitions/InputRunConfig"
             }
           }
         ],
@@ -1459,6 +1511,55 @@ func init() {
         }
       }
     },
+    "InputRunConfig": {
+      "description": "All the properties that define how the application runs in docker",
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "networks": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "placement": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "publishedPorts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "targetPorts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "volumes": {
+          "description": "volume bindings for the app",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RunConfigVolume"
+          }
+        }
+      }
+    },
     "Plugin": {
       "type": "object",
       "required": [
@@ -1550,12 +1651,12 @@ func init() {
           "description": "volume bindings for the app",
           "type": "array",
           "items": {
-            "$ref": "#/definitions/RunConfigVolumesItems0"
+            "$ref": "#/definitions/RunConfigVolume"
           }
         }
       }
     },
-    "RunConfigVolumesItems0": {
+    "RunConfigVolume": {
       "type": "object",
       "properties": {
         "Source": {

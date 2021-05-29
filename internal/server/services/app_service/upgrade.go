@@ -51,7 +51,7 @@ func Upgrade(
 			log.W("Failed to save new app image after upgrading the app")
 			return false, err
 		}
-		err = run_config_service.Update(tx, details.RunConfig)
+		err = run_config_service.Upsert(tx, details.RunConfig)
 		if err != nil {
 			log.W("Failed to save new image digest after upgrading the app")
 			return false, err

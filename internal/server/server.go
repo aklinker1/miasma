@@ -58,7 +58,7 @@ func useControllers(api *operations.MiasmaAPI) {
 
 	// Run Config
 	api.GetRunConfigHandler = handlers.GetRunConfig       // ✅
-	api.UpdateRunConfigHandler = handlers.UpdateRunConfig // ❌
+	api.UpdateRunConfigHandler = handlers.UpdateRunConfig // ✅
 
 	// Plugins
 	api.ListPluginsHandler = handlers.ListPlugins         // ❌

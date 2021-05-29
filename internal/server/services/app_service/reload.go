@@ -21,6 +21,13 @@ func Reload(details *server_models.AppDetails, env map[string]string, plugins *s
 		return nil
 	}
 
+	for _, network := range details.RunConfig.Networks {
+		err = docker_service.UpsertNetwork(network)
+		if err != nil {
+			return err
+		}
+	}
+
 	log.V("Updating a running service: %s", details.App.Name)
 	return docker_service.UpdateService(existingService, newServiceSpec)
 }

@@ -30,7 +30,7 @@ var Plugins = predefinedPlugins{
 				"node.labels.traefik==true",
 				"node.role==manager",
 			},
-			Volumes: []*models.RunConfigVolumesItems0{{
+			Volumes: []*models.RunConfigVolume{{
 				Source: "/var/run/docker.sock",
 				Target: "/var/run/docker.sock",
 			}},

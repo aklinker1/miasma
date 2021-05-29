@@ -68,7 +68,7 @@ type UpdateRunConfigParams struct {
 	*/
 	AppName string
 	/*NewRunConfig*/
-	NewRunConfig *models.RunConfig
+	NewRunConfig *models.InputRunConfig
 
 	timeout    time.Duration
 	Context    context.Context
@@ -120,13 +120,13 @@ func (o *UpdateRunConfigParams) SetAppName(appName string) {
 }
 
 // WithNewRunConfig adds the newRunConfig to the update run config params
-func (o *UpdateRunConfigParams) WithNewRunConfig(newRunConfig *models.RunConfig) *UpdateRunConfigParams {
+func (o *UpdateRunConfigParams) WithNewRunConfig(newRunConfig *models.InputRunConfig) *UpdateRunConfigParams {
 	o.SetNewRunConfig(newRunConfig)
 	return o
 }
 
 // SetNewRunConfig adds the newRunConfig to the update run config params
-func (o *UpdateRunConfigParams) SetNewRunConfig(newRunConfig *models.RunConfig) {
+func (o *UpdateRunConfigParams) SetNewRunConfig(newRunConfig *models.InputRunConfig) {
 	o.NewRunConfig = newRunConfig
 }
 
