@@ -39,7 +39,7 @@ var UpgradeApp = operations.UpgradeAppHandlerFunc(
 		} else {
 			newImage = *params.NewImage
 		}
-		updated, err := app_service.Upgrade(details, env, plugins, newImage)
+		updated, err := app_service.Upgrade(tx, details, env, plugins, newImage)
 
 		if err != nil {
 			return operations.NewUpgradeAppDefault(500).WithPayload(err.Error())
@@ -47,6 +47,6 @@ var UpgradeApp = operations.UpgradeAppHandlerFunc(
 		if !updated {
 			return operations.NewUpgradeAppBadRequest().WithPayload(fmt.Sprintf("No updates are available for %s!", newImage))
 		}
-		return operations.NewUpgradeAppOK().WithPayload(nil)
+		return operations.NewUpgradeAppNoContent()
 	},
 )

@@ -59,7 +59,7 @@ type ClientService interface {
 
 	UpdateRunConfig(params *UpdateRunConfigParams) (*UpdateRunConfigOK, error)
 
-	UpgradeApp(params *UpgradeAppParams) (*UpgradeAppOK, error)
+	UpgradeApp(params *UpgradeAppParams) (*UpgradeAppNoContent, error)
 
 	SetTransport(transport runtime.ClientTransport)
 }
@@ -597,7 +597,7 @@ func (a *Client) UpdateRunConfig(params *UpdateRunConfigParams) (*UpdateRunConfi
 /*
   UpgradeApp pulls the app s image and restart it
 */
-func (a *Client) UpgradeApp(params *UpgradeAppParams) (*UpgradeAppOK, error) {
+func (a *Client) UpgradeApp(params *UpgradeAppParams) (*UpgradeAppNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewUpgradeAppParams()
@@ -618,7 +618,7 @@ func (a *Client) UpgradeApp(params *UpgradeAppParams) (*UpgradeAppOK, error) {
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*UpgradeAppOK)
+	success, ok := result.(*UpgradeAppNoContent)
 	if ok {
 		return success, nil
 	}

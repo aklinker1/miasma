@@ -47,7 +47,7 @@ func useControllers(api *operations.MiasmaAPI) {
 	api.ListAppsHandler = handlers.ListApps     // ✅
 	api.CreateAppHandler = handlers.CreateApp   // ✅
 	api.GetAppHandler = handlers.GetApp         // ✅
-	api.UpgradeAppHandler = handlers.UpgradeApp // ❌
+	api.UpgradeAppHandler = handlers.UpgradeApp // ✅
 	api.DeleteAppHandler = handlers.DeleteApp   // ✅
 	api.StartAppHandler = handlers.StartApp     // ✅
 	api.StopAppHandler = handlers.StopApp       // ✅

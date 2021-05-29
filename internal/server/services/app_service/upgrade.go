@@ -2,12 +2,15 @@ package app_service
 
 import (
 	"github.com/aklinker1/miasma/internal/server/services/docker_service"
+	"github.com/aklinker1/miasma/internal/server/services/run_config_service"
 	"github.com/aklinker1/miasma/internal/server/utils/server_models"
 	"github.com/aklinker1/miasma/internal/shared/log"
+	"gorm.io/gorm"
 )
 
 // Upgrade pulls the latest image and reloads the application
 func Upgrade(
+	tx *gorm.DB,
 	details *server_models.AppDetails,
 	env map[string]string,
 	plugins *server_models.AppPlugins,
@@ -43,11 +46,16 @@ func Upgrade(
 
 	// Update the app's image if the image changed
 	if originalImage != newImage {
-		panic("TODO: Save app and run config")
-		// err = app_service.WriteAppMeta(appMeta)
-		// if err != nil {
-		// 	log.W("Failed to save new app image after updating the app")
-		// }
+		err = Update(tx, details.App)
+		if err != nil {
+			log.W("Failed to save new app image after upgrading the app")
+			return false, err
+		}
+		err = run_config_service.Update(tx, details.RunConfig)
+		if err != nil {
+			log.W("Failed to save new image digest after upgrading the app")
+			return false, err
+		}
 	}
 
 	return true, nil

@@ -11,46 +11,28 @@ import (
 	"github.com/go-openapi/runtime"
 )
 
-// UpgradeAppOKCode is the HTTP code returned for type UpgradeAppOK
-const UpgradeAppOKCode int = 200
+// UpgradeAppNoContentCode is the HTTP code returned for type UpgradeAppNoContent
+const UpgradeAppNoContentCode int = 204
 
-/*UpgradeAppOK OK
+/*UpgradeAppNoContent Upgrade success
 
-swagger:response upgradeAppOK
+swagger:response upgradeAppNoContent
 */
-type UpgradeAppOK struct {
-
-	/*
-	  In: Body
-	*/
-	Payload interface{} `json:"body,omitempty"`
+type UpgradeAppNoContent struct {
 }
 
-// NewUpgradeAppOK creates UpgradeAppOK with default headers values
-func NewUpgradeAppOK() *UpgradeAppOK {
+// NewUpgradeAppNoContent creates UpgradeAppNoContent with default headers values
+func NewUpgradeAppNoContent() *UpgradeAppNoContent {
 
-	return &UpgradeAppOK{}
-}
-
-// WithPayload adds the payload to the upgrade app o k response
-func (o *UpgradeAppOK) WithPayload(payload interface{}) *UpgradeAppOK {
-	o.Payload = payload
-	return o
-}
-
-// SetPayload sets the payload to the upgrade app o k response
-func (o *UpgradeAppOK) SetPayload(payload interface{}) {
-	o.Payload = payload
+	return &UpgradeAppNoContent{}
 }
 
 // WriteResponse to the client
-func (o *UpgradeAppOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+func (o *UpgradeAppNoContent) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.WriteHeader(200)
-	payload := o.Payload
-	if err := producer.Produce(rw, payload); err != nil {
-		panic(err) // let the recovery middleware deal with this
-	}
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(204)
 }
 
 // UpgradeAppBadRequestCode is the HTTP code returned for type UpgradeAppBadRequest

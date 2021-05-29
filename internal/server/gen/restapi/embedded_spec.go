@@ -344,11 +344,8 @@ func init() {
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object"
-            }
+          "204": {
+            "description": "Upgrade success"
           },
           "400": {
             "description": "Bad Request",
@@ -1151,11 +1148,8 @@ func init() {
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object"
-            }
+          "204": {
+            "description": "Upgrade success"
           },
           "400": {
             "description": "Bad Request",

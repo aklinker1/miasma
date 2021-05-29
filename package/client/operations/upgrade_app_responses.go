@@ -21,8 +21,8 @@ type UpgradeAppReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *UpgradeAppReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-	case 200:
-		result := NewUpgradeAppOK()
+	case 204:
+		result := NewUpgradeAppNoContent()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -51,33 +51,23 @@ func (o *UpgradeAppReader) ReadResponse(response runtime.ClientResponse, consume
 	}
 }
 
-// NewUpgradeAppOK creates a UpgradeAppOK with default headers values
-func NewUpgradeAppOK() *UpgradeAppOK {
-	return &UpgradeAppOK{}
+// NewUpgradeAppNoContent creates a UpgradeAppNoContent with default headers values
+func NewUpgradeAppNoContent() *UpgradeAppNoContent {
+	return &UpgradeAppNoContent{}
 }
 
-/*UpgradeAppOK handles this case with default header values.
+/*UpgradeAppNoContent handles this case with default header values.
 
-OK
+Upgrade success
 */
-type UpgradeAppOK struct {
-	Payload interface{}
+type UpgradeAppNoContent struct {
 }
 
-func (o *UpgradeAppOK) Error() string {
-	return fmt.Sprintf("[PUT /api/apps/{appName}/upgrade][%d] upgradeAppOK  %+v", 200, o.Payload)
+func (o *UpgradeAppNoContent) Error() string {
+	return fmt.Sprintf("[PUT /api/apps/{appName}/upgrade][%d] upgradeAppNoContent ", 204)
 }
 
-func (o *UpgradeAppOK) GetPayload() interface{} {
-	return o.Payload
-}
-
-func (o *UpgradeAppOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
-		return err
-	}
+func (o *UpgradeAppNoContent) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

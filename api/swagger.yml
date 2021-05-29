@@ -217,10 +217,8 @@ paths:
           type: string
           description: A new image to base the app off of
       responses:
-        200:
-          description: OK
-          schema:
-            type: object
+        204:
+          description: Upgrade success
         400:
           description: Bad Request
           schema:

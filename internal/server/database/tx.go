@@ -10,7 +10,7 @@ func TX(err *error) (tx *gorm.DB, onDefer func()) {
 	tx = db.Begin()
 	onDefer = func() {
 		if panicErr := recover(); panicErr != nil {
-			log.E("Paniced, rolling back")
+			log.E("Paniced, rolling back: %v", panicErr)
 			tx.Rollback()
 		}
 		if errVal := *err; errVal != nil {
