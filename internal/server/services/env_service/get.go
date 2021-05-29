@@ -8,8 +8,8 @@ import (
 
 func Get(tx *gorm.DB, appID string) (map[string]string, error) {
 	log.V("env_service.Get(%v)", appID)
-	envVars := []entities.SQLEnvVar{}
-	err := tx.Where("app_id = ?", appID).Find(&envVars).Error
+	var envVars []entities.SQLEnvVar
+	err := tx.Find(&envVars, "app_id = ?", appID).Error
 
 	keyValues := map[string]string{}
 	if err != nil {
