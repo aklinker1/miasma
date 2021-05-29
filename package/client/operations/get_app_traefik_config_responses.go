@@ -29,6 +29,12 @@ func (o *GetAppTraefikConfigReader) ReadResponse(response runtime.ClientResponse
 			return nil, err
 		}
 		return result, nil
+	case 400:
+		result := NewGetAppTraefikConfigBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 404:
 		result := NewGetAppTraefikConfigNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -54,14 +60,14 @@ func NewGetAppTraefikConfigOK() *GetAppTraefikConfigOK {
 
 /*GetAppTraefikConfigOK handles this case with default header values.
 
-Created
+Found and returned the config
 */
 type GetAppTraefikConfigOK struct {
 	Payload *models.TraefikPluginConfig
 }
 
 func (o *GetAppTraefikConfigOK) Error() string {
-	return fmt.Sprintf("[GET /api/plugins/traefik/{appName}][%d] getAppTraefikConfigOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /api/plugins/traefik/{appId}][%d] getAppTraefikConfigOK  %+v", 200, o.Payload)
 }
 
 func (o *GetAppTraefikConfigOK) GetPayload() *models.TraefikPluginConfig {
@@ -80,6 +86,37 @@ func (o *GetAppTraefikConfigOK) readResponse(response runtime.ClientResponse, co
 	return nil
 }
 
+// NewGetAppTraefikConfigBadRequest creates a GetAppTraefikConfigBadRequest with default headers values
+func NewGetAppTraefikConfigBadRequest() *GetAppTraefikConfigBadRequest {
+	return &GetAppTraefikConfigBadRequest{}
+}
+
+/*GetAppTraefikConfigBadRequest handles this case with default header values.
+
+Traefik plugin is not installed
+*/
+type GetAppTraefikConfigBadRequest struct {
+	Payload string
+}
+
+func (o *GetAppTraefikConfigBadRequest) Error() string {
+	return fmt.Sprintf("[GET /api/plugins/traefik/{appId}][%d] getAppTraefikConfigBadRequest  %+v", 400, o.Payload)
+}
+
+func (o *GetAppTraefikConfigBadRequest) GetPayload() string {
+	return o.Payload
+}
+
+func (o *GetAppTraefikConfigBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// response payload
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
 // NewGetAppTraefikConfigNotFound creates a GetAppTraefikConfigNotFound with default headers values
 func NewGetAppTraefikConfigNotFound() *GetAppTraefikConfigNotFound {
 	return &GetAppTraefikConfigNotFound{}
@@ -87,26 +124,16 @@ func NewGetAppTraefikConfigNotFound() *GetAppTraefikConfigNotFound {
 
 /*GetAppTraefikConfigNotFound handles this case with default header values.
 
-Not Found
+No config for the app
 */
 type GetAppTraefikConfigNotFound struct {
-	Payload string
 }
 
 func (o *GetAppTraefikConfigNotFound) Error() string {
-	return fmt.Sprintf("[GET /api/plugins/traefik/{appName}][%d] getAppTraefikConfigNotFound  %+v", 404, o.Payload)
-}
-
-func (o *GetAppTraefikConfigNotFound) GetPayload() string {
-	return o.Payload
+	return fmt.Sprintf("[GET /api/plugins/traefik/{appId}][%d] getAppTraefikConfigNotFound ", 404)
 }
 
 func (o *GetAppTraefikConfigNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
-		return err
-	}
 
 	return nil
 }
@@ -134,7 +161,7 @@ func (o *GetAppTraefikConfigDefault) Code() int {
 }
 
 func (o *GetAppTraefikConfigDefault) Error() string {
-	return fmt.Sprintf("[GET /api/plugins/traefik/{appName}][%d] getAppTraefikConfig default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[GET /api/plugins/traefik/{appId}][%d] getAppTraefikConfig default  %+v", o._statusCode, o.Payload)
 }
 
 func (o *GetAppTraefikConfigDefault) GetPayload() string {

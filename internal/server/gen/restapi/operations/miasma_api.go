@@ -75,6 +75,9 @@ func NewMiasmaAPI(spec *loads.Document) *MiasmaAPI {
 		ListPluginsHandler: ListPluginsHandlerFunc(func(params ListPluginsParams) middleware.Responder {
 			return middleware.NotImplemented("operation ListPlugins has not yet been implemented")
 		}),
+		RemoveAppTraefikConfigHandler: RemoveAppTraefikConfigHandlerFunc(func(params RemoveAppTraefikConfigParams) middleware.Responder {
+			return middleware.NotImplemented("operation RemoveAppTraefikConfig has not yet been implemented")
+		}),
 		StartAppHandler: StartAppHandlerFunc(func(params StartAppParams) middleware.Responder {
 			return middleware.NotImplemented("operation StartApp has not yet been implemented")
 		}),
@@ -86,6 +89,9 @@ func NewMiasmaAPI(spec *loads.Document) *MiasmaAPI {
 		}),
 		UpdateAppEnvHandler: UpdateAppEnvHandlerFunc(func(params UpdateAppEnvParams) middleware.Responder {
 			return middleware.NotImplemented("operation UpdateAppEnv has not yet been implemented")
+		}),
+		UpdateAppTraefikConfigHandler: UpdateAppTraefikConfigHandlerFunc(func(params UpdateAppTraefikConfigParams) middleware.Responder {
+			return middleware.NotImplemented("operation UpdateAppTraefikConfig has not yet been implemented")
 		}),
 		UpdateRunConfigHandler: UpdateRunConfigHandlerFunc(func(params UpdateRunConfigParams) middleware.Responder {
 			return middleware.NotImplemented("operation UpdateRunConfig has not yet been implemented")
@@ -149,6 +155,8 @@ type MiasmaAPI struct {
 	ListAppsHandler ListAppsHandler
 	// ListPluginsHandler sets the operation handler for the list plugins operation
 	ListPluginsHandler ListPluginsHandler
+	// RemoveAppTraefikConfigHandler sets the operation handler for the remove app traefik config operation
+	RemoveAppTraefikConfigHandler RemoveAppTraefikConfigHandler
 	// StartAppHandler sets the operation handler for the start app operation
 	StartAppHandler StartAppHandler
 	// StopAppHandler sets the operation handler for the stop app operation
@@ -157,6 +165,8 @@ type MiasmaAPI struct {
 	UninstallPluginHandler UninstallPluginHandler
 	// UpdateAppEnvHandler sets the operation handler for the update app env operation
 	UpdateAppEnvHandler UpdateAppEnvHandler
+	// UpdateAppTraefikConfigHandler sets the operation handler for the update app traefik config operation
+	UpdateAppTraefikConfigHandler UpdateAppTraefikConfigHandler
 	// UpdateRunConfigHandler sets the operation handler for the update run config operation
 	UpdateRunConfigHandler UpdateRunConfigHandler
 	// UpgradeAppHandler sets the operation handler for the upgrade app operation
@@ -270,6 +280,9 @@ func (o *MiasmaAPI) Validate() error {
 	if o.ListPluginsHandler == nil {
 		unregistered = append(unregistered, "ListPluginsHandler")
 	}
+	if o.RemoveAppTraefikConfigHandler == nil {
+		unregistered = append(unregistered, "RemoveAppTraefikConfigHandler")
+	}
 	if o.StartAppHandler == nil {
 		unregistered = append(unregistered, "StartAppHandler")
 	}
@@ -281,6 +294,9 @@ func (o *MiasmaAPI) Validate() error {
 	}
 	if o.UpdateAppEnvHandler == nil {
 		unregistered = append(unregistered, "UpdateAppEnvHandler")
+	}
+	if o.UpdateAppTraefikConfigHandler == nil {
+		unregistered = append(unregistered, "UpdateAppTraefikConfigHandler")
 	}
 	if o.UpdateRunConfigHandler == nil {
 		unregistered = append(unregistered, "UpdateRunConfigHandler")
@@ -395,7 +411,7 @@ func (o *MiasmaAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/api/plugins/traefik/{appName}"] = NewGetAppTraefikConfig(o.context, o.GetAppTraefikConfigHandler)
+	o.handlers["GET"]["/api/plugins/traefik/{appId}"] = NewGetAppTraefikConfig(o.context, o.GetAppTraefikConfigHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -420,6 +436,10 @@ func (o *MiasmaAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/api/plugins"] = NewListPlugins(o.context, o.ListPluginsHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/api/plugins/traefik/{appId}"] = NewRemoveAppTraefikConfig(o.context, o.RemoveAppTraefikConfigHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -436,6 +456,10 @@ func (o *MiasmaAPI) initHandlerCache() {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
 	o.handlers["PUT"]["/api/apps/{appName}/env"] = NewUpdateAppEnv(o.context, o.UpdateAppEnvHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/api/plugins/traefik/{appId}"] = NewUpdateAppTraefikConfig(o.context, o.UpdateAppTraefikConfigHandler)
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}

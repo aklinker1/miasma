@@ -49,6 +49,8 @@ type ClientService interface {
 
 	ListPlugins(params *ListPluginsParams) (*ListPluginsOK, error)
 
+	RemoveAppTraefikConfig(params *RemoveAppTraefikConfigParams) (*RemoveAppTraefikConfigOK, error)
+
 	StartApp(params *StartAppParams) (*StartAppNoContent, error)
 
 	StopApp(params *StopAppParams) (*StopAppNoContent, error)
@@ -56,6 +58,8 @@ type ClientService interface {
 	UninstallPlugin(params *UninstallPluginParams) (*UninstallPluginOK, error)
 
 	UpdateAppEnv(params *UpdateAppEnvParams) (*UpdateAppEnvOK, error)
+
+	UpdateAppTraefikConfig(params *UpdateAppTraefikConfigParams) (*UpdateAppTraefikConfigOK, error)
 
 	UpdateRunConfig(params *UpdateRunConfigParams) (*UpdateRunConfigOK, error)
 
@@ -209,7 +213,7 @@ func (a *Client) GetAppTraefikConfig(params *GetAppTraefikConfigParams) (*GetApp
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "getAppTraefikConfig",
 		Method:             "GET",
-		PathPattern:        "/api/plugins/traefik/{appName}",
+		PathPattern:        "/api/plugins/traefik/{appId}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
@@ -430,6 +434,39 @@ func (a *Client) ListPlugins(params *ListPluginsParams) (*ListPluginsOK, error) 
 }
 
 /*
+  RemoveAppTraefikConfig removes an app s routing config
+*/
+func (a *Client) RemoveAppTraefikConfig(params *RemoveAppTraefikConfigParams) (*RemoveAppTraefikConfigOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRemoveAppTraefikConfigParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "removeAppTraefikConfig",
+		Method:             "DELETE",
+		PathPattern:        "/api/plugins/traefik/{appId}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &RemoveAppTraefikConfigReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RemoveAppTraefikConfigOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*RemoveAppTraefikConfigDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
   StartApp starts the app
 */
 func (a *Client) StartApp(params *StartAppParams) (*StartAppNoContent, error) {
@@ -558,6 +595,39 @@ func (a *Client) UpdateAppEnv(params *UpdateAppEnvParams) (*UpdateAppEnvOK, erro
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*UpdateAppEnvDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  UpdateAppTraefikConfig updates an app s routing config
+*/
+func (a *Client) UpdateAppTraefikConfig(params *UpdateAppTraefikConfigParams) (*UpdateAppTraefikConfigOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewUpdateAppTraefikConfigParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "updateAppTraefikConfig",
+		Method:             "PUT",
+		PathPattern:        "/api/plugins/traefik/{appId}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &UpdateAppTraefikConfigReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*UpdateAppTraefikConfigOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*UpdateAppTraefikConfigDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 

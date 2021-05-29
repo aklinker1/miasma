@@ -29,7 +29,7 @@ func NewGetAppTraefikConfig(ctx *middleware.Context, handler GetAppTraefikConfig
 	return &GetAppTraefikConfig{Context: ctx, Handler: handler}
 }
 
-/*GetAppTraefikConfig swagger:route GET /api/plugins/traefik/{appName} getAppTraefikConfig
+/*GetAppTraefikConfig swagger:route GET /api/plugins/traefik/{appId} getAppTraefikConfig
 
 Get an app's routing config
 

@@ -16,7 +16,7 @@ import (
 // GetAppTraefikConfigOKCode is the HTTP code returned for type GetAppTraefikConfigOK
 const GetAppTraefikConfigOKCode int = 200
 
-/*GetAppTraefikConfigOK Created
+/*GetAppTraefikConfigOK Found and returned the config
 
 swagger:response getAppTraefikConfigOK
 */
@@ -57,19 +57,56 @@ func (o *GetAppTraefikConfigOK) WriteResponse(rw http.ResponseWriter, producer r
 	}
 }
 
-// GetAppTraefikConfigNotFoundCode is the HTTP code returned for type GetAppTraefikConfigNotFound
-const GetAppTraefikConfigNotFoundCode int = 404
+// GetAppTraefikConfigBadRequestCode is the HTTP code returned for type GetAppTraefikConfigBadRequest
+const GetAppTraefikConfigBadRequestCode int = 400
 
-/*GetAppTraefikConfigNotFound Not Found
+/*GetAppTraefikConfigBadRequest Traefik plugin is not installed
 
-swagger:response getAppTraefikConfigNotFound
+swagger:response getAppTraefikConfigBadRequest
 */
-type GetAppTraefikConfigNotFound struct {
+type GetAppTraefikConfigBadRequest struct {
 
 	/*
 	  In: Body
 	*/
 	Payload string `json:"body,omitempty"`
+}
+
+// NewGetAppTraefikConfigBadRequest creates GetAppTraefikConfigBadRequest with default headers values
+func NewGetAppTraefikConfigBadRequest() *GetAppTraefikConfigBadRequest {
+
+	return &GetAppTraefikConfigBadRequest{}
+}
+
+// WithPayload adds the payload to the get app traefik config bad request response
+func (o *GetAppTraefikConfigBadRequest) WithPayload(payload string) *GetAppTraefikConfigBadRequest {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the get app traefik config bad request response
+func (o *GetAppTraefikConfigBadRequest) SetPayload(payload string) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *GetAppTraefikConfigBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(400)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
+}
+
+// GetAppTraefikConfigNotFoundCode is the HTTP code returned for type GetAppTraefikConfigNotFound
+const GetAppTraefikConfigNotFoundCode int = 404
+
+/*GetAppTraefikConfigNotFound No config for the app
+
+swagger:response getAppTraefikConfigNotFound
+*/
+type GetAppTraefikConfigNotFound struct {
 }
 
 // NewGetAppTraefikConfigNotFound creates GetAppTraefikConfigNotFound with default headers values
@@ -78,25 +115,12 @@ func NewGetAppTraefikConfigNotFound() *GetAppTraefikConfigNotFound {
 	return &GetAppTraefikConfigNotFound{}
 }
 
-// WithPayload adds the payload to the get app traefik config not found response
-func (o *GetAppTraefikConfigNotFound) WithPayload(payload string) *GetAppTraefikConfigNotFound {
-	o.Payload = payload
-	return o
-}
-
-// SetPayload sets the payload to the get app traefik config not found response
-func (o *GetAppTraefikConfigNotFound) SetPayload(payload string) {
-	o.Payload = payload
-}
-
 // WriteResponse to the client
 func (o *GetAppTraefikConfigNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
 	rw.WriteHeader(404)
-	payload := o.Payload
-	if err := producer.Produce(rw, payload); err != nil {
-		panic(err) // let the recovery middleware deal with this
-	}
 }
 
 /*GetAppTraefikConfigDefault Unknown Error

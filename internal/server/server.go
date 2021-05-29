@@ -65,4 +65,8 @@ func useControllers(api *operations.MiasmaAPI) {
 	api.GetPluginHandler = handlers.GetPlugin
 	api.InstallPluginHandler = handlers.InstallPlugin
 	api.UninstallPluginHandler = handlers.UninstallPlugin
+	// Traefik
+	api.GetAppTraefikConfigHandler = handlers.GetAppTraefikConfig
+	api.UpdateAppTraefikConfigHandler = handlers.UpdateAppTraefikConfig
+	api.RemoveAppTraefikConfigHandler = handlers.RemoveAppTraefikConfig
 }

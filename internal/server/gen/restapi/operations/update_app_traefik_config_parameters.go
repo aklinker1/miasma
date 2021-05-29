@@ -9,23 +9,26 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/validate"
+
+	"github.com/aklinker1/miasma/package/models"
 )
 
-// NewGetAppTraefikConfigParams creates a new GetAppTraefikConfigParams object
+// NewUpdateAppTraefikConfigParams creates a new UpdateAppTraefikConfigParams object
 // no default values defined in spec.
-func NewGetAppTraefikConfigParams() GetAppTraefikConfigParams {
+func NewUpdateAppTraefikConfigParams() UpdateAppTraefikConfigParams {
 
-	return GetAppTraefikConfigParams{}
+	return UpdateAppTraefikConfigParams{}
 }
 
-// GetAppTraefikConfigParams contains all the bound params for the get app traefik config operation
+// UpdateAppTraefikConfigParams contains all the bound params for the update app traefik config operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters getAppTraefikConfig
-type GetAppTraefikConfigParams struct {
+// swagger:parameters updateAppTraefikConfig
+type UpdateAppTraefikConfigParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
@@ -35,13 +38,17 @@ type GetAppTraefikConfigParams struct {
 	  In: path
 	*/
 	AppID strfmt.UUID4
+	/*
+	  In: body
+	*/
+	NewTraefikConfig *models.InputTraefikPluginConfig
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewGetAppTraefikConfigParams() beforehand.
-func (o *GetAppTraefikConfigParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewUpdateAppTraefikConfigParams() beforehand.
+func (o *UpdateAppTraefikConfigParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
@@ -51,6 +58,22 @@ func (o *GetAppTraefikConfigParams) BindRequest(r *http.Request, route *middlewa
 		res = append(res, err)
 	}
 
+	if runtime.HasBody(r) {
+		defer r.Body.Close()
+		var body models.InputTraefikPluginConfig
+		if err := route.Consumer.Consume(r.Body, &body); err != nil {
+			res = append(res, errors.NewParseError("newTraefikConfig", "body", "", err))
+		} else {
+			// validate body object
+			if err := body.Validate(route.Formats); err != nil {
+				res = append(res, err)
+			}
+
+			if len(res) == 0 {
+				o.NewTraefikConfig = &body
+			}
+		}
+	}
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -58,7 +81,7 @@ func (o *GetAppTraefikConfigParams) BindRequest(r *http.Request, route *middlewa
 }
 
 // bindAppID binds and validates parameter AppID from path.
-func (o *GetAppTraefikConfigParams) bindAppID(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *UpdateAppTraefikConfigParams) bindAppID(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -82,7 +105,7 @@ func (o *GetAppTraefikConfigParams) bindAppID(rawData []string, hasKey bool, for
 }
 
 // validateAppID carries on validations for parameter AppID
-func (o *GetAppTraefikConfigParams) validateAppID(formats strfmt.Registry) error {
+func (o *UpdateAppTraefikConfigParams) validateAppID(formats strfmt.Registry) error {
 
 	if err := validate.FormatOf("appId", "path", "uuid4", o.AppID.String(), formats); err != nil {
 		return err

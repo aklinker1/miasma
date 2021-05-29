@@ -400,13 +400,49 @@ func init() {
         }
       }
     },
-    "/api/plugins/traefik/{appName}": {
+    "/api/plugins/traefik/{appId}": {
       "get": {
         "summary": "Get an app's routing config",
         "operationId": "getAppTraefikConfig",
         "parameters": [
           {
-            "$ref": "#/parameters/appName"
+            "$ref": "#/parameters/appId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Found and returned the config",
+            "schema": {
+              "$ref": "#/definitions/TraefikPluginConfig"
+            }
+          },
+          "400": {
+            "description": "Traefik plugin is not installed",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "No config for the app"
+          },
+          "default": {
+            "$ref": "#/responses/unknown"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an app's routing config",
+        "operationId": "updateAppTraefikConfig",
+        "parameters": [
+          {
+            "$ref": "#/parameters/appId"
+          },
+          {
+            "name": "newTraefikConfig",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/InputTraefikPluginConfig"
+            }
           }
         ],
         "responses": {
@@ -416,8 +452,34 @@ func init() {
               "$ref": "#/definitions/TraefikPluginConfig"
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Traefik plugin is not installed",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/unknown"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Removes an app's routing config",
+        "operationId": "removeAppTraefikConfig",
+        "parameters": [
+          {
+            "$ref": "#/parameters/appId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/TraefikPluginConfig"
+            }
+          },
+          "400": {
+            "description": "Traefik plugin is not installed",
             "schema": {
               "type": "string"
             }
@@ -651,6 +713,26 @@ func init() {
         }
       }
     },
+    "InputTraefikPluginConfig": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "description": "Describes the hostname the app is served at (\"test.domain.com\")",
+          "type": "string",
+          "x-nullable": true
+        },
+        "path": {
+          "description": "The path at a given host the app can be reached from (\"/api\"). It should start with a \"/\"",
+          "type": "string",
+          "x-nullable": true
+        },
+        "traefikRule": {
+          "description": "Instead of using ` + "`" + `host` + "`" + ` and/or ` + "`" + `path` + "`" + `, you can specify the exact rule Traefik will use to route to the app. See [Traefik's documentation]() for how to use this field. This field takes priority over ` + "`" + `host` + "`" + ` and ` + "`" + `path` + "`" + `",
+          "type": "string",
+          "x-nullable": true
+        }
+      }
+    },
     "Plugin": {
       "type": "object",
       "required": [
@@ -780,6 +862,13 @@ func init() {
     }
   },
   "parameters": {
+    "appId": {
+      "type": "string",
+      "format": "uuid4",
+      "name": "appId",
+      "in": "path",
+      "required": true
+    },
     "appName": {
       "type": "string",
       "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",
@@ -1255,15 +1344,91 @@ func init() {
         }
       }
     },
-    "/api/plugins/traefik/{appName}": {
+    "/api/plugins/traefik/{appId}": {
       "get": {
         "summary": "Get an app's routing config",
         "operationId": "getAppTraefikConfig",
         "parameters": [
           {
             "type": "string",
-            "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",
-            "name": "appName",
+            "format": "uuid4",
+            "name": "appId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Found and returned the config",
+            "schema": {
+              "$ref": "#/definitions/TraefikPluginConfig"
+            }
+          },
+          "400": {
+            "description": "Traefik plugin is not installed",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "No config for the app"
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an app's routing config",
+        "operationId": "updateAppTraefikConfig",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "uuid4",
+            "name": "appId",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "newTraefikConfig",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/InputTraefikPluginConfig"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/TraefikPluginConfig"
+            }
+          },
+          "400": {
+            "description": "Traefik plugin is not installed",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Removes an app's routing config",
+        "operationId": "removeAppTraefikConfig",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "uuid4",
+            "name": "appId",
             "in": "path",
             "required": true
           }
@@ -1275,8 +1440,8 @@ func init() {
               "$ref": "#/definitions/TraefikPluginConfig"
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Traefik plugin is not installed",
             "schema": {
               "type": "string"
             }
@@ -1553,6 +1718,26 @@ func init() {
         }
       }
     },
+    "InputTraefikPluginConfig": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "description": "Describes the hostname the app is served at (\"test.domain.com\")",
+          "type": "string",
+          "x-nullable": true
+        },
+        "path": {
+          "description": "The path at a given host the app can be reached from (\"/api\"). It should start with a \"/\"",
+          "type": "string",
+          "x-nullable": true
+        },
+        "traefikRule": {
+          "description": "Instead of using ` + "`" + `host` + "`" + ` and/or ` + "`" + `path` + "`" + `, you can specify the exact rule Traefik will use to route to the app. See [Traefik's documentation]() for how to use this field. This field takes priority over ` + "`" + `host` + "`" + ` and ` + "`" + `path` + "`" + `",
+          "type": "string",
+          "x-nullable": true
+        }
+      }
+    },
     "Plugin": {
       "type": "object",
       "required": [
@@ -1682,6 +1867,13 @@ func init() {
     }
   },
   "parameters": {
+    "appId": {
+      "type": "string",
+      "format": "uuid4",
+      "name": "appId",
+      "in": "path",
+      "required": true
+    },
     "appName": {
       "type": "string",
       "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",

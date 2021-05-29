@@ -6,7 +6,7 @@ import (
 	"github.com/aklinker1/miasma/package/models"
 )
 
-func TraefikPluginConfig(traefik *models.TraefikPluginConfig) error {
+func TraefikPluginConfig(traefik *models.InputTraefikPluginConfig) error {
 	if traefik.TraefikRule != nil && traefik.Host != nil {
 		return errors.New("Route cannot include both a 'traefikRule' and 'host'. Only one can be defined")
 	} else if traefik.Host == nil && traefik.Path != nil {

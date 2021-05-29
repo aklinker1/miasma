@@ -77,6 +77,7 @@ r: run
 w: watch
 s: swagger
 p: publish
+sr: swagger run
 
 c: cli
 d: docs

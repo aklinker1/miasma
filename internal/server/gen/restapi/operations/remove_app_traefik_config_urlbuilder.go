@@ -14,8 +14,8 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// GetAppTraefikConfigURL generates an URL for the get app traefik config operation
-type GetAppTraefikConfigURL struct {
+// RemoveAppTraefikConfigURL generates an URL for the remove app traefik config operation
+type RemoveAppTraefikConfigURL struct {
 	AppID strfmt.UUID4
 
 	_basePath string
@@ -26,7 +26,7 @@ type GetAppTraefikConfigURL struct {
 // WithBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *GetAppTraefikConfigURL) WithBasePath(bp string) *GetAppTraefikConfigURL {
+func (o *RemoveAppTraefikConfigURL) WithBasePath(bp string) *RemoveAppTraefikConfigURL {
 	o.SetBasePath(bp)
 	return o
 }
@@ -34,12 +34,12 @@ func (o *GetAppTraefikConfigURL) WithBasePath(bp string) *GetAppTraefikConfigURL
 // SetBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *GetAppTraefikConfigURL) SetBasePath(bp string) {
+func (o *RemoveAppTraefikConfigURL) SetBasePath(bp string) {
 	o._basePath = bp
 }
 
 // Build a url path and query string
-func (o *GetAppTraefikConfigURL) Build() (*url.URL, error) {
+func (o *RemoveAppTraefikConfigURL) Build() (*url.URL, error) {
 	var _result url.URL
 
 	var _path = "/api/plugins/traefik/{appId}"
@@ -48,7 +48,7 @@ func (o *GetAppTraefikConfigURL) Build() (*url.URL, error) {
 	if appID != "" {
 		_path = strings.Replace(_path, "{appId}", appID, -1)
 	} else {
-		return nil, errors.New("appId is required on GetAppTraefikConfigURL")
+		return nil, errors.New("appId is required on RemoveAppTraefikConfigURL")
 	}
 
 	_basePath := o._basePath
@@ -58,7 +58,7 @@ func (o *GetAppTraefikConfigURL) Build() (*url.URL, error) {
 }
 
 // Must is a helper function to panic when the url builder returns an error
-func (o *GetAppTraefikConfigURL) Must(u *url.URL, err error) *url.URL {
+func (o *RemoveAppTraefikConfigURL) Must(u *url.URL, err error) *url.URL {
 	if err != nil {
 		panic(err)
 	}
@@ -69,17 +69,17 @@ func (o *GetAppTraefikConfigURL) Must(u *url.URL, err error) *url.URL {
 }
 
 // String returns the string representation of the path with query string
-func (o *GetAppTraefikConfigURL) String() string {
+func (o *RemoveAppTraefikConfigURL) String() string {
 	return o.Must(o.Build()).String()
 }
 
 // BuildFull builds a full url with scheme, host, path and query string
-func (o *GetAppTraefikConfigURL) BuildFull(scheme, host string) (*url.URL, error) {
+func (o *RemoveAppTraefikConfigURL) BuildFull(scheme, host string) (*url.URL, error) {
 	if scheme == "" {
-		return nil, errors.New("scheme is required for a full url on GetAppTraefikConfigURL")
+		return nil, errors.New("scheme is required for a full url on RemoveAppTraefikConfigURL")
 	}
 	if host == "" {
-		return nil, errors.New("host is required for a full url on GetAppTraefikConfigURL")
+		return nil, errors.New("host is required for a full url on RemoveAppTraefikConfigURL")
 	}
 
 	base, err := o.Build()
@@ -93,6 +93,6 @@ func (o *GetAppTraefikConfigURL) BuildFull(scheme, host string) (*url.URL, error
 }
 
 // StringFull returns the string representation of a complete url
-func (o *GetAppTraefikConfigURL) StringFull(scheme, host string) string {
+func (o *RemoveAppTraefikConfigURL) StringFull(scheme, host string) string {
 	return o.Must(o.BuildFull(scheme, host)).String()
 }

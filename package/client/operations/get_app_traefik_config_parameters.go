@@ -60,11 +60,8 @@ for the get app traefik config operation typically these are written to a http.R
 */
 type GetAppTraefikConfigParams struct {
 
-	/*AppName
-	  App name from the `-a|--app` flag
-
-	*/
-	AppName string
+	/*AppID*/
+	AppID strfmt.UUID4
 
 	timeout    time.Duration
 	Context    context.Context
@@ -104,15 +101,15 @@ func (o *GetAppTraefikConfigParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
-// WithAppName adds the appName to the get app traefik config params
-func (o *GetAppTraefikConfigParams) WithAppName(appName string) *GetAppTraefikConfigParams {
-	o.SetAppName(appName)
+// WithAppID adds the appID to the get app traefik config params
+func (o *GetAppTraefikConfigParams) WithAppID(appID strfmt.UUID4) *GetAppTraefikConfigParams {
+	o.SetAppID(appID)
 	return o
 }
 
-// SetAppName adds the appName to the get app traefik config params
-func (o *GetAppTraefikConfigParams) SetAppName(appName string) {
-	o.AppName = appName
+// SetAppID adds the appId to the get app traefik config params
+func (o *GetAppTraefikConfigParams) SetAppID(appID strfmt.UUID4) {
+	o.AppID = appID
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -123,8 +120,8 @@ func (o *GetAppTraefikConfigParams) WriteToRequest(r runtime.ClientRequest, reg 
 	}
 	var res []error
 
-	// path param appName
-	if err := r.SetPathParam("appName", o.AppName); err != nil {
+	// path param appId
+	if err := r.SetPathParam("appId", o.AppID.String()); err != nil {
 		return err
 	}
 
