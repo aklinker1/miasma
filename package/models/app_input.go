@@ -17,16 +17,19 @@ import (
 // swagger:model AppInput
 type AppInput struct {
 
+	// A simple label to track what apps are related
+	Group string `json:"group,omitempty" gorm:"index"`
+
 	// Whether or not the app is hidden during regular requests
 	Hidden bool `json:"hidden,omitempty"`
 
-	// The image the app is based off of
+	// The image and tag the application runs
 	// Required: true
-	Image *string `json:"image"`
+	Image string `json:"image"`
 
 	// The apps name, used in the CLI with the `-a|--app` flag
 	// Required: true
-	Name *string `json:"name"`
+	Name string `json:"name"`
 }
 
 // Validate validates this app input
@@ -49,7 +52,7 @@ func (m *AppInput) Validate(formats strfmt.Registry) error {
 
 func (m *AppInput) validateImage(formats strfmt.Registry) error {
 
-	if err := validate.Required("image", "body", m.Image); err != nil {
+	if err := validate.RequiredString("image", "body", string(m.Image)); err != nil {
 		return err
 	}
 
@@ -58,7 +61,7 @@ func (m *AppInput) validateImage(formats strfmt.Registry) error {
 
 func (m *AppInput) validateName(formats strfmt.Registry) error {
 
-	if err := validate.Required("name", "body", m.Name); err != nil {
+	if err := validate.RequiredString("name", "body", string(m.Name)); err != nil {
 		return err
 	}
 

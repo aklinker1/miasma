@@ -51,23 +51,26 @@ func NewMiasmaAPI(spec *loads.Document) *MiasmaAPI {
 		GetAppHandler: GetAppHandlerFunc(func(params GetAppParams) middleware.Responder {
 			return middleware.NotImplemented("operation GetApp has not yet been implemented")
 		}),
-		GetAppConfigHandler: GetAppConfigHandlerFunc(func(params GetAppConfigParams) middleware.Responder {
-			return middleware.NotImplemented("operation GetAppConfig has not yet been implemented")
-		}),
 		GetAppEnvHandler: GetAppEnvHandlerFunc(func(params GetAppEnvParams) middleware.Responder {
 			return middleware.NotImplemented("operation GetAppEnv has not yet been implemented")
 		}),
-		GetAppsHandler: GetAppsHandlerFunc(func(params GetAppsParams) middleware.Responder {
-			return middleware.NotImplemented("operation GetApps has not yet been implemented")
-		}),
-		GetHealthCheckHandler: GetHealthCheckHandlerFunc(func(params GetHealthCheckParams) middleware.Responder {
-			return middleware.NotImplemented("operation GetHealthCheck has not yet been implemented")
+		GetAppTraefikConfigHandler: GetAppTraefikConfigHandlerFunc(func(params GetAppTraefikConfigParams) middleware.Responder {
+			return middleware.NotImplemented("operation GetAppTraefikConfig has not yet been implemented")
 		}),
 		GetPluginHandler: GetPluginHandlerFunc(func(params GetPluginParams) middleware.Responder {
 			return middleware.NotImplemented("operation GetPlugin has not yet been implemented")
 		}),
+		GetRunConfigHandler: GetRunConfigHandlerFunc(func(params GetRunConfigParams) middleware.Responder {
+			return middleware.NotImplemented("operation GetRunConfig has not yet been implemented")
+		}),
+		HealthCheckHandler: HealthCheckHandlerFunc(func(params HealthCheckParams) middleware.Responder {
+			return middleware.NotImplemented("operation HealthCheck has not yet been implemented")
+		}),
 		InstallPluginHandler: InstallPluginHandlerFunc(func(params InstallPluginParams) middleware.Responder {
 			return middleware.NotImplemented("operation InstallPlugin has not yet been implemented")
+		}),
+		ListAppsHandler: ListAppsHandlerFunc(func(params ListAppsParams) middleware.Responder {
+			return middleware.NotImplemented("operation ListApps has not yet been implemented")
 		}),
 		ListPluginsHandler: ListPluginsHandlerFunc(func(params ListPluginsParams) middleware.Responder {
 			return middleware.NotImplemented("operation ListPlugins has not yet been implemented")
@@ -81,14 +84,14 @@ func NewMiasmaAPI(spec *loads.Document) *MiasmaAPI {
 		UninstallPluginHandler: UninstallPluginHandlerFunc(func(params UninstallPluginParams) middleware.Responder {
 			return middleware.NotImplemented("operation UninstallPlugin has not yet been implemented")
 		}),
-		UpdateAppHandler: UpdateAppHandlerFunc(func(params UpdateAppParams) middleware.Responder {
-			return middleware.NotImplemented("operation UpdateApp has not yet been implemented")
-		}),
-		UpdateAppConfigHandler: UpdateAppConfigHandlerFunc(func(params UpdateAppConfigParams) middleware.Responder {
-			return middleware.NotImplemented("operation UpdateAppConfig has not yet been implemented")
-		}),
 		UpdateAppEnvHandler: UpdateAppEnvHandlerFunc(func(params UpdateAppEnvParams) middleware.Responder {
 			return middleware.NotImplemented("operation UpdateAppEnv has not yet been implemented")
+		}),
+		UpdateRunConfigHandler: UpdateRunConfigHandlerFunc(func(params UpdateRunConfigParams) middleware.Responder {
+			return middleware.NotImplemented("operation UpdateRunConfig has not yet been implemented")
+		}),
+		UpgradeAppHandler: UpgradeAppHandlerFunc(func(params UpgradeAppParams) middleware.Responder {
+			return middleware.NotImplemented("operation UpgradeApp has not yet been implemented")
 		}),
 	}
 }
@@ -130,18 +133,20 @@ type MiasmaAPI struct {
 	DeleteAppHandler DeleteAppHandler
 	// GetAppHandler sets the operation handler for the get app operation
 	GetAppHandler GetAppHandler
-	// GetAppConfigHandler sets the operation handler for the get app config operation
-	GetAppConfigHandler GetAppConfigHandler
 	// GetAppEnvHandler sets the operation handler for the get app env operation
 	GetAppEnvHandler GetAppEnvHandler
-	// GetAppsHandler sets the operation handler for the get apps operation
-	GetAppsHandler GetAppsHandler
-	// GetHealthCheckHandler sets the operation handler for the get health check operation
-	GetHealthCheckHandler GetHealthCheckHandler
+	// GetAppTraefikConfigHandler sets the operation handler for the get app traefik config operation
+	GetAppTraefikConfigHandler GetAppTraefikConfigHandler
 	// GetPluginHandler sets the operation handler for the get plugin operation
 	GetPluginHandler GetPluginHandler
+	// GetRunConfigHandler sets the operation handler for the get run config operation
+	GetRunConfigHandler GetRunConfigHandler
+	// HealthCheckHandler sets the operation handler for the health check operation
+	HealthCheckHandler HealthCheckHandler
 	// InstallPluginHandler sets the operation handler for the install plugin operation
 	InstallPluginHandler InstallPluginHandler
+	// ListAppsHandler sets the operation handler for the list apps operation
+	ListAppsHandler ListAppsHandler
 	// ListPluginsHandler sets the operation handler for the list plugins operation
 	ListPluginsHandler ListPluginsHandler
 	// StartAppHandler sets the operation handler for the start app operation
@@ -150,12 +155,12 @@ type MiasmaAPI struct {
 	StopAppHandler StopAppHandler
 	// UninstallPluginHandler sets the operation handler for the uninstall plugin operation
 	UninstallPluginHandler UninstallPluginHandler
-	// UpdateAppHandler sets the operation handler for the update app operation
-	UpdateAppHandler UpdateAppHandler
-	// UpdateAppConfigHandler sets the operation handler for the update app config operation
-	UpdateAppConfigHandler UpdateAppConfigHandler
 	// UpdateAppEnvHandler sets the operation handler for the update app env operation
 	UpdateAppEnvHandler UpdateAppEnvHandler
+	// UpdateRunConfigHandler sets the operation handler for the update run config operation
+	UpdateRunConfigHandler UpdateRunConfigHandler
+	// UpgradeAppHandler sets the operation handler for the upgrade app operation
+	UpgradeAppHandler UpgradeAppHandler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -241,23 +246,26 @@ func (o *MiasmaAPI) Validate() error {
 	if o.GetAppHandler == nil {
 		unregistered = append(unregistered, "GetAppHandler")
 	}
-	if o.GetAppConfigHandler == nil {
-		unregistered = append(unregistered, "GetAppConfigHandler")
-	}
 	if o.GetAppEnvHandler == nil {
 		unregistered = append(unregistered, "GetAppEnvHandler")
 	}
-	if o.GetAppsHandler == nil {
-		unregistered = append(unregistered, "GetAppsHandler")
-	}
-	if o.GetHealthCheckHandler == nil {
-		unregistered = append(unregistered, "GetHealthCheckHandler")
+	if o.GetAppTraefikConfigHandler == nil {
+		unregistered = append(unregistered, "GetAppTraefikConfigHandler")
 	}
 	if o.GetPluginHandler == nil {
 		unregistered = append(unregistered, "GetPluginHandler")
 	}
+	if o.GetRunConfigHandler == nil {
+		unregistered = append(unregistered, "GetRunConfigHandler")
+	}
+	if o.HealthCheckHandler == nil {
+		unregistered = append(unregistered, "HealthCheckHandler")
+	}
 	if o.InstallPluginHandler == nil {
 		unregistered = append(unregistered, "InstallPluginHandler")
+	}
+	if o.ListAppsHandler == nil {
+		unregistered = append(unregistered, "ListAppsHandler")
 	}
 	if o.ListPluginsHandler == nil {
 		unregistered = append(unregistered, "ListPluginsHandler")
@@ -271,14 +279,14 @@ func (o *MiasmaAPI) Validate() error {
 	if o.UninstallPluginHandler == nil {
 		unregistered = append(unregistered, "UninstallPluginHandler")
 	}
-	if o.UpdateAppHandler == nil {
-		unregistered = append(unregistered, "UpdateAppHandler")
-	}
-	if o.UpdateAppConfigHandler == nil {
-		unregistered = append(unregistered, "UpdateAppConfigHandler")
-	}
 	if o.UpdateAppEnvHandler == nil {
 		unregistered = append(unregistered, "UpdateAppEnvHandler")
+	}
+	if o.UpdateRunConfigHandler == nil {
+		unregistered = append(unregistered, "UpdateRunConfigHandler")
+	}
+	if o.UpgradeAppHandler == nil {
+		unregistered = append(unregistered, "UpgradeAppHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -383,27 +391,31 @@ func (o *MiasmaAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/api/apps/{appName}/config"] = NewGetAppConfig(o.context, o.GetAppConfigHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
 	o.handlers["GET"]["/api/apps/{appName}/env"] = NewGetAppEnv(o.context, o.GetAppEnvHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/api/apps"] = NewGetApps(o.context, o.GetAppsHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/api/health"] = NewGetHealthCheck(o.context, o.GetHealthCheckHandler)
+	o.handlers["GET"]["/api/plugins/traefik/{appName}"] = NewGetAppTraefikConfig(o.context, o.GetAppTraefikConfigHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/api/plugins/{pluginName}"] = NewGetPlugin(o.context, o.GetPluginHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/api/apps/{appName}/config"] = NewGetRunConfig(o.context, o.GetRunConfigHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/api/health"] = NewHealthCheck(o.context, o.HealthCheckHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/api/plugins/{pluginName}"] = NewInstallPlugin(o.context, o.InstallPluginHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/api/apps"] = NewListApps(o.context, o.ListAppsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -423,15 +435,15 @@ func (o *MiasmaAPI) initHandlerCache() {
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
-	o.handlers["PUT"]["/api/apps/{appName}/update"] = NewUpdateApp(o.context, o.UpdateAppHandler)
-	if o.handlers["PUT"] == nil {
-		o.handlers["PUT"] = make(map[string]http.Handler)
-	}
-	o.handlers["PUT"]["/api/apps/{appName}/config"] = NewUpdateAppConfig(o.context, o.UpdateAppConfigHandler)
-	if o.handlers["PUT"] == nil {
-		o.handlers["PUT"] = make(map[string]http.Handler)
-	}
 	o.handlers["PUT"]["/api/apps/{appName}/env"] = NewUpdateAppEnv(o.context, o.UpdateAppEnvHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/api/apps/{appName}/config"] = NewUpdateRunConfig(o.context, o.UpdateRunConfigHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/api/apps/{appName}/upgrade"] = NewUpgradeApp(o.context, o.UpgradeAppHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

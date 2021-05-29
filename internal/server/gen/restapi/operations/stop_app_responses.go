@@ -11,28 +11,28 @@ import (
 	"github.com/go-openapi/runtime"
 )
 
-// StopAppOKCode is the HTTP code returned for type StopAppOK
-const StopAppOKCode int = 200
+// StopAppNoContentCode is the HTTP code returned for type StopAppNoContent
+const StopAppNoContentCode int = 204
 
-/*StopAppOK Stopped
+/*StopAppNoContent Stopped
 
-swagger:response stopAppOK
+swagger:response stopAppNoContent
 */
-type StopAppOK struct {
+type StopAppNoContent struct {
 }
 
-// NewStopAppOK creates StopAppOK with default headers values
-func NewStopAppOK() *StopAppOK {
+// NewStopAppNoContent creates StopAppNoContent with default headers values
+func NewStopAppNoContent() *StopAppNoContent {
 
-	return &StopAppOK{}
+	return &StopAppNoContent{}
 }
 
 // WriteResponse to the client
-func (o *StopAppOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+func (o *StopAppNoContent) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
 
-	rw.WriteHeader(200)
+	rw.WriteHeader(204)
 }
 
 // StopAppNotFoundCode is the HTTP code returned for type StopAppNotFound

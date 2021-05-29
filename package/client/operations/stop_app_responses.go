@@ -21,8 +21,8 @@ type StopAppReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *StopAppReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-	case 200:
-		result := NewStopAppOK()
+	case 204:
+		result := NewStopAppNoContent()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -45,23 +45,23 @@ func (o *StopAppReader) ReadResponse(response runtime.ClientResponse, consumer r
 	}
 }
 
-// NewStopAppOK creates a StopAppOK with default headers values
-func NewStopAppOK() *StopAppOK {
-	return &StopAppOK{}
+// NewStopAppNoContent creates a StopAppNoContent with default headers values
+func NewStopAppNoContent() *StopAppNoContent {
+	return &StopAppNoContent{}
 }
 
-/*StopAppOK handles this case with default header values.
+/*StopAppNoContent handles this case with default header values.
 
 Stopped
 */
-type StopAppOK struct {
+type StopAppNoContent struct {
 }
 
-func (o *StopAppOK) Error() string {
-	return fmt.Sprintf("[POST /api/apps/{appName}/stop][%d] stopAppOK ", 200)
+func (o *StopAppNoContent) Error() string {
+	return fmt.Sprintf("[POST /api/apps/{appName}/stop][%d] stopAppNoContent ", 204)
 }
 
-func (o *StopAppOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *StopAppNoContent) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

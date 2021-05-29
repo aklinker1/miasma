@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-openapi/runtime"
 
-	"github.com/aklinker1/miasma/internal/server/gen/models"
+	"github.com/aklinker1/miasma/package/models"
 )
 
 // ListPluginsOKCode is the HTTP code returned for type ListPluginsOK

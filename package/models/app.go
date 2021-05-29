@@ -17,35 +17,34 @@ import (
 // swagger:model App
 type App struct {
 
-	// Whether or not the app is hidden during regular requests
-	Hidden bool `json:"hidden,omitempty"`
+	// A simple label to track what apps are related
+	Group string `json:"group,omitempty" gorm:"index"`
 
-	// The image the app is based off of
+	// Whether or not the app is returned during regular requests
+	Hidden bool `json:"hidden,omitempty" gorm:"index"`
+
+	// id
 	// Required: true
-	Image *string `json:"image"`
+	// Format: uuid4
+	ID strfmt.UUID4 `json:"id" gorm:"primaryKey"`
+
+	// The image and tag the application runs
+	Image string `json:"image,omitempty"`
 
 	// The apps name, used in the CLI with the `-a|--app` flag
 	// Required: true
-	Name *string `json:"name"`
-
-	// running
-	// Required: true
-	Running *bool `json:"running"`
+	Name string `json:"name" gorm:"uniqueIndex"`
 }
 
 // Validate validates this app
 func (m *App) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateImage(formats); err != nil {
+	if err := m.validateID(formats); err != nil {
 		res = append(res, err)
 	}
 
 	if err := m.validateName(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateRunning(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -55,9 +54,13 @@ func (m *App) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *App) validateImage(formats strfmt.Registry) error {
+func (m *App) validateID(formats strfmt.Registry) error {
 
-	if err := validate.Required("image", "body", m.Image); err != nil {
+	if err := validate.Required("id", "body", strfmt.UUID4(m.ID)); err != nil {
+		return err
+	}
+
+	if err := validate.FormatOf("id", "body", "uuid4", m.ID.String(), formats); err != nil {
 		return err
 	}
 
@@ -66,16 +69,7 @@ func (m *App) validateImage(formats strfmt.Registry) error {
 
 func (m *App) validateName(formats strfmt.Registry) error {
 
-	if err := validate.Required("name", "body", m.Name); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *App) validateRunning(formats strfmt.Registry) error {
-
-	if err := validate.Required("running", "body", m.Running); err != nil {
+	if err := validate.RequiredString("name", "body", string(m.Name)); err != nil {
 		return err
 	}
 

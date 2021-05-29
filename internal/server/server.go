@@ -5,9 +5,9 @@ import (
 
 	"github.com/go-openapi/loads"
 
-	"github.com/aklinker1/miasma/internal/server/controllers"
 	"github.com/aklinker1/miasma/internal/server/gen/restapi"
 	"github.com/aklinker1/miasma/internal/server/gen/restapi/operations"
+	"github.com/aklinker1/miasma/internal/server/handlers"
 	"github.com/aklinker1/miasma/internal/shared/log"
 )
 
@@ -40,7 +40,29 @@ func Start() {
 }
 
 func useControllers(api *operations.MiasmaAPI) {
-	controllers.UseHealthController(api)
-	controllers.UseAppsController(api)
-	controllers.UsePluginsController(api)
+	// Health
+	api.HealthCheckHandler = handlers.HealthCheck // ✅
+
+	// Apps
+	api.ListAppsHandler = handlers.ListApps     // ✅
+	api.CreateAppHandler = handlers.CreateApp   // ✅
+	api.GetAppHandler = handlers.GetApp         // ✅
+	api.UpgradeAppHandler = handlers.UpgradeApp // ❌
+	api.DeleteAppHandler = handlers.DeleteApp   // ✅
+	api.StartAppHandler = handlers.StartApp     // ✅
+	api.StopAppHandler = handlers.StopApp       // ✅
+
+	// App Env
+	api.GetAppEnvHandler = handlers.GetAppEnv       // ❌
+	api.UpdateAppEnvHandler = handlers.UpdateAppEnv // ❌
+
+	// Run Config
+	api.GetRunConfigHandler = handlers.GetRunConfig       // ✅
+	api.UpdateRunConfigHandler = handlers.UpdateRunConfig // ❌
+
+	// Plugins
+	api.ListPluginsHandler = handlers.ListPlugins         // ❌
+	api.GetPluginHandler = handlers.GetPlugin             // ❌
+	api.InstallPluginHandler = handlers.InstallPlugin     // ❌
+	api.UninstallPluginHandler = handlers.UninstallPlugin // ❌
 }

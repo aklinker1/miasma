@@ -11,28 +11,28 @@ import (
 	"github.com/go-openapi/runtime"
 )
 
-// StartAppOKCode is the HTTP code returned for type StartAppOK
-const StartAppOKCode int = 200
+// StartAppNoContentCode is the HTTP code returned for type StartAppNoContent
+const StartAppNoContentCode int = 204
 
-/*StartAppOK Started
+/*StartAppNoContent Started
 
-swagger:response startAppOK
+swagger:response startAppNoContent
 */
-type StartAppOK struct {
+type StartAppNoContent struct {
 }
 
-// NewStartAppOK creates StartAppOK with default headers values
-func NewStartAppOK() *StartAppOK {
+// NewStartAppNoContent creates StartAppNoContent with default headers values
+func NewStartAppNoContent() *StartAppNoContent {
 
-	return &StartAppOK{}
+	return &StartAppNoContent{}
 }
 
 // WriteResponse to the client
-func (o *StartAppOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+func (o *StartAppNoContent) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
 
-	rw.WriteHeader(200)
+	rw.WriteHeader(204)
 }
 
 // StartAppNotFoundCode is the HTTP code returned for type StartAppNotFound

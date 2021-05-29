@@ -32,11 +32,7 @@ func listApps(includeHidden bool) {
 		os.Exit(1)
 	}
 	for _, app := range apps.Payload {
-		running := ""
-		if !*app.Running {
-			running = " (stopped)"
-		}
-		fmt.Printf(" - %s%s\n", *app.Name, running)
+		fmt.Printf(" - %s\n", *app.Name)
 	}
 	fmt.Printf("(%d total)\n", len(apps.Payload))
 }

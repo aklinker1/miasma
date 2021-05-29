@@ -45,8 +45,8 @@ func configureApp(appName string, newConfig *flags.AppUpdateConfig) {
 
 	// Get current config
 	client := config.Client()
-	configResponse, err := client.Operations.GetAppConfig(
-		operations.NewGetAppConfigParams().WithAppName(appName),
+	configResponse, err := client.Operations.GetRunConfig(
+		operations.NewGetRunConfigParams().WithAppName(appName),
 	)
 	if err != nil {
 		fmt.Println(err)
@@ -119,10 +119,10 @@ func configureApp(appName string, newConfig *flags.AppUpdateConfig) {
 	}
 
 	// push config updates
-	_, err = client.Operations.UpdateAppConfig(
-		operations.NewUpdateAppConfigParams().
+	_, err = client.Operations.UpdateRunConfig(
+		operations.NewUpdateRunConfigParams().
 			WithAppName(appName).
-			WithNewAppConfig(config),
+			WithNewRunConfig(config),
 	)
 	if err != nil {
 		fmt.Println(err)
