@@ -53,8 +53,8 @@ func useControllers(api *operations.MiasmaAPI) {
 	api.StopAppHandler = handlers.StopApp       // ✅
 
 	// App Env
-	api.GetAppEnvHandler = handlers.GetAppEnv       // ❌
-	api.UpdateAppEnvHandler = handlers.UpdateAppEnv // ❌
+	api.GetAppEnvHandler = handlers.GetAppEnv       // ✅
+	api.UpdateAppEnvHandler = handlers.UpdateAppEnv // ✅
 
 	// Run Config
 	api.GetRunConfigHandler = handlers.GetRunConfig       // ✅
