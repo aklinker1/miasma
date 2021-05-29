@@ -3,39 +3,32 @@ package plugin_service
 import (
 	"fmt"
 
+	"github.com/aklinker1/miasma/internal/server/utils/constants"
 	"github.com/aklinker1/miasma/package/models"
+	"gorm.io/gorm"
 )
 
-func Uninstall(pluginName string) (plugin *models.Plugin, err error) {
+func Uninstall(tx *gorm.DB, pluginName string) (plugin *models.Plugin, pluginApp *models.App, err error) {
 	switch pluginName {
-	case "traefik":
-		plugin, err = uninstallTraefik()
+	case constants.PluginNameTraefik:
+		plugin, pluginApp, err = uninstallTraefik(tx)
 	default:
 		err = fmt.Errorf("%s is not a valid plugin name", pluginName)
 	}
 
-	return plugin, err
+	return plugin, pluginApp, err
 }
 
-func uninstallTraefik() (*models.Plugin, error) {
-	panic("TODO: Save that the app is uninstalled")
-	// pluginMeta.Traefik = false
-	// traefik := constants.Plugins.Traefik
+func uninstallTraefik(tx *gorm.DB) (*models.Plugin, *models.App, error) {
+	if !IsInstalled(tx, constants.PluginNameTraefik) {
+		return nil, nil, fmt.Errorf("traefik is not installed")
+	}
 
-	// err := app_service.StopApp(traefik.Name)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// err = docker_service.DestroyNetwork(traefik.Name)
-	// if err != nil {
-	// 	log.W("Failed to destroy network: %v", err)
-	// }
-	// _ = WritePluginMeta(pluginMeta)
-	// if err != nil {
-	// 	log.W("Failed to mark Traefik as uninstalled: %v", err)
-	// }
+	err := UpdatePluginInstalled(tx, constants.PluginNameTraefik, false)
+	if err != nil {
+		return nil, nil, err
+	}
 
-	panic("TODO: remove all the apps plugins for traefik")
-
-	// return Get(traefik.Name, pluginMeta)
+	plugin, err := Get(tx, constants.PluginNameTraefik)
+	return plugin, constants.Plugins.Traefik.App, err
 }

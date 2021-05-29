@@ -12,8 +12,7 @@ import (
 var GetAppEnv = operations.GetAppEnvHandlerFunc(
 	func(params operations.GetAppEnvParams) middleware.Responder {
 		log.V("handlers.GetAppEnv()")
-		var err error
-		db, onDefer := database.ReadOnly(&err)
+		db, onDefer := database.ReadOnly()
 		defer onDefer()
 
 		appID, err := app_service.GetAppID(db, params.AppName)

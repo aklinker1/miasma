@@ -10,6 +10,10 @@ type predefinedPlugins struct {
 }
 
 const (
+	PluginNameTraefik = "traefik"
+)
+
+const (
 	traefikID = "ff828d53-f29a-4c42-a426-e465f9005be6"
 )
 

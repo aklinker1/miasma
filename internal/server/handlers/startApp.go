@@ -14,8 +14,7 @@ import (
 var StartApp = operations.StartAppHandlerFunc(
 	func(params operations.StartAppParams) middleware.Responder {
 		log.V("handlers.StartApp()")
-		var err error
-		db, onDefer := database.ReadOnly(&err)
+		db, onDefer := database.ReadOnly()
 		defer onDefer()
 
 		details, err := app_service.Details(db, params.AppName)

@@ -29,6 +29,7 @@ func open() *gorm.DB {
 		&models.App{},
 		&entities.SQLRunConfig{},
 		&entities.SQLEnvVar{},
+		&models.Plugin{},
 		&models.TraefikPluginConfig{},
 	)
 	if err != nil {

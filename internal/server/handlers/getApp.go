@@ -11,8 +11,7 @@ import (
 var GetApp = operations.GetAppHandlerFunc(
 	func(params operations.GetAppParams) middleware.Responder {
 		log.V("handlers.GetApp()")
-		var err error
-		db, onDefer := database.ReadOnly(&err)
+		db, onDefer := database.ReadOnly()
 		defer onDefer()
 
 		app, err := app_service.Get(db, params.AppName)

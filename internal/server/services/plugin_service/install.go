@@ -5,14 +5,18 @@ import (
 
 	"github.com/aklinker1/miasma/internal/server/services/docker_service"
 	"github.com/aklinker1/miasma/internal/server/utils/constants"
+	"github.com/aklinker1/miasma/internal/server/utils/server_models"
 	"github.com/aklinker1/miasma/internal/shared/log"
 	"github.com/aklinker1/miasma/package/models"
+	"gorm.io/gorm"
 )
 
-func Install(pluginName string) (plugin *models.Plugin, err error) {
+func Install(tx *gorm.DB, pluginName string) (plugin *models.Plugin, pluginDetails *server_models.AppDetails, err error) {
+	log.V("plugin_server.Install(%v)", pluginName)
+
 	switch pluginName {
-	case "traefik":
-		plugin, err = installTreafik()
+	case constants.PluginNameTraefik:
+		plugin, pluginDetails, err = installTraefik(tx)
 	// case "postgres":
 	// 	plugin, err = installPostgres()
 	// case "mongo":
@@ -23,50 +27,33 @@ func Install(pluginName string) (plugin *models.Plugin, err error) {
 		err = fmt.Errorf("%s is not a valid plugin name", pluginName)
 	}
 
-	return plugin, err
+	return
 }
 
-func installTreafik() (*models.Plugin, error) {
-	panic("TODO: Save that the app is installed")
-	// pluginMeta.Traefik = true
+func installTraefik(tx *gorm.DB) (*models.Plugin, *server_models.AppDetails, error) {
+	log.V("plugin_server.installTraefik()")
+	if IsInstalled(tx, constants.PluginNameTraefik) {
+		return nil, nil, fmt.Errorf("traefik is already installed")
+	}
+
+	err := UpdatePluginInstalled(tx, constants.PluginNameTraefik, true)
+	if err != nil {
+		return nil, nil, err
+	}
 	traefik := constants.Plugins.Traefik
 
-	err := docker_service.PullImage(traefik.App.Image)
+	err = docker_service.PullImage(traefik.App.Image)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	digest, err := docker_service.GetImageDigest(traefik.App.Image)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	log.W("TODO: Remove this log %v", digest)
+	traefik.RunConfig.ImageDigest = digest
 
-	panic("TODO: Add traefik config for port 4000, pass into app_mapper.ToService")
-	// plugins := &server_models.AppPlugins{}
+	// TODO: Add traefik config for port 4000, pass into app_mapper.ToService
 
-	// env := map[string]string{}
-	// serviceSpec, _ := app_mapper.ToService(
-	// 	traefik,
-	// 	env,
-	// 	plugins,
-	// 	func(i int) ([]uint32, error) {
-	// 		return traefik.RunConfig.PublishedPorts, nil
-	// 	},
-	// 	digest,
-	// )
-	// serviceOptions := types.ServiceCreateOptions{}
-
-	// err = docker_service.UpsertNetwork(traefik.App.Name)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// err = docker_service.StartService(*serviceSpec, serviceOptions)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// err = WritePluginMeta(pluginMeta)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// return Get("traefik", pluginMeta)
+	plugin, err := Get(tx, constants.PluginNameTraefik)
+	return plugin, traefik, err
 }

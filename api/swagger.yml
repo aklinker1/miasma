@@ -530,18 +530,12 @@ definitions:
       name:
         description: The plugin's name. It can be used to install a plugin
         type: string
+        x-nullable: false
+        x-go-custom-tag: 'gorm:"primaryKey"'
       installed:
         description: Whether or not the plugin is installed
         type: boolean
-      installCommand:
-        description: Command to run to install the plugin
-        type: string
-        x-nullable: true
-      uninstallCommand:
-        description: Command to run to uninstall the plugin
-        type: string
-        x-nullable: true
-
+        x-nullable: false
     required:
       - name
       - installed

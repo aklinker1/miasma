@@ -13,8 +13,7 @@ import (
 var StopApp = operations.StopAppHandlerFunc(
 	func(params operations.StopAppParams) middleware.Responder {
 		log.V("handlers.StopApp()")
-		var err error
-		db, onDefer := database.ReadOnly(&err)
+		db, onDefer := database.ReadOnly()
 		defer onDefer()
 
 		app, _ := app_service.Get(db, params.AppName)
@@ -22,7 +21,7 @@ var StopApp = operations.StopAppHandlerFunc(
 			return operations.NewStopAppNotFound().WithPayload(fmt.Sprintf("%s does not exist", params.AppName))
 		}
 
-		err = app_service.Stop(app)
+		err := app_service.Stop(app)
 		if err != nil {
 			return operations.NewStopAppDefault(500).WithPayload(err.Error())
 		}

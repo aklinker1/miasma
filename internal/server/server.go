@@ -41,28 +41,28 @@ func Start() {
 
 func useControllers(api *operations.MiasmaAPI) {
 	// Health
-	api.HealthCheckHandler = handlers.HealthCheck // ✅
+	api.HealthCheckHandler = handlers.HealthCheck
 
 	// Apps
-	api.ListAppsHandler = handlers.ListApps     // ✅
-	api.CreateAppHandler = handlers.CreateApp   // ✅
-	api.GetAppHandler = handlers.GetApp         // ✅
-	api.UpgradeAppHandler = handlers.UpgradeApp // ✅
-	api.DeleteAppHandler = handlers.DeleteApp   // ✅
-	api.StartAppHandler = handlers.StartApp     // ✅
-	api.StopAppHandler = handlers.StopApp       // ✅
+	api.ListAppsHandler = handlers.ListApps
+	api.CreateAppHandler = handlers.CreateApp
+	api.GetAppHandler = handlers.GetApp
+	api.UpgradeAppHandler = handlers.UpgradeApp
+	api.DeleteAppHandler = handlers.DeleteApp
+	api.StartAppHandler = handlers.StartApp
+	api.StopAppHandler = handlers.StopApp
 
 	// App Env
-	api.GetAppEnvHandler = handlers.GetAppEnv       // ✅
-	api.UpdateAppEnvHandler = handlers.UpdateAppEnv // ✅
+	api.GetAppEnvHandler = handlers.GetAppEnv
+	api.UpdateAppEnvHandler = handlers.UpdateAppEnv
 
 	// Run Config
-	api.GetRunConfigHandler = handlers.GetRunConfig       // ✅
-	api.UpdateRunConfigHandler = handlers.UpdateRunConfig // ✅
+	api.GetRunConfigHandler = handlers.GetRunConfig
+	api.UpdateRunConfigHandler = handlers.UpdateRunConfig
 
 	// Plugins
-	api.ListPluginsHandler = handlers.ListPlugins         // ❌
-	api.GetPluginHandler = handlers.GetPlugin             // ❌
-	api.InstallPluginHandler = handlers.InstallPlugin     // ❌
-	api.UninstallPluginHandler = handlers.UninstallPlugin // ❌
+	api.ListPluginsHandler = handlers.ListPlugins
+	api.GetPluginHandler = handlers.GetPlugin
+	api.InstallPluginHandler = handlers.InstallPlugin
+	api.UninstallPluginHandler = handlers.UninstallPlugin
 }

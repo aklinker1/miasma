@@ -3,35 +3,28 @@ package plugin_service
 import (
 	"fmt"
 
-	"github.com/aklinker1/miasma/internal/shared"
+	"github.com/aklinker1/miasma/internal/server/utils/constants"
+	"github.com/aklinker1/miasma/internal/shared/log"
 	"github.com/aklinker1/miasma/package/models"
+	"gorm.io/gorm"
 )
 
-func Get(pluginName string) (*models.Plugin, error) {
-	panic("TODO: Lookup installed plugins")
+func Get(tx *gorm.DB, pluginName string) (*models.Plugin, error) {
+	log.V("plugin_server.Get(%v)", pluginName)
+
 	installed := false
+	found := false
 	switch pluginName {
-	case "traefik":
-		panic("TODO: Check if traefik is installed")
-		// installed = meta.Traefik
-		// case "postgres":
-		// 	installed = meta.Postgres
-		// case "mongo":
-		// 	installed = meta.Mongo
+	// case "postgres":
+	case constants.PluginNameTraefik:
+		installed = IsInstalled(tx, pluginName)
+		found = true
 	}
-
-	var installCommand *string
-	var uninstallCommand *string
-	if installed {
-		uninstallCommand = shared.StringPtr(fmt.Sprintf("miasma plugin:uninstall %s", pluginName))
-	} else {
-		installCommand = shared.StringPtr(fmt.Sprintf("miasma plugin:install %s", pluginName))
+	if !found {
+		return nil, fmt.Errorf("No plugin named %v is available", pluginName)
 	}
-
 	return &models.Plugin{
-		Name:             &pluginName,
-		Installed:        &installed,
-		InstallCommand:   installCommand,
-		UninstallCommand: uninstallCommand,
+		Name:      pluginName,
+		Installed: installed,
 	}, nil
 }

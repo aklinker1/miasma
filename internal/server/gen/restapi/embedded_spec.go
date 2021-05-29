@@ -658,23 +658,16 @@ func init() {
         "installed"
       ],
       "properties": {
-        "installCommand": {
-          "description": "Command to run to install the plugin",
-          "type": "string",
-          "x-nullable": true
-        },
         "installed": {
           "description": "Whether or not the plugin is installed",
-          "type": "boolean"
+          "type": "boolean",
+          "x-nullable": false
         },
         "name": {
           "description": "The plugin's name. It can be used to install a plugin",
-          "type": "string"
-        },
-        "uninstallCommand": {
-          "description": "Command to run to uninstall the plugin",
           "type": "string",
-          "x-nullable": true
+          "x-go-custom-tag": "gorm:\"primaryKey\"",
+          "x-nullable": false
         }
       }
     },
@@ -1567,23 +1560,16 @@ func init() {
         "installed"
       ],
       "properties": {
-        "installCommand": {
-          "description": "Command to run to install the plugin",
-          "type": "string",
-          "x-nullable": true
-        },
         "installed": {
           "description": "Whether or not the plugin is installed",
-          "type": "boolean"
+          "type": "boolean",
+          "x-nullable": false
         },
         "name": {
           "description": "The plugin's name. It can be used to install a plugin",
-          "type": "string"
-        },
-        "uninstallCommand": {
-          "description": "Command to run to uninstall the plugin",
           "type": "string",
-          "x-nullable": true
+          "x-go-custom-tag": "gorm:\"primaryKey\"",
+          "x-nullable": false
         }
       }
     },

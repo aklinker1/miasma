@@ -11,8 +11,7 @@ import (
 var ListApps = operations.ListAppsHandlerFunc(
 	func(params operations.ListAppsParams) middleware.Responder {
 		log.V("handlers.ListApps()")
-		var err error
-		db, onDefer := database.ReadOnly(&err)
+		db, onDefer := database.ReadOnly()
 		defer onDefer()
 
 		showHidden := params.Hidden != nil && *params.Hidden
