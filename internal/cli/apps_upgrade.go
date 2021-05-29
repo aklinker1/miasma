@@ -10,8 +10,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var appsUpdateCmd = &cobra.Command{
-	Use:   "apps:update",
+var appsUpgradeCmd = &cobra.Command{
+	Use:   "apps:upgrade",
 	Short: "Pull the latest version of the application's image and reload the app",
 	Long:  "Pull the latest version of the application's image and reload the app. If a new image is passed, the app is updated to use that image instead of the current one",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -24,17 +24,17 @@ var appsUpdateCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(appsUpdateCmd)
-	flags.UseNewImageFlag(appsUpdateCmd)
-	flags.UseAppFlag(appsUpdateCmd)
+	RootCmd.AddCommand(appsUpgradeCmd)
+	flags.UseNewImageFlag(appsUpgradeCmd)
+	flags.UseAppFlag(appsUpgradeCmd)
 }
 
 func updateApp(appName string, image *string) {
 	client := config.Client()
 
 	fmt.Printf("Pulling latest image for %s...\n", appName)
-	_, err := client.Operations.UpdateApp(
-		operations.NewUpdateAppParams().
+	_, err := client.Operations.UpgradeApp(
+		operations.NewUpgradeAppParams().
 			WithAppName(appName).
 			WithNewImage(image),
 	)

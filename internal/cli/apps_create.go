@@ -42,8 +42,8 @@ func createApp(appName string, image string, hidden bool) {
 	fmt.Printf("Creating %s...\n", appName)
 	createParams := operations.NewCreateAppParams()
 	createParams.App = &models.AppInput{
-		Name:   &appName,
-		Image:  &image,
+		Name:   appName,
+		Image:  image,
 		Hidden: hidden,
 	}
 	_, err := client.Operations.CreateApp(createParams)

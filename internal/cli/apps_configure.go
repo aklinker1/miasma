@@ -7,6 +7,7 @@ import (
 	"github.com/aklinker1/miasma/internal/cli/config"
 	"github.com/aklinker1/miasma/internal/cli/flags"
 	"github.com/aklinker1/miasma/package/client/operations"
+	"github.com/aklinker1/miasma/package/models"
 	"github.com/spf13/cobra"
 )
 
@@ -28,7 +29,7 @@ Only the properties specified in the flags will update be updated. To remove a p
 	Run: func(cmd *cobra.Command, args []string) {
 		appName, deferable := flags.GetAppFlag(cmd)
 		defer deferable()
-		newConfig := flags.GetConfigFlags(cmd)
+		newConfig := flags.GetUpdateRunConfigFlags(cmd)
 
 		configureApp(appName, newConfig)
 	},
@@ -37,10 +38,10 @@ Only the properties specified in the flags will update be updated. To remove a p
 func init() {
 	RootCmd.AddCommand(appsConfigureCmd)
 	flags.UseAppFlag(appsConfigureCmd)
-	flags.UseConfigFlags(appsConfigureCmd)
+	flags.UseUpdateRunConfigFlags(appsConfigureCmd)
 }
 
-func configureApp(appName string, newConfig *flags.AppUpdateConfig) {
+func configureApp(appName string, newConfig *flags.UpdateRunConfig) {
 	fmt.Printf("Updating %s...\n", appName)
 
 	// Get current config
@@ -52,12 +53,19 @@ func configureApp(appName string, newConfig *flags.AppUpdateConfig) {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	config := configResponse.Payload
-	existingTargetPortMap := map[int64]int{}
+	config := &models.InputRunConfig{
+		Command:        configResponse.Payload.Command,
+		Networks:       configResponse.Payload.Networks,
+		Placement:      configResponse.Payload.Placement,
+		PublishedPorts: configResponse.Payload.PublishedPorts,
+		TargetPorts:    configResponse.Payload.TargetPorts,
+		Volumes:        configResponse.Payload.Volumes,
+	}
+	existingTargetPortMap := map[uint32]int{}
 	for index, port := range config.TargetPorts {
 		existingTargetPortMap[port] = index
 	}
-	existingPublishedPortMap := map[int64]int{}
+	existingPublishedPortMap := map[uint32]int{}
 	for index, port := range config.PublishedPorts {
 		existingPublishedPortMap[port] = index
 	}
@@ -67,14 +75,14 @@ func configureApp(appName string, newConfig *flags.AppUpdateConfig) {
 	}
 
 	// Update config
-	if newConfig.Hidden {
-		config.Hidden = true
-	} else if newConfig.RMHidden {
-		config.Hidden = false
-	}
-	if newConfig.Image != nil {
-		config.Image = *newConfig.Image
-	}
+	// if newConfig.Hidden {
+	// 	config.Hidden = true
+	// } else if newConfig.RMHidden {
+	// 	config.Hidden = false
+	// }
+	// if newConfig.Image != nil {
+	// 	config.Image = *newConfig.Image
+	// }
 	for _, targetPort := range newConfig.AddTargetPorts {
 		if _, ok := existingTargetPortMap[targetPort]; !ok {
 			config.TargetPorts = append(config.TargetPorts, targetPort)

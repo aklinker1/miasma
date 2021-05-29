@@ -31,10 +31,10 @@ func listPlugins() {
 	}
 	for _, app := range plugins.Payload {
 		installed := ""
-		if *app.Installed {
+		if app.Installed {
 			installed = " (installed)"
 		}
-		fmt.Printf(" - %s%s\n", *app.Name, installed)
+		fmt.Printf(" - %s%s\n", app.Name, installed)
 	}
 	fmt.Printf("(%d total)\n", len(plugins.Payload))
 }

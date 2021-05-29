@@ -29,7 +29,7 @@ func connectToServer(host string) {
 	client := miasmaAPI.NewClientWith(host)
 	viper.Set("host", host)
 
-	_, err := client.Operations.GetHealthCheck(operations.NewGetHealthCheckParams())
+	_, err := client.Operations.HealthCheck(operations.NewHealthCheckParams())
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
