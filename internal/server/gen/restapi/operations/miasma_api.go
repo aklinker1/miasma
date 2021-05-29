@@ -48,6 +48,9 @@ func NewMiasmaAPI(spec *loads.Document) *MiasmaAPI {
 		DeleteAppHandler: DeleteAppHandlerFunc(func(params DeleteAppParams) middleware.Responder {
 			return middleware.NotImplemented("operation DeleteApp has not yet been implemented")
 		}),
+		EditAppHandler: EditAppHandlerFunc(func(params EditAppParams) middleware.Responder {
+			return middleware.NotImplemented("operation EditApp has not yet been implemented")
+		}),
 		GetAppHandler: GetAppHandlerFunc(func(params GetAppParams) middleware.Responder {
 			return middleware.NotImplemented("operation GetApp has not yet been implemented")
 		}),
@@ -137,6 +140,8 @@ type MiasmaAPI struct {
 	CreateAppHandler CreateAppHandler
 	// DeleteAppHandler sets the operation handler for the delete app operation
 	DeleteAppHandler DeleteAppHandler
+	// EditAppHandler sets the operation handler for the edit app operation
+	EditAppHandler EditAppHandler
 	// GetAppHandler sets the operation handler for the get app operation
 	GetAppHandler GetAppHandler
 	// GetAppEnvHandler sets the operation handler for the get app env operation
@@ -252,6 +257,9 @@ func (o *MiasmaAPI) Validate() error {
 	}
 	if o.DeleteAppHandler == nil {
 		unregistered = append(unregistered, "DeleteAppHandler")
+	}
+	if o.EditAppHandler == nil {
+		unregistered = append(unregistered, "EditAppHandler")
 	}
 	if o.GetAppHandler == nil {
 		unregistered = append(unregistered, "GetAppHandler")
@@ -400,6 +408,10 @@ func (o *MiasmaAPI) initHandlerCache() {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/api/apps/{appName}"] = NewDeleteApp(o.context, o.DeleteAppHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/api/apps/{appName}"] = NewEditApp(o.context, o.EditAppHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

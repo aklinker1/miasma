@@ -31,6 +31,8 @@ type ClientService interface {
 
 	DeleteApp(params *DeleteAppParams) (*DeleteAppOK, error)
 
+	EditApp(params *EditAppParams) (*EditAppOK, error)
+
 	GetApp(params *GetAppParams) (*GetAppOK, error)
 
 	GetAppEnv(params *GetAppEnvParams) (*GetAppEnvOK, error)
@@ -131,6 +133,39 @@ func (a *Client) DeleteApp(params *DeleteAppParams) (*DeleteAppOK, error) {
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*DeleteAppDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  EditApp edits the app details
+*/
+func (a *Client) EditApp(params *EditAppParams) (*EditAppOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewEditAppParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "editApp",
+		Method:             "PUT",
+		PathPattern:        "/api/apps/{appName}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &EditAppReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*EditAppOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*EditAppDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 

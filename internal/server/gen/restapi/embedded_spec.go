@@ -112,6 +112,46 @@ func init() {
           }
         }
       },
+      "put": {
+        "summary": "Edit the app details",
+        "operationId": "editApp",
+        "parameters": [
+          {
+            "$ref": "#/parameters/appName"
+          },
+          {
+            "name": "newApp",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AppEdit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/App"
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/unknown"
+          }
+        }
+      },
       "delete": {
         "summary": "Stop and delete an app",
         "operationId": "deleteApp",
@@ -592,6 +632,27 @@ func init() {
           "description": "The apps name, used in the CLI with the ` + "`" + `-a|--app` + "`" + ` flag",
           "type": "string",
           "x-go-custom-tag": "gorm:\"uniqueIndex\"",
+          "x-nullable": false
+        }
+      }
+    },
+    "AppEdit": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "group": {
+          "description": "A simple label to track what apps are related",
+          "type": "string"
+        },
+        "hidden": {
+          "description": "Whether or not the app is returned during regular requests",
+          "type": "boolean"
+        },
+        "name": {
+          "description": "The apps name, used in the CLI with the ` + "`" + `-a|--app` + "`" + ` flag",
+          "type": "string",
           "x-nullable": false
         }
       }
@@ -997,6 +1058,53 @@ func init() {
           }
         }
       },
+      "put": {
+        "summary": "Edit the app details",
+        "operationId": "editApp",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",
+            "name": "appName",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "newApp",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AppEdit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/App"
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "delete": {
         "summary": "Stop and delete an app",
         "operationId": "deleteApp",
@@ -1575,6 +1683,27 @@ func init() {
           "description": "The apps name, used in the CLI with the ` + "`" + `-a|--app` + "`" + ` flag",
           "type": "string",
           "x-go-custom-tag": "gorm:\"uniqueIndex\"",
+          "x-nullable": false
+        }
+      }
+    },
+    "AppEdit": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "group": {
+          "description": "A simple label to track what apps are related",
+          "type": "string"
+        },
+        "hidden": {
+          "description": "Whether or not the app is returned during regular requests",
+          "type": "boolean"
+        },
+        "name": {
+          "description": "The apps name, used in the CLI with the ` + "`" + `-a|--app` + "`" + ` flag",
+          "type": "string",
           "x-nullable": false
         }
       }

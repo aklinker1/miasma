@@ -73,6 +73,31 @@ paths:
           description: Not Found
           schema:
             type: string
+    put:
+      summary: Edit the app details
+      operationId: editApp
+      parameters:
+        - $ref: "#/parameters/appName"
+        - name: newApp
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/AppEdit"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/App"
+        400:
+          description: BadRequest
+          schema:
+            type: string
+        404:
+          description: Not Found
+          schema:
+            type: string
+        default:
+          $ref: "#/responses/unknown"
     delete:
       summary: Stop and delete an app
       operationId: deleteApp
@@ -401,7 +426,6 @@ definitions:
       id:
         type: string
         format: uuid4
-        x-go-custom-tag: 'gorm:"primaryKey"'
         x-nullable: false
         x-go-custom-tag: 'gorm:"primaryKey"'
       name:
@@ -445,6 +469,21 @@ definitions:
       hidden:
         type: boolean
         description: Whether or not the app is hidden during regular requests
+  AppEdit:
+    type: object
+    properties:
+      name:
+        type: string
+        description: The apps name, used in the CLI with the `-a|--app` flag
+        x-nullable: false
+      group:
+        type: string
+        description: A simple label to track what apps are related
+      hidden:
+        type: boolean
+        description: Whether or not the app is returned during regular requests
+    required:
+      - name
   RunConfigVolume:
     type: object
     properties:

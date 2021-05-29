@@ -33,3 +33,11 @@ func AppInput(app *models.AppInput) error {
 	}
 	return nil
 }
+
+func AppEdit(app *models.AppEdit) error {
+	err := AppName(app.Name)
+	if err != nil {
+		return nil
+	}
+	return nil
+}
