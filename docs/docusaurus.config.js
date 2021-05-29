@@ -1,6 +1,6 @@
 module.exports = {
   title: 'Miasma',
-  tagline: 'Open source, Docker Swarm based PaaS with ARM support',
+  tagline: 'Docker based PaaS with cluster and ARM support ',
   url: 'https://aklinker1.github.io',
   baseUrl: '/miasma/',
   onBrokenLinks: 'throw',
