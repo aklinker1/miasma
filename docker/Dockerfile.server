@@ -10,7 +10,7 @@ WORKDIR /build
 
 FROM golang:1.14-alpine as go-builder-base
 RUN apk update
-RUN apk add git jq
+RUN apk add git jq build-base
 RUN mkdir /build
 WORKDIR /build
 
@@ -30,11 +30,13 @@ ARG BUILD_DATE
 ARG BUILD_VAR_PATH="github.com/aklinker1/miasma/internal/shared/constants"
 COPY go.mod go.sum ./
 RUN go mod download
+RUN go install github.com/mattn/go-sqlite3
 COPY meta.json .
 COPY .git ./.git
 COPY cmd/server ./cmd/server
 COPY internal/shared ./internal/shared
 COPY internal/server ./internal/server
+COPY package/models ./package/models
 RUN go build \
     -ldflags "-X $BUILD_VAR_PATH.VERSION=$VERSION -X $BUILD_VAR_PATH.BUILD=$BUILD -X $BUILD_VAR_PATH.BUILD_HASH=$BUILD_HASH -X $BUILD_VAR_PATH.BUILD_DATE=$BUILD_DATE" \
     -o bin/server \

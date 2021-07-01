@@ -1,5 +1,5 @@
 ---
-swagger: '2.0'
+swagger: "2.0"
 info:
   version: 0.0.0
   title: Miasma
@@ -13,17 +13,17 @@ paths:
   /api/health:
     get:
       summary: Standard health check endpoint that checks all the service's statuses
-      operationId: getHealthCheck
+      operationId: healthCheck
       responses:
         200:
           description: OK
           schema:
             type: object
-            $ref: '#/definitions/Health'
+            $ref: "#/definitions/Health"
   /api/apps:
     get:
       summary: List all the running apps
-      operationId: getApps
+      operationId: listApps
       parameters:
         - in: query
           name: hidden
@@ -36,9 +36,9 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/App'
+              $ref: "#/definitions/App"
         default:
-          $ref: '#/responses/unknown'
+          $ref: "#/responses/unknown"
     post:
       summary: Create and start a new app
       operationId: createApp
@@ -46,110 +46,135 @@ paths:
         - in: body
           name: app
           schema:
-            $ref: '#/definitions/AppInput'
+            $ref: "#/definitions/AppInput"
       responses:
         201:
           description: Created
           schema:
-            $ref: '#/definitions/App'
+            $ref: "#/definitions/App"
         400:
           description: Bad Request
           schema:
             type: string
         default:
-          $ref: '#/responses/unknown'
+          $ref: "#/responses/unknown"
   /api/apps/{appName}:
     get:
       summary: Get an app by name
       operationId: getApp
       parameters:
-        - $ref: '#/parameters/appName'
+        - $ref: "#/parameters/appName"
       responses:
         200:
           description: OK
           schema:
-            $ref: '#/definitions/App'
+            $ref: "#/definitions/App"
         404:
           description: Not Found
           schema:
             type: string
-    delete:
-      summary: Stop and delete an app
-      operationId: deleteApp
+    put:
+      summary: Edit the app details
+      operationId: editApp
       parameters:
-        - $ref: '#/parameters/appName'
+        - $ref: "#/parameters/appName"
+        - name: newApp
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/AppEdit"
       responses:
         200:
           description: OK
           schema:
-            $ref: '#/definitions/App'
+            $ref: "#/definitions/App"
+        400:
+          description: BadRequest
+          schema:
+            type: string
         404:
           description: Not Found
           schema:
             type: string
         default:
-          $ref: '#/responses/unknown'
+          $ref: "#/responses/unknown"
+    delete:
+      summary: Stop and delete an app
+      operationId: deleteApp
+      parameters:
+        - $ref: "#/parameters/appName"
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: "#/definitions/App"
+        404:
+          description: Not Found
+          schema:
+            type: string
+        default:
+          $ref: "#/responses/unknown"
   /api/apps/{appName}/start:
     post:
       summary: start the app
       operationId: startApp
       parameters:
-        - $ref: '#/parameters/appName'
+        - $ref: "#/parameters/appName"
       responses:
-        200:
+        204:
           description: Started
         404:
           description: Not Found
           schema:
             type: string
         default:
-          $ref: '#/responses/unknown'
+          $ref: "#/responses/unknown"
   /api/apps/{appName}/stop:
     post:
       summary: stop the app
       operationId: stopApp
       parameters:
-        - $ref: '#/parameters/appName'
+        - $ref: "#/parameters/appName"
       responses:
-        200:
+        204:
           description: Stopped
         404:
           description: Not Found
           schema:
             type: string
         default:
-          $ref: '#/responses/unknown'
+          $ref: "#/responses/unknown"
   /api/apps/{appName}/config:
     get:
       summary: get an app's current config
-      operationId: getAppConfig
+      operationId: getRunConfig
       parameters:
-        - $ref: '#/parameters/appName'
+        - $ref: "#/parameters/appName"
       responses:
         200:
           description: OK
           schema:
-            $ref: '#/definitions/AppConfig'
+            $ref: "#/definitions/RunConfig"
         404:
           description: Not Found
           schema:
             type: string
         default:
-          $ref: '#/responses/unknown'
+          $ref: "#/responses/unknown"
     put:
       summary: update an app's config
-      operationId: updateAppConfig
+      operationId: updateRunConfig
       parameters:
-        - $ref: '#/parameters/appName'
+        - $ref: "#/parameters/appName"
         - in: body
-          name: newAppConfig
+          name: newRunConfig
           schema:
-            $ref: '#/definitions/AppConfig'
+            $ref: "#/definitions/InputRunConfig"
       responses:
         200:
           description: OK
           schema:
-            $ref: '#/definitions/AppConfig'
+            $ref: "#/definitions/RunConfig"
         400:
           description: Bad Request
           schema:
@@ -159,13 +184,13 @@ paths:
           schema:
             type: string
         default:
-          $ref: '#/responses/unknown'
+          $ref: "#/responses/unknown"
   /api/apps/{appName}/env:
     get:
       summary: get an app's environment variables
       operationId: getAppEnv
       parameters:
-        - $ref: '#/parameters/appName'
+        - $ref: "#/parameters/appName"
       responses:
         200:
           description: OK
@@ -176,12 +201,12 @@ paths:
           schema:
             type: string
         default:
-          $ref: '#/responses/unknown'
+          $ref: "#/responses/unknown"
     put:
       summary: update an app's env
       operationId: updateAppEnv
       parameters:
-        - $ref: '#/parameters/appName'
+        - $ref: "#/parameters/appName"
         - in: body
           name: newEnv
           schema:
@@ -204,23 +229,21 @@ paths:
           schema:
             type: string
         default:
-          $ref: '#/responses/unknown'
-  /api/apps/{appName}/update:
+          $ref: "#/responses/unknown"
+  /api/apps/{appName}/upgrade:
     put:
       summary: pull the app's image and restart it
-      operationId: updateApp
+      operationId: upgradeApp
       parameters:
-        - $ref: '#/parameters/appName'
+        - $ref: "#/parameters/appName"
         - in: query
           name: newImage
           required: false
           type: string
           description: A new image to base the app off of
       responses:
-        200:
-          description: OK
-          schema:
-            type: object
+        204:
+          description: Upgrade success
         400:
           description: Bad Request
           schema:
@@ -230,7 +253,7 @@ paths:
           schema:
             type: string
         default:
-          $ref: '#/responses/unknown'
+          $ref: "#/responses/unknown"
   /api/plugins:
     get:
       summary: List all available plugins and if they are installed
@@ -241,50 +264,105 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Plugin'
+              $ref: "#/definitions/Plugin"
         default:
-          $ref: '#/responses/unknown'
+          $ref: "#/responses/unknown"
   /api/plugins/{pluginName}:
     get:
       summary: Get a plugin
       operationId: getPlugin
       parameters:
-        - $ref: '#/parameters/pluginName'
+        - $ref: "#/parameters/pluginName"
       responses:
         200:
           description: Created
           schema:
-            $ref: '#/definitions/Plugin'
+            $ref: "#/definitions/Plugin"
         404:
           description: Not Found
           schema:
             type: string
         default:
-          $ref: '#/responses/unknown'
+          $ref: "#/responses/unknown"
     post:
       summary: Install (and start) a plugin
       operationId: installPlugin
       parameters:
-        - $ref: '#/parameters/pluginName'
+        - $ref: "#/parameters/pluginName"
       responses:
         201:
           description: Created
           schema:
-            $ref: '#/definitions/Plugin'
+            $ref: "#/definitions/Plugin"
         default:
-          $ref: '#/responses/unknown'
+          $ref: "#/responses/unknown"
     delete:
       summary: Stop and uninstall a plugin
       operationId: uninstallPlugin
       parameters:
-        - $ref: '#/parameters/pluginName'
+        - $ref: "#/parameters/pluginName"
       responses:
         200:
           description: Created
           schema:
-            $ref: '#/definitions/Plugin'
+            $ref: "#/definitions/Plugin"
         default:
-          $ref: '#/responses/unknown'
+          $ref: "#/responses/unknown"
+  /api/plugins/traefik/{appId}:
+    get:
+      summary: Get an app's routing config
+      operationId: getAppTraefikConfig
+      parameters:
+        - $ref: "#/parameters/appId"
+      responses:
+        200:
+          description: Found and returned the config
+          schema:
+            $ref: "#/definitions/TraefikPluginConfig"
+        400:
+          description: Traefik plugin is not installed
+          schema:
+            type: string
+        404:
+          description: No config for the app
+        default:
+          $ref: "#/responses/unknown"
+    put:
+      summary: Update an app's routing config
+      operationId: updateAppTraefikConfig
+      parameters:
+        - $ref: "#/parameters/appId"
+        - name: newTraefikConfig
+          in: body
+          schema:
+            $ref: "#/definitions/InputTraefikPluginConfig"
+      responses:
+        200:
+          description: Created
+          schema:
+            $ref: "#/definitions/TraefikPluginConfig"
+        400:
+          description: Traefik plugin is not installed
+          schema:
+            type: string
+        default:
+          $ref: "#/responses/unknown"
+    delete:
+      summary: Removes an app's routing config
+      operationId: removeAppTraefikConfig
+      parameters:
+        - $ref: "#/parameters/appId"
+      responses:
+        200:
+          description: Created
+          schema:
+            $ref: "#/definitions/TraefikPluginConfig"
+        400:
+          description: Traefik plugin is not installed
+          schema:
+            type: string
+        default:
+          $ref: "#/responses/unknown"
 
 parameters:
   appName:
@@ -293,6 +371,12 @@ parameters:
     required: true
     type: string
     description: App name from the `-a|--app` flag
+  appId:
+    name: appId
+    in: path
+    required: true
+    type: string
+    format: uuid4
   pluginName:
     name: pluginName
     in: path
@@ -316,7 +400,7 @@ definitions:
         description: The version of docker running on the host, or null if docker is not running
       swarm:
         type: object
-        description: 
+        description:
           The info about the docker swarm if the host running miasma is apart of
           one. If it is not apart of a swarm, it returns `null`
         properties:
@@ -339,55 +423,113 @@ definitions:
   App:
     type: object
     properties:
+      id:
+        type: string
+        format: uuid4
+        x-nullable: false
+        x-go-custom-tag: 'gorm:"primaryKey"'
       name:
         type: string
         description: The apps name, used in the CLI with the `-a|--app` flag
+        x-nullable: false
+        x-go-custom-tag: 'gorm:"uniqueIndex"'
+      group:
+        type: string
+        description: A simple label to track what apps are related
+        x-go-custom-tag: 'gorm:"index"'
       image:
         type: string
-        description: The image the app is based off of
+        description: The image and tag the application runs
+        x-nullable: false
       hidden:
         type: boolean
-        description: Whether or not the app is hidden during regular requests
-      running:
-        type: boolean
+        description: Whether or not the app is returned during regular requests
+        x-go-custom-tag: 'gorm:"index"'
     required:
+      - id
       - name
-      - image
-      - running
   AppInput:
     type: object
+    required:
+      - name
+      - image
     properties:
       name:
         type: string
         description: The apps name, used in the CLI with the `-a|--app` flag
+        x-nullable: false
+      group:
+        type: string
+        description: A simple label to track what apps are related
+        x-go-custom-tag: 'gorm:"index"'
       image:
         type: string
-        description: The image the app is based off of
+        description: The image and tag the application runs
+        x-nullable: false
       hidden:
         type: boolean
         description: Whether or not the app is hidden during regular requests
-    required:
-      - name
-      - image
-  AppConfig:
+  AppEdit:
     type: object
     properties:
-      image:
-        description: The docker image the app runs
+      name:
         type: string
+        description: The apps name, used in the CLI with the `-a|--app` flag
+        x-nullable: false
+      group:
+        type: string
+        description: A simple label to track what apps are related
       hidden:
-        description: Whether or not the app shows up by default when listing the apps
         type: boolean
+        description: Whether or not the app is returned during regular requests
+    required:
+      - name
+  RunConfigVolume:
+    type: object
+    properties:
+      Source:
+        description: The volume name or directory on the host that the data is stored in
+        type: string
+      Target:
+        description: The path inside the container that the data is served from
+        type: string
+      # Type:
+      #   description:
+      #     The type of binding. Should be either "bind", "volume", "tmpfs", or "npipe".
+      #   type: string
+      #   x-nullable: true
+  RunConfig:
+    type: object
+    description: All the properties that define how the application runs in docker
+    required:
+      - appId
+      - imageDigest
+    properties:
+      appId:
+        description: The ID of the app the run config is for
+        type: string
+        format: uuid4
+        x-go-custom-tag: 'gorm:"primaryKey"'
+        x-nullable: false
+        x-go-custom-tag: 'gorm:"primaryKey"'
+      imageDigest:
+        type: string
+        description: |
+          The currently running image digest (hash). Used internally when running applications
+          instead of the tag because the when a new image is pushed, the tag stays the same but the
+          digest changes
+        x-nullable: false
       targetPorts:
-        description: 
+        description:
           The ports that the app is listening to inside the container. If no target ports
           are specified, then the container should respect the `PORT` env var.
         type: array
         items:
           type: integer
+          format: uint32
         uniqueItems: true
       publishedPorts:
-        description: 
+        description:
           The ports that you access the app through in the swarm. This field can, and should
           be left empty. Miasma automatically manages assigning published ports between 3001-4999.
           If you need to specify a port, make sure it's outside that range or the port has not been
@@ -400,9 +542,10 @@ definitions:
         type: array
         items:
           type: integer
+          format: uint32
         uniqueItems: true
       placement:
-        description: 
+        description:
           The placement constraints specifying which nodes the app will be ran on. Any valid
           value for the
           [`--constraint` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints)
@@ -412,23 +555,10 @@ definitions:
           type: string
         uniqueItems: true
       volumes:
-        description:
-          volume bindings for the app
+        description: volume bindings for the app
         type: array
         items:
-          type: object
-          properties:
-            Source:
-              description: The volume name or directory on the host that the data is stored in
-              type: string
-            Target:
-              description: The path inside the container that the data is served from
-              type: string
-            # Type:
-            #   description:
-            #     The type of binding. Should be either "bind", "volume", "tmpfs", or "npipe".
-            #   type: string
-            #   x-nullable: true
+          $ref: "#/definitions/RunConfigVolume"
       networks:
         description:
           A list of other apps that the service communicates with using their service name and
@@ -438,48 +568,101 @@ definitions:
         items:
           type: string
         uniqueItems: true
-      route:
-        description: 
-          When the Traefik plugin is installed, the route describes where the app can be accessed
-          from.
-        type: object
-        x-nullable: true
-        properties:
-          host:
-            description: Describes the hostname the app is served at ("test.domain.com")
-            type: string
-            x-nullable: true
-          path:
-            description: 
-              The path at a given host the app can be reached from ("/api"). It should start
-              with a "/"
-            type: string
-            x-nullable: true
-          traefikRule:
-            description: 
-              Instead of using `host` and/or `path`, you can specify the exact rule Traefik will use
-              to route to the app. See [Traefik's documentation]() for how to use this field.
-              This field takes priority over `host` and `path`
-            type: string
-            x-nullable: true
+      command:
+        type: array
+        items:
+          type: string
+  InputRunConfig:
+    type: object
+    description: All the properties that define how the application runs in docker
+    properties:
+      targetPorts:
+        type: array
+        items:
+          type: integer
+          format: uint32
+        uniqueItems: true
+      publishedPorts:
+        type: array
+        items:
+          type: integer
+          format: uint32
+        uniqueItems: true
+      placement:
+        type: array
+        items:
+          type: string
+        uniqueItems: true
+      volumes:
+        description: volume bindings for the app
+        type: array
+        items:
+          $ref: "#/definitions/RunConfigVolume"
+      networks:
+        type: array
+        items:
+          type: string
+        uniqueItems: true
+      command:
+        type: array
+        items:
+          type: string
   Plugin:
     type: object
     properties:
       name:
         description: The plugin's name. It can be used to install a plugin
         type: string
+        x-nullable: false
+        x-go-custom-tag: 'gorm:"primaryKey"'
       installed:
         description: Whether or not the plugin is installed
         type: boolean
-      installCommand:
-        description: Command to run to install the plugin
-        type: string
-        x-nullable: true
-      uninstallCommand:
-        description: Command to run to uninstall the plugin
-        type: string
-        x-nullable: true
-
+        x-nullable: false
     required:
       - name
       - installed
+  TraefikPluginConfig:
+    type: object
+    properties:
+      appId:
+        type: string
+        format: uuid4
+        x-go-custom-tag: 'gorm:"primaryKey"'
+      host:
+        description: Describes the hostname the app is served at ("test.domain.com")
+        type: string
+        x-nullable: true
+      path:
+        description:
+          The path at a given host the app can be reached from ("/api"). It should start
+          with a "/"
+        type: string
+        x-nullable: true
+      traefikRule:
+        description:
+          Instead of using `host` and/or `path`, you can specify the exact rule Traefik will use
+          to route to the app. See [Traefik's documentation]() for how to use this field.
+          This field takes priority over `host` and `path`
+        type: string
+        x-nullable: true
+  InputTraefikPluginConfig:
+    type: object
+    properties:
+      host:
+        description: Describes the hostname the app is served at ("test.domain.com")
+        type: string
+        x-nullable: true
+      path:
+        description:
+          The path at a given host the app can be reached from ("/api"). It should start
+          with a "/"
+        type: string
+        x-nullable: true
+      traefikRule:
+        description:
+          Instead of using `host` and/or `path`, you can specify the exact rule Traefik will use
+          to route to the app. See [Traefik's documentation]() for how to use this field.
+          This field takes priority over `host` and `path`
+        type: string
+        x-nullable: true

@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 
-	"github.com/aklinker1/miasma/internal/server/gen/models"
+	"github.com/aklinker1/miasma/package/models"
 )
 
 // NewCreateAppParams creates a new CreateAppParams object

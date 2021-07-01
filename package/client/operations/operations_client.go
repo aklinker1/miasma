@@ -31,33 +31,41 @@ type ClientService interface {
 
 	DeleteApp(params *DeleteAppParams) (*DeleteAppOK, error)
 
-	GetApp(params *GetAppParams) (*GetAppOK, error)
+	EditApp(params *EditAppParams) (*EditAppOK, error)
 
-	GetAppConfig(params *GetAppConfigParams) (*GetAppConfigOK, error)
+	GetApp(params *GetAppParams) (*GetAppOK, error)
 
 	GetAppEnv(params *GetAppEnvParams) (*GetAppEnvOK, error)
 
-	GetApps(params *GetAppsParams) (*GetAppsOK, error)
-
-	GetHealthCheck(params *GetHealthCheckParams) (*GetHealthCheckOK, error)
+	GetAppTraefikConfig(params *GetAppTraefikConfigParams) (*GetAppTraefikConfigOK, error)
 
 	GetPlugin(params *GetPluginParams) (*GetPluginOK, error)
 
+	GetRunConfig(params *GetRunConfigParams) (*GetRunConfigOK, error)
+
+	HealthCheck(params *HealthCheckParams) (*HealthCheckOK, error)
+
 	InstallPlugin(params *InstallPluginParams) (*InstallPluginCreated, error)
+
+	ListApps(params *ListAppsParams) (*ListAppsOK, error)
 
 	ListPlugins(params *ListPluginsParams) (*ListPluginsOK, error)
 
-	StartApp(params *StartAppParams) (*StartAppOK, error)
+	RemoveAppTraefikConfig(params *RemoveAppTraefikConfigParams) (*RemoveAppTraefikConfigOK, error)
 
-	StopApp(params *StopAppParams) (*StopAppOK, error)
+	StartApp(params *StartAppParams) (*StartAppNoContent, error)
+
+	StopApp(params *StopAppParams) (*StopAppNoContent, error)
 
 	UninstallPlugin(params *UninstallPluginParams) (*UninstallPluginOK, error)
 
-	UpdateApp(params *UpdateAppParams) (*UpdateAppOK, error)
-
-	UpdateAppConfig(params *UpdateAppConfigParams) (*UpdateAppConfigOK, error)
-
 	UpdateAppEnv(params *UpdateAppEnvParams) (*UpdateAppEnvOK, error)
+
+	UpdateAppTraefikConfig(params *UpdateAppTraefikConfigParams) (*UpdateAppTraefikConfigOK, error)
+
+	UpdateRunConfig(params *UpdateRunConfigParams) (*UpdateRunConfigOK, error)
+
+	UpgradeApp(params *UpgradeAppParams) (*UpgradeAppNoContent, error)
 
 	SetTransport(transport runtime.ClientTransport)
 }
@@ -129,6 +137,39 @@ func (a *Client) DeleteApp(params *DeleteAppParams) (*DeleteAppOK, error) {
 }
 
 /*
+  EditApp edits the app details
+*/
+func (a *Client) EditApp(params *EditAppParams) (*EditAppOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewEditAppParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "editApp",
+		Method:             "PUT",
+		PathPattern:        "/api/apps/{appName}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &EditAppReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*EditAppOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*EditAppDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
   GetApp gets an app by name
 */
 func (a *Client) GetApp(params *GetAppParams) (*GetAppOK, error) {
@@ -160,39 +201,6 @@ func (a *Client) GetApp(params *GetAppParams) (*GetAppOK, error) {
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for getApp: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
-}
-
-/*
-  GetAppConfig gets an app s current config
-*/
-func (a *Client) GetAppConfig(params *GetAppConfigParams) (*GetAppConfigOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetAppConfigParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "getAppConfig",
-		Method:             "GET",
-		PathPattern:        "/api/apps/{appName}/config",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetAppConfigReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*GetAppConfigOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	unexpectedSuccess := result.(*GetAppConfigDefault)
-	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
@@ -229,70 +237,36 @@ func (a *Client) GetAppEnv(params *GetAppEnvParams) (*GetAppEnvOK, error) {
 }
 
 /*
-  GetApps lists all the running apps
+  GetAppTraefikConfig gets an app s routing config
 */
-func (a *Client) GetApps(params *GetAppsParams) (*GetAppsOK, error) {
+func (a *Client) GetAppTraefikConfig(params *GetAppTraefikConfigParams) (*GetAppTraefikConfigOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewGetAppsParams()
+		params = NewGetAppTraefikConfigParams()
 	}
 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "getApps",
+		ID:                 "getAppTraefikConfig",
 		Method:             "GET",
-		PathPattern:        "/api/apps",
+		PathPattern:        "/api/plugins/traefik/{appId}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &GetAppsReader{formats: a.formats},
+		Reader:             &GetAppTraefikConfigReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*GetAppsOK)
+	success, ok := result.(*GetAppTraefikConfigOK)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
-	unexpectedSuccess := result.(*GetAppsDefault)
+	unexpectedSuccess := result.(*GetAppTraefikConfigDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
-}
-
-/*
-  GetHealthCheck standards health check endpoint that checks all the service s statuses
-*/
-func (a *Client) GetHealthCheck(params *GetHealthCheckParams) (*GetHealthCheckOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetHealthCheckParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "getHealthCheck",
-		Method:             "GET",
-		PathPattern:        "/api/health",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetHealthCheckReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*GetHealthCheckOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for getHealthCheck: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
 }
 
 /*
@@ -329,6 +303,73 @@ func (a *Client) GetPlugin(params *GetPluginParams) (*GetPluginOK, error) {
 }
 
 /*
+  GetRunConfig gets an app s current config
+*/
+func (a *Client) GetRunConfig(params *GetRunConfigParams) (*GetRunConfigOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetRunConfigParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "getRunConfig",
+		Method:             "GET",
+		PathPattern:        "/api/apps/{appName}/config",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetRunConfigReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetRunConfigOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*GetRunConfigDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  HealthCheck standards health check endpoint that checks all the service s statuses
+*/
+func (a *Client) HealthCheck(params *HealthCheckParams) (*HealthCheckOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewHealthCheckParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "healthCheck",
+		Method:             "GET",
+		PathPattern:        "/api/health",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &HealthCheckReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*HealthCheckOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for healthCheck: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
   InstallPlugin installs and start a plugin
 */
 func (a *Client) InstallPlugin(params *InstallPluginParams) (*InstallPluginCreated, error) {
@@ -358,6 +399,39 @@ func (a *Client) InstallPlugin(params *InstallPluginParams) (*InstallPluginCreat
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*InstallPluginDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  ListApps lists all the running apps
+*/
+func (a *Client) ListApps(params *ListAppsParams) (*ListAppsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewListAppsParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "listApps",
+		Method:             "GET",
+		PathPattern:        "/api/apps",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ListAppsReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ListAppsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*ListAppsDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
@@ -395,9 +469,42 @@ func (a *Client) ListPlugins(params *ListPluginsParams) (*ListPluginsOK, error) 
 }
 
 /*
+  RemoveAppTraefikConfig removes an app s routing config
+*/
+func (a *Client) RemoveAppTraefikConfig(params *RemoveAppTraefikConfigParams) (*RemoveAppTraefikConfigOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRemoveAppTraefikConfigParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "removeAppTraefikConfig",
+		Method:             "DELETE",
+		PathPattern:        "/api/plugins/traefik/{appId}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &RemoveAppTraefikConfigReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RemoveAppTraefikConfigOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*RemoveAppTraefikConfigDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
   StartApp starts the app
 */
-func (a *Client) StartApp(params *StartAppParams) (*StartAppOK, error) {
+func (a *Client) StartApp(params *StartAppParams) (*StartAppNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewStartAppParams()
@@ -418,7 +525,7 @@ func (a *Client) StartApp(params *StartAppParams) (*StartAppOK, error) {
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*StartAppOK)
+	success, ok := result.(*StartAppNoContent)
 	if ok {
 		return success, nil
 	}
@@ -430,7 +537,7 @@ func (a *Client) StartApp(params *StartAppParams) (*StartAppOK, error) {
 /*
   StopApp stops the app
 */
-func (a *Client) StopApp(params *StopAppParams) (*StopAppOK, error) {
+func (a *Client) StopApp(params *StopAppParams) (*StopAppNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewStopAppParams()
@@ -451,7 +558,7 @@ func (a *Client) StopApp(params *StopAppParams) (*StopAppOK, error) {
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*StopAppOK)
+	success, ok := result.(*StopAppNoContent)
 	if ok {
 		return success, nil
 	}
@@ -494,72 +601,6 @@ func (a *Client) UninstallPlugin(params *UninstallPluginParams) (*UninstallPlugi
 }
 
 /*
-  UpdateApp pulls the app s image and restart it
-*/
-func (a *Client) UpdateApp(params *UpdateAppParams) (*UpdateAppOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewUpdateAppParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "updateApp",
-		Method:             "PUT",
-		PathPattern:        "/api/apps/{appName}/update",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &UpdateAppReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*UpdateAppOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	unexpectedSuccess := result.(*UpdateAppDefault)
-	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
-}
-
-/*
-  UpdateAppConfig updates an app s config
-*/
-func (a *Client) UpdateAppConfig(params *UpdateAppConfigParams) (*UpdateAppConfigOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewUpdateAppConfigParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "updateAppConfig",
-		Method:             "PUT",
-		PathPattern:        "/api/apps/{appName}/config",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &UpdateAppConfigReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*UpdateAppConfigOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	unexpectedSuccess := result.(*UpdateAppConfigDefault)
-	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
-}
-
-/*
   UpdateAppEnv updates an app s env
 */
 func (a *Client) UpdateAppEnv(params *UpdateAppEnvParams) (*UpdateAppEnvOK, error) {
@@ -589,6 +630,105 @@ func (a *Client) UpdateAppEnv(params *UpdateAppEnvParams) (*UpdateAppEnvOK, erro
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*UpdateAppEnvDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  UpdateAppTraefikConfig updates an app s routing config
+*/
+func (a *Client) UpdateAppTraefikConfig(params *UpdateAppTraefikConfigParams) (*UpdateAppTraefikConfigOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewUpdateAppTraefikConfigParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "updateAppTraefikConfig",
+		Method:             "PUT",
+		PathPattern:        "/api/plugins/traefik/{appId}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &UpdateAppTraefikConfigReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*UpdateAppTraefikConfigOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*UpdateAppTraefikConfigDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  UpdateRunConfig updates an app s config
+*/
+func (a *Client) UpdateRunConfig(params *UpdateRunConfigParams) (*UpdateRunConfigOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewUpdateRunConfigParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "updateRunConfig",
+		Method:             "PUT",
+		PathPattern:        "/api/apps/{appName}/config",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &UpdateRunConfigReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*UpdateRunConfigOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*UpdateRunConfigDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  UpgradeApp pulls the app s image and restart it
+*/
+func (a *Client) UpgradeApp(params *UpgradeAppParams) (*UpgradeAppNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewUpgradeAppParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "upgradeApp",
+		Method:             "PUT",
+		PathPattern:        "/api/apps/{appName}/upgrade",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &UpgradeAppReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*UpgradeAppNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*UpgradeAppDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 

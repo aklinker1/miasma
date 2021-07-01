@@ -17,29 +17,15 @@ To deploy the server, you will need a device running on one of the supported arc
 My device and OS of choice a **Raspberry Pi 3b running 64bit Ubuntu Server**.
 :::
 
-This device will be the first manager node of the docker swarm. After your device is up and running, all that's left is to run the install script on that device!
+This device will be the main node of the cluster. After your device is up and running, run the install script on that device:
 
 ```bash
 $ bash | curl https://github.com/aklinker1/miasma/releases/current/install-server.sh
 ```
 
-The install script might take a while if you don't have docker installed already. Once it finishes, the server should up and running on port `3000`! To verify the installation, we're going to ping the health endpoint of the REST API.
+Once it finishes, the Miasma server should up and running on port `3000`!
 
-```bash
-$ curl localhost:3000/api/health
-{
-   "dockerVersion": "19.03.13-4484c46",
-   "swarm": {
-      "createdAt": "2020-11-15 21:44:20.898473606 +0000 UTC",
-      "id": "yk39px7m8pql5apr6qx8cekak",
-      "joinCommand": "docker swarm join --token <some-long-string> <miasma-ip:port>",
-      "updatedAt": "2021-02-13 16:31:13.583995176 +0000 UTC"
-   },
-   "version": "<some-version>"
-}
-```
-
-If everything worked correctly, you should see a `"swarm"` field in the JSON response, signifying that a swarm was initialized and the server is ready to go! You're now ready to [install the CLI](#install-the-cli)
+You're now ready to [install the CLI](#install-the-cli) on your dev computer or [add more devices](#add-more-nodes) to the cluster
 
 ### Manual Install
 
@@ -57,14 +43,53 @@ If you don't trust the install script, or it did not succeed, you may have to in
      aklinker1/miasma
    ```
 
-> If you're unfamiliar with Docker, here's what's happening:
-> 
-> - **`-d`**: Start the server in the background in a daemon rather than the foreground
-> - **`--restart unless-stopped`**: Restart the server unless it is manually stopped, ensuring the server restarts if it crashes or the device restarts
-> - **`-p 3000:3000`**: Exposing port 3000 on the host, and mapping it to port 3000 in the container (the port the server runs on)
-> - **`-v /var/run/docker.sock:/var/run/docker.sock`**: Binding a special volume to the container, allowing miasma to communicate with docker
-> - **`-v $HOME/.miasma:/data/miasma`**: Bind another volume, this time the server's data directory, to the the `~/.miasma` directory of the user that ran the docker run command
-> - **`aklinker1/miasma`**: The name of the image to run, in this case the latest stable version of the Miasma server. See [Docker Hub](https://hub.docker.com/r/aklinker1/miasma/tags) for additional tags that could be used
+   > If you're unfamiliar with Docker, here's what's happening:
+   > 
+   > - `-d`: Start the server in a background daemon rather than the foreground
+   > - `--restart unless-stopped`: Restart the server unless it is manually stopped, ensuring the server restarts if it crashes or the device restarts
+   > - `-p 3000:3000`: Exposing port `3000` on the host, and mapping it to port `3000` in the container (the port the server is accessed at)
+   > - `-v /var/run/docker.sock:/var/run/docker.sock`: Binding a special volume to the container, allowing miasma to communicate with docker on your behalf
+   > - `-v $HOME/.miasma:/data/miasma`: Bind another volume, this time the server's data directory, to the the `~/.miasma` directory of the user that ran the docker run command
+   > - `aklinker1/miasma`: The name of the image to run, in this case the latest stable version of the Miasma server. See [Docker Hub](https://hub.docker.com/r/aklinker1/miasma/tags) for additional tags that could be used
+
+4. Ping the health endpoint of the server to make sure it's up and running
+
+   ```bash
+   $ curl localhost:3000/api/health
+   {
+      "dockerVersion": "19.03.13-4484c46",
+      "swarm": {
+         "createdAt": "2020-11-15 21:44:20.898473606 +0000 UTC",
+         "id": "yk39px7m8pql5apr6qx8cekak",
+         "joinCommand": "docker swarm join --token <some-long-string> <miasma-ip:port>",
+         "updatedAt": "2021-02-13 16:31:13.583995176 +0000 UTC"
+      },
+      "version": "<some-version>"
+   }
+   ```
+
+
+## Add More Nodes
+
+Adding more devices to the swarm is simple. Miasma provides a "join command" that is used to join the cluster. If you just ran the install script, the join command is printed at the end, or you can get using:
+
+```bash
+$ ssh username@main-device-ip
+$ docker swarm join-token worker
+To add a worker to this swarm, run the following command:
+
+    docker swarm join --token <some-token> <some-ip:some-port>
+
+```
+
+Copy the join command, SSH into each device you want to add to the cluster, then paste and run the command!
+
+```bash
+$ ssh username@device-ip
+$ docker swarm join --token <some-token> <miasma-ip:port>
+```
+
+Add that's it!
 
 ## Install the CLI
 

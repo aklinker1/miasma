@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/aklinker1/miasma/internal/server/gen/models"
+	"github.com/aklinker1/miasma/package/models"
 )
 
 func AppName(appName string) error {
@@ -24,12 +24,20 @@ func AppName(appName string) error {
 }
 
 func AppInput(app *models.AppInput) error {
-	err := AppName(*app.Name)
+	err := AppName(app.Name)
 	if err != nil {
 		return nil
 	}
-	if len(*app.Image) == 0 {
+	if len(app.Image) == 0 {
 		return errors.New("'image' is required")
+	}
+	return nil
+}
+
+func AppEdit(app *models.AppEdit) error {
+	err := AppName(app.Name)
+	if err != nil {
+		return nil
 	}
 	return nil
 }

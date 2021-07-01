@@ -33,7 +33,7 @@ func init() {
     "/api/apps": {
       "get": {
         "summary": "List all the running apps",
-        "operationId": "getApps",
+        "operationId": "listApps",
         "parameters": [
           {
             "type": "boolean",
@@ -112,6 +112,46 @@ func init() {
           }
         }
       },
+      "put": {
+        "summary": "Edit the app details",
+        "operationId": "editApp",
+        "parameters": [
+          {
+            "$ref": "#/parameters/appName"
+          },
+          {
+            "name": "newApp",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AppEdit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/App"
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/unknown"
+          }
+        }
+      },
       "delete": {
         "summary": "Stop and delete an app",
         "operationId": "deleteApp",
@@ -142,7 +182,7 @@ func init() {
     "/api/apps/{appName}/config": {
       "get": {
         "summary": "get an app's current config",
-        "operationId": "getAppConfig",
+        "operationId": "getRunConfig",
         "parameters": [
           {
             "$ref": "#/parameters/appName"
@@ -152,7 +192,7 @@ func init() {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/AppConfig"
+              "$ref": "#/definitions/RunConfig"
             }
           },
           "404": {
@@ -168,16 +208,16 @@ func init() {
       },
       "put": {
         "summary": "update an app's config",
-        "operationId": "updateAppConfig",
+        "operationId": "updateRunConfig",
         "parameters": [
           {
             "$ref": "#/parameters/appName"
           },
           {
-            "name": "newAppConfig",
+            "name": "newRunConfig",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/AppConfig"
+              "$ref": "#/definitions/InputRunConfig"
             }
           }
         ],
@@ -185,7 +225,7 @@ func init() {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/AppConfig"
+              "$ref": "#/definitions/RunConfig"
             }
           },
           "400": {
@@ -288,7 +328,7 @@ func init() {
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "Started"
           },
           "404": {
@@ -313,7 +353,7 @@ func init() {
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "Stopped"
           },
           "404": {
@@ -328,10 +368,10 @@ func init() {
         }
       }
     },
-    "/api/apps/{appName}/update": {
+    "/api/apps/{appName}/upgrade": {
       "put": {
         "summary": "pull the app's image and restart it",
-        "operationId": "updateApp",
+        "operationId": "upgradeApp",
         "parameters": [
           {
             "$ref": "#/parameters/appName"
@@ -344,11 +384,8 @@ func init() {
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object"
-            }
+          "204": {
+            "description": "Upgrade success"
           },
           "400": {
             "description": "Bad Request",
@@ -371,7 +408,7 @@ func init() {
     "/api/health": {
       "get": {
         "summary": "Standard health check endpoint that checks all the service's statuses",
-        "operationId": "getHealthCheck",
+        "operationId": "healthCheck",
         "responses": {
           "200": {
             "description": "OK",
@@ -395,6 +432,96 @@ func init() {
               "items": {
                 "$ref": "#/definitions/Plugin"
               }
+            }
+          },
+          "default": {
+            "$ref": "#/responses/unknown"
+          }
+        }
+      }
+    },
+    "/api/plugins/traefik/{appId}": {
+      "get": {
+        "summary": "Get an app's routing config",
+        "operationId": "getAppTraefikConfig",
+        "parameters": [
+          {
+            "$ref": "#/parameters/appId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Found and returned the config",
+            "schema": {
+              "$ref": "#/definitions/TraefikPluginConfig"
+            }
+          },
+          "400": {
+            "description": "Traefik plugin is not installed",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "No config for the app"
+          },
+          "default": {
+            "$ref": "#/responses/unknown"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an app's routing config",
+        "operationId": "updateAppTraefikConfig",
+        "parameters": [
+          {
+            "$ref": "#/parameters/appId"
+          },
+          {
+            "name": "newTraefikConfig",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/InputTraefikPluginConfig"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/TraefikPluginConfig"
+            }
+          },
+          "400": {
+            "description": "Traefik plugin is not installed",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/unknown"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Removes an app's routing config",
+        "operationId": "removeAppTraefikConfig",
+        "parameters": [
+          {
+            "$ref": "#/parameters/appId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/TraefikPluginConfig"
+            }
+          },
+          "400": {
+            "description": "Traefik plugin is not installed",
+            "schema": {
+              "type": "string"
             }
           },
           "default": {
@@ -476,109 +603,57 @@ func init() {
     "App": {
       "type": "object",
       "required": [
-        "name",
-        "image",
-        "running"
+        "id",
+        "name"
       ],
       "properties": {
+        "group": {
+          "description": "A simple label to track what apps are related",
+          "type": "string",
+          "x-go-custom-tag": "gorm:\"index\""
+        },
         "hidden": {
-          "description": "Whether or not the app is hidden during regular requests",
-          "type": "boolean"
+          "description": "Whether or not the app is returned during regular requests",
+          "type": "boolean",
+          "x-go-custom-tag": "gorm:\"index\""
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid4",
+          "x-go-custom-tag": "gorm:\"primaryKey\"",
+          "x-nullable": false
         },
         "image": {
-          "description": "The image the app is based off of",
-          "type": "string"
+          "description": "The image and tag the application runs",
+          "type": "string",
+          "x-nullable": false
         },
         "name": {
           "description": "The apps name, used in the CLI with the ` + "`" + `-a|--app` + "`" + ` flag",
-          "type": "string"
-        },
-        "running": {
-          "type": "boolean"
+          "type": "string",
+          "x-go-custom-tag": "gorm:\"uniqueIndex\"",
+          "x-nullable": false
         }
       }
     },
-    "AppConfig": {
+    "AppEdit": {
       "type": "object",
+      "required": [
+        "name"
+      ],
       "properties": {
-        "hidden": {
-          "description": "Whether or not the app shows up by default when listing the apps",
-          "type": "boolean"
-        },
-        "image": {
-          "description": "The docker image the app runs",
+        "group": {
+          "description": "A simple label to track what apps are related",
           "type": "string"
         },
-        "networks": {
-          "description": "A list of other apps that the service communicates with using their service name and docker's internal DNS. Services don't have to be two way; only the service that accesses the other needs the other network added",
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "string"
-          }
+        "hidden": {
+          "description": "Whether or not the app is returned during regular requests",
+          "type": "boolean"
         },
-        "placement": {
-          "description": "The placement constraints specifying which nodes the app will be ran on. Any valid value for the [` + "`" + `--constraint` + "`" + ` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints) is valid item in this list",
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "string"
-          }
-        },
-        "publishedPorts": {
-          "description": "The ports that you access the app through in the swarm. This field can, and should be left empty. Miasma automatically manages assigning published ports between 3001-4999. If you need to specify a port, make sure it's outside that range or the port has not been taken. Plugins have set ports starting with 4000, so avoid 4000-4020 if you want to add a plugin at a later date. If these ports are ever cleared, the app will continue using the same ports it was published to before, so that the ports don't change unnecessarily. If you removed it to clear a port for another app/plugin, make sure to restart the app and a new, random port will be allocated for the app, freeing the old port",
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "integer"
-          }
-        },
-        "route": {
-          "description": "When the Traefik plugin is installed, the route describes where the app can be accessed from.",
-          "type": "object",
-          "properties": {
-            "host": {
-              "description": "Describes the hostname the app is served at (\"test.domain.com\")",
-              "type": "string",
-              "x-nullable": true
-            },
-            "path": {
-              "description": "The path at a given host the app can be reached from (\"/api\"). It should start with a \"/\"",
-              "type": "string",
-              "x-nullable": true
-            },
-            "traefikRule": {
-              "description": "Instead of using ` + "`" + `host` + "`" + ` and/or ` + "`" + `path` + "`" + `, you can specify the exact rule Traefik will use to route to the app. See [Traefik's documentation]() for how to use this field. This field takes priority over ` + "`" + `host` + "`" + ` and ` + "`" + `path` + "`" + `",
-              "type": "string",
-              "x-nullable": true
-            }
-          },
-          "x-nullable": true
-        },
-        "targetPorts": {
-          "description": "The ports that the app is listening to inside the container. If no target ports are specified, then the container should respect the ` + "`" + `PORT` + "`" + ` env var.",
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "integer"
-          }
-        },
-        "volumes": {
-          "description": "volume bindings for the app",
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "Source": {
-                "description": "The volume name or directory on the host that the data is stored in",
-                "type": "string"
-              },
-              "Target": {
-                "description": "The path inside the container that the data is served from",
-                "type": "string"
-              }
-            }
-          }
+        "name": {
+          "description": "The apps name, used in the CLI with the ` + "`" + `-a|--app` + "`" + ` flag",
+          "type": "string",
+          "x-nullable": false
         }
       }
     },
@@ -589,17 +664,24 @@ func init() {
         "image"
       ],
       "properties": {
+        "group": {
+          "description": "A simple label to track what apps are related",
+          "type": "string",
+          "x-go-custom-tag": "gorm:\"index\""
+        },
         "hidden": {
           "description": "Whether or not the app is hidden during regular requests",
           "type": "boolean"
         },
         "image": {
-          "description": "The image the app is based off of",
-          "type": "string"
+          "description": "The image and tag the application runs",
+          "type": "string",
+          "x-nullable": false
         },
         "name": {
           "description": "The apps name, used in the CLI with the ` + "`" + `-a|--app` + "`" + ` flag",
-          "type": "string"
+          "type": "string",
+          "x-nullable": false
         }
       }
     },
@@ -643,6 +725,75 @@ func init() {
         }
       }
     },
+    "InputRunConfig": {
+      "description": "All the properties that define how the application runs in docker",
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "networks": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "placement": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "publishedPorts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "targetPorts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "volumes": {
+          "description": "volume bindings for the app",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RunConfigVolume"
+          }
+        }
+      }
+    },
+    "InputTraefikPluginConfig": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "description": "Describes the hostname the app is served at (\"test.domain.com\")",
+          "type": "string",
+          "x-nullable": true
+        },
+        "path": {
+          "description": "The path at a given host the app can be reached from (\"/api\"). It should start with a \"/\"",
+          "type": "string",
+          "x-nullable": true
+        },
+        "traefikRule": {
+          "description": "Instead of using ` + "`" + `host` + "`" + ` and/or ` + "`" + `path` + "`" + `, you can specify the exact rule Traefik will use to route to the app. See [Traefik's documentation]() for how to use this field. This field takes priority over ` + "`" + `host` + "`" + ` and ` + "`" + `path` + "`" + `",
+          "type": "string",
+          "x-nullable": true
+        }
+      }
+    },
     "Plugin": {
       "type": "object",
       "required": [
@@ -650,21 +801,121 @@ func init() {
         "installed"
       ],
       "properties": {
-        "installCommand": {
-          "description": "Command to run to install the plugin",
-          "type": "string",
-          "x-nullable": true
-        },
         "installed": {
           "description": "Whether or not the plugin is installed",
-          "type": "boolean"
+          "type": "boolean",
+          "x-nullable": false
         },
         "name": {
           "description": "The plugin's name. It can be used to install a plugin",
+          "type": "string",
+          "x-go-custom-tag": "gorm:\"primaryKey\"",
+          "x-nullable": false
+        }
+      }
+    },
+    "RunConfig": {
+      "description": "All the properties that define how the application runs in docker",
+      "type": "object",
+      "required": [
+        "appId",
+        "imageDigest"
+      ],
+      "properties": {
+        "appId": {
+          "description": "The ID of the app the run config is for",
+          "type": "string",
+          "format": "uuid4",
+          "x-go-custom-tag": "gorm:\"primaryKey\"",
+          "x-nullable": false
+        },
+        "command": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "imageDigest": {
+          "description": "The currently running image digest (hash). Used internally when running applications\ninstead of the tag because the when a new image is pushed, the tag stays the same but the\ndigest changes\n",
+          "type": "string",
+          "x-nullable": false
+        },
+        "networks": {
+          "description": "A list of other apps that the service communicates with using their service name and docker's internal DNS. Services don't have to be two way; only the service that accesses the other needs the other network added",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "placement": {
+          "description": "The placement constraints specifying which nodes the app will be ran on. Any valid value for the [` + "`" + `--constraint` + "`" + ` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints) is valid item in this list",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "publishedPorts": {
+          "description": "The ports that you access the app through in the swarm. This field can, and should be left empty. Miasma automatically manages assigning published ports between 3001-4999. If you need to specify a port, make sure it's outside that range or the port has not been taken. Plugins have set ports starting with 4000, so avoid 4000-4020 if you want to add a plugin at a later date. If these ports are ever cleared, the app will continue using the same ports it was published to before, so that the ports don't change unnecessarily. If you removed it to clear a port for another app/plugin, make sure to restart the app and a new, random port will be allocated for the app, freeing the old port",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "targetPorts": {
+          "description": "The ports that the app is listening to inside the container. If no target ports are specified, then the container should respect the ` + "`" + `PORT` + "`" + ` env var.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "volumes": {
+          "description": "volume bindings for the app",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RunConfigVolume"
+          }
+        }
+      }
+    },
+    "RunConfigVolume": {
+      "type": "object",
+      "properties": {
+        "Source": {
+          "description": "The volume name or directory on the host that the data is stored in",
           "type": "string"
         },
-        "uninstallCommand": {
-          "description": "Command to run to uninstall the plugin",
+        "Target": {
+          "description": "The path inside the container that the data is served from",
+          "type": "string"
+        }
+      }
+    },
+    "TraefikPluginConfig": {
+      "type": "object",
+      "properties": {
+        "appId": {
+          "type": "string",
+          "format": "uuid4",
+          "x-go-custom-tag": "gorm:\"primaryKey\""
+        },
+        "host": {
+          "description": "Describes the hostname the app is served at (\"test.domain.com\")",
+          "type": "string",
+          "x-nullable": true
+        },
+        "path": {
+          "description": "The path at a given host the app can be reached from (\"/api\"). It should start with a \"/\"",
+          "type": "string",
+          "x-nullable": true
+        },
+        "traefikRule": {
+          "description": "Instead of using ` + "`" + `host` + "`" + ` and/or ` + "`" + `path` + "`" + `, you can specify the exact rule Traefik will use to route to the app. See [Traefik's documentation]() for how to use this field. This field takes priority over ` + "`" + `host` + "`" + ` and ` + "`" + `path` + "`" + `",
           "type": "string",
           "x-nullable": true
         }
@@ -672,6 +923,13 @@ func init() {
     }
   },
   "parameters": {
+    "appId": {
+      "type": "string",
+      "format": "uuid4",
+      "name": "appId",
+      "in": "path",
+      "required": true
+    },
     "appName": {
       "type": "string",
       "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",
@@ -711,7 +969,7 @@ func init() {
     "/api/apps": {
       "get": {
         "summary": "List all the running apps",
-        "operationId": "getApps",
+        "operationId": "listApps",
         "parameters": [
           {
             "type": "boolean",
@@ -800,6 +1058,53 @@ func init() {
           }
         }
       },
+      "put": {
+        "summary": "Edit the app details",
+        "operationId": "editApp",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",
+            "name": "appName",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "newApp",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AppEdit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/App"
+            }
+          },
+          "400": {
+            "description": "BadRequest",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "delete": {
         "summary": "Stop and delete an app",
         "operationId": "deleteApp",
@@ -837,7 +1142,7 @@ func init() {
     "/api/apps/{appName}/config": {
       "get": {
         "summary": "get an app's current config",
-        "operationId": "getAppConfig",
+        "operationId": "getRunConfig",
         "parameters": [
           {
             "type": "string",
@@ -851,7 +1156,7 @@ func init() {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/AppConfig"
+              "$ref": "#/definitions/RunConfig"
             }
           },
           "404": {
@@ -870,7 +1175,7 @@ func init() {
       },
       "put": {
         "summary": "update an app's config",
-        "operationId": "updateAppConfig",
+        "operationId": "updateRunConfig",
         "parameters": [
           {
             "type": "string",
@@ -880,10 +1185,10 @@ func init() {
             "required": true
           },
           {
-            "name": "newAppConfig",
+            "name": "newRunConfig",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/AppConfig"
+              "$ref": "#/definitions/InputRunConfig"
             }
           }
         ],
@@ -891,7 +1196,7 @@ func init() {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/AppConfig"
+              "$ref": "#/definitions/RunConfig"
             }
           },
           "400": {
@@ -1015,7 +1320,7 @@ func init() {
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "Started"
           },
           "404": {
@@ -1047,7 +1352,7 @@ func init() {
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "Stopped"
           },
           "404": {
@@ -1065,10 +1370,10 @@ func init() {
         }
       }
     },
-    "/api/apps/{appName}/update": {
+    "/api/apps/{appName}/upgrade": {
       "put": {
         "summary": "pull the app's image and restart it",
-        "operationId": "updateApp",
+        "operationId": "upgradeApp",
         "parameters": [
           {
             "type": "string",
@@ -1085,11 +1390,8 @@ func init() {
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object"
-            }
+          "204": {
+            "description": "Upgrade success"
           },
           "400": {
             "description": "Bad Request",
@@ -1115,7 +1417,7 @@ func init() {
     "/api/health": {
       "get": {
         "summary": "Standard health check endpoint that checks all the service's statuses",
-        "operationId": "getHealthCheck",
+        "operationId": "healthCheck",
         "responses": {
           "200": {
             "description": "OK",
@@ -1139,6 +1441,117 @@ func init() {
               "items": {
                 "$ref": "#/definitions/Plugin"
               }
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/plugins/traefik/{appId}": {
+      "get": {
+        "summary": "Get an app's routing config",
+        "operationId": "getAppTraefikConfig",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "uuid4",
+            "name": "appId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Found and returned the config",
+            "schema": {
+              "$ref": "#/definitions/TraefikPluginConfig"
+            }
+          },
+          "400": {
+            "description": "Traefik plugin is not installed",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "No config for the app"
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an app's routing config",
+        "operationId": "updateAppTraefikConfig",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "uuid4",
+            "name": "appId",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "newTraefikConfig",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/InputTraefikPluginConfig"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/TraefikPluginConfig"
+            }
+          },
+          "400": {
+            "description": "Traefik plugin is not installed",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Removes an app's routing config",
+        "operationId": "removeAppTraefikConfig",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "uuid4",
+            "name": "appId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/TraefikPluginConfig"
+            }
+          },
+          "400": {
+            "description": "Traefik plugin is not installed",
+            "schema": {
+              "type": "string"
             }
           },
           "default": {
@@ -1241,134 +1654,57 @@ func init() {
     "App": {
       "type": "object",
       "required": [
-        "name",
-        "image",
-        "running"
+        "id",
+        "name"
       ],
       "properties": {
+        "group": {
+          "description": "A simple label to track what apps are related",
+          "type": "string",
+          "x-go-custom-tag": "gorm:\"index\""
+        },
         "hidden": {
-          "description": "Whether or not the app is hidden during regular requests",
-          "type": "boolean"
+          "description": "Whether or not the app is returned during regular requests",
+          "type": "boolean",
+          "x-go-custom-tag": "gorm:\"index\""
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid4",
+          "x-go-custom-tag": "gorm:\"primaryKey\"",
+          "x-nullable": false
         },
         "image": {
-          "description": "The image the app is based off of",
-          "type": "string"
+          "description": "The image and tag the application runs",
+          "type": "string",
+          "x-nullable": false
         },
         "name": {
           "description": "The apps name, used in the CLI with the ` + "`" + `-a|--app` + "`" + ` flag",
-          "type": "string"
-        },
-        "running": {
-          "type": "boolean"
+          "type": "string",
+          "x-go-custom-tag": "gorm:\"uniqueIndex\"",
+          "x-nullable": false
         }
       }
     },
-    "AppConfig": {
+    "AppEdit": {
       "type": "object",
+      "required": [
+        "name"
+      ],
       "properties": {
+        "group": {
+          "description": "A simple label to track what apps are related",
+          "type": "string"
+        },
         "hidden": {
-          "description": "Whether or not the app shows up by default when listing the apps",
+          "description": "Whether or not the app is returned during regular requests",
           "type": "boolean"
         },
-        "image": {
-          "description": "The docker image the app runs",
-          "type": "string"
-        },
-        "networks": {
-          "description": "A list of other apps that the service communicates with using their service name and docker's internal DNS. Services don't have to be two way; only the service that accesses the other needs the other network added",
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "string"
-          }
-        },
-        "placement": {
-          "description": "The placement constraints specifying which nodes the app will be ran on. Any valid value for the [` + "`" + `--constraint` + "`" + ` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints) is valid item in this list",
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "string"
-          }
-        },
-        "publishedPorts": {
-          "description": "The ports that you access the app through in the swarm. This field can, and should be left empty. Miasma automatically manages assigning published ports between 3001-4999. If you need to specify a port, make sure it's outside that range or the port has not been taken. Plugins have set ports starting with 4000, so avoid 4000-4020 if you want to add a plugin at a later date. If these ports are ever cleared, the app will continue using the same ports it was published to before, so that the ports don't change unnecessarily. If you removed it to clear a port for another app/plugin, make sure to restart the app and a new, random port will be allocated for the app, freeing the old port",
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "integer"
-          }
-        },
-        "route": {
-          "description": "When the Traefik plugin is installed, the route describes where the app can be accessed from.",
-          "type": "object",
-          "properties": {
-            "host": {
-              "description": "Describes the hostname the app is served at (\"test.domain.com\")",
-              "type": "string",
-              "x-nullable": true
-            },
-            "path": {
-              "description": "The path at a given host the app can be reached from (\"/api\"). It should start with a \"/\"",
-              "type": "string",
-              "x-nullable": true
-            },
-            "traefikRule": {
-              "description": "Instead of using ` + "`" + `host` + "`" + ` and/or ` + "`" + `path` + "`" + `, you can specify the exact rule Traefik will use to route to the app. See [Traefik's documentation]() for how to use this field. This field takes priority over ` + "`" + `host` + "`" + ` and ` + "`" + `path` + "`" + `",
-              "type": "string",
-              "x-nullable": true
-            }
-          },
-          "x-nullable": true
-        },
-        "targetPorts": {
-          "description": "The ports that the app is listening to inside the container. If no target ports are specified, then the container should respect the ` + "`" + `PORT` + "`" + ` env var.",
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "integer"
-          }
-        },
-        "volumes": {
-          "description": "volume bindings for the app",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/AppConfigVolumesItems0"
-          }
-        }
-      }
-    },
-    "AppConfigRoute": {
-      "description": "When the Traefik plugin is installed, the route describes where the app can be accessed from.",
-      "type": "object",
-      "properties": {
-        "host": {
-          "description": "Describes the hostname the app is served at (\"test.domain.com\")",
+        "name": {
+          "description": "The apps name, used in the CLI with the ` + "`" + `-a|--app` + "`" + ` flag",
           "type": "string",
-          "x-nullable": true
-        },
-        "path": {
-          "description": "The path at a given host the app can be reached from (\"/api\"). It should start with a \"/\"",
-          "type": "string",
-          "x-nullable": true
-        },
-        "traefikRule": {
-          "description": "Instead of using ` + "`" + `host` + "`" + ` and/or ` + "`" + `path` + "`" + `, you can specify the exact rule Traefik will use to route to the app. See [Traefik's documentation]() for how to use this field. This field takes priority over ` + "`" + `host` + "`" + ` and ` + "`" + `path` + "`" + `",
-          "type": "string",
-          "x-nullable": true
-        }
-      },
-      "x-nullable": true
-    },
-    "AppConfigVolumesItems0": {
-      "type": "object",
-      "properties": {
-        "Source": {
-          "description": "The volume name or directory on the host that the data is stored in",
-          "type": "string"
-        },
-        "Target": {
-          "description": "The path inside the container that the data is served from",
-          "type": "string"
+          "x-nullable": false
         }
       }
     },
@@ -1379,17 +1715,24 @@ func init() {
         "image"
       ],
       "properties": {
+        "group": {
+          "description": "A simple label to track what apps are related",
+          "type": "string",
+          "x-go-custom-tag": "gorm:\"index\""
+        },
         "hidden": {
           "description": "Whether or not the app is hidden during regular requests",
           "type": "boolean"
         },
         "image": {
-          "description": "The image the app is based off of",
-          "type": "string"
+          "description": "The image and tag the application runs",
+          "type": "string",
+          "x-nullable": false
         },
         "name": {
           "description": "The apps name, used in the CLI with the ` + "`" + `-a|--app` + "`" + ` flag",
-          "type": "string"
+          "type": "string",
+          "x-nullable": false
         }
       }
     },
@@ -1455,6 +1798,75 @@ func init() {
         }
       }
     },
+    "InputRunConfig": {
+      "description": "All the properties that define how the application runs in docker",
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "networks": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "placement": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "publishedPorts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "targetPorts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "volumes": {
+          "description": "volume bindings for the app",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RunConfigVolume"
+          }
+        }
+      }
+    },
+    "InputTraefikPluginConfig": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "description": "Describes the hostname the app is served at (\"test.domain.com\")",
+          "type": "string",
+          "x-nullable": true
+        },
+        "path": {
+          "description": "The path at a given host the app can be reached from (\"/api\"). It should start with a \"/\"",
+          "type": "string",
+          "x-nullable": true
+        },
+        "traefikRule": {
+          "description": "Instead of using ` + "`" + `host` + "`" + ` and/or ` + "`" + `path` + "`" + `, you can specify the exact rule Traefik will use to route to the app. See [Traefik's documentation]() for how to use this field. This field takes priority over ` + "`" + `host` + "`" + ` and ` + "`" + `path` + "`" + `",
+          "type": "string",
+          "x-nullable": true
+        }
+      }
+    },
     "Plugin": {
       "type": "object",
       "required": [
@@ -1462,21 +1874,121 @@ func init() {
         "installed"
       ],
       "properties": {
-        "installCommand": {
-          "description": "Command to run to install the plugin",
-          "type": "string",
-          "x-nullable": true
-        },
         "installed": {
           "description": "Whether or not the plugin is installed",
-          "type": "boolean"
+          "type": "boolean",
+          "x-nullable": false
         },
         "name": {
           "description": "The plugin's name. It can be used to install a plugin",
+          "type": "string",
+          "x-go-custom-tag": "gorm:\"primaryKey\"",
+          "x-nullable": false
+        }
+      }
+    },
+    "RunConfig": {
+      "description": "All the properties that define how the application runs in docker",
+      "type": "object",
+      "required": [
+        "appId",
+        "imageDigest"
+      ],
+      "properties": {
+        "appId": {
+          "description": "The ID of the app the run config is for",
+          "type": "string",
+          "format": "uuid4",
+          "x-go-custom-tag": "gorm:\"primaryKey\"",
+          "x-nullable": false
+        },
+        "command": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "imageDigest": {
+          "description": "The currently running image digest (hash). Used internally when running applications\ninstead of the tag because the when a new image is pushed, the tag stays the same but the\ndigest changes\n",
+          "type": "string",
+          "x-nullable": false
+        },
+        "networks": {
+          "description": "A list of other apps that the service communicates with using their service name and docker's internal DNS. Services don't have to be two way; only the service that accesses the other needs the other network added",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "placement": {
+          "description": "The placement constraints specifying which nodes the app will be ran on. Any valid value for the [` + "`" + `--constraint` + "`" + ` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints) is valid item in this list",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "publishedPorts": {
+          "description": "The ports that you access the app through in the swarm. This field can, and should be left empty. Miasma automatically manages assigning published ports between 3001-4999. If you need to specify a port, make sure it's outside that range or the port has not been taken. Plugins have set ports starting with 4000, so avoid 4000-4020 if you want to add a plugin at a later date. If these ports are ever cleared, the app will continue using the same ports it was published to before, so that the ports don't change unnecessarily. If you removed it to clear a port for another app/plugin, make sure to restart the app and a new, random port will be allocated for the app, freeing the old port",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "targetPorts": {
+          "description": "The ports that the app is listening to inside the container. If no target ports are specified, then the container should respect the ` + "`" + `PORT` + "`" + ` env var.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "volumes": {
+          "description": "volume bindings for the app",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RunConfigVolume"
+          }
+        }
+      }
+    },
+    "RunConfigVolume": {
+      "type": "object",
+      "properties": {
+        "Source": {
+          "description": "The volume name or directory on the host that the data is stored in",
           "type": "string"
         },
-        "uninstallCommand": {
-          "description": "Command to run to uninstall the plugin",
+        "Target": {
+          "description": "The path inside the container that the data is served from",
+          "type": "string"
+        }
+      }
+    },
+    "TraefikPluginConfig": {
+      "type": "object",
+      "properties": {
+        "appId": {
+          "type": "string",
+          "format": "uuid4",
+          "x-go-custom-tag": "gorm:\"primaryKey\""
+        },
+        "host": {
+          "description": "Describes the hostname the app is served at (\"test.domain.com\")",
+          "type": "string",
+          "x-nullable": true
+        },
+        "path": {
+          "description": "The path at a given host the app can be reached from (\"/api\"). It should start with a \"/\"",
+          "type": "string",
+          "x-nullable": true
+        },
+        "traefikRule": {
+          "description": "Instead of using ` + "`" + `host` + "`" + ` and/or ` + "`" + `path` + "`" + `, you can specify the exact rule Traefik will use to route to the app. See [Traefik's documentation]() for how to use this field. This field takes priority over ` + "`" + `host` + "`" + ` and ` + "`" + `path` + "`" + `",
           "type": "string",
           "x-nullable": true
         }
@@ -1484,6 +1996,13 @@ func init() {
     }
   },
   "parameters": {
+    "appId": {
+      "type": "string",
+      "format": "uuid4",
+      "name": "appId",
+      "in": "path",
+      "required": true
+    },
     "appName": {
       "type": "string",
       "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",

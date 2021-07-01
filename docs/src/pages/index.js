@@ -8,11 +8,11 @@ import styles from './styles.module.css';
 
 const features = [
   {
-    title: 'Fast and Light-weight',
+    title: 'Fast and Lightweight',
     imageUrl: 'img/undraw_docusaurus_react.svg',
     description: (
       <>
-        Miasma is just a wrapper around Docker Swarm written in Go, making it lightweight and fast
+        Miasma is a wrapper around Docker Swarm written in Go, making it lightweight and fast
       </>
     ),
   },
@@ -21,16 +21,18 @@ const features = [
     imageUrl: 'img/undraw_docusaurus_mountain.svg',
     description: (
       <>
-        The CLI is very similar to Heroku with touches of docker, making it easy to create and manage apps
+        Based off the Heroku CLI, it makes creating and managing apps easy! You don't need any
+        knowledge of Docker swarm to get started
       </>
     ),
   },
   {
-    title: 'Supports ARM Devices',
+    title: 'Raspberry Pis',
     imageUrl: 'img/undraw_docusaurus_tree.svg',
     description: (
       <>
-        The only open source PaaS that supports ARM devices, like Raspberry PI, and a cluster of devices
+        The only open source PaaS that supports clusters <strong>and</strong> ARM devices, making it
+        an ideal solution for home networks
       </>
     ),
   },

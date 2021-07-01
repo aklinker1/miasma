@@ -21,8 +21,8 @@ type StartAppReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *StartAppReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-	case 200:
-		result := NewStartAppOK()
+	case 204:
+		result := NewStartAppNoContent()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -45,23 +45,23 @@ func (o *StartAppReader) ReadResponse(response runtime.ClientResponse, consumer 
 	}
 }
 
-// NewStartAppOK creates a StartAppOK with default headers values
-func NewStartAppOK() *StartAppOK {
-	return &StartAppOK{}
+// NewStartAppNoContent creates a StartAppNoContent with default headers values
+func NewStartAppNoContent() *StartAppNoContent {
+	return &StartAppNoContent{}
 }
 
-/*StartAppOK handles this case with default header values.
+/*StartAppNoContent handles this case with default header values.
 
 Started
 */
-type StartAppOK struct {
+type StartAppNoContent struct {
 }
 
-func (o *StartAppOK) Error() string {
-	return fmt.Sprintf("[POST /api/apps/{appName}/start][%d] startAppOK ", 200)
+func (o *StartAppNoContent) Error() string {
+	return fmt.Sprintf("[POST /api/apps/{appName}/start][%d] startAppNoContent ", 204)
 }
 
-func (o *StartAppOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *StartAppNoContent) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	return nil
 }

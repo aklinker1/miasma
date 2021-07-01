@@ -17,19 +17,13 @@ import (
 // swagger:model Plugin
 type Plugin struct {
 
-	// Command to run to install the plugin
-	InstallCommand *string `json:"installCommand,omitempty"`
-
 	// Whether or not the plugin is installed
 	// Required: true
-	Installed *bool `json:"installed"`
+	Installed bool `json:"installed"`
 
 	// The plugin's name. It can be used to install a plugin
 	// Required: true
-	Name *string `json:"name"`
-
-	// Command to run to uninstall the plugin
-	UninstallCommand *string `json:"uninstallCommand,omitempty"`
+	Name string `json:"name" gorm:"primaryKey"`
 }
 
 // Validate validates this plugin
@@ -52,7 +46,7 @@ func (m *Plugin) Validate(formats strfmt.Registry) error {
 
 func (m *Plugin) validateInstalled(formats strfmt.Registry) error {
 
-	if err := validate.Required("installed", "body", m.Installed); err != nil {
+	if err := validate.Required("installed", "body", bool(m.Installed)); err != nil {
 		return err
 	}
 
@@ -61,7 +55,7 @@ func (m *Plugin) validateInstalled(formats strfmt.Registry) error {
 
 func (m *Plugin) validateName(formats strfmt.Registry) error {
 
-	if err := validate.Required("name", "body", m.Name); err != nil {
+	if err := validate.RequiredString("name", "body", string(m.Name)); err != nil {
 		return err
 	}
 

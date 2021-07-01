@@ -16,7 +16,7 @@ import (
 	"github.com/aklinker1/miasma/internal/server/utils"
 )
 
-//go:generate swagger generate server --target ../../gen --name Miasma --spec ../../../api/swagger.yml --principal interface{} --exclude-main
+//go:generate swagger generate server --target ../../gen --name Miasma --spec ../../../../../../../../../tmp/swagger.yml209984126 --model-package ../../../package/models --principal interface{} --exclude-main
 
 func configureFlags(api *operations.MiasmaAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
@@ -55,14 +55,59 @@ func configureAPI(api *operations.MiasmaAPI) http.Handler {
 			return middleware.NotImplemented("operation operations.GetApp has not yet been implemented")
 		})
 	}
-	if api.GetAppsHandler == nil {
-		api.GetAppsHandler = operations.GetAppsHandlerFunc(func(params operations.GetAppsParams) middleware.Responder {
-			return middleware.NotImplemented("operation operations.GetApps has not yet been implemented")
+	if api.GetAppEnvHandler == nil {
+		api.GetAppEnvHandler = operations.GetAppEnvHandlerFunc(func(params operations.GetAppEnvParams) middleware.Responder {
+			return middleware.NotImplemented("operation operations.GetAppEnv has not yet been implemented")
 		})
 	}
-	if api.GetHealthCheckHandler == nil {
-		api.GetHealthCheckHandler = operations.GetHealthCheckHandlerFunc(func(params operations.GetHealthCheckParams) middleware.Responder {
-			return middleware.NotImplemented("operation operations.GetHealthCheck has not yet been implemented")
+	if api.GetAppTraefikConfigHandler == nil {
+		api.GetAppTraefikConfigHandler = operations.GetAppTraefikConfigHandlerFunc(func(params operations.GetAppTraefikConfigParams) middleware.Responder {
+			return middleware.NotImplemented("operation operations.GetAppTraefikConfig has not yet been implemented")
+		})
+	}
+	if api.GetPluginHandler == nil {
+		api.GetPluginHandler = operations.GetPluginHandlerFunc(func(params operations.GetPluginParams) middleware.Responder {
+			return middleware.NotImplemented("operation operations.GetPlugin has not yet been implemented")
+		})
+	}
+	if api.GetRunConfigHandler == nil {
+		api.GetRunConfigHandler = operations.GetRunConfigHandlerFunc(func(params operations.GetRunConfigParams) middleware.Responder {
+			return middleware.NotImplemented("operation operations.GetRunConfig has not yet been implemented")
+		})
+	}
+	if api.InstallPluginHandler == nil {
+		api.InstallPluginHandler = operations.InstallPluginHandlerFunc(func(params operations.InstallPluginParams) middleware.Responder {
+			return middleware.NotImplemented("operation operations.InstallPlugin has not yet been implemented")
+		})
+	}
+	if api.ListPluginsHandler == nil {
+		api.ListPluginsHandler = operations.ListPluginsHandlerFunc(func(params operations.ListPluginsParams) middleware.Responder {
+			return middleware.NotImplemented("operation operations.ListPlugins has not yet been implemented")
+		})
+	}
+	if api.StartAppHandler == nil {
+		api.StartAppHandler = operations.StartAppHandlerFunc(func(params operations.StartAppParams) middleware.Responder {
+			return middleware.NotImplemented("operation operations.StartApp has not yet been implemented")
+		})
+	}
+	if api.StopAppHandler == nil {
+		api.StopAppHandler = operations.StopAppHandlerFunc(func(params operations.StopAppParams) middleware.Responder {
+			return middleware.NotImplemented("operation operations.StopApp has not yet been implemented")
+		})
+	}
+	if api.UninstallPluginHandler == nil {
+		api.UninstallPluginHandler = operations.UninstallPluginHandlerFunc(func(params operations.UninstallPluginParams) middleware.Responder {
+			return middleware.NotImplemented("operation operations.UninstallPlugin has not yet been implemented")
+		})
+	}
+	if api.UpdateAppEnvHandler == nil {
+		api.UpdateAppEnvHandler = operations.UpdateAppEnvHandlerFunc(func(params operations.UpdateAppEnvParams) middleware.Responder {
+			return middleware.NotImplemented("operation operations.UpdateAppEnv has not yet been implemented")
+		})
+	}
+	if api.UpdateRunConfigHandler == nil {
+		api.UpdateRunConfigHandler = operations.UpdateRunConfigHandlerFunc(func(params operations.UpdateRunConfigParams) middleware.Responder {
+			return middleware.NotImplemented("operation operations.UpdateRunConfig has not yet been implemented")
 		})
 	}
 
@@ -100,6 +145,6 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 		recovr.New(),
 		customMiddleware.UI(),
 		customMiddleware.RequestLogger(),
-		customMiddleware.XResponseTime(),
+		// customMiddleware.XResponseTime(),
 	)
 }

@@ -21,8 +21,20 @@ run: build
 watch:
 	@modd
 swagger:
-	swagger generate server -t internal/server/gen -f ./api/swagger.yml --exclude-main -A miasma
-	swagger generate client -t package -f ./api/swagger.yml -A miasma
+	mkdir -p internal/server/gen package/client package/models
+	rm -rf internal/server/gen/restapi/operations package/client/operations
+	swagger generate -q server \
+		--name miasma \
+		--spec ./api/swagger.yml \
+		--target internal/server/gen \
+		--struct-tags json,gorm \
+		--model-package ../../../package/models \
+		--exclude-main
+	swagger generate -q client \
+		--name miasma \
+		--spec ./api/swagger.yml \
+		--target package \
+		--existing-models github.com/aklinker1/miasma/package/models
 publish:
 	docker login
 	docker buildx build \
@@ -65,6 +77,7 @@ r: run
 w: watch
 s: swagger
 p: publish
+sr: swagger run
 
 c: cli
 d: docs

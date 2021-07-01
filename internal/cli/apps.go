@@ -26,17 +26,13 @@ func init() {
 func listApps(includeHidden bool) {
 	fmt.Println("List apps:")
 	client := config.Client()
-	apps, err := client.Operations.GetApps(operations.NewGetAppsParams().WithHidden(&includeHidden))
+	apps, err := client.Operations.ListApps(operations.NewListAppsParams().WithHidden(&includeHidden))
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 	for _, app := range apps.Payload {
-		running := ""
-		if !*app.Running {
-			running = " (stopped)"
-		}
-		fmt.Printf(" - %s%s\n", *app.Name, running)
+		fmt.Printf(" - %s\n", app.Name)
 	}
 	fmt.Printf("(%d total)\n", len(apps.Payload))
 }
