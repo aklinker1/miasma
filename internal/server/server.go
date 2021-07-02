@@ -2,6 +2,7 @@ package server
 
 import (
 	"flag"
+	"time"
 
 	"github.com/go-openapi/loads"
 
@@ -22,6 +23,8 @@ func Start() {
 	api := operations.NewMiasmaAPI(swaggerSpec)
 	api.Logger = log.I
 	server := restapi.NewServer(api)
+	server.ReadTimeout = 3 * time.Minute
+	server.WriteTimeout = 3 * time.Minute
 	defer server.Shutdown()
 
 	// Parse flags
