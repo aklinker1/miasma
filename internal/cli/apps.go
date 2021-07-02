@@ -61,4 +61,5 @@ func listApps(includeHidden bool) {
 		prevGroup = app.Group
 	}
 	fmt.Printf(dim("\n(%d total)\n"), len(apps.Payload))
+	fmt.Println()
 }
