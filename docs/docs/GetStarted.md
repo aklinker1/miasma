@@ -20,7 +20,7 @@ My device and OS of choice a **Raspberry Pi 3b running 64bit Ubuntu Server**.
 This device will be the main node of the cluster. After your device is up and running, run the install script on that device:
 
 ```bash
-$ bash | curl https://github.com/aklinker1/miasma/releases/current/install-server.sh
+$ curl -o- https://raw.githubusercontent.com/aklinker1/miasma/main/scripts/install-server.sh | bash
 ```
 
 Once it finishes, the Miasma server should up and running on port `3000`!
@@ -33,6 +33,9 @@ If you don't trust the install script, or it did not succeed, you may have to in
 
 1. [Install Docker](https://docs.docker.com/get-docker/)
 1. [Initialize the docker swarm](https://docs.docker.com/engine/swarm/swarm-tutorial/create-swarm/)
+   ```bash
+   docker swarm init
+   ```
 1. Start the server
    ```bash
    docker run -d \
@@ -97,7 +100,7 @@ You can install the CLI on any computer you want to manage apps from. In most ca
 
 1. Use the install script
    ```bash
-   $ bash | curl https://github.com/aklinker1/miasma/releases/current/install-cli.sh
+   $ curl -o- https://raw.githubusercontent.com/aklinker1/miasma/main/scripts/install-cli.sh | bash
    ```
 1. Connect to the server, using the IP address or hostname pointing to the machine the server is installed on
    ```bash
@@ -106,4 +109,4 @@ You can install the CLI on any computer you want to manage apps from. In most ca
    192.168.1.0:3000 added to /home/user/.miasma.yaml
    ```
 
-And you're done installing the CLI! Checkout the next page to create and manage your first app.
+And you're done installing the CLI! Checkout the next page to create your first apps.
