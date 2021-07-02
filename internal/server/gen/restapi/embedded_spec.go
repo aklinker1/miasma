@@ -48,7 +48,7 @@ func init() {
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/App"
+                "$ref": "#/definitions/AppWithStatus"
               }
             }
           },
@@ -680,6 +680,46 @@ func init() {
         },
         "name": {
           "description": "The apps name, used in the CLI with the ` + "`" + `-a|--app` + "`" + ` flag",
+          "type": "string",
+          "x-nullable": false
+        }
+      }
+    },
+    "AppWithStatus": {
+      "type": "object",
+      "required": [
+        "name",
+        "ports",
+        "status"
+      ],
+      "properties": {
+        "group": {
+          "description": "A simple label to track what apps are related",
+          "type": "string"
+        },
+        "instances": {
+          "description": "The number of instances running vs what should be running",
+          "type": "string"
+        },
+        "name": {
+          "description": "The apps name, used in the CLI with the ` + "`" + `-a|--app` + "`" + ` flag",
+          "type": "string",
+          "x-nullable": false
+        },
+        "ports": {
+          "description": "The published ports for the app",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-nullable": false
+        },
+        "routing": {
+          "description": "If the app has routing, a simple string representing that route",
+          "type": "string"
+        },
+        "status": {
+          "description": "Whether or not the application is running, stopped, or starting up",
           "type": "string",
           "x-nullable": false
         }
@@ -984,7 +1024,7 @@ func init() {
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/App"
+                "$ref": "#/definitions/AppWithStatus"
               }
             }
           },
@@ -1731,6 +1771,46 @@ func init() {
         },
         "name": {
           "description": "The apps name, used in the CLI with the ` + "`" + `-a|--app` + "`" + ` flag",
+          "type": "string",
+          "x-nullable": false
+        }
+      }
+    },
+    "AppWithStatus": {
+      "type": "object",
+      "required": [
+        "name",
+        "ports",
+        "status"
+      ],
+      "properties": {
+        "group": {
+          "description": "A simple label to track what apps are related",
+          "type": "string"
+        },
+        "instances": {
+          "description": "The number of instances running vs what should be running",
+          "type": "string"
+        },
+        "name": {
+          "description": "The apps name, used in the CLI with the ` + "`" + `-a|--app` + "`" + ` flag",
+          "type": "string",
+          "x-nullable": false
+        },
+        "ports": {
+          "description": "The published ports for the app",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-nullable": false
+        },
+        "routing": {
+          "description": "If the app has routing, a simple string representing that route",
+          "type": "string"
+        },
+        "status": {
+          "description": "Whether or not the application is running, stopped, or starting up",
           "type": "string",
           "x-nullable": false
         }

@@ -36,7 +36,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/App"
+              $ref: "#/definitions/AppWithStatus"
         default:
           $ref: "#/responses/unknown"
     post:
@@ -448,6 +448,36 @@ definitions:
     required:
       - id
       - name
+  AppWithStatus:
+    type: object
+    properties:
+      name:
+        type: string
+        description: The apps name, used in the CLI with the `-a|--app` flag
+        x-nullable: false
+      group:
+        type: string
+        description: A simple label to track what apps are related
+      ports:
+        description: The published ports for the app
+        type: array
+        items:
+          type: string
+        x-nullable: false
+      routing:
+        description: If the app has routing, a simple string representing that route
+        type: string
+      status:
+        description: Whether or not the application is running, stopped, or starting up
+        type: string
+        x-nullable: false
+      instances:
+        description: The number of instances running vs what should be running
+        type: string
+    required:
+      - name
+      - ports
+      - status
   AppInput:
     type: object
     required:

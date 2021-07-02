@@ -25,7 +25,7 @@ type ListAppsOK struct {
 	/*
 	  In: Body
 	*/
-	Payload []*models.App `json:"body,omitempty"`
+	Payload []*models.AppWithStatus `json:"body,omitempty"`
 }
 
 // NewListAppsOK creates ListAppsOK with default headers values
@@ -35,13 +35,13 @@ func NewListAppsOK() *ListAppsOK {
 }
 
 // WithPayload adds the payload to the list apps o k response
-func (o *ListAppsOK) WithPayload(payload []*models.App) *ListAppsOK {
+func (o *ListAppsOK) WithPayload(payload []*models.AppWithStatus) *ListAppsOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the list apps o k response
-func (o *ListAppsOK) SetPayload(payload []*models.App) {
+func (o *ListAppsOK) SetPayload(payload []*models.AppWithStatus) {
 	o.Payload = payload
 }
 
@@ -52,7 +52,7 @@ func (o *ListAppsOK) WriteResponse(rw http.ResponseWriter, producer runtime.Prod
 	payload := o.Payload
 	if payload == nil {
 		// return empty array
-		payload = make([]*models.App, 0, 50)
+		payload = make([]*models.AppWithStatus, 0, 50)
 	}
 
 	if err := producer.Produce(rw, payload); err != nil {

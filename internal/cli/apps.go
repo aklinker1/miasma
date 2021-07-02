@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/aklinker1/miasma/internal/cli/config"
 	"github.com/aklinker1/miasma/internal/cli/flags"
@@ -46,8 +47,17 @@ func listApps(includeHidden bool) {
 			fmt.Println()
 			color.Magenta(app.Group)
 		}
-		appDetails := "" // "(:3000, 0/1)"
-		fmt.Printf(" %s %s %s\n", green("●"), bold(app.Name), dim(appDetails))
+		appDetails := strings.Join([]string{strings.Join(app.Ports, ","), app.Instances}, ", ")
+		status := green("●")
+		if app.Status == "down" {
+			status = red("●")
+		}
+		if appDetails == ", " {
+			appDetails = ""
+		} else {
+			appDetails = fmt.Sprintf("(%s)", appDetails)
+		}
+		fmt.Printf(" %s %s %s\n", status, bold(app.Name), dim(appDetails))
 		prevGroup = app.Group
 	}
 	fmt.Printf(dim("\n(%d total)\n"), len(apps.Payload))

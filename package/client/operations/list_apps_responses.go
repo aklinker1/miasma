@@ -51,14 +51,14 @@ func NewListAppsOK() *ListAppsOK {
 OK
 */
 type ListAppsOK struct {
-	Payload []*models.App
+	Payload []*models.AppWithStatus
 }
 
 func (o *ListAppsOK) Error() string {
 	return fmt.Sprintf("[GET /api/apps][%d] listAppsOK  %+v", 200, o.Payload)
 }
 
-func (o *ListAppsOK) GetPayload() []*models.App {
+func (o *ListAppsOK) GetPayload() []*models.AppWithStatus {
 	return o.Payload
 }
 
