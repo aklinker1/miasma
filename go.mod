@@ -10,6 +10,7 @@ require (
 	github.com/docker/distribution v2.7.1+incompatible
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/dre1080/recovr v1.0.3
+	github.com/fatih/color v1.12.0 // indirect
 	github.com/go-openapi/errors v0.19.9
 	github.com/go-openapi/loads v0.19.5
 	github.com/go-openapi/runtime v0.19.26
