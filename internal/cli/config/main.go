@@ -30,5 +30,6 @@ func Client() *miasmaAPI.Miasma {
 		fmt.Println("Miasma CLI is not connected to a server yet. Run 'miasma connect <ip:port>'")
 		os.Exit(1)
 	}
-	return miasmaAPI.NewClientWith(host)
+	client := miasmaAPI.NewClientWith(host)
+	return client
 }

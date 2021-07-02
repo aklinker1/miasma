@@ -11,18 +11,14 @@ Docker Hub has gone crazy with their pulling enforcement, so custom registries f
 # Create the app
 miasma apps:create docker-registry -i registry:2.7
 
-# Configure it's ports and placement onto node with logs of storage space
+# Configure it's ports, node placement, and mounted volume for data storage
 miasma apps:configure -a docker-registry \
     --add-target-ports 5000 \
-    --add-placement "node.labels.database == true"
+    --add-placement-constraint "node.labels.database == true" \
+    --add-volume /dir/path/on/physical/machine:/var/lib/registry
 
 # Give it a route
 miasma route:set --hostname docker.hostname.com
-
-# 
-miasma volume:add \
-    --target /var/lib/registry/ \
-    --source /physical/path/to/docker/docker-registry/data
 ```
 
 Because this is an insecure registry, you have to configure docker to allow it by editing the daemon config.

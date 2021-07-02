@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/aklinker1/miasma/internal/cli/config"
 	"github.com/aklinker1/miasma/internal/cli/flags"
@@ -29,7 +30,7 @@ Only the properties specified in the flags will update be updated. To remove a p
 	Run: func(cmd *cobra.Command, args []string) {
 		appName, deferable := flags.GetAppFlag(cmd)
 		defer deferable()
-		newConfig := flags.GetUpdateRunConfigFlags(cmd)
+		newConfig := flags.GetConfigureAppFlags(cmd)
 
 		configureApp(appName, newConfig)
 	},
@@ -41,7 +42,7 @@ func init() {
 	flags.UseUpdateRunConfigFlags(appsConfigureCmd)
 }
 
-func configureApp(appName string, newConfig *flags.UpdateRunConfig) {
+func configureApp(appName string, newConfig *flags.ConfigureApp) {
 	fmt.Printf("Updating %s...\n", appName)
 
 	// Get current config
@@ -73,16 +74,12 @@ func configureApp(appName string, newConfig *flags.UpdateRunConfig) {
 	for index, placement := range config.Placement {
 		existingPlacementMap[placement] = index
 	}
+	existingVolumesMap := map[string]int{}
+	for index, volume := range config.Volumes {
+		existingVolumesMap[volume.Source+":"+volume.Target] = index
+	}
 
 	// Update config
-	// if newConfig.Hidden {
-	// 	config.Hidden = true
-	// } else if newConfig.RMHidden {
-	// 	config.Hidden = false
-	// }
-	// if newConfig.Image != nil {
-	// 	config.Image = *newConfig.Image
-	// }
 	for _, targetPort := range newConfig.AddTargetPorts {
 		if _, ok := existingTargetPortMap[targetPort]; !ok {
 			config.TargetPorts = append(config.TargetPorts, targetPort)
@@ -122,6 +119,26 @@ func configureApp(appName string, newConfig *flags.UpdateRunConfig) {
 			config.Placement = append(
 				config.Placement[:index],
 				config.Placement[index+1:]...,
+			)
+		}
+	}
+	for _, volume := range newConfig.AddVolume {
+		if _, ok := existingVolumesMap[volume]; !ok {
+			split := strings.SplitN(volume, ":", 2)
+			source := split[0]
+			target := split[1]
+			config.Volumes = append(config.Volumes, &models.RunConfigVolume{
+				Target: target,
+				Source: source,
+			})
+			existingVolumesMap[volume] = len(config.Volumes) - 1
+		}
+	}
+	for _, volume := range newConfig.RMVolume {
+		if index, ok := existingVolumesMap[volume]; ok {
+			config.Volumes = append(
+				config.Volumes[:index],
+				config.Volumes[index+1:]...,
 			)
 		}
 	}
