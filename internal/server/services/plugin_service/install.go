@@ -55,5 +55,8 @@ func installTraefik(tx *gorm.DB) (*models.Plugin, *server_models.AppDetails, err
 	// TODO: Add traefik config for port 4000, pass into app_mapper.ToService
 
 	plugin, err := Get(tx, constants.PluginNameTraefik)
+	if err != nil {
+		return nil, nil, err
+	}
 	return plugin, traefik, err
 }
