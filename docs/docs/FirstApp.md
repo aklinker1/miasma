@@ -205,8 +205,6 @@ Done!
 
 ### Destroying Apps
 
-And that's all you need to know to get started!
-
 Before you start deploying your own apps, lets quickly clean up these two test apps so you're starting with a clean slate:
 
 ```bash
