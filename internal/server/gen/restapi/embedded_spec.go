@@ -318,6 +318,31 @@ func init() {
         }
       }
     },
+    "/api/apps/{appName}/reload": {
+      "post": {
+        "summary": "Reload",
+        "operationId": "reloadApp",
+        "parameters": [
+          {
+            "$ref": "#/parameters/appName"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Reloaded"
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/unknown"
+          }
+        }
+      }
+    },
     "/api/apps/{appName}/start": {
       "post": {
         "summary": "start the app",
@@ -1330,6 +1355,38 @@ func init() {
             "schema": {
               "type": "string"
             }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "Unknown Error",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/api/apps/{appName}/reload": {
+      "post": {
+        "summary": "Reload",
+        "operationId": "reloadApp",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "App name from the ` + "`" + `-a|--app` + "`" + ` flag",
+            "name": "appName",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Reloaded"
           },
           "404": {
             "description": "Not Found",

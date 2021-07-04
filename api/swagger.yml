@@ -254,6 +254,21 @@ paths:
             type: string
         default:
           $ref: "#/responses/unknown"
+  /api/apps/{appName}/reload:
+    post:
+      summary: Reload
+      operationId: reloadApp
+      parameters:
+        - $ref: "#/parameters/appName"
+      responses:
+        201:
+          description: Reloaded
+        404:
+          description: Not Found
+          schema:
+            type: string
+        default:
+          $ref: "#/responses/unknown"
   /api/plugins:
     get:
       summary: List all available plugins and if they are installed

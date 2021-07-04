@@ -27,6 +27,7 @@ func init() {
 }
 
 func getRouting(appName string) {
+	fmt.Printf("Getting Traefik config for %s...\n", appName)
 	client := config.Client()
 	app, err := client.Operations.GetApp(operations.NewGetAppParams().WithAppName(appName))
 	if err != nil {
@@ -41,12 +42,13 @@ func getRouting(appName string) {
 	}
 
 	if config.Payload.Host != nil {
-		fmt.Println("Host:", config.Payload.Host)
+		fmt.Printf("Host: %v\n", *config.Payload.Host)
 	}
 	if config.Payload.Path != nil {
-		fmt.Println("Path:", config.Payload.Path)
+		fmt.Printf("Path: %v\n", *config.Payload.Path)
 	}
 	if config.Payload.TraefikRule != nil {
-		fmt.Println("Rule:", config.Payload.TraefikRule)
+		fmt.Printf("Rule: %v\n", *config.Payload.TraefikRule)
 	}
+	fmt.Println("Done!")
 }

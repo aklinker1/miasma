@@ -51,6 +51,8 @@ type ClientService interface {
 
 	ListPlugins(params *ListPluginsParams) (*ListPluginsOK, error)
 
+	ReloadApp(params *ReloadAppParams) (*ReloadAppCreated, error)
+
 	RemoveAppTraefikConfig(params *RemoveAppTraefikConfigParams) (*RemoveAppTraefikConfigOK, error)
 
 	StartApp(params *StartAppParams) (*StartAppNoContent, error)
@@ -465,6 +467,39 @@ func (a *Client) ListPlugins(params *ListPluginsParams) (*ListPluginsOK, error) 
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*ListPluginsDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  ReloadApp reloads
+*/
+func (a *Client) ReloadApp(params *ReloadAppParams) (*ReloadAppCreated, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewReloadAppParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "reloadApp",
+		Method:             "POST",
+		PathPattern:        "/api/apps/{appName}/reload",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ReloadAppReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ReloadAppCreated)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*ReloadAppDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 

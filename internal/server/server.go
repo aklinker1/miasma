@@ -54,6 +54,7 @@ func useControllers(api *operations.MiasmaAPI) {
 	api.DeleteAppHandler = handlers.DeleteApp
 	api.StartAppHandler = handlers.StartApp
 	api.StopAppHandler = handlers.StopApp
+	api.ReloadAppHandler = handlers.ReloadApp
 	api.EditAppHandler = handlers.EditApp
 
 	// App Env

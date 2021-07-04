@@ -30,6 +30,7 @@ func init() {
 }
 
 func setRouting(appName string, routing *flags.SetTraefik) {
+	fmt.Printf("Updating Traefik config for %s...\n", appName)
 	client := config.Client()
 	app, err := client.Operations.GetApp(operations.NewGetAppParams().WithAppName(appName))
 	if err != nil {
@@ -46,4 +47,14 @@ func setRouting(appName string, routing *flags.SetTraefik) {
 				TraefikRule: routing.Rule,
 			}),
 	)
+
+	fmt.Printf("Reloading %s...\n", appName)
+	reloadParams := operations.NewReloadAppParams().WithAppName(appName)
+	_, err = config.Client().Operations.ReloadApp(reloadParams)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	fmt.Println("Done!")
 }

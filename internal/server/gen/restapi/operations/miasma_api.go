@@ -78,6 +78,9 @@ func NewMiasmaAPI(spec *loads.Document) *MiasmaAPI {
 		ListPluginsHandler: ListPluginsHandlerFunc(func(params ListPluginsParams) middleware.Responder {
 			return middleware.NotImplemented("operation ListPlugins has not yet been implemented")
 		}),
+		ReloadAppHandler: ReloadAppHandlerFunc(func(params ReloadAppParams) middleware.Responder {
+			return middleware.NotImplemented("operation ReloadApp has not yet been implemented")
+		}),
 		RemoveAppTraefikConfigHandler: RemoveAppTraefikConfigHandlerFunc(func(params RemoveAppTraefikConfigParams) middleware.Responder {
 			return middleware.NotImplemented("operation RemoveAppTraefikConfig has not yet been implemented")
 		}),
@@ -160,6 +163,8 @@ type MiasmaAPI struct {
 	ListAppsHandler ListAppsHandler
 	// ListPluginsHandler sets the operation handler for the list plugins operation
 	ListPluginsHandler ListPluginsHandler
+	// ReloadAppHandler sets the operation handler for the reload app operation
+	ReloadAppHandler ReloadAppHandler
 	// RemoveAppTraefikConfigHandler sets the operation handler for the remove app traefik config operation
 	RemoveAppTraefikConfigHandler RemoveAppTraefikConfigHandler
 	// StartAppHandler sets the operation handler for the start app operation
@@ -287,6 +292,9 @@ func (o *MiasmaAPI) Validate() error {
 	}
 	if o.ListPluginsHandler == nil {
 		unregistered = append(unregistered, "ListPluginsHandler")
+	}
+	if o.ReloadAppHandler == nil {
+		unregistered = append(unregistered, "ReloadAppHandler")
 	}
 	if o.RemoveAppTraefikConfigHandler == nil {
 		unregistered = append(unregistered, "RemoveAppTraefikConfigHandler")
@@ -448,6 +456,10 @@ func (o *MiasmaAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/api/plugins"] = NewListPlugins(o.context, o.ListPluginsHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/api/apps/{appName}/reload"] = NewReloadApp(o.context, o.ReloadAppHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
