@@ -28,13 +28,13 @@ func Start() {
 	defer server.Shutdown()
 
 	// Parse flags
-	var portFlag = flag.Int("port", 3000, "Port to run this service on")
-	flag.Parse()
+	portFlag := flag.Int("port", 3000, "Port to run this service on")
 	server.Port = *portFlag
 
 	// Use handlers
 	useControllers(api)
 	server.ConfigureAPI()
+	api.UseSwaggerUI()
 
 	// Serve API
 	if err := server.Serve(); err != nil {

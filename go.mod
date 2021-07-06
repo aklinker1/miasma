@@ -1,6 +1,6 @@
 module github.com/aklinker1/miasma
 
-go 1.14
+go 1.16
 
 require (
 	docker.io/go-docker v1.0.0

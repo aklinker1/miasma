@@ -1,0 +1,12 @@
+body {
+  background-color: black;
+}
+
+body * {
+  color: white;
+  font-family: sans-serif;
+}
+
+h1 {
+  color: rgba(255, 255, 255, 0.7);
+}

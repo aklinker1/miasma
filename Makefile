@@ -35,14 +35,8 @@ swagger:
 		--spec ./api/swagger.yml \
 		--target package \
 		--existing-models github.com/aklinker1/miasma/package/models
-publish:
-	docker login
-	docker buildx build \
-		-f docker/Dockerfile.server \
-		--push \
-		--platform linux/arm/v7,linux/arm64/v8,linux/amd64 \
-		--tag aklinker1/miasma:nightly \
-		.
+
+# UI
 
 # CLI
 
@@ -67,6 +61,29 @@ build-docs-site:
 	@echo 'Building docs site...'
 	yarn --cwd docs build
 build-docs: build-cli-docs build-server-docs build-docs-site
+
+# Publishing
+
+build-all:
+	docker build . -f docker/Dockerfile.all \
+		-t aklinker1/miasma:dev \
+		--build-arg VERSION="$(VERSION)" \
+		--build-arg BUILD="$(BUILD)" \
+		--build-arg BUILD_HASH="$(BUILD_HASH)" \
+		--build-arg BUILD_DATE="$(BUILD_DATE)"
+run-all: build-all
+	@echo ""
+	@echo "---"
+	@echo ""
+	docker run -i --env-file .env -p 3000:3000 -v "$(shell pwd)"/data:/data/miasma -v /var/run/docker.sock:/var/run/docker.sock aklinker1/miasma:dev
+publish-server:
+	docker login
+	docker buildx build \
+		-f docker/Dockerfile.all \
+		--push \
+		--platform linux/arm/v7,linux/arm64/v8,linux/amd64 \
+		--tag aklinker1/miasma:nightly \
+		.
 publish-docs: build-docs
 	yarn --cwd docs deploy
 

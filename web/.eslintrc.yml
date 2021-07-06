@@ -1,0 +1,38 @@
+root: true
+parser: vue-eslint-parser
+parserOptions:
+  parser: '@typescript-eslint/parser'
+  sourceType: module
+plugins:
+  - '@typescript-eslint'
+  - only-warn
+extends:
+  - eslint:recommended
+
+env:
+  browser: true
+  node: true
+
+rules:
+  no-unused-vars:
+    - warn
+    - argsIgnorePattern: _.*
+      varsIgnorePattern: _.*
+  generator-star-spacing: off
+
+overrides:
+  - files: ['*.js']
+  - files: ['*.ts']
+    excludedFiles: ['*.d.ts']
+    extends:
+      - plugin:@typescript-eslint/recommended
+  - files: ['*.vue', '*.tsx', '*.jsx']
+    extends:
+      - plugin:vue/vue3-strongly-recommended
+    rules:
+      no-unused-vars: off
+      vue/singleline-html-element-content-newline: off
+      vue/max-attributes-per-line: off
+      vue/html-self-closing: off
+      vue/html-closing-bracket-newline: off
+      vue/html-indent: off
