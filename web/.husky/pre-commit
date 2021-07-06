@@ -1,4 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-cd web && yarn pretty-quick --staged
+cd web && yarn pretty-quick --staged web
