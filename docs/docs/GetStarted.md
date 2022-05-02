@@ -37,7 +37,7 @@ If you don't trust the install script, or it did not succeed, you may have to in
    ```bash
    $ docker swarm init
    ```
-   
+
 1. Start the Miasma server
 
    ```bash

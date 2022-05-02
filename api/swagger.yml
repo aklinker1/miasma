@@ -1,5 +1,5 @@
 ---
-swagger: "2.0"
+swagger: '2.0'
 info:
   version: 0.0.0
   title: Miasma
@@ -19,7 +19,7 @@ paths:
           description: OK
           schema:
             type: object
-            $ref: "#/definitions/Health"
+            $ref: '#/definitions/Health'
   /api/apps:
     get:
       summary: List all the running apps
@@ -36,9 +36,9 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/AppWithStatus"
+              $ref: '#/definitions/AppWithStatus'
         default:
-          $ref: "#/responses/unknown"
+          $ref: '#/responses/unknown'
     post:
       summary: Create and start a new app
       operationId: createApp
@@ -46,29 +46,29 @@ paths:
         - in: body
           name: app
           schema:
-            $ref: "#/definitions/AppInput"
+            $ref: '#/definitions/AppInput'
       responses:
         201:
           description: Created
           schema:
-            $ref: "#/definitions/App"
+            $ref: '#/definitions/App'
         400:
           description: Bad Request
           schema:
             type: string
         default:
-          $ref: "#/responses/unknown"
+          $ref: '#/responses/unknown'
   /api/apps/{appName}:
     get:
       summary: Get an app by name
       operationId: getApp
       parameters:
-        - $ref: "#/parameters/appName"
+        - $ref: '#/parameters/appName'
       responses:
         200:
           description: OK
           schema:
-            $ref: "#/definitions/App"
+            $ref: '#/definitions/App'
         404:
           description: Not Found
           schema:
@@ -77,17 +77,17 @@ paths:
       summary: Edit the app details
       operationId: editApp
       parameters:
-        - $ref: "#/parameters/appName"
+        - $ref: '#/parameters/appName'
         - name: newApp
           in: body
           required: true
           schema:
-            $ref: "#/definitions/AppEdit"
+            $ref: '#/definitions/AppEdit'
       responses:
         200:
           description: OK
           schema:
-            $ref: "#/definitions/App"
+            $ref: '#/definitions/App'
         400:
           description: BadRequest
           schema:
@@ -97,29 +97,29 @@ paths:
           schema:
             type: string
         default:
-          $ref: "#/responses/unknown"
+          $ref: '#/responses/unknown'
     delete:
       summary: Stop and delete an app
       operationId: deleteApp
       parameters:
-        - $ref: "#/parameters/appName"
+        - $ref: '#/parameters/appName'
       responses:
         200:
           description: OK
           schema:
-            $ref: "#/definitions/App"
+            $ref: '#/definitions/App'
         404:
           description: Not Found
           schema:
             type: string
         default:
-          $ref: "#/responses/unknown"
+          $ref: '#/responses/unknown'
   /api/apps/{appName}/start:
     post:
       summary: start the app
       operationId: startApp
       parameters:
-        - $ref: "#/parameters/appName"
+        - $ref: '#/parameters/appName'
       responses:
         204:
           description: Started
@@ -128,13 +128,13 @@ paths:
           schema:
             type: string
         default:
-          $ref: "#/responses/unknown"
+          $ref: '#/responses/unknown'
   /api/apps/{appName}/stop:
     post:
       summary: stop the app
       operationId: stopApp
       parameters:
-        - $ref: "#/parameters/appName"
+        - $ref: '#/parameters/appName'
       responses:
         204:
           description: Stopped
@@ -143,38 +143,38 @@ paths:
           schema:
             type: string
         default:
-          $ref: "#/responses/unknown"
+          $ref: '#/responses/unknown'
   /api/apps/{appName}/config:
     get:
       summary: get an app's current config
       operationId: getRunConfig
       parameters:
-        - $ref: "#/parameters/appName"
+        - $ref: '#/parameters/appName'
       responses:
         200:
           description: OK
           schema:
-            $ref: "#/definitions/RunConfig"
+            $ref: '#/definitions/RunConfig'
         404:
           description: Not Found
           schema:
             type: string
         default:
-          $ref: "#/responses/unknown"
+          $ref: '#/responses/unknown'
     put:
       summary: update an app's config
       operationId: updateRunConfig
       parameters:
-        - $ref: "#/parameters/appName"
+        - $ref: '#/parameters/appName'
         - in: body
           name: newRunConfig
           schema:
-            $ref: "#/definitions/InputRunConfig"
+            $ref: '#/definitions/InputRunConfig'
       responses:
         200:
           description: OK
           schema:
-            $ref: "#/definitions/RunConfig"
+            $ref: '#/definitions/RunConfig'
         400:
           description: Bad Request
           schema:
@@ -184,13 +184,13 @@ paths:
           schema:
             type: string
         default:
-          $ref: "#/responses/unknown"
+          $ref: '#/responses/unknown'
   /api/apps/{appName}/env:
     get:
       summary: get an app's environment variables
       operationId: getAppEnv
       parameters:
-        - $ref: "#/parameters/appName"
+        - $ref: '#/parameters/appName'
       responses:
         200:
           description: OK
@@ -201,12 +201,12 @@ paths:
           schema:
             type: string
         default:
-          $ref: "#/responses/unknown"
+          $ref: '#/responses/unknown'
     put:
       summary: update an app's env
       operationId: updateAppEnv
       parameters:
-        - $ref: "#/parameters/appName"
+        - $ref: '#/parameters/appName'
         - in: body
           name: newEnv
           schema:
@@ -229,13 +229,13 @@ paths:
           schema:
             type: string
         default:
-          $ref: "#/responses/unknown"
+          $ref: '#/responses/unknown'
   /api/apps/{appName}/upgrade:
     put:
       summary: pull the app's image and restart it
       operationId: upgradeApp
       parameters:
-        - $ref: "#/parameters/appName"
+        - $ref: '#/parameters/appName'
         - in: query
           name: newImage
           required: false
@@ -253,13 +253,13 @@ paths:
           schema:
             type: string
         default:
-          $ref: "#/responses/unknown"
+          $ref: '#/responses/unknown'
   /api/apps/{appName}/reload:
     post:
       summary: Reload
       operationId: reloadApp
       parameters:
-        - $ref: "#/parameters/appName"
+        - $ref: '#/parameters/appName'
       responses:
         201:
           description: Reloaded
@@ -268,7 +268,7 @@ paths:
           schema:
             type: string
         default:
-          $ref: "#/responses/unknown"
+          $ref: '#/responses/unknown'
   /api/plugins:
     get:
       summary: List all available plugins and if they are installed
@@ -279,61 +279,61 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/Plugin"
+              $ref: '#/definitions/Plugin'
         default:
-          $ref: "#/responses/unknown"
+          $ref: '#/responses/unknown'
   /api/plugins/{pluginName}:
     get:
       summary: Get a plugin
       operationId: getPlugin
       parameters:
-        - $ref: "#/parameters/pluginName"
+        - $ref: '#/parameters/pluginName'
       responses:
         200:
           description: Created
           schema:
-            $ref: "#/definitions/Plugin"
+            $ref: '#/definitions/Plugin'
         404:
           description: Not Found
           schema:
             type: string
         default:
-          $ref: "#/responses/unknown"
+          $ref: '#/responses/unknown'
     post:
       summary: Install (and start) a plugin
       operationId: installPlugin
       parameters:
-        - $ref: "#/parameters/pluginName"
+        - $ref: '#/parameters/pluginName'
       responses:
         201:
           description: Created
           schema:
-            $ref: "#/definitions/Plugin"
+            $ref: '#/definitions/Plugin'
         default:
-          $ref: "#/responses/unknown"
+          $ref: '#/responses/unknown'
     delete:
       summary: Stop and uninstall a plugin
       operationId: uninstallPlugin
       parameters:
-        - $ref: "#/parameters/pluginName"
+        - $ref: '#/parameters/pluginName'
       responses:
         200:
           description: Created
           schema:
-            $ref: "#/definitions/Plugin"
+            $ref: '#/definitions/Plugin'
         default:
-          $ref: "#/responses/unknown"
+          $ref: '#/responses/unknown'
   /api/plugins/traefik/{appId}:
     get:
       summary: Get an app's routing config
       operationId: getAppTraefikConfig
       parameters:
-        - $ref: "#/parameters/appId"
+        - $ref: '#/parameters/appId'
       responses:
         200:
           description: Found and returned the config
           schema:
-            $ref: "#/definitions/TraefikPluginConfig"
+            $ref: '#/definitions/TraefikPluginConfig'
         400:
           description: Traefik plugin is not installed
           schema:
@@ -341,43 +341,43 @@ paths:
         404:
           description: No config for the app
         default:
-          $ref: "#/responses/unknown"
+          $ref: '#/responses/unknown'
     put:
       summary: Update an app's routing config
       operationId: updateAppTraefikConfig
       parameters:
-        - $ref: "#/parameters/appId"
+        - $ref: '#/parameters/appId'
         - name: newTraefikConfig
           in: body
           schema:
-            $ref: "#/definitions/InputTraefikPluginConfig"
+            $ref: '#/definitions/InputTraefikPluginConfig'
       responses:
         200:
           description: Created
           schema:
-            $ref: "#/definitions/TraefikPluginConfig"
+            $ref: '#/definitions/TraefikPluginConfig'
         400:
           description: Traefik plugin is not installed
           schema:
             type: string
         default:
-          $ref: "#/responses/unknown"
+          $ref: '#/responses/unknown'
     delete:
       summary: Removes an app's routing config
       operationId: removeAppTraefikConfig
       parameters:
-        - $ref: "#/parameters/appId"
+        - $ref: '#/parameters/appId'
       responses:
         200:
           description: Created
           schema:
-            $ref: "#/definitions/TraefikPluginConfig"
+            $ref: '#/definitions/TraefikPluginConfig'
         400:
           description: Traefik plugin is not installed
           schema:
             type: string
         default:
-          $ref: "#/responses/unknown"
+          $ref: '#/responses/unknown'
 
 parameters:
   appName:
@@ -415,8 +415,7 @@ definitions:
         description: The version of docker running on the host, or null if docker is not running
       swarm:
         type: object
-        description:
-          The info about the docker swarm if the host running miasma is apart of
+        description: The info about the docker swarm if the host running miasma is apart of
           one. If it is not apart of a swarm, it returns `null`
         properties:
           id:
@@ -564,8 +563,7 @@ definitions:
           digest changes
         x-nullable: false
       targetPorts:
-        description:
-          The ports that the app is listening to inside the container. If no target ports
+        description: The ports that the app is listening to inside the container. If no target ports
           are specified, then the container should respect the `PORT` env var.
         type: array
         items:
@@ -602,7 +600,7 @@ definitions:
         description: volume bindings for the app
         type: array
         items:
-          $ref: "#/definitions/RunConfigVolume"
+          $ref: '#/definitions/RunConfigVolume'
       networks:
         description:
           A list of other apps that the service communicates with using their service name and
@@ -641,7 +639,7 @@ definitions:
         description: volume bindings for the app
         type: array
         items:
-          $ref: "#/definitions/RunConfigVolume"
+          $ref: '#/definitions/RunConfigVolume'
       networks:
         type: array
         items:
@@ -678,8 +676,7 @@ definitions:
         type: string
         x-nullable: true
       path:
-        description:
-          The path at a given host the app can be reached from ("/api"). It should start
+        description: The path at a given host the app can be reached from ("/api"). It should start
           with a "/"
         type: string
         x-nullable: true
@@ -698,8 +695,7 @@ definitions:
         type: string
         x-nullable: true
       path:
-        description:
-          The path at a given host the app can be reached from ("/api"). It should start
+        description: The path at a given host the app can be reached from ("/api"). It should start
           with a "/"
         type: string
         x-nullable: true

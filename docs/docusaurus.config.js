@@ -78,7 +78,7 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} Aaron Klinker`,
     },
     colorMode: {
-      defaultMode: "dark",
+      defaultMode: 'dark',
       disableSwitch: true,
     },
   },
@@ -89,8 +89,7 @@ module.exports = {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
-          editUrl:
-            'https://github.com/aklinker1/miasma/edit/main/docs/docs/',
+          editUrl: 'https://github.com/aklinker1/miasma/edit/main/docs/docs/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
