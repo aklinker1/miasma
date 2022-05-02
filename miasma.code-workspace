@@ -1,0 +1,20 @@
+{
+  "folders": [
+    {
+      "name": "Go",
+      "path": "internal"
+    },
+    {
+      "name": "JS",
+      "path": "web"
+    },
+    {
+      "name": "Docs",
+      "path": "docs"
+    },
+    {
+      "name": "Root",
+      "path": "."
+    }
+  ]
+}
