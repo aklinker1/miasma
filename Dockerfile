@@ -2,7 +2,6 @@
 FROM alpine as base-image
 RUN mkdir -p /data/miasma
 WORKDIR /app
-EXPOSE 3000
 
 FROM node:16-alpine as frontend-builder-base
 RUN apk add --update curl
@@ -49,8 +48,7 @@ RUN go build \
 
 # Make the final image with just the docker cli, the server's go binary, and dashboard UI
 FROM base-image
-ENV \
-  DOCKER_HOST="unix:///var/run/docker.sock"
+ENV DOCKER_HOST="unix:///var/run/docker.sock"
 COPY --from=backend-builder /build/bin/server .
 COPY --from=frontend-builder /build/web/dist web/dist
-CMD ["./server" ]
+ENTRYPOINT [ "./server" ]

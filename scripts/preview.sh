@@ -5,6 +5,7 @@ source scripts/build-config.sh
 ./scripts/build.sh
 docker run \
     -i \
+    --rm \
     --env-file .env \
     -p 3000:3000 \
     -v "$(pwd)/data":/data/miasma \

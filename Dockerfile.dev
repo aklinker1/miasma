@@ -2,9 +2,6 @@
 FROM alpine as base-image
 RUN mkdir -p /data/miasma
 WORKDIR /app
-RUN mkdir web/dist
-RUN echo "<html></html>" > web/dist/index.html
-EXPOSE 3001
 
 FROM golang:1.14-alpine as backend-builder-base
 RUN apk add --update git jq build-base
@@ -34,7 +31,7 @@ RUN go build \
 
 # Make the final image with just the docker cli, the server's go binary, and dashboard UI
 FROM base-image
-ENV \
-    DOCKER_HOST="unix:///var/run/docker.sock"
+ENV DOCKER_HOST="unix:///var/run/docker.sock"
 COPY --from=backend-builder /build/bin/server .
-CMD ["./server", "--port", "3001" ]
+RUN mkdir -p web/dist && echo "<html></html>" > web/dist/index.html
+ENTRYPOINT [ "./server", "--port", "3001" ]
