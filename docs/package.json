@@ -1,10 +1,9 @@
 {
   "name": "docsaurus",
-  "version": "0.0.0",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
-    "start": "docusaurus start",
+    "start": "docusaurus start --port 8888",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "GIT_USER=aklinker1 USE_SSH=true docusaurus deploy",

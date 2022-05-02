@@ -37,6 +37,7 @@ If you don't trust the install script, or it did not succeed, you may have to in
    docker swarm init
    ```
 1. Start the server
+
    ```bash
    docker run -d \
      --restart unless-stopped \
@@ -47,7 +48,7 @@ If you don't trust the install script, or it did not succeed, you may have to in
    ```
 
    > If you're unfamiliar with Docker, here's what's happening:
-   > 
+   >
    > - `-d`: Start the server in a background daemon rather than the foreground
    > - `--restart unless-stopped`: Restart the server unless it is manually stopped, ensuring the server restarts if it crashes or the device restarts
    > - `-p 3000:3000`: Exposing port `3000` on the host, and mapping it to port `3000` in the container (the port the server is accessed at)
@@ -55,7 +56,7 @@ If you don't trust the install script, or it did not succeed, you may have to in
    > - `-v $HOME/.miasma:/data/miasma`: Bind another volume, this time the server's data directory, to the the `~/.miasma` directory of the user that ran the docker run command
    > - `aklinker1/miasma`: The name of the image to run, in this case the latest stable version of the Miasma server. See [Docker Hub](https://hub.docker.com/r/aklinker1/miasma/tags) for additional tags that could be used
 
-4. Ping the health endpoint of the server to make sure it's up and running
+1. Ping the health endpoint of the server to make sure it's up and running
 
    ```bash
    $ curl localhost:3000/api/health
@@ -70,7 +71,6 @@ If you don't trust the install script, or it did not succeed, you may have to in
       "version": "<some-version>"
    }
    ```
-
 
 ## Add More Nodes
 

@@ -2,7 +2,7 @@
 set -e
 source scripts/build-config.sh
 
-./scripts/build.sh
+./scripts/server-build.sh
 docker run \
     -i \
     --rm \
