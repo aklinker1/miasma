@@ -1,0 +1,138 @@
+"""
+The info about the docker swarm if the host running miasma is apart of one.
+"""
+type SwarmInfo {
+  id: String!
+  joinCommand: String!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type Health {
+  "Miasma server's current version"
+  version: String!
+  "The version of docker running on the host, or null if docker is not running"
+  dockerVersion: String!
+  "The main node's swarm information, or null if not apart of a swarm"
+  swarm: SwarmInfo
+}
+
+type Group {
+  "A simple label to track what apps are related"
+  name: String!
+  "The apps in the group"
+  apps: [App!]!
+}
+
+type App {
+  id: ID!
+  name: String!
+  "The group the app belongs to, or `null` if it doesn't belong to a group"
+  group: Group
+  "The image and tag the application runs"
+  image: String!
+  "Whether or not the app is returned during regular requests"
+  hidden: Boolean
+  "The published ports for the app"
+  ports: [String!]
+  "If the app has routing, a simple string representing that route"
+  routing: String
+  "Whether or not the application is running, stopped, or starting up"
+  status: String!
+  "The number of instances running vs what should be running"
+  instances: String!
+}
+
+input CreateAppInput {
+  name: String!
+  image: String!
+  groupName: String
+  hidden: Boolean
+}
+
+input EditAppInput {
+  name: String!
+  groupName: String
+  hidden: Boolean
+}
+
+type BoundVolume {
+  "The path inside the container that the data is served from"
+  target: String
+  "The volume name or directory on the host that the data is stored in"
+  source: String
+}
+
+type DockerConfig {
+  "The ID of the app the run config is for"
+  appId: ID!
+  """
+  The currently running image digest (hash). Used internally when running
+  applications instead of the tag because the when a new image is pushed, the
+  tag stays the same but the digest changes
+  """
+  imageDigest: String!
+  """
+  The ports that the app is listening to inside the container. If no target
+  ports are specified, then the container should respect the `PORT` env var.
+  """
+  targetPorts: [Int!]
+  """
+  The ports that you access the app through in the swarm. This field can, and
+  should be left empty. Miasma automatically manages assigning published ports
+  between 3001-4999. If you need to specify a port, make sure it's outside that
+  range or the port has not been taken. Plugins have set ports starting with
+  4000, so avoid 4000-4020 if you want to add a plugin at a later date.
+
+  If these ports are ever cleared, the app will continue using the same ports it
+  was published to before, so that the ports don't change unnecessarily. If you
+  removed it to clear a port for another app/plugin, make sure to restart the
+  app and a new, random port will be allocated for the app, freeing the old
+  port.
+  """
+  publishedPorts: [Int!]
+  """
+  The placement constraints specifying which nodes the app will be ran on. Any
+  valid value for the [`--constraint` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints)
+  is valid item in this list
+  """
+  placement: [String!]
+  "Volume bindings for the app"
+  volumes: [BoundVolume!]
+  """
+  A list of other apps that the service communicates with using their service
+  name and docker's internal DNS. Services don't have to be two way; only the
+  service that accesses the other needs the other network added.
+  """
+  networks: [string!]
+  command: string
+}
+
+"Excluded inputs will be considered as empty inputs, clearing each empty field"
+input DockerConfigInput {
+  targetPorts: [Int!]
+  publishedPorts: [Int!]
+  placement: [string!]
+  volumes: [BoundVolume!]
+  networks: [string!]
+  command: string
+}
+
+type Plugin {
+  name: String!
+  "Whether or not the plugin has been enabled"
+  enable: Boolean!
+}
+
+type AppRouting {
+  appId: ID!
+  host: String
+  path: String
+  traefikRule: String
+}
+
+type AppRoutingInput {
+  host: String
+  path: String
+  traefikRule: String
+}

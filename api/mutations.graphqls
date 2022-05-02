@@ -1,0 +1,35 @@
+type Mutation {
+  "Create and start a new app"
+  createApp(app: CreateAppInput!): App!
+  "Edit app metadata unrelated to how the container(s) that are run"
+  editApp(appName: String!, app: EditAppInput!): App!
+  "Stop and delete an app"
+  deleteApp(appName: String!): App!
+  "Start a stopped app"
+  startApp(appName: String!): String!
+  "Stop a running app"
+  stopApp(appName: String!): String!
+  "Stop and restart an app"
+  reloadApp(appName: String!): App!
+  "Pull the latest version of the app's image and then restart"
+  upgradeApp(appName: String!): App!
+
+  "Configure the docker runtime config of an app then reload the app"
+  setAppDockerConfig(appName: String!, newConfig: DockerConfig): DockerConfig!
+
+  """
+  Update the app's environment variables all at once. Excluded environment
+  variables are removed
+  """
+  setAppEnv(appName: String!, newEnv: Map!): Map!
+
+  "Install one of Miasma's plugins"
+  enablePlugin(pluginName: String!): Plugin!
+  "Disable one of Miasma's plugins"
+  disablePlugin(pluginName: String!): Plugin!
+
+  "Only available when the 'router' plugin is enabled"
+  setAppRouting(appName: String!, routing: AppRoutingInput): AppRouting
+  "Only available when the 'router' plugin is enabled"
+  removeAppRouting(appName: String!): AppRouting
+}

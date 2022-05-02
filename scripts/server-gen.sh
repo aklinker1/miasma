@@ -6,17 +6,18 @@ if [[ "$(which swagger)" == "" ]]; then
     exit 1
 fi
 
-mkdir -p internal/server/gen package/client package/models
-rm -rf internal/server/gen/restapi/operations package/client/operations
+mkdir -p internal/miasma-server/swagger package/client
+
 swagger generate -q server \
     --name miasma \
     --spec ./api/swagger.yml \
-    --target internal/server/gen \
+    --target ../../internal/miasma-server/swagger \
     --struct-tags json,gorm \
-    --model-package ../../../package/models \
+    --model-package github.com/aklinker1/miasma/internal \
     --exclude-main
-swagger generate -q client \
-    --name miasma \
-    --spec ./api/swagger.yml \
-    --target package \
-    --existing-models github.com/aklinker1/miasma/package/models
+
+# swagger generate -q client \
+#     --name miasma \
+#     --spec ./api/swagger.yml \
+#     --target internal/miasma-client \
+#     --existing-models github.com/aklinker1/miasma/internal

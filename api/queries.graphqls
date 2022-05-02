@@ -1,0 +1,16 @@
+type Query {
+  health: Health
+
+  listApps(page: Int, size: Int, showHidden: Boolean): [App!]!
+  getApp(appName: String!): App!
+
+  getAppDockerConfig(appName: String!): DockerConfig!
+
+  getAppEnv(appName: String!): Map!
+
+  listPlugins: [Plugin!]!
+  getPlugin(pluginName: String!): Plugin!
+
+  "Only available when the 'router' plugin is enabled"
+  getAppRouting(appName: String!): AppRouting!
+}
