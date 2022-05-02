@@ -25,7 +25,7 @@ var HealthCheck = operations.HealthCheckHandlerFunc(
 				ID:          swarm.ID,
 				CreatedAt:   swarm.CreatedAt.String(),
 				UpdatedAt:   swarm.UpdatedAt.String(),
-				JoinCommand: fmt.Sprintf("docker swarm join --token %s <miasma-ip:port>", swarm.JoinTokens.Worker),
+				JoinCommand: fmt.Sprintf("docker swarm join --token %s <main-node-ip:port>", swarm.JoinTokens.Worker),
 			},
 		})
 	},

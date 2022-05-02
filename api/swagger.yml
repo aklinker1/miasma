@@ -554,7 +554,6 @@ definitions:
         description: The ID of the app the run config is for
         type: string
         format: uuid4
-        x-go-custom-tag: 'gorm:"primaryKey"'
         x-nullable: false
         x-go-custom-tag: 'gorm:"primaryKey"'
       imageDigest:
