@@ -1,18 +1,14 @@
 package server
 
-type TXMode int
-
-const (
-	ReadOnly  TXMode = 0
-	ReadWrite TXMode = 1
+import (
+	"context"
+	"database/sql"
 )
 
-type TX interface {
-	Commit()
-	Rollback()
-}
+type Tx = *sql.Tx
 
 type DB interface {
 	Open() error
-	TX(mode TXMode) (TX, error)
+	ReadonlyTx(ctx context.Context) (Tx, error)
+	ReadWriteTx(ctx context.Context) (Tx, error)
 }

@@ -14,6 +14,10 @@ func Printfln(format string, a ...any) {
 	fmt.Printf(format+"\n", a...)
 }
 
+func Errorf(format string, a ...any) error {
+	return fmt.Errorf(format, a...)
+}
+
 type Logger struct {
 }
 

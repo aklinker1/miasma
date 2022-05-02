@@ -6,6 +6,7 @@ require (
 	github.com/99designs/gqlgen v0.17.5
 	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/chi/v5 v5.0.7
+	github.com/mattn/go-sqlite3 v1.14.12
 	github.com/vektah/gqlparser/v2 v2.4.2
 )
 

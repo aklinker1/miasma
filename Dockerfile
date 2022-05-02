@@ -35,7 +35,7 @@ ARG BUILD_DATE
 ARG BUILD_VAR_PATH
 COPY go.mod go.sum ./
 RUN go mod download
-# RUN go install github.com/mattn/go-sqlite3
+RUN go install github.com/mattn/go-sqlite3
 COPY cmd/server ./cmd/server
 COPY internal internal
 RUN go build \

@@ -35,7 +35,7 @@ func NewServer(logger server.Logger, db server.DB, resolver gqlgen.ResolverRoot)
 	portStr := os.Getenv("PORT")
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
-		logger.W("$PORT could be not converted to integer ('%s'), falling back to %d", portStr, defaultPort)
+		logger.I("$PORT could be not converted to integer ('%s'), falling back to %d", portStr, defaultPort)
 		port = defaultPort
 	}
 	return &graphqlServer{

@@ -8,6 +8,7 @@
     "server:dev:backend": "nodemon -q --signal SIGTERM -e go --exec 'bash -c' ./scripts/server-dev-backend.sh",
     "server:dev:frontend": "cd web && pnpm dev",
     "server:gen": "go generate ./...",
+    "clean": "sudo rm -rf data/apps.*",
     "cli:build": "./scripts/cli-build.sh",
     "docs:gen": "./scripts/docs-gen.sh",
     "docs:build": "pnpm docs:gen && cd docs && pnpm build",
