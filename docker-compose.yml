@@ -1,0 +1,38 @@
+services:
+  proxy:
+    image: nginx:alpine
+    volumes:
+      - './docker/nginx-proxy.conf:/etc/nginx/conf.d/default.conf'
+    ports:
+      - 80:80
+
+  backend:
+    build:
+      dockerfile: docker/Dockerfile.dev.backend
+      context: .
+    volumes:
+      - ./docker/modd.conf:/build/modd.conf
+      - ./main.go:/build/main.go
+      - ./.git:/build/.git
+      - ./cmd/server:/build/cmd/server
+      - ./internal/shared:/build/internal/shared
+      - ./internal/server:/build/internal/server
+      - ./package/models:/build/package/models
+      - ./web/dist:/build/web/dist
+    ports:
+      - 3001:3001
+    environment:
+      PORT: '3000'
+      VERSION: ${VERSION}-dev
+      BUILD: ${BUILD}
+      BUILD_HASH: ${BUILD_HASH}
+      BUILD_DATE: ${BUILD_DATE}
+
+  frontend:
+    build:
+      dockerfile: docker/Dockerfile.dev.frontend
+      context: .
+    volumes:
+      - ./web:/build/web
+    ports:
+      - 3000:3002

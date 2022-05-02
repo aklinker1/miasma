@@ -1,0 +1,15 @@
+{
+  "name": "miasma",
+  "version": "0.4.0",
+  "scripts": {
+    "dev": "./scripts/dev.sh",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "husky": "^7.0.4",
+    "prettier": "^2.6.2",
+    "pretty-quick": "^3.1.3"
+  }
+}

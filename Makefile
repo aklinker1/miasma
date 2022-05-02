@@ -7,19 +7,20 @@ BUILD_VAR_PATH := github.com/aklinker1/miasma/internal/shared/constants
 # Server
 
 build:
-	docker build . -f docker/Dockerfile.server \
+	docker build . -f docker/Dockerfile.prod \
 		-t aklinker1/miasma:dev \
 		--build-arg VERSION="$(VERSION)" \
 		--build-arg BUILD="$(BUILD)" \
 		--build-arg BUILD_HASH="$(BUILD_HASH)" \
 		--build-arg BUILD_DATE="$(BUILD_DATE)"
-run: build
-	@echo ""
-	@echo "---"
-	@echo ""
-	docker run -i --env-file .env -p 3000:3000 -v "$(shell pwd)"/data:/data/miasma -v /var/run/docker.sock:/var/run/docker.sock aklinker1/miasma:dev
-watch:
-	@modd
+prep:
+	@mkdir -p web/dist
+	@echo "<html></html>" > web/dist/index.html
+
+run: prep
+	VERSION=$(VERSION) docker-compose up --build -V
+
+
 swagger:
 	mkdir -p internal/server/gen package/client package/models
 	rm -rf internal/server/gen/restapi/operations package/client/operations
@@ -38,7 +39,7 @@ swagger:
 publish:
 	docker login
 	docker buildx build \
-		-f docker/Dockerfile.server \
+		-f docker/Dockerfile.prod \
 		--push \
 		--platform linux/arm/v7,linux/arm64/v8,linux/amd64 \
 		--tag aklinker1/miasma:nightly \

@@ -6,3 +6,4 @@ bin/
 *.md
 modd.conf
 /docs
+node_modules

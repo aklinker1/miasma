@@ -1,0 +1,9 @@
+FROM golang:1.17-alpine
+RUN apk add --update git jq build-base
+RUN mkdir /build
+WORKDIR /build
+COPY go.mod go.sum ./
+RUN go mod download
+RUN go install github.com/mattn/go-sqlite3
+RUN GO111MODULE=on go get github.com/cortesi/modd/cmd/modd
+CMD modd
