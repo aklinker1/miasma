@@ -6,34 +6,31 @@ description: Simple walk through for deploying some hello world docker images to
 
 In this walk-through, we're going to cover:
 
-- Basic CLI Usage
-- Creating apps
-- Destroying apps
-- Port customization and rules
+- Basic CLI usage to create, update, and destroy apps
+- How ports are automatically allocated and how to override that behavior
 
-For this walk through, the main node and Miasma server will be located at `192.168.1.0:3000`. The IP address will be different for you.
+For this walk through, the main node and Miasma server will be located at `192.168.1.0:3000`. The IP address will probably be different for you.
 
 :::note
-This walk through will use [`httpie`](https://httpie.io/) to make requests to the apps we create because it formats JSON output, making responses easier to read.
+This walk through will use [`httpie`](https://httpie.io/) to make requests to web apps we deploy because it formats JSON output, making responses easier to read.
 
-You can use any HTTP client to follow along (`curl`, Insomnia, Postman, etc). We'll just be doing GET requests to the apps, so the examples should be easy to understand regardless of the HTTP client used
+You can use any HTTP client to follow along (`curl`, Insomnia, Postman, etc). We'll just be doing GET requests, so the examples should be easy to understand regardless of the method used.
 :::
 
-### Connect to a Miasma Server
+### Connect to Your Miasma Server
 
-Make sure you're connected to a miasma server. To test this, you can run any command.
+Before managing any apps, you first need to tell the CLI where your server is at. When you're not connected to a server, you'll see something like this when you run a command.
 
 ```bash
 $ misama apps
 Miasma CLI is not connected to a server yet. Run 'miasma connect <ip:port>'
 ```
 
-If you're not connected, go ahead and run the `connect` command, followed by the `apps` command again.
+Run the connect command, then list the apps again via `miasma apps`:
 
 ```bash
 $ miasma connect 192.168.1.0:3000
 Connected to miasma!
-192.168.1.0:3000 added to /home/user/.miasma.yaml
 
 $ misama apps
 List apps:
@@ -44,9 +41,13 @@ Nice! We're connected, but we don't have any apps yet... Lets change that!
 
 ### Creating an App
 
-For our first app, we're going to deploy a simple web app that returns JSON info about the request it received. We'll be using [`ealen/echo-server` from Docker Hub](https://hub.docker.com/r/ealen/echo-server) for this app.
+For our first app, we're going to deploy a simple web app that just responds with information about the request it recieved. We'll be using the [`ealen/echo-server`](https://hub.docker.com/r/ealen/echo-server) image for this app.
 
-We're using it because this image respects the `PORT` environment variable. We'll talk about ports more in the next section.
+:::info
+We're using `ealen/echo-server` because this image respects the `PORT` environment variable.
+
+We'll talk about ports more in the next section, but by default, Miasma expects your application to run on the port provided by this environment variable.
+:::
 
 ```bash
 $ miasma apps:create example-web-app -i ealen/echo-server
@@ -68,7 +69,11 @@ List apps:
 If you see `0/1`, that means 0 out of the 1 instances are running. You might have to wait a few seconds before an instance is started.
 :::
 
-Make a request to port `3000` and you'll get a response from our echo server:
+:::danger
+If it still doesn't start after a few seconds, make sure the image supports at least one of your nodes' architecture. It won't start the app if no nodes can run an image.
+:::
+
+Make a request to port `3001` and you'll get a response from our echo server:
 
 ```bash
 $ http http://192.168.1.0:3001/some/path
@@ -95,7 +100,7 @@ The app is up and running with a single CLI command!
 
 ### Ports
 
-[Like Heroku](https://devcenter.heroku.com/articles/runtime-principles#web-servers), Miasma will automatically manage ports for you. But unlike Heroku, you can override the app's target and published ports.
+[Like Heroku](https://devcenter.heroku.com/articles/runtime-principles#web-servers), Miasma will automatically manage ports for you. But unlike Heroku, you can override the app's **target** and **published** ports.
 
 :::info Docker Ports
 Docker (and thus Miasma) has two types of ports:
@@ -108,11 +113,11 @@ For more info, see Docker's [official documentation](https://docs.docker.com/com
 
 In our `example-web-app`, Miasma automatically configured the app to use a published port of `3001`. Behind the scenes, it also generated a random target port, then ran the app with that target port as the `PORT` environment variable.
 
-Most of the time, you don't need to override the published port, let Miasma manage that one. On the other hand, overriding the target port is very useful, especially when hosting a website.
+Most of the time, you don't need to override the published port, let Miasma manage that one. On the other hand, overriding the target port is very useful when the image you're using doesn't respect the `PORT` environment variable.
 
 ### Hosting a Website
 
-Most websites in Docker are hosted using [Nginx](https://hub.docker.com/_/nginx/), which always runs on port `80`. It can be configured to run on a port specified by the environment, but not easily. Instead, it makes more sense to just point toward port `80`.
+A common way to host a website in Docker is with the [nginx](https://hub.docker.com/_/nginx/) image. This image does not respect the `PORT` environment variable and it is difficult to configure so that it does. Instead, it makes more sense to tell Miasma to target port `80`.
 
 Our website will use an Nginx based hello world image: [`nginxdemos/hello:plain-text`](https://hub.docker.com/r/nginxdemos/hello:plain-text/)
 
@@ -134,16 +139,16 @@ $ http 192.168.1.0:3002
 http: error: ConnectionError: HTTPConnectionPool(host='192.168.1.0', port=3002): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f6a6b2caa60>: Failed to establish a new connection: [Errno 111] Connection refused')) while doing GET request to URL: http://192.168.1.0:3002/
 ```
 
-As you can see, our request doesn't even make it to the app and fails to establish a connection.
-
-Here's whats happening:
+As you can see, fails to connect to nginx. Here's whats happening:
 
 ```text
 192.168.1.0:3002 ───┬─── docker:$PORT ─── nothing
                     ╰─── docker:80    ─── nginx
 ```
 
-Our request is taking the top flow (`192.168.1.0:3002` &rarr; `docker:$PORT` &rarr; `nothing`), when we need it to take the bottom (`192.168.1.0:3002` &rarr; `docker:80` &rarr; `nginx`), so we configure the target port to be `80`.
+Miasma deployed the image assuming it will have something running on the `PORT` environment variable. So when we made the request, it didn't make the request to port `80`, but to the port specified by the environment variable.
+
+Instead, we need to tell Miasma that we should actually be targeting port `80` inside the container, not some random number. We do that using the `--add-target-ports` flag:
 
 ```bash
 $ miasma apps:configure -a example-website --add-target-ports 80
@@ -151,7 +156,7 @@ Updating example-website...
 Done!
 ```
 
-Now, when we make the same request, we get a response!
+Now when we make the same request, we get a response!
 
 ```bash
 $ http 192.168.1.0:3002
@@ -173,7 +178,7 @@ Request ID: e4a54530d02d6069d23cd8cc396332ae
 
 ### Stopping Apps
 
-Now that we have two echo servers running, lets stop `example-website`.
+Now that we have two apps running, lets stop `example-website`.
 
 ```bash
 $ miasma apps:stop
@@ -203,9 +208,11 @@ Starting example-website...
 Done!
 ```
 
+Apps are automatically started when they get created. If an app is updated, it will automatically restart if it was running before, otherwise it will remain stopped.
+
 ### Destroying Apps
 
-Before you start deploying your own apps, lets quickly clean up these two test apps so you're starting with a clean slate:
+Before you start deploying your own apps, lets quickly clean up these two example apps so you're starting with a clean slate:
 
 ```bash
 $ miasma apps:destroy -a example-web-app
@@ -216,3 +223,7 @@ $ miasma apps:destroy -a example-website
 Destroying example-website...
 Done!
 ```
+
+---
+
+You now know the basics of managing apps. Checkout the [CLI docs](/docs/cli) for more information, or get started with plugins on the next page.
