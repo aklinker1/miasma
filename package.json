@@ -7,7 +7,7 @@
     "server:dev": "concurrently --kill-others-on-fail -n JS,GO -c green,cyan \"pnpm -q server:dev:frontend\" \"pnpm -q server:dev:backend\"",
     "server:dev:backend": "nodemon -q --signal SIGTERM -e go --exec 'bash -c' ./scripts/server-dev-backend.sh",
     "server:dev:frontend": "cd web && pnpm dev",
-    "server:gen": "./scripts/server-gen.sh",
+    "server:gen": "go generate ./...",
     "cli:build": "./scripts/cli-build.sh",
     "docs:gen": "./scripts/docs-gen.sh",
     "docs:build": "pnpm docs:gen && cd docs && pnpm build",

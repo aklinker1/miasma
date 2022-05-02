@@ -15,7 +15,7 @@ type Mutation {
   upgradeApp(appName: String!): App!
 
   "Configure the docker runtime config of an app then reload the app"
-  setAppDockerConfig(appName: String!, newConfig: DockerConfig): DockerConfig!
+  setAppDockerConfig(appName: String!, newConfig: DockerConfigInput): DockerConfig!
 
   """
   Update the app's environment variables all at once. Excluded environment

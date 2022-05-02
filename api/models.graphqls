@@ -58,9 +58,14 @@ input EditAppInput {
 
 type BoundVolume {
   "The path inside the container that the data is served from"
-  target: String
+  target: String!
   "The volume name or directory on the host that the data is stored in"
-  source: String
+  source: String!
+}
+
+input BoundVolumeInput {
+  target: String!
+  source: String!
 }
 
 type DockerConfig {
@@ -104,18 +109,18 @@ type DockerConfig {
   name and docker's internal DNS. Services don't have to be two way; only the
   service that accesses the other needs the other network added.
   """
-  networks: [string!]
-  command: string
+  networks: [String!]
+  command: String
 }
 
 "Excluded inputs will be considered as empty inputs, clearing each empty field"
 input DockerConfigInput {
   targetPorts: [Int!]
   publishedPorts: [Int!]
-  placement: [string!]
-  volumes: [BoundVolume!]
-  networks: [string!]
-  command: string
+  placement: [String!]
+  volumes: [BoundVolumeInput!]
+  networks: [String!]
+  command: String
 }
 
 type Plugin {
@@ -131,7 +136,7 @@ type AppRouting {
   traefikRule: String
 }
 
-type AppRoutingInput {
+input AppRoutingInput {
   host: String
   path: String
   traefikRule: String

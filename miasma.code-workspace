@@ -18,6 +18,18 @@
     }
   ],
   "settings": {
-    "editor.rulers": [80]
+    "editor.rulers": [80],
+    "files.exclude": {
+      "**/.git": true,
+      "**/.svn": true,
+      "**/.hg": true,
+      "**/CVS": true,
+      "**/.DS_Store": true,
+      "**/Thumbs.db": true,
+      "internal": true,
+      "web": true,
+      "docs": true
+    },
+    "cSpell.words": ["Printfln"]
   }
 }

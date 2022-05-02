@@ -1,0 +1,42 @@
+schema:
+  - api/*.graphqls
+
+# Where should the generated server code go?
+exec:
+  layout: follow-schema
+  dir: internal/server/gqlgen
+  package: gqlgen
+
+# Where should any generated models go?
+model:
+  filename: internal/models.generated.go
+  package: internal
+
+# Where should the resolver implementations go?
+resolver:
+  layout: follow-schema
+  dir: internal/server/graphql
+  package: graphql
+  filename_template: '{name}.resolvers.go'
+
+# Optional: turn on to use []Thing instead of []*Thing
+omit_slice_element_pointers: true
+
+# Optional: set to speed up generation time by not performing a final validation pass.
+skip_validation: true
+
+# Optional: set to skip running `go mod tidy` when generating server code
+skip_mod_tidy: true
+
+# This section declares type mapping between the GraphQL and go type systems
+#
+# The first line in each type will be used as defaults for resolver arguments and
+# modelgen, the others will be allowed when binding to fields. Configure them to
+# your liking
+models:
+  ID:
+    model:
+      - github.com/99designs/gqlgen/graphql.ID
+  Int:
+    model:
+      - github.com/99designs/gqlgen/graphql.Int32
