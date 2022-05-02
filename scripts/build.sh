@@ -2,8 +2,8 @@
 set -e
 source scripts/build-config.sh
 
-docker build . -f docker/Dockerfile.prod \
-    -t aklinker1/miasma:dev \
+docker build . -f Dockerfile \
+    -t aklinker1/miasma:local \
     --build-arg VERSION="$VERSION" \
     --build-arg BUILD="$BUILD" \
     --build-arg BUILD_HASH="$BUILD_HASH" \

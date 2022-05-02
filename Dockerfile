@@ -18,9 +18,12 @@ WORKDIR /build
 
 # Build the dashboard
 FROM frontend-builder-base as frontend-builder
-COPY web .
-WORKDIR /build/web
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY web/package.json web/package.json
+COPY web/pnpm-lock.yaml web/pnpm-lock.yaml
 RUN pnpm install --frozen-lockfile
+COPY web web
+WORKDIR /build/web
 RUN pnpm build
 
 
@@ -49,5 +52,5 @@ FROM base-image
 ENV \
   DOCKER_HOST="unix:///var/run/docker.sock"
 COPY --from=backend-builder /build/bin/server .
-COPY --from=frontend-builder /build/dist dashboard
-CMD ["./server", "--port", "3001" ]
+COPY --from=frontend-builder /build/web/dist web/dist
+CMD ["./server" ]
