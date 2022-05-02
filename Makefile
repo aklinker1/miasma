@@ -1,4 +1,4 @@
-VERSION := $(shell jq -r .version meta.json)
+VERSION := $(shell jq -r .version package.json)
 BUILD := $(shell TZ=UTC git --no-pager show --quiet --abbrev=40 --format='%h')
 BUILD_HASH := $(shell TZ=UTC git --no-pager show --quiet --abbrev=8 --format='%h')
 BUILD_DATE := $(shell TZ=UTC git --no-pager show --quiet --date='format-local:%Y%m%d%H%M%S' --format='%cd')

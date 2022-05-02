@@ -2,7 +2,8 @@
   "name": "web",
   "private": true,
   "scripts": {
-    "dev": "vite --host"
+    "dev": "vite build --watch",
+    "build": "vite build"
   },
   "dependencies": {
     "antd": "^4.20.2",

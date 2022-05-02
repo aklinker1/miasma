@@ -4,8 +4,8 @@ WORKDIR /build
 RUN apk --no-cache add curl
 RUN curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm@6
 ADD package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+ADD web/package.json web/package.json
+ADD web/pnpm-lock.yaml web/pnpm-lock.yaml
 RUN pnpm install --frozen-lockfile
 WORKDIR /build/web
-# CMD ./node_modules/.bin/vite --host
-CMD pwd && ls -lA && ls -lA /build/node_modules/.pnpm
-# CMD [ "pnpm", "dev" ]
+CMD pnpm dev

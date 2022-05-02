@@ -7,3 +7,4 @@ bin/
 modd.conf
 /docs
 node_modules
+web/dist

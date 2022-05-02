@@ -4,14 +4,14 @@ RUN mkdir -p /data/miasma
 WORKDIR /app
 EXPOSE 3000
 
-FROM node:14-alpine as frontend-builder-base
+FROM node:16-alpine as frontend-builder-base
+RUN apk add --update curl
 RUN mkdir /build
-RUN npm i -g pnpm
+RUN curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm@7
 WORKDIR /build
 
 FROM golang:1.14-alpine as backend-builder-base
-RUN apk update
-RUN apk add git jq build-base
+RUN apk add --update git jq build-base
 RUN mkdir /build
 WORKDIR /build
 
@@ -19,7 +19,9 @@ WORKDIR /build
 # Build the dashboard
 FROM frontend-builder-base as frontend-builder
 COPY web .
-# yarn build
+WORKDIR /build/web
+RUN pnpm install --frozen-lockfile
+RUN pnpm build
 
 
 # Build the server
@@ -28,12 +30,10 @@ ARG VERSION
 ARG BUILD
 ARG BUILD_HASH
 ARG BUILD_DATE
-ARG BUILD_VAR_PATH="github.com/aklinker1/miasma/internal/shared/constants"
+ARG BUILD_VAR_PATH
 COPY go.mod go.sum ./
 RUN go mod download
 RUN go install github.com/mattn/go-sqlite3
-COPY meta.json .
-COPY .git ./.git
 COPY cmd/server ./cmd/server
 COPY internal/shared ./internal/shared
 COPY internal/server ./internal/server
@@ -50,4 +50,4 @@ ENV \
   DOCKER_HOST="unix:///var/run/docker.sock"
 COPY --from=backend-builder /build/bin/server .
 COPY --from=frontend-builder /build/dist dashboard
-CMD ["./server"]
+CMD ["./server", "--port", "3001" ]
