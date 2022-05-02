@@ -10,4 +10,4 @@ Currently, there is only 1 plugin:
 
 - [`traefik`](/docs/plugins/traefik): ingress router
 
-This is because everything else (databases, registries, other "common" apps) can all be configured and managed as plain apps.
+This is because everything else (databases, registries, other "common" apps) can be configured and managed as plain apps.

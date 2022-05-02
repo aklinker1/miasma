@@ -3,11 +3,9 @@ id: traefik
 title: Traefik Routing
 ---
 
-Traefik (pronounced "traffic") is a modern ingress router used to define hostname and path routing. Checkout their documentation to learn more:
+## Installing
 
-<https://traefik.io>
-
-But the good new is, you don't need to know anything more to setup ingress routing for your apps! To get started, install the plugin via the CLI:
+[Traefik](https://traefik.io) (pronounced "traffic") is a modern ingress router used to define hostname and path routing. To get started, add the plugin via the CLI:
 
 ```bash
 $ miasma plugins:add traefik
@@ -15,38 +13,37 @@ Installing traefik...
 Done!
 ```
 
-You can view Traefik's dashboard at `http://<swarm-ip>:4000` in a browser.
+You can view Traefik's dashboard at `http://<main-node-ip>:4000` in a browser.
 
-## Add Your First Routes
+## Example
 
-If you're just using Miasma inside a local home network, there are no restrictions on what the hostnames are.
+Let's say you want to host 4 apps on the `home.io` domain in the following locations:
 
-For this walk-through, we're going to assume you've chosen `home.io` to be the primary hostname you want to route these 5 apps accordingly:
-
-- `web-1` &rarr; `home.io`
-- `api-1` &rarr; `api1.home.io`
-- `web-2` &rarr; `web2.home.io`
-- `api-2` &rarr; `web2.home.io/api`
+| App Name | Hosted At                 |
+| -------- | ------------------------- |
+| `web-1`  | <http://home.io>          |
+| `api-1`  | <http://api1.home.io>     |
+| `web-2`  | <http://web2.home.io>     |
+| `api-2`  | <http://web2.home.io/api> |
 
 As you can see, we're going to be able to map to the apex domain, subdomains, and even paths.
 
-### Router/DNS Setup
+### Configuring Domain Names
 
-Most Routers have the ability to set custom dns maps. The goal here is to redirect all the domains we plan on using to any of the IP addresses the docker swarm is running on.
+You'll need to setup at least one domain name to use the traefik plugin. For this example, it's just `home.io`, but you can add as many domains as you'd like.
 
-Traefik exposes port `80` externally (the default web, non-https port), and it's the port that all requests you want routed should be made to go through. Because of this, the DNS mapping is very straight forward, you can exclude any port numbering. Just use the IP of any node in your cluster
+If you're hosting Miasma in the cloud, you might already have a domain name. If not, or if you're hosting it inside your local network, you'll need to setup DNS settings to point devices toward your cluster when making requests to the domain name.
 
-:::note IP Addresses
-Because of [Docker Swarm's routing mesh](https://docs.docker.com/engine/swarm/ingress/), the domain names can be mapped to any IP address that is apart of the swarm. It doesn't have to the the IP of the node Traefik is running on
-:::
+- When hosted in the cloud, you'll need to update your DNS settings for your domain
+- When hosted in a local network, you can use any domain name you'd like, and configure the custom DNS record on a device (via the OS's DNS settings) or at the network level (by configuring your router)
+
+Just point your domain names to the IP address of the cluster, and you're good to go. The traefik plugin runs on port 80, so you don't need to specify a port.
 
 Here are the custom DNS mappings you need to setup for this example:
 
-- `api1.home.io` &rarr; `192.168.1.1`
-- `home.io` &rarr; `192.168.1.1`
-- `web2.home.io` &rarr; `192.168.1.1`
-
-How you set this up depends on your router. Generally, the router can be configured at <http://192.168.0.1> or <http://0.0.0.0>
+- `api1.home.io` &rarr; `192.168.1.0`
+- `home.io` &rarr; `192.168.1.0`
+- `web2.home.io` &rarr; `192.168.1.0`
 
 ### Setting Up the Routes
 
