@@ -3,7 +3,7 @@ FROM alpine as base-image
 RUN mkdir -p /data/miasma
 WORKDIR /app
 
-FROM golang:1.14-alpine as backend-builder-base
+FROM golang:1.18-alpine as backend-builder-base
 RUN apk add --update git jq build-base
 RUN mkdir /build
 WORKDIR /build
