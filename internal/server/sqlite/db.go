@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io/fs"
 	"sort"
-	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 
@@ -77,7 +76,6 @@ func (sqlite *sqliteDB) migrate(ctx context.Context) error {
 		return err
 	}
 	sort.Strings(names)
-	sqlite.logger.I("Names: %s", strings.Join(names, ", "))
 
 	// Loop through all SQL migrations, executing each that hasn't been ran
 	sqlite.logger.I("Running SQLite migrations...")
