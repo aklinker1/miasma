@@ -40,5 +40,11 @@ models:
     model: github.com/99designs/gqlgen/graphql.Int32
   Map:
     model: map[string]any
+  Health:
+    fields:
+      swarm:
+        resolver: true
+      dockerVersion:
+        resolver: true
   internal.AppChanges:
     model: map[string]any

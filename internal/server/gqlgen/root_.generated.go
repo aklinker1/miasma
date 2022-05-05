@@ -30,6 +30,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Health() HealthResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 }
@@ -773,7 +774,7 @@ input AppRoutingInput {
 	{Name: "api/queries.graphqls", Input: `type Query {
   health: Health
 
-  listApps(page: Int, size: Int, showHidden: Boolean): [App!]!
+  listApps(page: Int = 1, size: Int = 10, showHidden: Boolean): [App!]!
   getApp(appName: String!): App!
 
   listPlugins: [Plugin!]!

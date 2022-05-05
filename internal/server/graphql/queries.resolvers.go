@@ -8,27 +8,25 @@ import (
 	"fmt"
 
 	"github.com/aklinker1/miasma/internal"
+	"github.com/aklinker1/miasma/internal/server"
 	"github.com/aklinker1/miasma/internal/server/gqlgen"
+	"github.com/aklinker1/miasma/internal/utils"
 )
 
 func (r *queryResolver) Health(ctx context.Context) (*internal.Health, error) {
-	swarm, err := r.Runtime.SwarmInfo(ctx)
-	if err != nil {
-		return nil, err
-	}
-	dockerVersion, err := r.Runtime.Version(ctx)
-	if err != nil {
-		return nil, err
-	}
 	return &internal.Health{
-		Version:       r.Version,
-		DockerVersion: dockerVersion,
-		Swarm:         swarm,
+		Version: r.Version,
 	}, nil
 }
 
 func (r *queryResolver) ListApps(ctx context.Context, page *int32, size *int32, showHidden *bool) ([]internal.App, error) {
-	panic(fmt.Errorf("not implemented"))
+	opts := server.GetAppOptions{
+		IncludeHidden: utils.BoolOr(showHidden, false),
+		Page:          utils.Int32Or(page, 1),
+		Size:          utils.Int32Or(size, 10),
+	}
+	apps, err := r.Apps.Get(ctx, opts)
+	return safeReturn(apps, err)
 }
 
 func (r *queryResolver) GetApp(ctx context.Context, appName string) (*internal.App, error) {

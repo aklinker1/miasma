@@ -9,8 +9,8 @@ import (
 type GetAppOptions struct {
 	Name          string
 	IncludeHidden bool
-	Page          int
-	Size          int
+	Page          int32
+	Size          int32
 }
 
 type AppService interface {

@@ -1,7 +1,7 @@
 type Query {
   health: Health
 
-  listApps(page: Int, size: Int, showHidden: Boolean): [App!]!
+  listApps(page: Int = 1, size: Int = 10, showHidden: Boolean): [App!]!
   getApp(appName: String!): App!
 
   listPlugins: [Plugin!]!

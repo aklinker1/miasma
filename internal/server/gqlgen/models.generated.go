@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -16,6 +17,11 @@ import (
 )
 
 // region    ************************** generated!.gotpl **************************
+
+type HealthResolver interface {
+	DockerVersion(ctx context.Context, obj *internal.Health) (string, error)
+	Swarm(ctx context.Context, obj *internal.Health) (*internal.SwarmInfo, error)
+}
 
 // endregion ************************** generated!.gotpl **************************
 
@@ -1022,7 +1028,7 @@ func (ec *executionContext) _Health_dockerVersion(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.DockerVersion, nil
+		return ec.resolvers.Health().DockerVersion(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1043,8 +1049,8 @@ func (ec *executionContext) fieldContext_Health_dockerVersion(ctx context.Contex
 	fc = &graphql.FieldContext{
 		Object:     "Health",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
@@ -1066,7 +1072,7 @@ func (ec *executionContext) _Health_swarm(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Swarm, nil
+		return ec.resolvers.Health().Swarm(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1084,8 +1090,8 @@ func (ec *executionContext) fieldContext_Health_swarm(ctx context.Context, field
 	fc = &graphql.FieldContext{
 		Object:     "Health",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -1832,19 +1838,45 @@ func (ec *executionContext) _Health(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = ec._Health_version(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "dockerVersion":
+			field := field
 
-			out.Values[i] = ec._Health_dockerVersion(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Health_dockerVersion(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
 			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "swarm":
+			field := field
 
-			out.Values[i] = ec._Health_swarm(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Health_swarm(ctx, field, obj)
+				return res
+			}
 
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
