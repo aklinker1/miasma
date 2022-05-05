@@ -10,6 +10,14 @@ import (
 	"github.com/aklinker1/miasma/internal/server/sqlite"
 )
 
+// Compile time variables
+var (
+	VERSION    string
+	BUILD      string
+	BUILD_HASH string
+	BUILD_DATE string
+)
+
 func main() {
 	logger := &fmt.Logger{}
 
@@ -21,7 +29,7 @@ func main() {
 	}
 
 	apps := sqlite.NewAppService(db)
-	runtime, err := docker.NewRuntimeService()
+	runtime, err := docker.NewRuntimeService(logger)
 	if err != nil {
 		logger.E("Failed to initialize docker runtime: %v", server.ExternalErrorMessage(err))
 		os.Exit(1)
@@ -29,6 +37,7 @@ func main() {
 	resolver := &graphql.Resolver{
 		Apps:    apps,
 		Runtime: runtime,
+		Version: VERSION,
 	}
 
 	server := graphql.NewServer(logger, db, resolver)

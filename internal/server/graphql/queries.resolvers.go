@@ -12,7 +12,19 @@ import (
 )
 
 func (r *queryResolver) Health(ctx context.Context) (*internal.Health, error) {
-	panic(fmt.Errorf("not implemented"))
+	swarm, err := r.Runtime.SwarmInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+	dockerVersion, err := r.Runtime.Version(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &internal.Health{
+		Version:       r.Version,
+		DockerVersion: dockerVersion,
+		Swarm:         swarm,
+	}, nil
 }
 
 func (r *queryResolver) ListApps(ctx context.Context, page *int32, size *int32, showHidden *bool) ([]internal.App, error) {
