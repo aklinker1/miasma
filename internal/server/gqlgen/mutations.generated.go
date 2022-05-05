@@ -16,15 +16,13 @@ import (
 // region    ************************** generated!.gotpl **************************
 
 type MutationResolver interface {
-	CreateApp(ctx context.Context, app internal.CreateAppInput) (*internal.App, error)
-	EditApp(ctx context.Context, appName string, app internal.EditAppInput) (*internal.App, error)
+	CreateApp(ctx context.Context, app internal.AppInput) (*internal.App, error)
+	EditApp(ctx context.Context, appName string, app internal.AppChanges) (*internal.App, error)
 	DeleteApp(ctx context.Context, appName string) (*internal.App, error)
 	StartApp(ctx context.Context, appName string) (string, error)
 	StopApp(ctx context.Context, appName string) (string, error)
 	ReloadApp(ctx context.Context, appName string) (*internal.App, error)
 	UpgradeApp(ctx context.Context, appName string) (*internal.App, error)
-	SetAppDockerConfig(ctx context.Context, appName string, newConfig *internal.DockerConfigInput) (*internal.DockerConfig, error)
-	SetAppEnv(ctx context.Context, appName string, newEnv map[string]interface{}) (map[string]interface{}, error)
 	EnablePlugin(ctx context.Context, pluginName string) (*internal.Plugin, error)
 	DisablePlugin(ctx context.Context, pluginName string) (*internal.Plugin, error)
 	SetAppRouting(ctx context.Context, appName string, routing *internal.AppRoutingInput) (*internal.AppRouting, error)
@@ -38,10 +36,10 @@ type MutationResolver interface {
 func (ec *executionContext) field_Mutation_createApp_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 internal.CreateAppInput
+	var arg0 internal.AppInput
 	if tmp, ok := rawArgs["app"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("app"))
-		arg0, err = ec.unmarshalNCreateAppInput2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐCreateAppInput(ctx, tmp)
+		arg0, err = ec.unmarshalNAppInput2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -92,10 +90,10 @@ func (ec *executionContext) field_Mutation_editApp_args(ctx context.Context, raw
 		}
 	}
 	args["appName"] = arg0
-	var arg1 internal.EditAppInput
+	var arg1 internal.AppChanges
 	if tmp, ok := rawArgs["app"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("app"))
-		arg1, err = ec.unmarshalNEditAppInput2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐEditAppInput(ctx, tmp)
+		arg1, err = ec.unmarshalNAppChanges2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppChanges(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -146,54 +144,6 @@ func (ec *executionContext) field_Mutation_removeAppRouting_args(ctx context.Con
 		}
 	}
 	args["appName"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_setAppDockerConfig_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["appName"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appName"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["appName"] = arg0
-	var arg1 *internal.DockerConfigInput
-	if tmp, ok := rawArgs["newConfig"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("newConfig"))
-		arg1, err = ec.unmarshalODockerConfigInput2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐDockerConfigInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["newConfig"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_setAppEnv_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["appName"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appName"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["appName"] = arg0
-	var arg1 map[string]interface{}
-	if tmp, ok := rawArgs["newEnv"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("newEnv"))
-		arg1, err = ec.unmarshalNMap2map(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["newEnv"] = arg1
 	return args, nil
 }
 
@@ -288,7 +238,7 @@ func (ec *executionContext) _Mutation_createApp(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateApp(rctx, fc.Args["app"].(internal.CreateAppInput))
+		return ec.resolvers.Mutation().CreateApp(rctx, fc.Args["app"].(internal.AppInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -331,6 +281,20 @@ func (ec *executionContext) fieldContext_Mutation_createApp(ctx context.Context,
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":
 				return ec.fieldContext_App_instances(ctx, field)
+			case "imageDigest":
+				return ec.fieldContext_App_imageDigest(ctx, field)
+			case "targetPorts":
+				return ec.fieldContext_App_targetPorts(ctx, field)
+			case "publishedPorts":
+				return ec.fieldContext_App_publishedPorts(ctx, field)
+			case "placement":
+				return ec.fieldContext_App_placement(ctx, field)
+			case "volumes":
+				return ec.fieldContext_App_volumes(ctx, field)
+			case "networks":
+				return ec.fieldContext_App_networks(ctx, field)
+			case "command":
+				return ec.fieldContext_App_command(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type App", field.Name)
 		},
@@ -363,7 +327,7 @@ func (ec *executionContext) _Mutation_editApp(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().EditApp(rctx, fc.Args["appName"].(string), fc.Args["app"].(internal.EditAppInput))
+		return ec.resolvers.Mutation().EditApp(rctx, fc.Args["appName"].(string), fc.Args["app"].(internal.AppChanges))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -406,6 +370,20 @@ func (ec *executionContext) fieldContext_Mutation_editApp(ctx context.Context, f
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":
 				return ec.fieldContext_App_instances(ctx, field)
+			case "imageDigest":
+				return ec.fieldContext_App_imageDigest(ctx, field)
+			case "targetPorts":
+				return ec.fieldContext_App_targetPorts(ctx, field)
+			case "publishedPorts":
+				return ec.fieldContext_App_publishedPorts(ctx, field)
+			case "placement":
+				return ec.fieldContext_App_placement(ctx, field)
+			case "volumes":
+				return ec.fieldContext_App_volumes(ctx, field)
+			case "networks":
+				return ec.fieldContext_App_networks(ctx, field)
+			case "command":
+				return ec.fieldContext_App_command(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type App", field.Name)
 		},
@@ -481,6 +459,20 @@ func (ec *executionContext) fieldContext_Mutation_deleteApp(ctx context.Context,
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":
 				return ec.fieldContext_App_instances(ctx, field)
+			case "imageDigest":
+				return ec.fieldContext_App_imageDigest(ctx, field)
+			case "targetPorts":
+				return ec.fieldContext_App_targetPorts(ctx, field)
+			case "publishedPorts":
+				return ec.fieldContext_App_publishedPorts(ctx, field)
+			case "placement":
+				return ec.fieldContext_App_placement(ctx, field)
+			case "volumes":
+				return ec.fieldContext_App_volumes(ctx, field)
+			case "networks":
+				return ec.fieldContext_App_networks(ctx, field)
+			case "command":
+				return ec.fieldContext_App_command(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type App", field.Name)
 		},
@@ -666,6 +658,20 @@ func (ec *executionContext) fieldContext_Mutation_reloadApp(ctx context.Context,
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":
 				return ec.fieldContext_App_instances(ctx, field)
+			case "imageDigest":
+				return ec.fieldContext_App_imageDigest(ctx, field)
+			case "targetPorts":
+				return ec.fieldContext_App_targetPorts(ctx, field)
+			case "publishedPorts":
+				return ec.fieldContext_App_publishedPorts(ctx, field)
+			case "placement":
+				return ec.fieldContext_App_placement(ctx, field)
+			case "volumes":
+				return ec.fieldContext_App_volumes(ctx, field)
+			case "networks":
+				return ec.fieldContext_App_networks(ctx, field)
+			case "command":
+				return ec.fieldContext_App_command(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type App", field.Name)
 		},
@@ -741,6 +747,20 @@ func (ec *executionContext) fieldContext_Mutation_upgradeApp(ctx context.Context
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":
 				return ec.fieldContext_App_instances(ctx, field)
+			case "imageDigest":
+				return ec.fieldContext_App_imageDigest(ctx, field)
+			case "targetPorts":
+				return ec.fieldContext_App_targetPorts(ctx, field)
+			case "publishedPorts":
+				return ec.fieldContext_App_publishedPorts(ctx, field)
+			case "placement":
+				return ec.fieldContext_App_placement(ctx, field)
+			case "volumes":
+				return ec.fieldContext_App_volumes(ctx, field)
+			case "networks":
+				return ec.fieldContext_App_networks(ctx, field)
+			case "command":
+				return ec.fieldContext_App_command(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type App", field.Name)
 		},
@@ -753,134 +773,6 @@ func (ec *executionContext) fieldContext_Mutation_upgradeApp(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_upgradeApp_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_setAppDockerConfig(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_setAppDockerConfig(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SetAppDockerConfig(rctx, fc.Args["appName"].(string), fc.Args["newConfig"].(*internal.DockerConfigInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*internal.DockerConfig)
-	fc.Result = res
-	return ec.marshalNDockerConfig2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐDockerConfig(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_setAppDockerConfig(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "appId":
-				return ec.fieldContext_DockerConfig_appId(ctx, field)
-			case "imageDigest":
-				return ec.fieldContext_DockerConfig_imageDigest(ctx, field)
-			case "targetPorts":
-				return ec.fieldContext_DockerConfig_targetPorts(ctx, field)
-			case "publishedPorts":
-				return ec.fieldContext_DockerConfig_publishedPorts(ctx, field)
-			case "placement":
-				return ec.fieldContext_DockerConfig_placement(ctx, field)
-			case "volumes":
-				return ec.fieldContext_DockerConfig_volumes(ctx, field)
-			case "networks":
-				return ec.fieldContext_DockerConfig_networks(ctx, field)
-			case "command":
-				return ec.fieldContext_DockerConfig_command(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type DockerConfig", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_setAppDockerConfig_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_setAppEnv(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_setAppEnv(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SetAppEnv(rctx, fc.Args["appName"].(string), fc.Args["newEnv"].(map[string]interface{}))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(map[string]interface{})
-	fc.Result = res
-	return ec.marshalNMap2map(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_setAppEnv(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Map does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_setAppEnv_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -1222,24 +1114,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_upgradeApp(ctx, field)
-			})
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "setAppDockerConfig":
-
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_setAppDockerConfig(ctx, field)
-			})
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "setAppEnv":
-
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_setAppEnv(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {

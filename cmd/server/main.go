@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/aklinker1/miasma/internal/server"
+	"github.com/aklinker1/miasma/internal/server/docker"
 	"github.com/aklinker1/miasma/internal/server/fmt"
 	"github.com/aklinker1/miasma/internal/server/graphql"
 	"github.com/aklinker1/miasma/internal/server/sqlite"
@@ -19,7 +20,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	resolver := &graphql.Resolver{}
+	apps := sqlite.NewAppService(db)
+	runtime, err := docker.NewRuntimeService()
+	if err != nil {
+		logger.E("Failed to initialize docker runtime: %v", server.ExternalErrorMessage(err))
+		os.Exit(1)
+	}
+	resolver := &graphql.Resolver{
+		Apps:    apps,
+		Runtime: runtime,
+	}
 
 	server := graphql.NewServer(logger, db, resolver)
 

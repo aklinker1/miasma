@@ -7,10 +7,9 @@ import (
 )
 
 type App struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-	// The group the app belongs to, or `null` if it doesn't belong to a group
-	Group *Group `json:"group"`
+	ID    string  `json:"id"`
+	Name  string  `json:"name"`
+	Group *string `json:"group"`
 	// The image and tag the application runs
 	Image string `json:"image"`
 	// Whether or not the app is returned during regular requests
@@ -23,43 +22,6 @@ type App struct {
 	Status string `json:"status"`
 	// The number of instances running vs what should be running
 	Instances string `json:"instances"`
-}
-
-type AppRouting struct {
-	AppID       string  `json:"appId"`
-	Host        *string `json:"host"`
-	Path        *string `json:"path"`
-	TraefikRule *string `json:"traefikRule"`
-}
-
-type AppRoutingInput struct {
-	Host        *string `json:"host"`
-	Path        *string `json:"path"`
-	TraefikRule *string `json:"traefikRule"`
-}
-
-type BoundVolume struct {
-	// The path inside the container that the data is served from
-	Target string `json:"target"`
-	// The volume name or directory on the host that the data is stored in
-	Source string `json:"source"`
-}
-
-type BoundVolumeInput struct {
-	Target string `json:"target"`
-	Source string `json:"source"`
-}
-
-type CreateAppInput struct {
-	Name      string  `json:"name"`
-	Image     string  `json:"image"`
-	GroupName *string `json:"groupName"`
-	Hidden    *bool   `json:"hidden"`
-}
-
-type DockerConfig struct {
-	// The ID of the app the run config is for
-	AppID string `json:"appId"`
 	// The currently running image digest (hash). Used internally when running
 	// applications instead of the tag because the when a new image is pushed, the
 	// tag stays the same but the digest changes
@@ -92,8 +54,11 @@ type DockerConfig struct {
 	Command  *string  `json:"command"`
 }
 
-// Excluded inputs will be considered as empty inputs, clearing each empty field
-type DockerConfigInput struct {
+type AppChanges struct {
+	Name           *string            `json:"name"`
+	Image          *string            `json:"image"`
+	Group          *string            `json:"group"`
+	Hidden         *bool              `json:"hidden"`
 	TargetPorts    []int32            `json:"targetPorts"`
 	PublishedPorts []int32            `json:"publishedPorts"`
 	Placement      []string           `json:"placement"`
@@ -102,17 +67,42 @@ type DockerConfigInput struct {
 	Command        *string            `json:"command"`
 }
 
-type EditAppInput struct {
-	Name      string  `json:"name"`
-	GroupName *string `json:"groupName"`
-	Hidden    *bool   `json:"hidden"`
+type AppInput struct {
+	Name           string             `json:"name"`
+	Image          string             `json:"image"`
+	Group          *string            `json:"group"`
+	Hidden         *bool              `json:"hidden"`
+	TargetPorts    []int32            `json:"targetPorts"`
+	PublishedPorts []int32            `json:"publishedPorts"`
+	Placement      []string           `json:"placement"`
+	Volumes        []BoundVolumeInput `json:"volumes"`
+	Networks       []string           `json:"networks"`
+	Command        *string            `json:"command"`
 }
 
-type Group struct {
-	// A simple label to track what apps are related
-	Name string `json:"name"`
-	// The apps in the group
-	Apps []App `json:"apps"`
+type AppRouting struct {
+	AppID       string  `json:"appId"`
+	Host        *string `json:"host"`
+	Path        *string `json:"path"`
+	TraefikRule *string `json:"traefikRule"`
+}
+
+type AppRoutingInput struct {
+	Host        *string `json:"host"`
+	Path        *string `json:"path"`
+	TraefikRule *string `json:"traefikRule"`
+}
+
+type BoundVolume struct {
+	// The path inside the container that the data is served from
+	Target string `json:"target"`
+	// The volume name or directory on the host that the data is stored in
+	Source string `json:"source"`
+}
+
+type BoundVolumeInput struct {
+	Target string `json:"target"`
+	Source string `json:"source"`
 }
 
 type Health struct {

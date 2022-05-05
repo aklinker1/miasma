@@ -39,15 +39,22 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	App struct {
-		Group     func(childComplexity int) int
-		Hidden    func(childComplexity int) int
-		ID        func(childComplexity int) int
-		Image     func(childComplexity int) int
-		Instances func(childComplexity int) int
-		Name      func(childComplexity int) int
-		Ports     func(childComplexity int) int
-		Routing   func(childComplexity int) int
-		Status    func(childComplexity int) int
+		Command        func(childComplexity int) int
+		Group          func(childComplexity int) int
+		Hidden         func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Image          func(childComplexity int) int
+		ImageDigest    func(childComplexity int) int
+		Instances      func(childComplexity int) int
+		Name           func(childComplexity int) int
+		Networks       func(childComplexity int) int
+		Placement      func(childComplexity int) int
+		Ports          func(childComplexity int) int
+		PublishedPorts func(childComplexity int) int
+		Routing        func(childComplexity int) int
+		Status         func(childComplexity int) int
+		TargetPorts    func(childComplexity int) int
+		Volumes        func(childComplexity int) int
 	}
 
 	AppRouting struct {
@@ -62,22 +69,6 @@ type ComplexityRoot struct {
 		Target func(childComplexity int) int
 	}
 
-	DockerConfig struct {
-		AppID          func(childComplexity int) int
-		Command        func(childComplexity int) int
-		ImageDigest    func(childComplexity int) int
-		Networks       func(childComplexity int) int
-		Placement      func(childComplexity int) int
-		PublishedPorts func(childComplexity int) int
-		TargetPorts    func(childComplexity int) int
-		Volumes        func(childComplexity int) int
-	}
-
-	Group struct {
-		Apps func(childComplexity int) int
-		Name func(childComplexity int) int
-	}
-
 	Health struct {
 		DockerVersion func(childComplexity int) int
 		Swarm         func(childComplexity int) int
@@ -85,19 +76,17 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateApp          func(childComplexity int, app internal.CreateAppInput) int
-		DeleteApp          func(childComplexity int, appName string) int
-		DisablePlugin      func(childComplexity int, pluginName string) int
-		EditApp            func(childComplexity int, appName string, app internal.EditAppInput) int
-		EnablePlugin       func(childComplexity int, pluginName string) int
-		ReloadApp          func(childComplexity int, appName string) int
-		RemoveAppRouting   func(childComplexity int, appName string) int
-		SetAppDockerConfig func(childComplexity int, appName string, newConfig *internal.DockerConfigInput) int
-		SetAppEnv          func(childComplexity int, appName string, newEnv map[string]interface{}) int
-		SetAppRouting      func(childComplexity int, appName string, routing *internal.AppRoutingInput) int
-		StartApp           func(childComplexity int, appName string) int
-		StopApp            func(childComplexity int, appName string) int
-		UpgradeApp         func(childComplexity int, appName string) int
+		CreateApp        func(childComplexity int, app internal.AppInput) int
+		DeleteApp        func(childComplexity int, appName string) int
+		DisablePlugin    func(childComplexity int, pluginName string) int
+		EditApp          func(childComplexity int, appName string, app internal.AppChanges) int
+		EnablePlugin     func(childComplexity int, pluginName string) int
+		ReloadApp        func(childComplexity int, appName string) int
+		RemoveAppRouting func(childComplexity int, appName string) int
+		SetAppRouting    func(childComplexity int, appName string, routing *internal.AppRoutingInput) int
+		StartApp         func(childComplexity int, appName string) int
+		StopApp          func(childComplexity int, appName string) int
+		UpgradeApp       func(childComplexity int, appName string) int
 	}
 
 	Plugin struct {
@@ -106,14 +95,12 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetApp             func(childComplexity int, appName string) int
-		GetAppDockerConfig func(childComplexity int, appName string) int
-		GetAppEnv          func(childComplexity int, appName string) int
-		GetAppRouting      func(childComplexity int, appName string) int
-		GetPlugin          func(childComplexity int, pluginName string) int
-		Health             func(childComplexity int) int
-		ListApps           func(childComplexity int, page *int32, size *int32, showHidden *bool) int
-		ListPlugins        func(childComplexity int) int
+		GetApp        func(childComplexity int, appName string) int
+		GetAppRouting func(childComplexity int, appName string) int
+		GetPlugin     func(childComplexity int, pluginName string) int
+		Health        func(childComplexity int) int
+		ListApps      func(childComplexity int, page *int32, size *int32, showHidden *bool) int
+		ListPlugins   func(childComplexity int) int
 	}
 
 	SwarmInfo struct {
@@ -138,6 +125,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "App.command":
+		if e.complexity.App.Command == nil {
+			break
+		}
+
+		return e.complexity.App.Command(childComplexity), true
 
 	case "App.group":
 		if e.complexity.App.Group == nil {
@@ -167,6 +161,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.App.Image(childComplexity), true
 
+	case "App.imageDigest":
+		if e.complexity.App.ImageDigest == nil {
+			break
+		}
+
+		return e.complexity.App.ImageDigest(childComplexity), true
+
 	case "App.instances":
 		if e.complexity.App.Instances == nil {
 			break
@@ -181,12 +182,33 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.App.Name(childComplexity), true
 
+	case "App.networks":
+		if e.complexity.App.Networks == nil {
+			break
+		}
+
+		return e.complexity.App.Networks(childComplexity), true
+
+	case "App.placement":
+		if e.complexity.App.Placement == nil {
+			break
+		}
+
+		return e.complexity.App.Placement(childComplexity), true
+
 	case "App.ports":
 		if e.complexity.App.Ports == nil {
 			break
 		}
 
 		return e.complexity.App.Ports(childComplexity), true
+
+	case "App.publishedPorts":
+		if e.complexity.App.PublishedPorts == nil {
+			break
+		}
+
+		return e.complexity.App.PublishedPorts(childComplexity), true
 
 	case "App.routing":
 		if e.complexity.App.Routing == nil {
@@ -201,6 +223,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.App.Status(childComplexity), true
+
+	case "App.targetPorts":
+		if e.complexity.App.TargetPorts == nil {
+			break
+		}
+
+		return e.complexity.App.TargetPorts(childComplexity), true
+
+	case "App.volumes":
+		if e.complexity.App.Volumes == nil {
+			break
+		}
+
+		return e.complexity.App.Volumes(childComplexity), true
 
 	case "AppRouting.appId":
 		if e.complexity.AppRouting.AppID == nil {
@@ -244,76 +280,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.BoundVolume.Target(childComplexity), true
 
-	case "DockerConfig.appId":
-		if e.complexity.DockerConfig.AppID == nil {
-			break
-		}
-
-		return e.complexity.DockerConfig.AppID(childComplexity), true
-
-	case "DockerConfig.command":
-		if e.complexity.DockerConfig.Command == nil {
-			break
-		}
-
-		return e.complexity.DockerConfig.Command(childComplexity), true
-
-	case "DockerConfig.imageDigest":
-		if e.complexity.DockerConfig.ImageDigest == nil {
-			break
-		}
-
-		return e.complexity.DockerConfig.ImageDigest(childComplexity), true
-
-	case "DockerConfig.networks":
-		if e.complexity.DockerConfig.Networks == nil {
-			break
-		}
-
-		return e.complexity.DockerConfig.Networks(childComplexity), true
-
-	case "DockerConfig.placement":
-		if e.complexity.DockerConfig.Placement == nil {
-			break
-		}
-
-		return e.complexity.DockerConfig.Placement(childComplexity), true
-
-	case "DockerConfig.publishedPorts":
-		if e.complexity.DockerConfig.PublishedPorts == nil {
-			break
-		}
-
-		return e.complexity.DockerConfig.PublishedPorts(childComplexity), true
-
-	case "DockerConfig.targetPorts":
-		if e.complexity.DockerConfig.TargetPorts == nil {
-			break
-		}
-
-		return e.complexity.DockerConfig.TargetPorts(childComplexity), true
-
-	case "DockerConfig.volumes":
-		if e.complexity.DockerConfig.Volumes == nil {
-			break
-		}
-
-		return e.complexity.DockerConfig.Volumes(childComplexity), true
-
-	case "Group.apps":
-		if e.complexity.Group.Apps == nil {
-			break
-		}
-
-		return e.complexity.Group.Apps(childComplexity), true
-
-	case "Group.name":
-		if e.complexity.Group.Name == nil {
-			break
-		}
-
-		return e.complexity.Group.Name(childComplexity), true
-
 	case "Health.dockerVersion":
 		if e.complexity.Health.DockerVersion == nil {
 			break
@@ -345,7 +311,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateApp(childComplexity, args["app"].(internal.CreateAppInput)), true
+		return e.complexity.Mutation.CreateApp(childComplexity, args["app"].(internal.AppInput)), true
 
 	case "Mutation.deleteApp":
 		if e.complexity.Mutation.DeleteApp == nil {
@@ -381,7 +347,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.EditApp(childComplexity, args["appName"].(string), args["app"].(internal.EditAppInput)), true
+		return e.complexity.Mutation.EditApp(childComplexity, args["appName"].(string), args["app"].(internal.AppChanges)), true
 
 	case "Mutation.enablePlugin":
 		if e.complexity.Mutation.EnablePlugin == nil {
@@ -418,30 +384,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.RemoveAppRouting(childComplexity, args["appName"].(string)), true
-
-	case "Mutation.setAppDockerConfig":
-		if e.complexity.Mutation.SetAppDockerConfig == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_setAppDockerConfig_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.SetAppDockerConfig(childComplexity, args["appName"].(string), args["newConfig"].(*internal.DockerConfigInput)), true
-
-	case "Mutation.setAppEnv":
-		if e.complexity.Mutation.SetAppEnv == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_setAppEnv_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.SetAppEnv(childComplexity, args["appName"].(string), args["newEnv"].(map[string]interface{})), true
 
 	case "Mutation.setAppRouting":
 		if e.complexity.Mutation.SetAppRouting == nil {
@@ -516,30 +458,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetApp(childComplexity, args["appName"].(string)), true
-
-	case "Query.getAppDockerConfig":
-		if e.complexity.Query.GetAppDockerConfig == nil {
-			break
-		}
-
-		args, err := ec.field_Query_getAppDockerConfig_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.GetAppDockerConfig(childComplexity, args["appName"].(string)), true
-
-	case "Query.getAppEnv":
-		if e.complexity.Query.GetAppEnv == nil {
-			break
-		}
-
-		args, err := ec.field_Query_getAppEnv_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.GetAppEnv(childComplexity, args["appName"].(string)), true
 
 	case "Query.getAppRouting":
 		if e.complexity.Query.GetAppRouting == nil {
@@ -627,11 +545,10 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputAppChanges,
+		ec.unmarshalInputAppInput,
 		ec.unmarshalInputAppRoutingInput,
 		ec.unmarshalInputBoundVolumeInput,
-		ec.unmarshalInputCreateAppInput,
-		ec.unmarshalInputDockerConfigInput,
-		ec.unmarshalInputEditAppInput,
 	)
 	first := true
 
@@ -711,18 +628,17 @@ type Health {
   swarm: SwarmInfo
 }
 
-type Group {
-  "A simple label to track what apps are related"
-  name: String!
-  "The apps in the group"
-  apps: [App!]!
+type BoundVolume {
+  "The path inside the container that the data is served from"
+  target: String!
+  "The volume name or directory on the host that the data is stored in"
+  source: String!
 }
 
 type App {
   id: ID!
   name: String!
-  "The group the app belongs to, or ` + "`" + `null` + "`" + ` if it doesn't belong to a group"
-  group: Group
+  group: String
   "The image and tag the application runs"
   image: String!
   "Whether or not the app is returned during regular requests"
@@ -735,36 +651,6 @@ type App {
   status: String!
   "The number of instances running vs what should be running"
   instances: String!
-}
-
-input CreateAppInput {
-  name: String!
-  image: String!
-  groupName: String
-  hidden: Boolean
-}
-
-input EditAppInput {
-  name: String!
-  groupName: String
-  hidden: Boolean
-}
-
-type BoundVolume {
-  "The path inside the container that the data is served from"
-  target: String!
-  "The volume name or directory on the host that the data is stored in"
-  source: String!
-}
-
-input BoundVolumeInput {
-  target: String!
-  source: String!
-}
-
-type DockerConfig {
-  "The ID of the app the run config is for"
-  appId: ID!
   """
   The currently running image digest (hash). Used internally when running
   applications instead of the tag because the when a new image is pushed, the
@@ -807,8 +693,29 @@ type DockerConfig {
   command: String
 }
 
-"Excluded inputs will be considered as empty inputs, clearing each empty field"
-input DockerConfigInput {
+input BoundVolumeInput {
+  target: String!
+  source: String!
+}
+
+input AppInput {
+  name: String!
+  image: String!
+  group: String
+  hidden: Boolean
+  targetPorts: [Int!]
+  publishedPorts: [Int!]
+  placement: [String!]
+  volumes: [BoundVolumeInput!]
+  networks: [String!]
+  command: String
+}
+
+input AppChanges {
+  name: String
+  image: String
+  group: String
+  hidden: Boolean
   targetPorts: [Int!]
   publishedPorts: [Int!]
   placement: [String!]
@@ -838,9 +745,9 @@ input AppRoutingInput {
 `, BuiltIn: false},
 	{Name: "api/mutations.graphqls", Input: `type Mutation {
   "Create and start a new app"
-  createApp(app: CreateAppInput!): App!
+  createApp(app: AppInput!): App!
   "Edit app metadata unrelated to how the container(s) that are run"
-  editApp(appName: String!, app: EditAppInput!): App!
+  editApp(appName: String!, app: AppChanges!): App!
   "Stop and delete an app"
   deleteApp(appName: String!): App!
   "Start a stopped app"
@@ -851,15 +758,6 @@ input AppRoutingInput {
   reloadApp(appName: String!): App!
   "Pull the latest version of the app's image and then restart"
   upgradeApp(appName: String!): App!
-
-  "Configure the docker runtime config of an app then reload the app"
-  setAppDockerConfig(appName: String!, newConfig: DockerConfigInput): DockerConfig!
-
-  """
-  Update the app's environment variables all at once. Excluded environment
-  variables are removed
-  """
-  setAppEnv(appName: String!, newEnv: Map!): Map!
 
   "Install one of Miasma's plugins"
   enablePlugin(pluginName: String!): Plugin!
@@ -877,10 +775,6 @@ input AppRoutingInput {
 
   listApps(page: Int, size: Int, showHidden: Boolean): [App!]!
   getApp(appName: String!): App!
-
-  getAppDockerConfig(appName: String!): DockerConfig!
-
-  getAppEnv(appName: String!): Map!
 
   listPlugins: [Plugin!]!
   getPlugin(pluginName: String!): Plugin!

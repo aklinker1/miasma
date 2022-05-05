@@ -35,8 +35,10 @@ skip_mod_tidy: true
 # your liking
 models:
   ID:
-    model:
-      - github.com/99designs/gqlgen/graphql.ID
+    model: github.com/99designs/gqlgen/graphql.ID
   Int:
-    model:
-      - github.com/99designs/gqlgen/graphql.Int32
+    model: github.com/99designs/gqlgen/graphql.Int32
+  Map:
+    model: map[string]any
+  internal.AppChanges:
+    model: map[string]any

@@ -1,8 +1,8 @@
 type Mutation {
   "Create and start a new app"
-  createApp(app: CreateAppInput!): App!
+  createApp(app: AppInput!): App!
   "Edit app metadata unrelated to how the container(s) that are run"
-  editApp(appName: String!, app: EditAppInput!): App!
+  editApp(appName: String!, app: AppChanges!): App!
   "Stop and delete an app"
   deleteApp(appName: String!): App!
   "Start a stopped app"
@@ -13,15 +13,6 @@ type Mutation {
   reloadApp(appName: String!): App!
   "Pull the latest version of the app's image and then restart"
   upgradeApp(appName: String!): App!
-
-  "Configure the docker runtime config of an app then reload the app"
-  setAppDockerConfig(appName: String!, newConfig: DockerConfigInput): DockerConfig!
-
-  """
-  Update the app's environment variables all at once. Excluded environment
-  variables are removed
-  """
-  setAppEnv(appName: String!, newEnv: Map!): Map!
 
   "Install one of Miasma's plugins"
   enablePlugin(pluginName: String!): Plugin!

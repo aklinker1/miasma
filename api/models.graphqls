@@ -17,18 +17,17 @@ type Health {
   swarm: SwarmInfo
 }
 
-type Group {
-  "A simple label to track what apps are related"
-  name: String!
-  "The apps in the group"
-  apps: [App!]!
+type BoundVolume {
+  "The path inside the container that the data is served from"
+  target: String!
+  "The volume name or directory on the host that the data is stored in"
+  source: String!
 }
 
 type App {
   id: ID!
   name: String!
-  "The group the app belongs to, or `null` if it doesn't belong to a group"
-  group: Group
+  group: String
   "The image and tag the application runs"
   image: String!
   "Whether or not the app is returned during regular requests"
@@ -41,36 +40,6 @@ type App {
   status: String!
   "The number of instances running vs what should be running"
   instances: String!
-}
-
-input CreateAppInput {
-  name: String!
-  image: String!
-  groupName: String
-  hidden: Boolean
-}
-
-input EditAppInput {
-  name: String!
-  groupName: String
-  hidden: Boolean
-}
-
-type BoundVolume {
-  "The path inside the container that the data is served from"
-  target: String!
-  "The volume name or directory on the host that the data is stored in"
-  source: String!
-}
-
-input BoundVolumeInput {
-  target: String!
-  source: String!
-}
-
-type DockerConfig {
-  "The ID of the app the run config is for"
-  appId: ID!
   """
   The currently running image digest (hash). Used internally when running
   applications instead of the tag because the when a new image is pushed, the
@@ -113,8 +82,29 @@ type DockerConfig {
   command: String
 }
 
-"Excluded inputs will be considered as empty inputs, clearing each empty field"
-input DockerConfigInput {
+input BoundVolumeInput {
+  target: String!
+  source: String!
+}
+
+input AppInput {
+  name: String!
+  image: String!
+  group: String
+  hidden: Boolean
+  targetPorts: [Int!]
+  publishedPorts: [Int!]
+  placement: [String!]
+  volumes: [BoundVolumeInput!]
+  networks: [String!]
+  command: String
+}
+
+input AppChanges {
+  name: String
+  image: String
+  group: String
+  hidden: Boolean
   targetPorts: [Int!]
   publishedPorts: [Int!]
   placement: [String!]
