@@ -47,7 +47,7 @@ func ExternalErrorMessage(err error) string {
 	} else if ok && e.Err != nil {
 		return ExternalErrorMessage(e.Err)
 	}
-	return "Unknown error"
+	return "Internal error"
 }
 
 // Error returns the string representation of the error message.

@@ -32,4 +32,5 @@ FROM base-image
 ENV DOCKER_HOST="unix:///var/run/docker.sock"
 COPY --from=backend-builder /build/bin/server .
 RUN mkdir -p web/dist && echo "<html></html>" > web/dist/index.html
-ENTRYPOINT [ "./server", "--port", "3001" ]
+ENV PORT=3001
+ENTRYPOINT [ "./server" ]
