@@ -47,10 +47,10 @@ func (s *RuntimeService) SwarmInfo(ctx context.Context) (*internal.SwarmInfo, er
 	info, err := s.client.Info(ctx)
 	if err != nil {
 		return nil, &server.Error{
-			Code:            server.EINTERNAL,
-			ExternalMessage: "Failed to run 'docker info'",
-			Op:              "docker.RuntimeService.SwarmInfo()",
-			Err:             err,
+			Code:    server.EINTERNAL,
+			Message: "Failed to run 'docker info'",
+			Op:      "docker.RuntimeService.SwarmInfo()",
+			Err:     err,
 		}
 	}
 	swarm, err := s.client.SwarmInspect(ctx)
@@ -58,10 +58,10 @@ func (s *RuntimeService) SwarmInfo(ctx context.Context) (*internal.SwarmInfo, er
 		return nil, nil
 	} else if err != nil {
 		return nil, &server.Error{
-			Code:            server.EINTERNAL,
-			ExternalMessage: "Failed to run 'docker swarm inspect'",
-			Op:              "docker.RuntimeService.SwarmInfo()",
-			Err:             err,
+			Code:    server.EINTERNAL,
+			Message: "Failed to run 'docker swarm inspect'",
+			Op:      "docker.RuntimeService.SwarmInfo()",
+			Err:     err,
 		}
 	}
 	return &internal.SwarmInfo{

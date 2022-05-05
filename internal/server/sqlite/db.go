@@ -42,11 +42,10 @@ func (sqlite *sqliteDB) Open() error {
 	sqlite.logger.V("Enabling WAL mode in the SQLite database")
 	if _, err := sqlite.db.Exec(`PRAGMA journal_mode = wal;`); err != nil {
 		return &server.Error{
-			Code:            server.EINTERNAL,
-			InternalMessage: "Failed to enable wal mode for SQLite",
-			ExternalMessage: "Failed to configure SQLite database",
-			Op:              "sqliteDB.Open",
-			Err:             err,
+			Code:    server.EINTERNAL,
+			Message: "Failed to enable wal mode for SQLite",
+			Op:      "sqliteDB.Open",
+			Err:     err,
 		}
 	}
 
@@ -63,10 +62,10 @@ func (sqlite *sqliteDB) migrate(ctx context.Context) error {
 	// Create migrations table if needed
 	if _, err := sqlite.db.Exec(`CREATE TABLE IF NOT EXISTS migrations (name TEXT PRIMARY KEY);`); err != nil {
 		return &server.Error{
-			Code:            server.EINTERNAL,
-			ExternalMessage: "Failed to create migrations table",
-			Op:              "sqliteDB.migrate",
-			Err:             err,
+			Code:    server.EINTERNAL,
+			Message: "Failed to create migrations table",
+			Op:      "sqliteDB.migrate",
+			Err:     err,
 		}
 	}
 
@@ -98,10 +97,10 @@ func (sqlite *sqliteDB) migrateFile(ctx context.Context, name string) error {
 	var n int
 	if err := tx.QueryRow(`SELECT COUNT(*) FROM migrations WHERE name = ?`, name).Scan(&n); err != nil {
 		return &server.Error{
-			Code:            server.EINTERNAL,
-			ExternalMessage: fmt.Sprintf("Failed to check if migration '%s' has already been ran", name),
-			Op:              "sqliteDB.migrateFile",
-			Err:             err,
+			Code:    server.EINTERNAL,
+			Message: fmt.Sprintf("Failed to check if migration '%s' has already been ran", name),
+			Op:      "sqliteDB.migrateFile",
+			Err:     err,
 		}
 	} else if n != 0 {
 		return nil // already run migration, skip
@@ -111,27 +110,27 @@ func (sqlite *sqliteDB) migrateFile(ctx context.Context, name string) error {
 	sqlite.logger.I(" - %s", name)
 	if buf, err := fs.ReadFile(migrationFS, name); err != nil {
 		return &server.Error{
-			Code:            server.EINTERNAL,
-			ExternalMessage: fmt.Sprintf("Failed to read migration file '%s'", name),
-			Op:              "sqliteDB.migrateFile",
-			Err:             err,
+			Code:    server.EINTERNAL,
+			Message: fmt.Sprintf("Failed to read migration file '%s'", name),
+			Op:      "sqliteDB.migrateFile",
+			Err:     err,
 		}
 	} else if _, err := tx.Exec(string(buf)); err != nil {
 		return &server.Error{
-			Code:            server.EINTERNAL,
-			ExternalMessage: fmt.Sprintf("Failed to run migration '%s'", name),
-			Op:              "sqliteDB.migrateFile",
-			Err:             err,
+			Code:    server.EINTERNAL,
+			Message: fmt.Sprintf("Failed to run migration '%s'", name),
+			Op:      "sqliteDB.migrateFile",
+			Err:     err,
 		}
 	}
 
 	// Insert record into migrations to prevent re-running migration.
 	if _, err := tx.Exec(`INSERT INTO migrations (name) VALUES (?)`, name); err != nil {
 		return &server.Error{
-			Code:            server.EINTERNAL,
-			ExternalMessage: fmt.Sprintf("Failed to save migration '%s' as ran", name),
-			Op:              "sqliteDB.migrateFile",
-			Err:             err,
+			Code:    server.EINTERNAL,
+			Message: fmt.Sprintf("Failed to save migration '%s' as ran", name),
+			Op:      "sqliteDB.migrateFile",
+			Err:     err,
 		}
 	}
 

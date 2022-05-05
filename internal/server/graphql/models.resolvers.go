@@ -15,7 +15,8 @@ func (r *healthResolver) DockerVersion(ctx context.Context, obj *internal.Health
 }
 
 func (r *healthResolver) Swarm(ctx context.Context, obj *internal.Health) (*internal.SwarmInfo, error) {
-	return safeReturn(r.Runtime.SwarmInfo(ctx))
+	swarm, err := r.Runtime.SwarmInfo(ctx)
+	return safeReturn(swarm, nil, err)
 }
 
 // Health returns gqlgen.HealthResolver implementation.

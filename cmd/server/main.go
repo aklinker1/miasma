@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 
-	"github.com/aklinker1/miasma/internal/server"
 	"github.com/aklinker1/miasma/internal/server/docker"
 	"github.com/aklinker1/miasma/internal/server/fmt"
 	"github.com/aklinker1/miasma/internal/server/graphql"
@@ -24,14 +23,14 @@ func main() {
 	db := sqlite.NewDB("/data/miasma/apps.db", logger)
 	err := db.Open()
 	if err != nil {
-		logger.E("Failed to open database: %v", server.ExternalErrorMessage(err))
+		logger.E("Failed to open database: %v", err)
 		os.Exit(1)
 	}
 
 	apps := sqlite.NewAppService(db)
 	runtime, err := docker.NewRuntimeService(logger)
 	if err != nil {
-		logger.E("Failed to initialize docker runtime: %v", server.ExternalErrorMessage(err))
+		logger.E("Failed to initialize docker runtime: %v", err)
 		os.Exit(1)
 	}
 	resolver := &graphql.Resolver{

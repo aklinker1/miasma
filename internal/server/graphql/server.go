@@ -8,7 +8,6 @@ import (
 	"runtime/debug"
 	"strconv"
 
-	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
@@ -17,7 +16,6 @@ import (
 	"github.com/aklinker1/miasma/internal/server/gqlgen"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
-	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 const (
@@ -74,11 +72,6 @@ func (s *graphqlServer) createGraphqlHandler() *handler.Server {
 	srv.Use(extension.Introspection{})
 
 	// Setup error handling
-	srv.SetErrorPresenter(func(ctx context.Context, e error) *gqlerror.Error {
-		err := graphql.DefaultErrorPresenter(ctx, e)
-		err.Message = server.ExternalErrorMessage(e)
-		return err
-	})
 	srv.SetRecoverFunc(func(ctx context.Context, e interface{}) error {
 		var message string
 		var err error
@@ -91,10 +84,9 @@ func (s *graphqlServer) createGraphqlHandler() *handler.Server {
 			message = fmt.Sprintf("Unhandled error %v (%T)", e, e)
 		}
 		return &server.Error{
-			Code:            server.EINTERNAL,
-			InternalMessage: message,
-			ExternalMessage: "Internal server error",
-			Err:             err,
+			Code:    server.EINTERNAL,
+			Message: message,
+			Err:     err,
 		}
 	})
 

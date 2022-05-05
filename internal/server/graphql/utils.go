@@ -1,9 +1,8 @@
 package graphql
 
-func safeReturn[T any](value T, err error) (T, error) {
-	var nilAny any
+func safeReturn[T any](value T, fallback T, err error) (T, error) {
 	if err != nil {
-		return nilAny.(T), err
+		return fallback, err
 	} else {
 		return value, err
 	}

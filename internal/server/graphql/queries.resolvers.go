@@ -26,7 +26,7 @@ func (r *queryResolver) ListApps(ctx context.Context, page *int32, size *int32, 
 		Size:          utils.Int32Or(size, 10),
 	}
 	apps, err := r.Apps.Get(ctx, opts)
-	return safeReturn(apps, err)
+	return safeReturn(apps, nil, err)
 }
 
 func (r *queryResolver) GetApp(ctx context.Context, appName string) (*internal.App, error) {
