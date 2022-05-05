@@ -23,23 +23,23 @@ func NewRuntimeService(logger server.Logger) (server.RuntimeService, error) {
 }
 
 // PullLatest implements server.RuntimeService
-func (*RuntimeService) PullLatest(ctx context.Context, image string) error {
-	panic("unimplemented")
+func (*RuntimeService) PullLatest(ctx context.Context, image string) (string, error) {
+	return "", server.NewNotImplementedError("docker.RuntimeService.PullLatest")
 }
 
 // Restart implements server.RuntimeService
 func (*RuntimeService) Restart(ctx context.Context, app internal.App) error {
-	panic("unimplemented")
+	return server.NewNotImplementedError("docker.RuntimeService.Restart")
 }
 
 // Start implements server.RuntimeService
 func (*RuntimeService) Start(ctx context.Context, app internal.App) error {
-	panic("unimplemented")
+	return server.NewNotImplementedError("docker.RuntimeService.Start")
 }
 
 // Stop implements server.RuntimeService
 func (*RuntimeService) Stop(ctx context.Context, app internal.App) error {
-	panic("unimplemented")
+	return server.NewNotImplementedError("docker.RuntimeService.Stop")
 }
 
 // SwarmInfo implements server.RuntimeService

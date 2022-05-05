@@ -25,7 +25,7 @@ type RuntimeService interface {
 	Start(ctx context.Context, app internal.App) error
 	Restart(ctx context.Context, app internal.App) error
 	Stop(ctx context.Context, app internal.App) error
-	PullLatest(ctx context.Context, image string) error
+	PullLatest(ctx context.Context, image string) (string, error)
 	Version(ctx context.Context) (string, error)
 	SwarmInfo(ctx context.Context) (*internal.SwarmInfo, error)
 }
