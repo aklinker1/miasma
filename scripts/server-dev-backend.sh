@@ -13,7 +13,6 @@ docker build -q . -f Dockerfile.dev \
 docker run \
     -i \
     --rm \
-    --env-file .env \
     -p 3001:3001 \
     -v "$(pwd)/data":/data/miasma \
     -v /var/run/docker.sock:/var/run/docker.sock \
