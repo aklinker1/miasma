@@ -2,17 +2,17 @@ type Mutation {
   "Create and start a new app"
   createApp(app: AppInput!): App!
   "Edit app metadata unrelated to how the container(s) that are run"
-  editApp(appName: String!, app: AppChanges!): App!
+  editApp(id: ID!, changes: AppChanges!): App!
   "Stop and delete an app"
-  deleteApp(appName: String!): App!
+  deleteApp(id: ID!): App!
   "Start a stopped app"
-  startApp(appName: String!): String!
+  startApp(id: ID!): String!
   "Stop a running app"
-  stopApp(appName: String!): String!
+  stopApp(id: ID!): String!
   "Stop and restart an app"
-  reloadApp(appName: String!): App!
+  reloadApp(id: ID!): App!
   "Pull the latest version of the app's image and then restart"
-  upgradeApp(appName: String!): App!
+  upgradeApp(id: ID!): App!
 
   "Install one of Miasma's plugins"
   enablePlugin(pluginName: String!): Plugin!
@@ -20,7 +20,7 @@ type Mutation {
   disablePlugin(pluginName: String!): Plugin!
 
   "Only available when the 'router' plugin is enabled"
-  setAppRouting(appName: String!, routing: AppRoutingInput): AppRouting
+  setAppRouting(appId: ID!, routing: AppRoutingInput): AppRouting
   "Only available when the 'router' plugin is enabled"
-  removeAppRouting(appName: String!): AppRouting
+  removeAppRouting(appId: ID!): AppRouting
 }

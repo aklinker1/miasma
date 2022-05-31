@@ -79,6 +79,88 @@ func (ec *executionContext) fieldContext_App_id(ctx context.Context, field graph
 	return fc, nil
 }
 
+func (ec *executionContext) _App_createdAt(ctx context.Context, field graphql.CollectedField, obj *internal.App) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_App_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_App_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "App",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _App_updatedAt(ctx context.Context, field graphql.CollectedField, obj *internal.App) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_App_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_App_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "App",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _App_name(ctx context.Context, field graphql.CollectedField, obj *internal.App) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_App_name(ctx, field)
 	if err != nil {
@@ -208,6 +290,50 @@ func (ec *executionContext) fieldContext_App_image(ctx context.Context, field gr
 	return fc, nil
 }
 
+func (ec *executionContext) _App_imageDigest(ctx context.Context, field graphql.CollectedField, obj *internal.App) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_App_imageDigest(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ImageDigest, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_App_imageDigest(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "App",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _App_hidden(ctx context.Context, field graphql.CollectedField, obj *internal.App) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_App_hidden(ctx, field)
 	if err != nil {
@@ -249,47 +375,6 @@ func (ec *executionContext) fieldContext_App_hidden(ctx context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _App_ports(ctx context.Context, field graphql.CollectedField, obj *internal.App) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_App_ports(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Ports, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]string)
-	fc.Result = res
-	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_App_ports(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "App",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _App_routing(ctx context.Context, field graphql.CollectedField, obj *internal.App) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_App_routing(ctx, field)
 	if err != nil {
@@ -313,12 +398,61 @@ func (ec *executionContext) _App_routing(ctx context.Context, field graphql.Coll
 	if resTmp == nil {
 		return graphql.Null
 	}
+	res := resTmp.(*internal.AppRouting)
+	fc.Result = res
+	return ec.marshalOAppRouting2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppRouting(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_App_routing(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "App",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "host":
+				return ec.fieldContext_AppRouting_host(ctx, field)
+			case "path":
+				return ec.fieldContext_AppRouting_path(ctx, field)
+			case "traefikRule":
+				return ec.fieldContext_AppRouting_traefikRule(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AppRouting", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _App_simpleRoute(ctx context.Context, field graphql.CollectedField, obj *internal.App) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_App_simpleRoute(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SimpleRoute, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_App_routing(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_App_simpleRoute(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "App",
 		Field:      field,
@@ -407,50 +541,6 @@ func (ec *executionContext) _App_instances(ctx context.Context, field graphql.Co
 }
 
 func (ec *executionContext) fieldContext_App_instances(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "App",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _App_imageDigest(ctx context.Context, field graphql.CollectedField, obj *internal.App) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_App_imageDigest(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ImageDigest, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_App_imageDigest(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "App",
 		Field:      field,
@@ -710,50 +800,6 @@ func (ec *executionContext) fieldContext_App_command(ctx context.Context, field 
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _AppRouting_appId(ctx context.Context, field graphql.CollectedField, obj *internal.AppRouting) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_AppRouting_appId(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AppID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_AppRouting_appId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "AppRouting",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1377,101 +1423,6 @@ func (ec *executionContext) fieldContext_SwarmInfo_updatedAt(ctx context.Context
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputAppChanges(ctx context.Context, obj interface{}) (internal.AppChanges, error) {
-	var it internal.AppChanges
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	for k, v := range asMap {
-		switch k {
-		case "name":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "image":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
-			it.Image, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "group":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("group"))
-			it.Group, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "hidden":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hidden"))
-			it.Hidden, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "targetPorts":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("targetPorts"))
-			it.TargetPorts, err = ec.unmarshalOInt2ᚕint32ᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "publishedPorts":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("publishedPorts"))
-			it.PublishedPorts, err = ec.unmarshalOInt2ᚕint32ᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "placement":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("placement"))
-			it.Placement, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "volumes":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("volumes"))
-			it.Volumes, err = ec.unmarshalOBoundVolumeInput2ᚕgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐBoundVolumeInputᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "networks":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("networks"))
-			it.Networks, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "command":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("command"))
-			it.Command, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputAppInput(ctx context.Context, obj interface{}) (internal.AppInput, error) {
 	var it internal.AppInput
 	asMap := map[string]interface{}{}
@@ -1550,6 +1501,14 @@ func (ec *executionContext) unmarshalInputAppInput(ctx context.Context, obj inte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("networks"))
 			it.Networks, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "routing":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("routing"))
+			it.Routing, err = ec.unmarshalOAppRoutingInput2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppRoutingInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -1662,6 +1621,14 @@ func (ec *executionContext) _App(ctx context.Context, sel ast.SelectionSet, obj 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createdAt":
+
+			out.Values[i] = ec._App_createdAt(ctx, field, obj)
+
+		case "updatedAt":
+
+			out.Values[i] = ec._App_updatedAt(ctx, field, obj)
+
 		case "name":
 
 			out.Values[i] = ec._App_name(ctx, field, obj)
@@ -1680,17 +1647,24 @@ func (ec *executionContext) _App(ctx context.Context, sel ast.SelectionSet, obj 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "imageDigest":
+
+			out.Values[i] = ec._App_imageDigest(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "hidden":
 
 			out.Values[i] = ec._App_hidden(ctx, field, obj)
 
-		case "ports":
-
-			out.Values[i] = ec._App_ports(ctx, field, obj)
-
 		case "routing":
 
 			out.Values[i] = ec._App_routing(ctx, field, obj)
+
+		case "simpleRoute":
+
+			out.Values[i] = ec._App_simpleRoute(ctx, field, obj)
 
 		case "status":
 
@@ -1702,13 +1676,6 @@ func (ec *executionContext) _App(ctx context.Context, sel ast.SelectionSet, obj 
 		case "instances":
 
 			out.Values[i] = ec._App_instances(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "imageDigest":
-
-			out.Values[i] = ec._App_imageDigest(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -1758,13 +1725,6 @@ func (ec *executionContext) _AppRouting(ctx context.Context, sel ast.SelectionSe
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AppRouting")
-		case "appId":
-
-			out.Values[i] = ec._AppRouting_appId(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "host":
 
 			out.Values[i] = ec._AppRouting_host(ctx, field, obj)
@@ -2034,9 +1994,8 @@ func (ec *executionContext) marshalNApp2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋi
 	return ec._App(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNAppChanges2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppChanges(ctx context.Context, v interface{}) (internal.AppChanges, error) {
-	res, err := ec.unmarshalInputAppChanges(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
+func (ec *executionContext) unmarshalNAppChanges2map(ctx context.Context, v interface{}) (map[string]interface{}, error) {
+	return v.(map[string]interface{}), nil
 }
 
 func (ec *executionContext) unmarshalNAppInput2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppInput(ctx context.Context, v interface{}) (internal.AppInput, error) {

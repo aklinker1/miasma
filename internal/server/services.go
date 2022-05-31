@@ -6,17 +6,11 @@ import (
 	"github.com/aklinker1/miasma/internal"
 )
 
-type GetAppOptions struct {
-	Name          string
-	IncludeHidden bool
-	Page          int32
-	Size          int32
-}
-
 type AppService interface {
 	Create(ctx context.Context, app internal.AppInput) (internal.App, error)
-	Get(ctx context.Context, options GetAppOptions) ([]internal.App, error)
-	Update(ctx context.Context, app internal.App) error
+	Get(ctx context.Context, filter internal.AppsFilter) ([]internal.App, error)
+	GetOne(ctx context.Context, filter internal.AppsFilter) (internal.App, error)
+	Update(ctx context.Context, app internal.App) (internal.App, error)
 	Delete(ctx context.Context, appName string) (internal.App, error)
 }
 

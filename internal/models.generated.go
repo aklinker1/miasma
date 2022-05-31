@@ -7,25 +7,27 @@ import (
 )
 
 type App struct {
-	ID    string  `json:"id"`
-	Name  string  `json:"name"`
-	Group *string `json:"group"`
+	ID        string     `json:"id"`
+	CreatedAt *time.Time `json:"createdAt"`
+	UpdatedAt *time.Time `json:"updatedAt"`
+	Name      string     `json:"name"`
+	Group     *string    `json:"group"`
 	// The image and tag the application runs
 	Image string `json:"image"`
-	// Whether or not the app is returned during regular requests
-	Hidden *bool `json:"hidden"`
-	// The published ports for the app
-	Ports []string `json:"ports"`
-	// If the app has routing, a simple string representing that route
-	Routing *string `json:"routing"`
-	// Whether or not the application is running, stopped, or starting up
-	Status string `json:"status"`
-	// The number of instances running vs what should be running
-	Instances string `json:"instances"`
 	// The currently running image digest (hash). Used internally when running
 	// applications instead of the tag because the when a new image is pushed, the
 	// tag stays the same but the digest changes
 	ImageDigest string `json:"imageDigest"`
+	// Whether or not the app is returned during regular requests
+	Hidden *bool `json:"hidden"`
+	// If the app has routing, this is the routing config
+	Routing *AppRouting `json:"routing"`
+	// If the app has routing, a simple string representing that route
+	SimpleRoute *string `json:"simpleRoute"`
+	// Whether or not the application is running, stopped, or starting up
+	Status string `json:"status"`
+	// The number of instances running vs what should be running
+	Instances string `json:"instances"`
 	// The ports that the app is listening to inside the container. If no target
 	// ports are specified, then the container should respect the `PORT` env var.
 	TargetPorts []int32 `json:"targetPorts"`
@@ -54,19 +56,6 @@ type App struct {
 	Command  *string  `json:"command"`
 }
 
-type AppChanges struct {
-	Name           *string            `json:"name"`
-	Image          *string            `json:"image"`
-	Group          *string            `json:"group"`
-	Hidden         *bool              `json:"hidden"`
-	TargetPorts    []int32            `json:"targetPorts"`
-	PublishedPorts []int32            `json:"publishedPorts"`
-	Placement      []string           `json:"placement"`
-	Volumes        []BoundVolumeInput `json:"volumes"`
-	Networks       []string           `json:"networks"`
-	Command        *string            `json:"command"`
-}
-
 type AppInput struct {
 	Name           string             `json:"name"`
 	Image          string             `json:"image"`
@@ -77,11 +66,11 @@ type AppInput struct {
 	Placement      []string           `json:"placement"`
 	Volumes        []BoundVolumeInput `json:"volumes"`
 	Networks       []string           `json:"networks"`
+	Routing        *AppRoutingInput   `json:"routing"`
 	Command        *string            `json:"command"`
 }
 
 type AppRouting struct {
-	AppID       string  `json:"appId"`
 	Host        *string `json:"host"`
 	Path        *string `json:"path"`
 	TraefikRule *string `json:"traefikRule"`

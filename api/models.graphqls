@@ -26,26 +26,28 @@ type BoundVolume {
 
 type App {
   id: ID!
+  createdAt: Time
+  updatedAt: Time
   name: String!
   group: String
   "The image and tag the application runs"
   image: String!
-  "Whether or not the app is returned during regular requests"
-  hidden: Boolean
-  "The published ports for the app"
-  ports: [String!]
-  "If the app has routing, a simple string representing that route"
-  routing: String
-  "Whether or not the application is running, stopped, or starting up"
-  status: String!
-  "The number of instances running vs what should be running"
-  instances: String!
   """
   The currently running image digest (hash). Used internally when running
   applications instead of the tag because the when a new image is pushed, the
   tag stays the same but the digest changes
   """
   imageDigest: String!
+  "Whether or not the app is returned during regular requests"
+  hidden: Boolean
+  "If the app has routing, this is the routing config"
+  routing: AppRouting
+  "If the app has routing, a simple string representing that route"
+  simpleRoute: String
+  "Whether or not the application is running, stopped, or starting up"
+  status: String!
+  "The number of instances running vs what should be running"
+  instances: String!
   """
   The ports that the app is listening to inside the container. If no target
   ports are specified, then the container should respect the `PORT` env var.
@@ -97,6 +99,7 @@ input AppInput {
   placement: [String!]
   volumes: [BoundVolumeInput!]
   networks: [String!]
+  routing: AppRoutingInput
   command: String
 }
 
@@ -120,7 +123,6 @@ type Plugin {
 }
 
 type AppRouting {
-  appId: ID!
   host: String
   path: String
   traefikRule: String

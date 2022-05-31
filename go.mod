@@ -7,7 +7,9 @@ require (
 	github.com/docker/docker v20.10.14+incompatible
 	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/chi/v5 v5.0.7
+	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/mattn/go-sqlite3 v1.14.12
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/vektah/gqlparser/v2 v2.4.2
 )
 
@@ -25,7 +27,6 @@ require (
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/matryer/moq v0.2.7 // indirect
-	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/moby/term v0.0.0-20210619224110-3f7ff695adc6 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect

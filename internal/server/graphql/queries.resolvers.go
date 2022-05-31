@@ -8,7 +8,6 @@ import (
 	"fmt"
 
 	"github.com/aklinker1/miasma/internal"
-	"github.com/aklinker1/miasma/internal/server"
 	"github.com/aklinker1/miasma/internal/server/gqlgen"
 	"github.com/aklinker1/miasma/internal/utils"
 )
@@ -20,16 +19,18 @@ func (r *queryResolver) Health(ctx context.Context) (*internal.Health, error) {
 }
 
 func (r *queryResolver) ListApps(ctx context.Context, page *int32, size *int32, showHidden *bool) ([]internal.App, error) {
-	opts := server.GetAppOptions{
-		IncludeHidden: utils.BoolOr(showHidden, false),
-		Page:          utils.Int32Or(page, 1),
-		Size:          utils.Int32Or(size, 10),
+	opts := internal.AppsFilter{
+		IncludeHidden: showHidden,
+		Pagination: &internal.Pagination{
+			Page: utils.Int32Or(page, 1),
+			Size: utils.Int32Or(size, 10),
+		},
 	}
 	apps, err := r.Apps.Get(ctx, opts)
 	return safeReturn(apps, nil, err)
 }
 
-func (r *queryResolver) GetApp(ctx context.Context, appName string) (*internal.App, error) {
+func (r *queryResolver) GetApp(ctx context.Context, id string) (*internal.App, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -41,7 +42,7 @@ func (r *queryResolver) GetPlugin(ctx context.Context, pluginName string) (*inte
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) GetAppRouting(ctx context.Context, appName string) (*internal.AppRouting, error) {
+func (r *queryResolver) GetAppRouting(ctx context.Context, appID string) (*internal.AppRouting, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

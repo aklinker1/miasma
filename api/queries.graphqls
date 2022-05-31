@@ -2,11 +2,11 @@ type Query {
   health: Health
 
   listApps(page: Int = 1, size: Int = 10, showHidden: Boolean): [App!]!
-  getApp(appName: String!): App!
+  getApp(id: ID!): App!
 
   listPlugins: [Plugin!]!
   getPlugin(pluginName: String!): Plugin!
 
   "Only available when the 'router' plugin is enabled"
-  getAppRouting(appName: String!): AppRouting!
+  getAppRouting(appId: ID!): AppRouting!
 }

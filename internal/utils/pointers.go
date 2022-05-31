@@ -13,3 +13,7 @@ func BoolOr(ptr *bool, defaultValue bool) bool {
 	}
 	return *ptr
 }
+
+func Ptr[T any](t T) *T {
+	return &t
+}

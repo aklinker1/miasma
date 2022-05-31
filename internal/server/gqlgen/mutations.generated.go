@@ -17,16 +17,16 @@ import (
 
 type MutationResolver interface {
 	CreateApp(ctx context.Context, app internal.AppInput) (*internal.App, error)
-	EditApp(ctx context.Context, appName string, app internal.AppChanges) (*internal.App, error)
-	DeleteApp(ctx context.Context, appName string) (*internal.App, error)
-	StartApp(ctx context.Context, appName string) (string, error)
-	StopApp(ctx context.Context, appName string) (string, error)
-	ReloadApp(ctx context.Context, appName string) (*internal.App, error)
-	UpgradeApp(ctx context.Context, appName string) (*internal.App, error)
+	EditApp(ctx context.Context, id string, changes map[string]interface{}) (*internal.App, error)
+	DeleteApp(ctx context.Context, id string) (*internal.App, error)
+	StartApp(ctx context.Context, id string) (string, error)
+	StopApp(ctx context.Context, id string) (string, error)
+	ReloadApp(ctx context.Context, id string) (*internal.App, error)
+	UpgradeApp(ctx context.Context, id string) (*internal.App, error)
 	EnablePlugin(ctx context.Context, pluginName string) (*internal.Plugin, error)
 	DisablePlugin(ctx context.Context, pluginName string) (*internal.Plugin, error)
-	SetAppRouting(ctx context.Context, appName string, routing *internal.AppRoutingInput) (*internal.AppRouting, error)
-	RemoveAppRouting(ctx context.Context, appName string) (*internal.AppRouting, error)
+	SetAppRouting(ctx context.Context, appID string, routing *internal.AppRoutingInput) (*internal.AppRouting, error)
+	RemoveAppRouting(ctx context.Context, appID string) (*internal.AppRouting, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -52,14 +52,14 @@ func (ec *executionContext) field_Mutation_deleteApp_args(ctx context.Context, r
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["appName"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appName"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["appName"] = arg0
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -82,23 +82,23 @@ func (ec *executionContext) field_Mutation_editApp_args(ctx context.Context, raw
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["appName"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appName"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["appName"] = arg0
-	var arg1 internal.AppChanges
-	if tmp, ok := rawArgs["app"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("app"))
-		arg1, err = ec.unmarshalNAppChanges2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppChanges(ctx, tmp)
+	args["id"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["changes"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("changes"))
+		arg1, err = ec.unmarshalNAppChanges2map(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["app"] = arg1
+	args["changes"] = arg1
 	return args, nil
 }
 
@@ -121,14 +121,14 @@ func (ec *executionContext) field_Mutation_reloadApp_args(ctx context.Context, r
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["appName"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appName"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["appName"] = arg0
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -136,14 +136,14 @@ func (ec *executionContext) field_Mutation_removeAppRouting_args(ctx context.Con
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["appName"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appName"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	if tmp, ok := rawArgs["appId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appId"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["appName"] = arg0
+	args["appId"] = arg0
 	return args, nil
 }
 
@@ -151,14 +151,14 @@ func (ec *executionContext) field_Mutation_setAppRouting_args(ctx context.Contex
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["appName"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appName"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	if tmp, ok := rawArgs["appId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appId"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["appName"] = arg0
+	args["appId"] = arg0
 	var arg1 *internal.AppRoutingInput
 	if tmp, ok := rawArgs["routing"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("routing"))
@@ -175,14 +175,14 @@ func (ec *executionContext) field_Mutation_startApp_args(ctx context.Context, ra
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["appName"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appName"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["appName"] = arg0
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -190,14 +190,14 @@ func (ec *executionContext) field_Mutation_stopApp_args(ctx context.Context, raw
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["appName"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appName"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["appName"] = arg0
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -205,14 +205,14 @@ func (ec *executionContext) field_Mutation_upgradeApp_args(ctx context.Context, 
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["appName"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appName"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["appName"] = arg0
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -265,24 +265,28 @@ func (ec *executionContext) fieldContext_Mutation_createApp(ctx context.Context,
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_App_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_App_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_App_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_App_name(ctx, field)
 			case "group":
 				return ec.fieldContext_App_group(ctx, field)
 			case "image":
 				return ec.fieldContext_App_image(ctx, field)
+			case "imageDigest":
+				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
-			case "ports":
-				return ec.fieldContext_App_ports(ctx, field)
 			case "routing":
 				return ec.fieldContext_App_routing(ctx, field)
+			case "simpleRoute":
+				return ec.fieldContext_App_simpleRoute(ctx, field)
 			case "status":
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":
 				return ec.fieldContext_App_instances(ctx, field)
-			case "imageDigest":
-				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "targetPorts":
 				return ec.fieldContext_App_targetPorts(ctx, field)
 			case "publishedPorts":
@@ -327,7 +331,7 @@ func (ec *executionContext) _Mutation_editApp(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().EditApp(rctx, fc.Args["appName"].(string), fc.Args["app"].(internal.AppChanges))
+		return ec.resolvers.Mutation().EditApp(rctx, fc.Args["id"].(string), fc.Args["changes"].(map[string]interface{}))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -354,24 +358,28 @@ func (ec *executionContext) fieldContext_Mutation_editApp(ctx context.Context, f
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_App_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_App_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_App_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_App_name(ctx, field)
 			case "group":
 				return ec.fieldContext_App_group(ctx, field)
 			case "image":
 				return ec.fieldContext_App_image(ctx, field)
+			case "imageDigest":
+				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
-			case "ports":
-				return ec.fieldContext_App_ports(ctx, field)
 			case "routing":
 				return ec.fieldContext_App_routing(ctx, field)
+			case "simpleRoute":
+				return ec.fieldContext_App_simpleRoute(ctx, field)
 			case "status":
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":
 				return ec.fieldContext_App_instances(ctx, field)
-			case "imageDigest":
-				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "targetPorts":
 				return ec.fieldContext_App_targetPorts(ctx, field)
 			case "publishedPorts":
@@ -416,7 +424,7 @@ func (ec *executionContext) _Mutation_deleteApp(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteApp(rctx, fc.Args["appName"].(string))
+		return ec.resolvers.Mutation().DeleteApp(rctx, fc.Args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -443,24 +451,28 @@ func (ec *executionContext) fieldContext_Mutation_deleteApp(ctx context.Context,
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_App_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_App_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_App_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_App_name(ctx, field)
 			case "group":
 				return ec.fieldContext_App_group(ctx, field)
 			case "image":
 				return ec.fieldContext_App_image(ctx, field)
+			case "imageDigest":
+				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
-			case "ports":
-				return ec.fieldContext_App_ports(ctx, field)
 			case "routing":
 				return ec.fieldContext_App_routing(ctx, field)
+			case "simpleRoute":
+				return ec.fieldContext_App_simpleRoute(ctx, field)
 			case "status":
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":
 				return ec.fieldContext_App_instances(ctx, field)
-			case "imageDigest":
-				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "targetPorts":
 				return ec.fieldContext_App_targetPorts(ctx, field)
 			case "publishedPorts":
@@ -505,7 +517,7 @@ func (ec *executionContext) _Mutation_startApp(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().StartApp(rctx, fc.Args["appName"].(string))
+		return ec.resolvers.Mutation().StartApp(rctx, fc.Args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -560,7 +572,7 @@ func (ec *executionContext) _Mutation_stopApp(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().StopApp(rctx, fc.Args["appName"].(string))
+		return ec.resolvers.Mutation().StopApp(rctx, fc.Args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -615,7 +627,7 @@ func (ec *executionContext) _Mutation_reloadApp(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ReloadApp(rctx, fc.Args["appName"].(string))
+		return ec.resolvers.Mutation().ReloadApp(rctx, fc.Args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -642,24 +654,28 @@ func (ec *executionContext) fieldContext_Mutation_reloadApp(ctx context.Context,
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_App_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_App_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_App_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_App_name(ctx, field)
 			case "group":
 				return ec.fieldContext_App_group(ctx, field)
 			case "image":
 				return ec.fieldContext_App_image(ctx, field)
+			case "imageDigest":
+				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
-			case "ports":
-				return ec.fieldContext_App_ports(ctx, field)
 			case "routing":
 				return ec.fieldContext_App_routing(ctx, field)
+			case "simpleRoute":
+				return ec.fieldContext_App_simpleRoute(ctx, field)
 			case "status":
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":
 				return ec.fieldContext_App_instances(ctx, field)
-			case "imageDigest":
-				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "targetPorts":
 				return ec.fieldContext_App_targetPorts(ctx, field)
 			case "publishedPorts":
@@ -704,7 +720,7 @@ func (ec *executionContext) _Mutation_upgradeApp(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpgradeApp(rctx, fc.Args["appName"].(string))
+		return ec.resolvers.Mutation().UpgradeApp(rctx, fc.Args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -731,24 +747,28 @@ func (ec *executionContext) fieldContext_Mutation_upgradeApp(ctx context.Context
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_App_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_App_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_App_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_App_name(ctx, field)
 			case "group":
 				return ec.fieldContext_App_group(ctx, field)
 			case "image":
 				return ec.fieldContext_App_image(ctx, field)
+			case "imageDigest":
+				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
-			case "ports":
-				return ec.fieldContext_App_ports(ctx, field)
 			case "routing":
 				return ec.fieldContext_App_routing(ctx, field)
+			case "simpleRoute":
+				return ec.fieldContext_App_simpleRoute(ctx, field)
 			case "status":
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":
 				return ec.fieldContext_App_instances(ctx, field)
-			case "imageDigest":
-				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "targetPorts":
 				return ec.fieldContext_App_targetPorts(ctx, field)
 			case "publishedPorts":
@@ -915,7 +935,7 @@ func (ec *executionContext) _Mutation_setAppRouting(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SetAppRouting(rctx, fc.Args["appName"].(string), fc.Args["routing"].(*internal.AppRoutingInput))
+		return ec.resolvers.Mutation().SetAppRouting(rctx, fc.Args["appId"].(string), fc.Args["routing"].(*internal.AppRoutingInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -937,8 +957,6 @@ func (ec *executionContext) fieldContext_Mutation_setAppRouting(ctx context.Cont
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "appId":
-				return ec.fieldContext_AppRouting_appId(ctx, field)
 			case "host":
 				return ec.fieldContext_AppRouting_host(ctx, field)
 			case "path":
@@ -977,7 +995,7 @@ func (ec *executionContext) _Mutation_removeAppRouting(ctx context.Context, fiel
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().RemoveAppRouting(rctx, fc.Args["appName"].(string))
+		return ec.resolvers.Mutation().RemoveAppRouting(rctx, fc.Args["appId"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -999,8 +1017,6 @@ func (ec *executionContext) fieldContext_Mutation_removeAppRouting(ctx context.C
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "appId":
-				return ec.fieldContext_AppRouting_appId(ctx, field)
 			case "host":
 				return ec.fieldContext_AppRouting_host(ctx, field)
 			case "path":

@@ -41,6 +41,7 @@ type DirectiveRoot struct {
 type ComplexityRoot struct {
 	App struct {
 		Command        func(childComplexity int) int
+		CreatedAt      func(childComplexity int) int
 		Group          func(childComplexity int) int
 		Hidden         func(childComplexity int) int
 		ID             func(childComplexity int) int
@@ -50,16 +51,16 @@ type ComplexityRoot struct {
 		Name           func(childComplexity int) int
 		Networks       func(childComplexity int) int
 		Placement      func(childComplexity int) int
-		Ports          func(childComplexity int) int
 		PublishedPorts func(childComplexity int) int
 		Routing        func(childComplexity int) int
+		SimpleRoute    func(childComplexity int) int
 		Status         func(childComplexity int) int
 		TargetPorts    func(childComplexity int) int
+		UpdatedAt      func(childComplexity int) int
 		Volumes        func(childComplexity int) int
 	}
 
 	AppRouting struct {
-		AppID       func(childComplexity int) int
 		Host        func(childComplexity int) int
 		Path        func(childComplexity int) int
 		TraefikRule func(childComplexity int) int
@@ -78,16 +79,16 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateApp        func(childComplexity int, app internal.AppInput) int
-		DeleteApp        func(childComplexity int, appName string) int
+		DeleteApp        func(childComplexity int, id string) int
 		DisablePlugin    func(childComplexity int, pluginName string) int
-		EditApp          func(childComplexity int, appName string, app internal.AppChanges) int
+		EditApp          func(childComplexity int, id string, changes map[string]interface{}) int
 		EnablePlugin     func(childComplexity int, pluginName string) int
-		ReloadApp        func(childComplexity int, appName string) int
-		RemoveAppRouting func(childComplexity int, appName string) int
-		SetAppRouting    func(childComplexity int, appName string, routing *internal.AppRoutingInput) int
-		StartApp         func(childComplexity int, appName string) int
-		StopApp          func(childComplexity int, appName string) int
-		UpgradeApp       func(childComplexity int, appName string) int
+		ReloadApp        func(childComplexity int, id string) int
+		RemoveAppRouting func(childComplexity int, appID string) int
+		SetAppRouting    func(childComplexity int, appID string, routing *internal.AppRoutingInput) int
+		StartApp         func(childComplexity int, id string) int
+		StopApp          func(childComplexity int, id string) int
+		UpgradeApp       func(childComplexity int, id string) int
 	}
 
 	Plugin struct {
@@ -96,8 +97,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetApp        func(childComplexity int, appName string) int
-		GetAppRouting func(childComplexity int, appName string) int
+		GetApp        func(childComplexity int, id string) int
+		GetAppRouting func(childComplexity int, appID string) int
 		GetPlugin     func(childComplexity int, pluginName string) int
 		Health        func(childComplexity int) int
 		ListApps      func(childComplexity int, page *int32, size *int32, showHidden *bool) int
@@ -133,6 +134,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.App.Command(childComplexity), true
+
+	case "App.createdAt":
+		if e.complexity.App.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.App.CreatedAt(childComplexity), true
 
 	case "App.group":
 		if e.complexity.App.Group == nil {
@@ -197,13 +205,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.App.Placement(childComplexity), true
 
-	case "App.ports":
-		if e.complexity.App.Ports == nil {
-			break
-		}
-
-		return e.complexity.App.Ports(childComplexity), true
-
 	case "App.publishedPorts":
 		if e.complexity.App.PublishedPorts == nil {
 			break
@@ -217,6 +218,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.App.Routing(childComplexity), true
+
+	case "App.simpleRoute":
+		if e.complexity.App.SimpleRoute == nil {
+			break
+		}
+
+		return e.complexity.App.SimpleRoute(childComplexity), true
 
 	case "App.status":
 		if e.complexity.App.Status == nil {
@@ -232,19 +240,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.App.TargetPorts(childComplexity), true
 
+	case "App.updatedAt":
+		if e.complexity.App.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.App.UpdatedAt(childComplexity), true
+
 	case "App.volumes":
 		if e.complexity.App.Volumes == nil {
 			break
 		}
 
 		return e.complexity.App.Volumes(childComplexity), true
-
-	case "AppRouting.appId":
-		if e.complexity.AppRouting.AppID == nil {
-			break
-		}
-
-		return e.complexity.AppRouting.AppID(childComplexity), true
 
 	case "AppRouting.host":
 		if e.complexity.AppRouting.Host == nil {
@@ -324,7 +332,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteApp(childComplexity, args["appName"].(string)), true
+		return e.complexity.Mutation.DeleteApp(childComplexity, args["id"].(string)), true
 
 	case "Mutation.disablePlugin":
 		if e.complexity.Mutation.DisablePlugin == nil {
@@ -348,7 +356,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.EditApp(childComplexity, args["appName"].(string), args["app"].(internal.AppChanges)), true
+		return e.complexity.Mutation.EditApp(childComplexity, args["id"].(string), args["changes"].(map[string]interface{})), true
 
 	case "Mutation.enablePlugin":
 		if e.complexity.Mutation.EnablePlugin == nil {
@@ -372,7 +380,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.ReloadApp(childComplexity, args["appName"].(string)), true
+		return e.complexity.Mutation.ReloadApp(childComplexity, args["id"].(string)), true
 
 	case "Mutation.removeAppRouting":
 		if e.complexity.Mutation.RemoveAppRouting == nil {
@@ -384,7 +392,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.RemoveAppRouting(childComplexity, args["appName"].(string)), true
+		return e.complexity.Mutation.RemoveAppRouting(childComplexity, args["appId"].(string)), true
 
 	case "Mutation.setAppRouting":
 		if e.complexity.Mutation.SetAppRouting == nil {
@@ -396,7 +404,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.SetAppRouting(childComplexity, args["appName"].(string), args["routing"].(*internal.AppRoutingInput)), true
+		return e.complexity.Mutation.SetAppRouting(childComplexity, args["appId"].(string), args["routing"].(*internal.AppRoutingInput)), true
 
 	case "Mutation.startApp":
 		if e.complexity.Mutation.StartApp == nil {
@@ -408,7 +416,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.StartApp(childComplexity, args["appName"].(string)), true
+		return e.complexity.Mutation.StartApp(childComplexity, args["id"].(string)), true
 
 	case "Mutation.stopApp":
 		if e.complexity.Mutation.StopApp == nil {
@@ -420,7 +428,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.StopApp(childComplexity, args["appName"].(string)), true
+		return e.complexity.Mutation.StopApp(childComplexity, args["id"].(string)), true
 
 	case "Mutation.upgradeApp":
 		if e.complexity.Mutation.UpgradeApp == nil {
@@ -432,7 +440,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpgradeApp(childComplexity, args["appName"].(string)), true
+		return e.complexity.Mutation.UpgradeApp(childComplexity, args["id"].(string)), true
 
 	case "Plugin.enable":
 		if e.complexity.Plugin.Enable == nil {
@@ -458,7 +466,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetApp(childComplexity, args["appName"].(string)), true
+		return e.complexity.Query.GetApp(childComplexity, args["id"].(string)), true
 
 	case "Query.getAppRouting":
 		if e.complexity.Query.GetAppRouting == nil {
@@ -470,7 +478,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetAppRouting(childComplexity, args["appName"].(string)), true
+		return e.complexity.Query.GetAppRouting(childComplexity, args["appId"].(string)), true
 
 	case "Query.getPlugin":
 		if e.complexity.Query.GetPlugin == nil {
@@ -546,7 +554,6 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputAppChanges,
 		ec.unmarshalInputAppInput,
 		ec.unmarshalInputAppRoutingInput,
 		ec.unmarshalInputBoundVolumeInput,
@@ -638,26 +645,28 @@ type BoundVolume {
 
 type App {
   id: ID!
+  createdAt: Time
+  updatedAt: Time
   name: String!
   group: String
   "The image and tag the application runs"
   image: String!
-  "Whether or not the app is returned during regular requests"
-  hidden: Boolean
-  "The published ports for the app"
-  ports: [String!]
-  "If the app has routing, a simple string representing that route"
-  routing: String
-  "Whether or not the application is running, stopped, or starting up"
-  status: String!
-  "The number of instances running vs what should be running"
-  instances: String!
   """
   The currently running image digest (hash). Used internally when running
   applications instead of the tag because the when a new image is pushed, the
   tag stays the same but the digest changes
   """
   imageDigest: String!
+  "Whether or not the app is returned during regular requests"
+  hidden: Boolean
+  "If the app has routing, this is the routing config"
+  routing: AppRouting
+  "If the app has routing, a simple string representing that route"
+  simpleRoute: String
+  "Whether or not the application is running, stopped, or starting up"
+  status: String!
+  "The number of instances running vs what should be running"
+  instances: String!
   """
   The ports that the app is listening to inside the container. If no target
   ports are specified, then the container should respect the ` + "`" + `PORT` + "`" + ` env var.
@@ -709,6 +718,7 @@ input AppInput {
   placement: [String!]
   volumes: [BoundVolumeInput!]
   networks: [String!]
+  routing: AppRoutingInput
   command: String
 }
 
@@ -732,7 +742,6 @@ type Plugin {
 }
 
 type AppRouting {
-  appId: ID!
   host: String
   path: String
   traefikRule: String
@@ -748,17 +757,17 @@ input AppRoutingInput {
   "Create and start a new app"
   createApp(app: AppInput!): App!
   "Edit app metadata unrelated to how the container(s) that are run"
-  editApp(appName: String!, app: AppChanges!): App!
+  editApp(id: ID!, changes: AppChanges!): App!
   "Stop and delete an app"
-  deleteApp(appName: String!): App!
+  deleteApp(id: ID!): App!
   "Start a stopped app"
-  startApp(appName: String!): String!
+  startApp(id: ID!): String!
   "Stop a running app"
-  stopApp(appName: String!): String!
+  stopApp(id: ID!): String!
   "Stop and restart an app"
-  reloadApp(appName: String!): App!
+  reloadApp(id: ID!): App!
   "Pull the latest version of the app's image and then restart"
-  upgradeApp(appName: String!): App!
+  upgradeApp(id: ID!): App!
 
   "Install one of Miasma's plugins"
   enablePlugin(pluginName: String!): Plugin!
@@ -766,22 +775,22 @@ input AppRoutingInput {
   disablePlugin(pluginName: String!): Plugin!
 
   "Only available when the 'router' plugin is enabled"
-  setAppRouting(appName: String!, routing: AppRoutingInput): AppRouting
+  setAppRouting(appId: ID!, routing: AppRoutingInput): AppRouting
   "Only available when the 'router' plugin is enabled"
-  removeAppRouting(appName: String!): AppRouting
+  removeAppRouting(appId: ID!): AppRouting
 }
 `, BuiltIn: false},
 	{Name: "api/queries.graphqls", Input: `type Query {
   health: Health
 
   listApps(page: Int = 1, size: Int = 10, showHidden: Boolean): [App!]!
-  getApp(appName: String!): App!
+  getApp(id: ID!): App!
 
   listPlugins: [Plugin!]!
   getPlugin(pluginName: String!): Plugin!
 
   "Only available when the 'router' plugin is enabled"
-  getAppRouting(appName: String!): AppRouting!
+  getAppRouting(appId: ID!): AppRouting!
 }
 `, BuiltIn: false},
 	{Name: "api/scalars.graphqls", Input: `scalar Map

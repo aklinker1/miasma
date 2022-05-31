@@ -65,3 +65,11 @@ func NewNotImplementedError(op string) error {
 		Op:   op,
 	}
 }
+
+func NewDatabaseError(op string, err error) error {
+	return &Error{
+		Code: EINTERNAL,
+		Op:   op,
+		Err:  err,
+	}
+}

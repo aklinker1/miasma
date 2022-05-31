@@ -19,10 +19,10 @@ import (
 type QueryResolver interface {
 	Health(ctx context.Context) (*internal.Health, error)
 	ListApps(ctx context.Context, page *int32, size *int32, showHidden *bool) ([]internal.App, error)
-	GetApp(ctx context.Context, appName string) (*internal.App, error)
+	GetApp(ctx context.Context, id string) (*internal.App, error)
 	ListPlugins(ctx context.Context) ([]internal.Plugin, error)
 	GetPlugin(ctx context.Context, pluginName string) (*internal.Plugin, error)
-	GetAppRouting(ctx context.Context, appName string) (*internal.AppRouting, error)
+	GetAppRouting(ctx context.Context, appID string) (*internal.AppRouting, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -48,14 +48,14 @@ func (ec *executionContext) field_Query_getAppRouting_args(ctx context.Context, 
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["appName"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appName"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	if tmp, ok := rawArgs["appId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appId"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["appName"] = arg0
+	args["appId"] = arg0
 	return args, nil
 }
 
@@ -63,14 +63,14 @@ func (ec *executionContext) field_Query_getApp_args(ctx context.Context, rawArgs
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["appName"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appName"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["appName"] = arg0
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -220,24 +220,28 @@ func (ec *executionContext) fieldContext_Query_listApps(ctx context.Context, fie
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_App_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_App_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_App_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_App_name(ctx, field)
 			case "group":
 				return ec.fieldContext_App_group(ctx, field)
 			case "image":
 				return ec.fieldContext_App_image(ctx, field)
+			case "imageDigest":
+				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
-			case "ports":
-				return ec.fieldContext_App_ports(ctx, field)
 			case "routing":
 				return ec.fieldContext_App_routing(ctx, field)
+			case "simpleRoute":
+				return ec.fieldContext_App_simpleRoute(ctx, field)
 			case "status":
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":
 				return ec.fieldContext_App_instances(ctx, field)
-			case "imageDigest":
-				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "targetPorts":
 				return ec.fieldContext_App_targetPorts(ctx, field)
 			case "publishedPorts":
@@ -282,7 +286,7 @@ func (ec *executionContext) _Query_getApp(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetApp(rctx, fc.Args["appName"].(string))
+		return ec.resolvers.Query().GetApp(rctx, fc.Args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -309,24 +313,28 @@ func (ec *executionContext) fieldContext_Query_getApp(ctx context.Context, field
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_App_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_App_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_App_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_App_name(ctx, field)
 			case "group":
 				return ec.fieldContext_App_group(ctx, field)
 			case "image":
 				return ec.fieldContext_App_image(ctx, field)
+			case "imageDigest":
+				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
-			case "ports":
-				return ec.fieldContext_App_ports(ctx, field)
 			case "routing":
 				return ec.fieldContext_App_routing(ctx, field)
+			case "simpleRoute":
+				return ec.fieldContext_App_simpleRoute(ctx, field)
 			case "status":
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":
 				return ec.fieldContext_App_instances(ctx, field)
-			case "imageDigest":
-				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "targetPorts":
 				return ec.fieldContext_App_targetPorts(ctx, field)
 			case "publishedPorts":
@@ -482,7 +490,7 @@ func (ec *executionContext) _Query_getAppRouting(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetAppRouting(rctx, fc.Args["appName"].(string))
+		return ec.resolvers.Query().GetAppRouting(rctx, fc.Args["appId"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -507,8 +515,6 @@ func (ec *executionContext) fieldContext_Query_getAppRouting(ctx context.Context
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "appId":
-				return ec.fieldContext_AppRouting_appId(ctx, field)
 			case "host":
 				return ec.fieldContext_AppRouting_host(ctx, field)
 			case "path":
