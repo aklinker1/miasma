@@ -16,15 +16,15 @@ import (
 // region    ************************** generated!.gotpl **************************
 
 type MutationResolver interface {
-	CreateApp(ctx context.Context, app internal.AppInput) (*internal.App, error)
+	CreateApp(ctx context.Context, input internal.AppInput) (*internal.App, error)
 	EditApp(ctx context.Context, id string, changes map[string]interface{}) (*internal.App, error)
 	DeleteApp(ctx context.Context, id string) (*internal.App, error)
 	StartApp(ctx context.Context, id string) (string, error)
 	StopApp(ctx context.Context, id string) (string, error)
 	ReloadApp(ctx context.Context, id string) (*internal.App, error)
 	UpgradeApp(ctx context.Context, id string) (*internal.App, error)
-	EnablePlugin(ctx context.Context, pluginName string) (*internal.Plugin, error)
-	DisablePlugin(ctx context.Context, pluginName string) (*internal.Plugin, error)
+	EnablePlugin(ctx context.Context, name string) (*internal.Plugin, error)
+	DisablePlugin(ctx context.Context, name string) (*internal.Plugin, error)
 	SetAppRouting(ctx context.Context, appID string, routing *internal.AppRoutingInput) (*internal.AppRouting, error)
 	RemoveAppRouting(ctx context.Context, appID string) (*internal.AppRouting, error)
 }
@@ -37,14 +37,14 @@ func (ec *executionContext) field_Mutation_createApp_args(ctx context.Context, r
 	var err error
 	args := map[string]interface{}{}
 	var arg0 internal.AppInput
-	if tmp, ok := rawArgs["app"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("app"))
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNAppInput2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["app"] = arg0
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -67,14 +67,14 @@ func (ec *executionContext) field_Mutation_disablePlugin_args(ctx context.Contex
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["pluginName"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pluginName"))
+	if tmp, ok := rawArgs["name"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["pluginName"] = arg0
+	args["name"] = arg0
 	return args, nil
 }
 
@@ -106,14 +106,14 @@ func (ec *executionContext) field_Mutation_enablePlugin_args(ctx context.Context
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["pluginName"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pluginName"))
+	if tmp, ok := rawArgs["name"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["pluginName"] = arg0
+	args["name"] = arg0
 	return args, nil
 }
 
@@ -238,7 +238,7 @@ func (ec *executionContext) _Mutation_createApp(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateApp(rctx, fc.Args["app"].(internal.AppInput))
+		return ec.resolvers.Mutation().CreateApp(rctx, fc.Args["input"].(internal.AppInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -813,7 +813,7 @@ func (ec *executionContext) _Mutation_enablePlugin(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().EnablePlugin(rctx, fc.Args["pluginName"].(string))
+		return ec.resolvers.Mutation().EnablePlugin(rctx, fc.Args["name"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -874,7 +874,7 @@ func (ec *executionContext) _Mutation_disablePlugin(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DisablePlugin(rctx, fc.Args["pluginName"].(string))
+		return ec.resolvers.Mutation().DisablePlugin(rctx, fc.Args["name"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

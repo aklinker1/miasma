@@ -86,11 +86,11 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateApp        func(childComplexity int, app internal.AppInput) int
+		CreateApp        func(childComplexity int, input internal.AppInput) int
 		DeleteApp        func(childComplexity int, id string) int
-		DisablePlugin    func(childComplexity int, pluginName string) int
+		DisablePlugin    func(childComplexity int, name string) int
 		EditApp          func(childComplexity int, id string, changes map[string]interface{}) int
-		EnablePlugin     func(childComplexity int, pluginName string) int
+		EnablePlugin     func(childComplexity int, name string) int
 		ReloadApp        func(childComplexity int, id string) int
 		RemoveAppRouting func(childComplexity int, appID string) int
 		SetAppRouting    func(childComplexity int, appID string, routing *internal.AppRoutingInput) int
@@ -349,7 +349,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateApp(childComplexity, args["app"].(internal.AppInput)), true
+		return e.complexity.Mutation.CreateApp(childComplexity, args["input"].(internal.AppInput)), true
 
 	case "Mutation.deleteApp":
 		if e.complexity.Mutation.DeleteApp == nil {
@@ -373,7 +373,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DisablePlugin(childComplexity, args["pluginName"].(string)), true
+		return e.complexity.Mutation.DisablePlugin(childComplexity, args["name"].(string)), true
 
 	case "Mutation.editApp":
 		if e.complexity.Mutation.EditApp == nil {
@@ -397,7 +397,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.EnablePlugin(childComplexity, args["pluginName"].(string)), true
+		return e.complexity.Mutation.EnablePlugin(childComplexity, args["name"].(string)), true
 
 	case "Mutation.reloadApp":
 		if e.complexity.Mutation.ReloadApp == nil {
@@ -756,7 +756,7 @@ input AppRoutingInput {
 `, BuiltIn: false},
 	{Name: "api/mutations.graphqls", Input: `type Mutation {
   "Create and start a new app"
-  createApp(app: AppInput!): App!
+  createApp(input: AppInput!): App!
   "Edit app metadata unrelated to how the container(s) that are run"
   editApp(id: ID!, changes: AppChanges!): App!
   "Stop and delete an app"
@@ -771,9 +771,9 @@ input AppRoutingInput {
   upgradeApp(id: ID!): App!
 
   "Install one of Miasma's plugins"
-  enablePlugin(pluginName: String!): Plugin!
+  enablePlugin(name: String!): Plugin!
   "Disable one of Miasma's plugins"
-  disablePlugin(pluginName: String!): Plugin!
+  disablePlugin(name: String!): Plugin!
 
   "Only available when the 'router' plugin is enabled"
   setAppRouting(appId: ID!, routing: AppRoutingInput): AppRouting

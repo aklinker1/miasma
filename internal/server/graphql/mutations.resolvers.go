@@ -100,11 +100,11 @@ func (r *mutationResolver) UpgradeApp(ctx context.Context, id string) (*internal
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) EnablePlugin(ctx context.Context, pluginName string) (*internal.Plugin, error) {
+func (r *mutationResolver) EnablePlugin(ctx context.Context, name string) (*internal.Plugin, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) DisablePlugin(ctx context.Context, pluginName string) (*internal.Plugin, error) {
+func (r *mutationResolver) DisablePlugin(ctx context.Context, name string) (*internal.Plugin, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

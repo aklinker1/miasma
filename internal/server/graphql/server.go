@@ -49,7 +49,7 @@ func (s *graphqlServer) ServeGraphql() error {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
-	r.Use(middleware.Logger)
+	// r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
 	r.Handle("/graphql", s.createGraphqlHandler())

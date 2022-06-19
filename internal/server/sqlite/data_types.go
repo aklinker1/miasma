@@ -11,13 +11,13 @@ import (
 
 // blob -> []string
 
-type StringArray []string
+type sqliteStringArray []string
 
-func (array StringArray) Value() (driver.Value, error) {
+func (array sqliteStringArray) Value() (driver.Value, error) {
 	return json.Marshal(array)
 }
 
-func (array *StringArray) Scan(src interface{}) error {
+func (array *sqliteStringArray) Scan(src interface{}) error {
 	if src == nil {
 		return nil
 	}
@@ -35,13 +35,13 @@ func (array *StringArray) Scan(src interface{}) error {
 
 // blob -> []int32
 
-type Int32Array []int32
+type sqliteInt32Array []int32
 
-func (array Int32Array) Value() (driver.Value, error) {
+func (array sqliteInt32Array) Value() (driver.Value, error) {
 	return json.Marshal(array)
 }
 
-func (array *Int32Array) Scan(src interface{}) error {
+func (array *sqliteInt32Array) Scan(src interface{}) error {
 	if src == nil {
 		return nil
 	}
@@ -59,13 +59,13 @@ func (array *Int32Array) Scan(src interface{}) error {
 
 // blob -> []internal.BoundVolume
 
-type BoundVolumeArray []internal.BoundVolume
+type sqliteBoundVolumeArray []internal.BoundVolume
 
-func (array BoundVolumeArray) Value() (driver.Value, error) {
+func (array sqliteBoundVolumeArray) Value() (driver.Value, error) {
 	return json.Marshal(array)
 }
 
-func (array *BoundVolumeArray) Scan(src interface{}) error {
+func (array *sqliteBoundVolumeArray) Scan(src interface{}) error {
 	if src == nil {
 		return nil
 	}
@@ -83,16 +83,16 @@ func (array *BoundVolumeArray) Scan(src interface{}) error {
 
 // blob -> internal.AppRouting
 
-type AppRoutingBlob internal.AppRouting
+type sqliteAppRoutingBlob internal.AppRouting
 
-func (blob *AppRoutingBlob) Value() (driver.Value, error) {
+func (blob *sqliteAppRoutingBlob) Value() (driver.Value, error) {
 	if blob == nil {
 		return nil, nil
 	}
 	return json.Marshal(blob)
 }
 
-func (blob *AppRoutingBlob) Scan(src interface{}) error {
+func (blob *sqliteAppRoutingBlob) Scan(src interface{}) error {
 	if src == nil {
 		return nil
 	}

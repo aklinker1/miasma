@@ -2,6 +2,16 @@ package fmt
 
 import "fmt"
 
+var cReset = "\x1b[0m"
+var cBold = "\x1b[1m"
+var cDim = "\x1b[2m"
+var cRed = "\x1b[91m"
+var cGreen = "\x1b[92m"
+var cYellow = "\x1b[93m"
+var cBlue = "\x1b[94m"
+var cPurple = "\x1b[95m"
+var cCyan = "\x1b[96m"
+
 func Println(a ...any) {
 	fmt.Println(a...)
 }
@@ -22,21 +32,21 @@ type Logger struct {
 }
 
 func (*Logger) V(format string, a ...any) {
-	Printfln("[verbose] "+format, a...)
+	Printfln(cReset+cDim+"[verbose] "+format+cReset, a...)
 }
 
 func (*Logger) D(format string, a ...any) {
-	Printfln("[debug  ] "+format, a...)
+	Printfln(cReset+"[debug  ] "+format, a...)
 }
 
 func (*Logger) I(format string, a ...any) {
-	Printfln("[info   ] "+format, a...)
+	Printfln(cReset+cBlue+"[info   ] "+format+cReset, a...)
 }
 
 func (*Logger) W(format string, a ...any) {
-	Printfln("[warn   ] "+format, a...)
+	Printfln(cReset+cBold+cYellow+"[warn   ] "+format+cReset, a...)
 }
 
 func (*Logger) E(format string, a ...any) {
-	Printfln("[error  ] "+format, a...)
+	Printfln(cReset+cBold+cRed+"[error  ] "+format+cReset, a...)
 }

@@ -33,8 +33,6 @@ models:
     model: github.com/99designs/gqlgen/graphql.ID
   Int:
     model: github.com/99designs/gqlgen/graphql.Int32
-  Map:
-    model: map[string]any
   Health:
     fields:
       swarm:

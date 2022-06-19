@@ -1,6 +1,6 @@
 type Mutation {
   "Create and start a new app"
-  createApp(app: AppInput!): App!
+  createApp(input: AppInput!): App!
   "Edit app metadata unrelated to how the container(s) that are run"
   editApp(id: ID!, changes: AppChanges!): App!
   "Stop and delete an app"
@@ -15,9 +15,9 @@ type Mutation {
   upgradeApp(id: ID!): App!
 
   "Install one of Miasma's plugins"
-  enablePlugin(pluginName: String!): Plugin!
+  enablePlugin(name: String!): Plugin!
   "Disable one of Miasma's plugins"
-  disablePlugin(pluginName: String!): Plugin!
+  disablePlugin(name: String!): Plugin!
 
   "Only available when the 'router' plugin is enabled"
   setAppRouting(appId: ID!, routing: AppRoutingInput): AppRouting

@@ -84,7 +84,7 @@ func (b *selectBuilder) ToSQL() (sql string, args []any) {
 	var limitOffset string
 	if b.pagination != nil {
 		limitOffset = " LIMIT ? OFFSET ?"
-		args = append(args, b.pagination.Limit, b.pagination.Offset)
+		args = append(args, b.pagination.Limit(), b.pagination.Offset())
 	}
 	sql = fmt.Sprintf(`SELECT %s FROM %s%s%s%s`, columns, b.table, where, order, limitOffset)
 	b.logger.V("SQL Query: %s %v", sql, args)

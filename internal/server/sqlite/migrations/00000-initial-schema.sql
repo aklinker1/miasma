@@ -1,6 +1,7 @@
 CREATE TABLE apps(
     id text PRIMARY KEY NOT NULL,
     created_at text NOT NULL,
+    updated_at text NOT NULL,
     name text NOT NULL,
     "group" text,
     image text NOT NULL,

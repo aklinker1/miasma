@@ -1,6 +1,6 @@
-API_VERSION=$(shell node -p -e "require('./package.json').apiVersion")
-CLI_VERSION=$(shell node -p -e "require('./package.json').cliVersion")
-UI_VERSION=$(shell node -p -e "require('./package.json').uiVersion")
+API_VERSION=$(shell node -p -e "require('./meta.json').apiVersion")
+CLI_VERSION=$(shell node -p -e "require('./meta.json').cliVersion")
+UI_VERSION=$(shell node -p -e "require('./meta.json').uiVersion")
 BUILD=$(shell TZ=UTC git --no-pager show --quiet --abbrev=40 --format='%h')
 BUILD_HASH=$(shell TZ=UTC git --no-pager show --quiet --abbrev=8 --format='%h')
 BUILD_DATE=$(shell TZ=UTC git --no-pager show --quiet --date='format-local:%Y%m%d%H%M%S' --format='%cd')
@@ -26,7 +26,7 @@ run: build
 		--rm \
 		--env-file .env \
 		-p 3000:3000 \
-		-v "$(pwd)/data":/data/miasma \
+		-v "$(shell pwd)/data":/data/miasma \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		aklinker1/miasma:local
 
