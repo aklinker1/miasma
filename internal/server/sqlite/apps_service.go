@@ -12,12 +12,14 @@ var (
 )
 
 type AppService struct {
-	db server.DB
+	db      server.DB
+	runtime server.RuntimeService
 }
 
-func NewAppService(db server.DB) server.AppService {
+func NewAppService(db server.DB, runtime server.RuntimeService) server.AppService {
 	return &AppService{
-		db: db,
+		db:      db,
+		runtime: runtime,
 	}
 }
 
@@ -29,11 +31,20 @@ func (s *AppService) Create(ctx context.Context, app internal.App) (internal.App
 	}
 	defer tx.Rollback()
 
+	// Get image digest
+	imageDigest, err := s.runtime.PullLatest(ctx, app.Image)
+	if err != nil {
+		return EmptyApp, err
+	}
+	app.ImageDigest = imageDigest
+
+	// Create app
 	created, err := createApp(ctx, tx, app)
 	if err != nil {
 		return EmptyApp, err
 	}
 
+	// Create routing if necessary
 	if app.Routing != nil {
 		createdRoute, err := createRoute(ctx, tx, internal.AppRouting{
 			AppID:       created.ID,
@@ -45,6 +56,12 @@ func (s *AppService) Create(ctx context.Context, app internal.App) (internal.App
 			return EmptyApp, err
 		}
 		created.Routing = &createdRoute
+	}
+
+	// Start the app
+	err = s.runtime.Start(ctx, created)
+	if err != nil {
+		return EmptyApp, err
 	}
 
 	tx.Commit()
@@ -59,6 +76,7 @@ func (s *AppService) Delete(ctx context.Context, id string) (internal.App, error
 	}
 	defer tx.Rollback()
 
+	// Find DB models
 	app, err := findApp(ctx, tx, server.AppsFilter{
 		ID: &id,
 	})
@@ -68,16 +86,26 @@ func (s *AppService) Delete(ctx context.Context, id string) (internal.App, error
 	route, err := findRoute(ctx, tx, server.RoutesFilter{
 		AppID: &id,
 	})
-	if err != nil {
+	if server.ErrorCode(err) == server.ENOTFOUND {
+		// noop
+	} else if err != nil {
 		return EmptyApp, err
+	} else {
+		app.Routing = &route
 	}
-	app.Routing = &route
 
+	// Remove DB models
 	err = deleteApp(ctx, tx, app)
 	if err != nil {
 		return EmptyApp, err
 	}
 	err = deleteRoute(ctx, tx, route)
+	if err != nil {
+		return EmptyApp, err
+	}
+
+	// After all other successes, stop the service
+	err = s.runtime.Stop(ctx, app)
 	if err != nil {
 		return EmptyApp, err
 	}
@@ -104,17 +132,31 @@ func (s *AppService) FindApp(ctx context.Context, filter server.AppsFilter) (int
 }
 
 // Update implements server.AppService
-func (s *AppService) Update(ctx context.Context, app internal.App) (internal.App, error) {
+func (s *AppService) Update(ctx context.Context, app internal.App, newImage *string) (internal.App, error) {
 	tx, err := s.db.ReadonlyTx(ctx)
 	if err != nil {
 		return EmptyApp, err
 	}
 	defer tx.Rollback()
 
+	if newImage != nil {
+		newDigest, err := s.runtime.PullLatest(ctx, *newImage)
+		if err != nil {
+			return EmptyApp, err
+		}
+		app.ImageDigest = newDigest
+	}
+
 	created, err := updateApp(ctx, tx, app)
 	if err != nil {
 		return EmptyApp, err
 	}
+
+	err = s.runtime.Restart(ctx, app)
+	if err != nil {
+		return EmptyApp, err
+	}
+
 	tx.Commit()
 	return created, nil
 }

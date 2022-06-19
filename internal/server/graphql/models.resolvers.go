@@ -21,7 +21,13 @@ func getAppRoute(ctx context.Context, routes server.RouteService, obj *internal.
 	route, err := routes.FindRoute(ctx, server.RoutesFilter{
 		AppID: &obj.ID,
 	})
-	return safeReturn(&route, nil, err)
+	if server.ErrorCode(err) == server.ENOTFOUND {
+		return nil, nil
+	} else if err != nil {
+		return nil, err
+	} else {
+		return &route, nil
+	}
 }
 
 func (r *appResolver) Routing(ctx context.Context, obj *internal.App) (*internal.AppRouting, error) {
@@ -33,6 +39,10 @@ func (r *appResolver) SimpleRoute(ctx context.Context, obj *internal.App) (*stri
 	if err != nil {
 		return nil, err
 	}
+	if route == nil {
+		return nil, nil
+	}
+
 	if route.TraefikRule != nil {
 		return route.TraefikRule, nil
 	} else {

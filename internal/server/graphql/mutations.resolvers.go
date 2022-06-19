@@ -33,12 +33,11 @@ func (r *mutationResolver) CreateApp(ctx context.Context, input internal.AppInpu
 	}
 
 	a := internal.App{
-		CreatedAt:   time.Now(),
-		Name:        input.Name,
-		Group:       input.Group,
-		Image:       input.Image,
-		ImageDigest: "TODO",
-		Hidden:      utils.BoolOr(input.Hidden, false),
+		CreatedAt: time.Now(),
+		Name:      input.Name,
+		Group:     input.Group,
+		Image:     input.Image,
+		Hidden:    utils.BoolOr(input.Hidden, false),
 		Routing: lo.If[*internal.AppRouting](input.Routing == nil, nil).ElseF(func() *internal.AppRouting {
 			return &internal.AppRouting{
 				Host:        input.Routing.Host,
@@ -71,7 +70,15 @@ func (r *mutationResolver) EditApp(ctx context.Context, id string, changes map[s
 		return nil, err
 	}
 	gqlgen.ApplyChanges(changes, &newApp)
-	updated, err := r.Apps.Update(ctx, newApp)
+
+	// Grab new image from changes
+	var newImage *string
+	newImageStr, ok := changes["image"].(string)
+	if ok {
+		newImage = &newImageStr
+	}
+
+	updated, err := r.Apps.Update(ctx, newApp, newImage)
 	return safeReturn(&updated, nil, err)
 }
 
