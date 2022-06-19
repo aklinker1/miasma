@@ -28,16 +28,16 @@ WORKDIR /build
 
 # Build the server
 FROM backend-builder-base as backend-builder
-ARG VERSION
-ARG BUILD
-ARG BUILD_HASH
-ARG BUILD_DATE
-ARG BUILD_VAR_PATH
 COPY go.mod go.sum ./
 RUN go mod download
 RUN go install github.com/mattn/go-sqlite3
 COPY cmd/server ./cmd/server
 COPY internal internal
+ARG VERSION
+ARG BUILD
+ARG BUILD_HASH
+ARG BUILD_DATE
+ARG BUILD_VAR_PATH
 RUN go build \
   -ldflags "-X $BUILD_VAR_PATH.VERSION=$VERSION -X $BUILD_VAR_PATH.BUILD=$BUILD -X $BUILD_VAR_PATH.BUILD_HASH=$BUILD_HASH -X $BUILD_VAR_PATH.BUILD_DATE=$BUILD_DATE" \
   -o bin/server \
