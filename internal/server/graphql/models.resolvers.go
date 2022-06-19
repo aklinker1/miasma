@@ -10,6 +10,14 @@ import (
 	"github.com/aklinker1/miasma/internal/server/gqlgen"
 )
 
+func (r *appResolver) Status(ctx context.Context, obj *internal.App) (string, error) {
+	return "TODO", nil
+}
+
+func (r *appResolver) Instances(ctx context.Context, obj *internal.App) (string, error) {
+	return "TODO", nil
+}
+
 func (r *healthResolver) DockerVersion(ctx context.Context, obj *internal.Health) (string, error) {
 	return r.Runtime.Version(ctx)
 }
@@ -19,7 +27,11 @@ func (r *healthResolver) Swarm(ctx context.Context, obj *internal.Health) (*inte
 	return safeReturn(swarm, nil, err)
 }
 
+// App returns gqlgen.AppResolver implementation.
+func (r *Resolver) App() gqlgen.AppResolver { return &appResolver{r} }
+
 // Health returns gqlgen.HealthResolver implementation.
 func (r *Resolver) Health() gqlgen.HealthResolver { return &healthResolver{r} }
 
+type appResolver struct{ *Resolver }
 type healthResolver struct{ *Resolver }

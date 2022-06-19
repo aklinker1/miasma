@@ -16,11 +16,6 @@ model:
 resolver:
   layout: follow-schema
   dir: internal/server/graphql
-  package: graphql
-  filename_template: '{name}.resolvers.go'
-
-# Optional: turn on to use []Thing instead of []*Thing
-omit_slice_element_pointers: true
 
 # Optional: set to speed up generation time by not performing a final validation pass.
 skip_validation: true
@@ -45,6 +40,12 @@ models:
       swarm:
         resolver: true
       dockerVersion:
+        resolver: true
+  App:
+    fields:
+      instances:
+        resolver: true
+      status:
         resolver: true
   AppChanges:
     model: map[string]interface{}

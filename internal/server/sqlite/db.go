@@ -138,9 +138,20 @@ func (sqlite *sqliteDB) migrateFile(ctx context.Context, name string) error {
 }
 
 func (sqlite *sqliteDB) ReadonlyTx(ctx context.Context) (server.Tx, error) {
-	return sqlite.db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+	return sqlite.beginTx(ctx, &sql.TxOptions{ReadOnly: true})
 }
-
 func (sqlite *sqliteDB) ReadWriteTx(ctx context.Context) (server.Tx, error) {
-	return sqlite.db.BeginTx(ctx, nil)
+	return sqlite.beginTx(ctx, nil)
+}
+func (sqlite *sqliteDB) beginTx(ctx context.Context, opts *sql.TxOptions) (server.Tx, error) {
+	tx, err := sqlite.db.BeginTx(ctx, opts)
+	if err != nil {
+		return nil, &server.Error{
+			Code:    server.EINTERNAL,
+			Message: "Failed to start transaction",
+			Op:      "sqlite.AppService.Create",
+			Err:     err,
+		}
+	}
+	return tx, nil
 }

@@ -30,6 +30,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	App() AppResolver
 	Health() HealthResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
@@ -645,8 +646,8 @@ type BoundVolume {
 
 type App {
   id: ID!
-  createdAt: Time
-  updatedAt: Time
+  createdAt: Time!
+  updatedAt: Time!
   name: String!
   group: String
   "The image and tag the application runs"
@@ -658,7 +659,7 @@ type App {
   """
   imageDigest: String!
   "Whether or not the app is returned during regular requests"
-  hidden: Boolean
+  hidden: Boolean!
   "If the app has routing, this is the routing config"
   routing: AppRouting
   "If the app has routing, a simple string representing that route"

@@ -18,6 +18,10 @@ import (
 
 // region    ************************** generated!.gotpl **************************
 
+type AppResolver interface {
+	Status(ctx context.Context, obj *internal.App) (string, error)
+	Instances(ctx context.Context, obj *internal.App) (string, error)
+}
 type HealthResolver interface {
 	DockerVersion(ctx context.Context, obj *internal.Health) (string, error)
 	Swarm(ctx context.Context, obj *internal.Health) (*internal.SwarmInfo, error)
@@ -100,11 +104,14 @@ func (ec *executionContext) _App_createdAt(ctx context.Context, field graphql.Co
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*time.Time)
+	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_App_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -141,11 +148,14 @@ func (ec *executionContext) _App_updatedAt(ctx context.Context, field graphql.Co
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*time.Time)
+	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_App_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -355,11 +365,14 @@ func (ec *executionContext) _App_hidden(ctx context.Context, field graphql.Colle
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_App_hidden(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -479,7 +492,7 @@ func (ec *executionContext) _App_status(ctx context.Context, field graphql.Colle
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Status, nil
+		return ec.resolvers.App().Status(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -500,8 +513,8 @@ func (ec *executionContext) fieldContext_App_status(ctx context.Context, field g
 	fc = &graphql.FieldContext{
 		Object:     "App",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
@@ -523,7 +536,7 @@ func (ec *executionContext) _App_instances(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Instances, nil
+		return ec.resolvers.App().Instances(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -544,8 +557,8 @@ func (ec *executionContext) fieldContext_App_instances(ctx context.Context, fiel
 	fc = &graphql.FieldContext{
 		Object:     "App",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
@@ -699,9 +712,9 @@ func (ec *executionContext) _App_volumes(ctx context.Context, field graphql.Coll
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]internal.BoundVolume)
+	res := resTmp.([]*internal.BoundVolume)
 	fc.Result = res
-	return ec.marshalOBoundVolume2ᚕgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐBoundVolumeᚄ(ctx, field.Selections, res)
+	return ec.marshalOBoundVolume2ᚕᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐBoundVolumeᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_App_volumes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1492,7 +1505,7 @@ func (ec *executionContext) unmarshalInputAppInput(ctx context.Context, obj inte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("volumes"))
-			it.Volumes, err = ec.unmarshalOBoundVolumeInput2ᚕgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐBoundVolumeInputᚄ(ctx, v)
+			it.Volumes, err = ec.unmarshalOBoundVolumeInput2ᚕᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐBoundVolumeInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -1619,22 +1632,28 @@ func (ec *executionContext) _App(ctx context.Context, sel ast.SelectionSet, obj 
 			out.Values[i] = ec._App_id(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "createdAt":
 
 			out.Values[i] = ec._App_createdAt(ctx, field, obj)
 
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "updatedAt":
 
 			out.Values[i] = ec._App_updatedAt(ctx, field, obj)
 
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "name":
 
 			out.Values[i] = ec._App_name(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "group":
 
@@ -1645,19 +1664,22 @@ func (ec *executionContext) _App(ctx context.Context, sel ast.SelectionSet, obj 
 			out.Values[i] = ec._App_image(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "imageDigest":
 
 			out.Values[i] = ec._App_imageDigest(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "hidden":
 
 			out.Values[i] = ec._App_hidden(ctx, field, obj)
 
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "routing":
 
 			out.Values[i] = ec._App_routing(ctx, field, obj)
@@ -1667,19 +1689,45 @@ func (ec *executionContext) _App(ctx context.Context, sel ast.SelectionSet, obj 
 			out.Values[i] = ec._App_simpleRoute(ctx, field, obj)
 
 		case "status":
+			field := field
 
-			out.Values[i] = ec._App_status(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._App_status(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
 			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "instances":
+			field := field
 
-			out.Values[i] = ec._App_instances(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._App_instances(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
 			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "targetPorts":
 
 			out.Values[i] = ec._App_targetPorts(ctx, field, obj)
@@ -1940,7 +1988,7 @@ func (ec *executionContext) marshalNApp2githubᚗcomᚋaklinker1ᚋmiasmaᚋinte
 	return ec._App(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNApp2ᚕgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppᚄ(ctx context.Context, sel ast.SelectionSet, v []internal.App) graphql.Marshaler {
+func (ec *executionContext) marshalNApp2ᚕᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppᚄ(ctx context.Context, sel ast.SelectionSet, v []*internal.App) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -1964,7 +2012,7 @@ func (ec *executionContext) marshalNApp2ᚕgithubᚗcomᚋaklinker1ᚋmiasmaᚋi
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNApp2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐApp(ctx, sel, v[i])
+			ret[i] = ec.marshalNApp2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐApp(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2017,20 +2065,26 @@ func (ec *executionContext) marshalNAppRouting2ᚖgithubᚗcomᚋaklinker1ᚋmia
 	return ec._AppRouting(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNBoundVolume2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐBoundVolume(ctx context.Context, sel ast.SelectionSet, v internal.BoundVolume) graphql.Marshaler {
-	return ec._BoundVolume(ctx, sel, &v)
+func (ec *executionContext) marshalNBoundVolume2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐBoundVolume(ctx context.Context, sel ast.SelectionSet, v *internal.BoundVolume) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._BoundVolume(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNBoundVolumeInput2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐBoundVolumeInput(ctx context.Context, v interface{}) (internal.BoundVolumeInput, error) {
+func (ec *executionContext) unmarshalNBoundVolumeInput2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐBoundVolumeInput(ctx context.Context, v interface{}) (*internal.BoundVolumeInput, error) {
 	res, err := ec.unmarshalInputBoundVolumeInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNPlugin2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐPlugin(ctx context.Context, sel ast.SelectionSet, v internal.Plugin) graphql.Marshaler {
 	return ec._Plugin(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNPlugin2ᚕgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐPluginᚄ(ctx context.Context, sel ast.SelectionSet, v []internal.Plugin) graphql.Marshaler {
+func (ec *executionContext) marshalNPlugin2ᚕᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐPluginᚄ(ctx context.Context, sel ast.SelectionSet, v []*internal.Plugin) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -2054,7 +2108,7 @@ func (ec *executionContext) marshalNPlugin2ᚕgithubᚗcomᚋaklinker1ᚋmiasma�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNPlugin2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐPlugin(ctx, sel, v[i])
+			ret[i] = ec.marshalNPlugin2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐPlugin(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2099,7 +2153,7 @@ func (ec *executionContext) unmarshalOAppRoutingInput2ᚖgithubᚗcomᚋaklinker
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOBoundVolume2ᚕgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐBoundVolumeᚄ(ctx context.Context, sel ast.SelectionSet, v []internal.BoundVolume) graphql.Marshaler {
+func (ec *executionContext) marshalOBoundVolume2ᚕᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐBoundVolumeᚄ(ctx context.Context, sel ast.SelectionSet, v []*internal.BoundVolume) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -2126,7 +2180,7 @@ func (ec *executionContext) marshalOBoundVolume2ᚕgithubᚗcomᚋaklinker1ᚋmi
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNBoundVolume2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐBoundVolume(ctx, sel, v[i])
+			ret[i] = ec.marshalNBoundVolume2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐBoundVolume(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2146,7 +2200,7 @@ func (ec *executionContext) marshalOBoundVolume2ᚕgithubᚗcomᚋaklinker1ᚋmi
 	return ret
 }
 
-func (ec *executionContext) unmarshalOBoundVolumeInput2ᚕgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐBoundVolumeInputᚄ(ctx context.Context, v interface{}) ([]internal.BoundVolumeInput, error) {
+func (ec *executionContext) unmarshalOBoundVolumeInput2ᚕᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐBoundVolumeInputᚄ(ctx context.Context, v interface{}) ([]*internal.BoundVolumeInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -2155,10 +2209,10 @@ func (ec *executionContext) unmarshalOBoundVolumeInput2ᚕgithubᚗcomᚋaklinke
 		vSlice = graphql.CoerceList(v)
 	}
 	var err error
-	res := make([]internal.BoundVolumeInput, len(vSlice))
+	res := make([]*internal.BoundVolumeInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNBoundVolumeInput2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐBoundVolumeInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNBoundVolumeInput2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐBoundVolumeInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}

@@ -6,12 +6,18 @@ import (
 	"github.com/aklinker1/miasma/internal"
 )
 
+type GetAppFilters struct {
+	Pagination
+	Name          string
+	IncludeHidden bool
+}
+
 type AppService interface {
-	Create(ctx context.Context, app internal.AppInput) (internal.App, error)
-	Get(ctx context.Context, filter internal.AppsFilter) ([]internal.App, error)
-	GetOne(ctx context.Context, filter internal.AppsFilter) (internal.App, error)
-	Update(ctx context.Context, app internal.App) (internal.App, error)
-	Delete(ctx context.Context, appName string) (internal.App, error)
+	Create(ctx context.Context, app internal.App) error
+	FindAppByName(ctx context.Context, name string) (internal.App, error)
+	FindApps(ctx context.Context, filter GetAppFilters) ([]internal.App, error)
+	Update(ctx context.Context, app internal.App) error
+	Delete(ctx context.Context, name string) (internal.App, error)
 }
 
 // RuntimeService defines how the server runs the apps

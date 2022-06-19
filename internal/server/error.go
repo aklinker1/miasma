@@ -61,8 +61,9 @@ func (e *Error) Error() string {
 
 func NewNotImplementedError(op string) error {
 	return &Error{
-		Code: ENOTIMPLEMENTED,
-		Op:   op,
+		Code:    ENOTIMPLEMENTED,
+		Op:      op,
+		Message: "Not implemented",
 	}
 }
 

@@ -10,6 +10,7 @@ require (
 	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/mattn/go-sqlite3 v1.14.12
 	github.com/mitchellh/mapstructure v1.5.0
+	github.com/ssoroka/slice v0.0.0-20220402005549-78f0cea3df8b
 	github.com/vektah/gqlparser/v2 v2.4.2
 )
 

@@ -18,9 +18,9 @@ import (
 
 type QueryResolver interface {
 	Health(ctx context.Context) (*internal.Health, error)
-	ListApps(ctx context.Context, page *int32, size *int32, showHidden *bool) ([]internal.App, error)
+	ListApps(ctx context.Context, page *int32, size *int32, showHidden *bool) ([]*internal.App, error)
 	GetApp(ctx context.Context, id string) (*internal.App, error)
-	ListPlugins(ctx context.Context) ([]internal.Plugin, error)
+	ListPlugins(ctx context.Context) ([]*internal.Plugin, error)
 	GetPlugin(ctx context.Context, pluginName string) (*internal.Plugin, error)
 	GetAppRouting(ctx context.Context, appID string) (*internal.AppRouting, error)
 }
@@ -205,9 +205,9 @@ func (ec *executionContext) _Query_listApps(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]internal.App)
+	res := resTmp.([]*internal.App)
 	fc.Result = res
-	return ec.marshalNApp2ᚕgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppᚄ(ctx, field.Selections, res)
+	return ec.marshalNApp2ᚕᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_listApps(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -391,9 +391,9 @@ func (ec *executionContext) _Query_listPlugins(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]internal.Plugin)
+	res := resTmp.([]*internal.Plugin)
 	fc.Result = res
-	return ec.marshalNPlugin2ᚕgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐPluginᚄ(ctx, field.Selections, res)
+	return ec.marshalNPlugin2ᚕᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐPluginᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_listPlugins(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {

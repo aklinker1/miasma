@@ -7,11 +7,11 @@ import (
 )
 
 type App struct {
-	ID        string     `json:"id"`
-	CreatedAt *time.Time `json:"createdAt"`
-	UpdatedAt *time.Time `json:"updatedAt"`
-	Name      string     `json:"name"`
-	Group     *string    `json:"group"`
+	ID        string    `json:"id"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	Name      string    `json:"name"`
+	Group     *string   `json:"group"`
 	// The image and tag the application runs
 	Image string `json:"image"`
 	// The currently running image digest (hash). Used internally when running
@@ -19,7 +19,7 @@ type App struct {
 	// tag stays the same but the digest changes
 	ImageDigest string `json:"imageDigest"`
 	// Whether or not the app is returned during regular requests
-	Hidden *bool `json:"hidden"`
+	Hidden bool `json:"hidden"`
 	// If the app has routing, this is the routing config
 	Routing *AppRouting `json:"routing"`
 	// If the app has routing, a simple string representing that route
@@ -48,7 +48,7 @@ type App struct {
 	// is valid item in this list
 	Placement []string `json:"placement"`
 	// Volume bindings for the app
-	Volumes []BoundVolume `json:"volumes"`
+	Volumes []*BoundVolume `json:"volumes"`
 	// A list of other apps that the service communicates with using their service
 	// name and docker's internal DNS. Services don't have to be two way; only the
 	// service that accesses the other needs the other network added.
@@ -57,17 +57,17 @@ type App struct {
 }
 
 type AppInput struct {
-	Name           string             `json:"name"`
-	Image          string             `json:"image"`
-	Group          *string            `json:"group"`
-	Hidden         *bool              `json:"hidden"`
-	TargetPorts    []int32            `json:"targetPorts"`
-	PublishedPorts []int32            `json:"publishedPorts"`
-	Placement      []string           `json:"placement"`
-	Volumes        []BoundVolumeInput `json:"volumes"`
-	Networks       []string           `json:"networks"`
-	Routing        *AppRoutingInput   `json:"routing"`
-	Command        *string            `json:"command"`
+	Name           string              `json:"name"`
+	Image          string              `json:"image"`
+	Group          *string             `json:"group"`
+	Hidden         *bool               `json:"hidden"`
+	TargetPorts    []int32             `json:"targetPorts"`
+	PublishedPorts []int32             `json:"publishedPorts"`
+	Placement      []string            `json:"placement"`
+	Volumes        []*BoundVolumeInput `json:"volumes"`
+	Networks       []string            `json:"networks"`
+	Routing        *AppRoutingInput    `json:"routing"`
+	Command        *string             `json:"command"`
 }
 
 type AppRouting struct {

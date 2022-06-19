@@ -3,11 +3,11 @@ FROM alpine as base-image
 RUN mkdir -p /data/miasma
 WORKDIR /app
 
-FROM node:16-alpine as frontend-builder-base
-RUN apk add --update curl
-RUN mkdir /build
-RUN curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm@7
-WORKDIR /build
+# FROM node:16-alpine as frontend-builder-base
+# RUN apk add --update curl
+# RUN mkdir /build
+# RUN curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm@7
+# WORKDIR /build
 
 FROM golang:1.18-alpine as backend-builder-base
 RUN apk add --update git jq build-base
@@ -16,14 +16,14 @@ WORKDIR /build
 
 
 # Build the dashboard
-FROM frontend-builder-base as frontend-builder
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY web/package.json web/package.json
-COPY web/pnpm-lock.yaml web/pnpm-lock.yaml
-RUN pnpm install --frozen-lockfile
-COPY web web
-WORKDIR /build/web
-RUN pnpm build
+# FROM frontend-builder-base as frontend-builder
+# COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# COPY web/package.json web/package.json
+# COPY web/pnpm-lock.yaml web/pnpm-lock.yaml
+# RUN pnpm install --frozen-lockfile
+# COPY web web
+# WORKDIR /build/web
+# RUN pnpm build
 
 
 # Build the server
@@ -48,5 +48,5 @@ RUN go build \
 FROM base-image
 ENV DOCKER_HOST="unix:///var/run/docker.sock"
 COPY --from=backend-builder /build/bin/server .
-COPY --from=frontend-builder /build/web/dist web/dist
+# COPY --from=frontend-builder /build/web/dist web/dist
 ENTRYPOINT [ "./server" ]
