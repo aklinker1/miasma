@@ -19,6 +19,8 @@ import (
 // region    ************************** generated!.gotpl **************************
 
 type AppResolver interface {
+	Routing(ctx context.Context, obj *internal.App) (*internal.AppRouting, error)
+	SimpleRoute(ctx context.Context, obj *internal.App) (*string, error)
 	Status(ctx context.Context, obj *internal.App) (string, error)
 	Instances(ctx context.Context, obj *internal.App) (string, error)
 }
@@ -401,7 +403,7 @@ func (ec *executionContext) _App_routing(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Routing, nil
+		return ec.resolvers.App().Routing(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -419,8 +421,8 @@ func (ec *executionContext) fieldContext_App_routing(ctx context.Context, field 
 	fc = &graphql.FieldContext{
 		Object:     "App",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "host":
@@ -450,7 +452,7 @@ func (ec *executionContext) _App_simpleRoute(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.SimpleRoute, nil
+		return ec.resolvers.App().SimpleRoute(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -468,8 +470,8 @@ func (ec *executionContext) fieldContext_App_simpleRoute(ctx context.Context, fi
 	fc = &graphql.FieldContext{
 		Object:     "App",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
@@ -1680,13 +1682,39 @@ func (ec *executionContext) _App(ctx context.Context, sel ast.SelectionSet, obj 
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "routing":
+			field := field
 
-			out.Values[i] = ec._App_routing(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._App_routing(ctx, field, obj)
+				return res
+			}
 
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "simpleRoute":
+			field := field
 
-			out.Values[i] = ec._App_simpleRoute(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._App_simpleRoute(ctx, field, obj)
+				return res
+			}
 
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "status":
 			field := field
 

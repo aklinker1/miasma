@@ -45,5 +45,9 @@ models:
         resolver: true
       status:
         resolver: true
+      routing:
+        resolver: true
+      simpleRoute:
+        resolver: true
   AppChanges:
     model: map[string]interface{}

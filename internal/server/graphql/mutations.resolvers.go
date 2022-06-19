@@ -50,6 +50,7 @@ func (r *mutationResolver) CreateApp(ctx context.Context, input internal.AppInpu
 		Image:          input.Image,
 		ImageDigest:    "TODO",
 		Hidden:         utils.BoolOr(input.Hidden, false),
+		Routing:        (*internal.AppRouting)(input.Routing),
 		TargetPorts:    input.TargetPorts,
 		PublishedPorts: input.PublishedPorts,
 		Placement:      input.Placement,

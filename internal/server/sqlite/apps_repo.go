@@ -2,12 +2,12 @@ package sqlite
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
-	"github.com/aklinker1/miasma/internal/server/sqlb"
+	"github.com/aklinker1/miasma/internal/server/sqlite/sqlb"
+	"github.com/aklinker1/miasma/internal/server/sqlite/sqlitetypes"
 	"github.com/aklinker1/miasma/internal/utils"
 	"github.com/gofrs/uuid"
 )
@@ -19,17 +19,16 @@ func findApps(ctx context.Context, tx server.Tx, filter server.AppsFilter) ([]in
 		"created_at":      &scanned.CreatedAt,
 		"updated_at":      &scanned.UpdatedAt,
 		"name":            &scanned.Name,
-		"\"group\"":       &scanned.Group,
+		"group":           &scanned.Group,
 		"image":           &scanned.Image,
 		"image_digest":    &scanned.ImageDigest,
 		"hidden":          &scanned.Hidden,
-		"target_ports":    &scanned.TargetPorts,
-		"published_ports": &scanned.PublishedPorts,
-		"placement":       &scanned.Placement,
-		"volumes":         &scanned.Volumes,
-		"networks":        &scanned.Networks,
-		"routing":         &scanned.Routing,
+		"target_ports":    sqlitetypes.Int32Array(&scanned.TargetPorts),
+		"published_ports": sqlitetypes.Int32Array(&scanned.PublishedPorts),
+		"placement":       sqlitetypes.StringArray(&scanned.Placement),
+		"volumes":         sqlitetypes.BoundVolumeArray(&scanned.Volumes),
 		"command":         &scanned.Command,
+		"networks":        sqlitetypes.StringArray(&scanned.Networks),
 	})
 	if filter.ID != nil {
 		query.Where("id = ?", *filter.ID)
@@ -90,24 +89,22 @@ func createApp(ctx context.Context, tx server.Tx, app internal.App) (internal.Ap
 	app.ID = id.String()
 	app.CreatedAt = time.Now()
 	app.UpdatedAt = time.Now()
-	fmt.Println(app.Routing)
 
 	sql, args := sqlb.Insert("apps", map[string]any{
 		"id":              app.ID,
 		"created_at":      app.CreatedAt,
 		"updated_at":      app.UpdatedAt,
 		"name":            app.Name,
-		"\"group\"":       app.Group,
+		"group":           app.Group,
 		"image":           app.Image,
 		"image_digest":    app.ImageDigest,
 		"hidden":          app.Hidden,
-		"target_ports":    utils.ToJSON(app.TargetPorts),
-		"published_ports": utils.ToJSON(app.PublishedPorts),
-		"placement":       utils.ToJSON(app.Placement),
-		"volumes":         utils.ToJSON(app.Volumes),
-		"networks":        utils.ToJSON(app.Networks),
-		"routing":         utils.ToJSON(app.Routing),
+		"target_ports":    sqlitetypes.Int32Array(app.TargetPorts),
+		"published_ports": sqlitetypes.Int32Array(app.PublishedPorts),
+		"placement":       sqlitetypes.StringArray(app.Placement),
+		"volumes":         sqlitetypes.BoundVolumeArray(app.Volumes),
 		"command":         app.Command,
+		"networks":        sqlitetypes.StringArray(app.Networks),
 	}).ToSQL()
 	_, err = tx.ExecContext(ctx, sql, args...)
 	return app, err
@@ -119,17 +116,16 @@ func updateApp(ctx context.Context, tx server.Tx, app internal.App) (internal.Ap
 	sql, args := sqlb.Update("apps", app.ID, map[string]any{
 		"updated_at":      app.UpdatedAt,
 		"name":            app.Name,
-		"\"group\"":       app.Group,
+		"group":           app.Group,
 		"image":           app.Image,
 		"image_digest":    app.ImageDigest,
 		"hidden":          app.Hidden,
-		"target_ports":    utils.ToJSON(app.TargetPorts),
-		"published_ports": utils.ToJSON(app.PublishedPorts),
-		"placement":       utils.ToJSON(app.Placement),
-		"volumes":         utils.ToJSON(app.Volumes),
-		"networks":        utils.ToJSON(app.Networks),
-		"routing":         utils.ToJSON(app.Routing),
+		"target_ports":    sqlitetypes.Int32Array(app.TargetPorts),
+		"published_ports": sqlitetypes.Int32Array(app.PublishedPorts),
+		"placement":       sqlitetypes.StringArray(app.Placement),
+		"volumes":         sqlitetypes.BoundVolumeArray(app.Volumes),
 		"command":         app.Command,
+		"networks":        sqlitetypes.StringArray(app.Networks),
 	}).ToSQL()
 	_, err := tx.ExecContext(ctx, sql, args...)
 	return app, err

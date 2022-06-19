@@ -27,7 +27,7 @@ func Select(table string, columns map[string]any) *selectBuilder {
 	selectColumns := []string{}
 	scanDest := []any{}
 	for name, target := range columns {
-		selectColumns = append(selectColumns, name)
+		selectColumns = append(selectColumns, `"`+name+`"`)
 		scanDest = append(scanDest, target)
 	}
 	return &selectBuilder{
@@ -78,7 +78,7 @@ func (b *selectBuilder) ToSQL() (sql string, args []any) {
 		if strings.ToUpper(b.order.Direction) == "DESC" {
 			dir = "DESC"
 		}
-		order = fmt.Sprintf(" ORDER BY %s %s", b.order.Field, dir)
+		order = fmt.Sprintf(` ORDER BY "%s" %s`, b.order.Field, dir)
 	}
 
 	var limitOffset string

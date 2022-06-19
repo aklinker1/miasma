@@ -5,10 +5,19 @@ package graphql
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server/gqlgen"
 )
+
+func (r *appResolver) Routing(ctx context.Context, obj *internal.App) (*internal.AppRouting, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *appResolver) SimpleRoute(ctx context.Context, obj *internal.App) (*string, error) {
+	panic(fmt.Errorf("not implemented"))
+}
 
 func (r *appResolver) Status(ctx context.Context, obj *internal.App) (string, error) {
 	return "TODO", nil
