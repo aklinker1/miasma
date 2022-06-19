@@ -53,7 +53,37 @@ func (s *AppService) Create(ctx context.Context, app internal.App) (internal.App
 
 // Delete implements server.AppService
 func (s *AppService) Delete(ctx context.Context, id string) (internal.App, error) {
-	return EmptyApp, server.NewNotImplementedError("sqlite.AppService.Delete")
+	tx, err := s.db.ReadWriteTx(ctx)
+	if err != nil {
+		return EmptyApp, err
+	}
+	defer tx.Rollback()
+
+	app, err := findApp(ctx, tx, server.AppsFilter{
+		ID: &id,
+	})
+	if err != nil {
+		return EmptyApp, err
+	}
+	route, err := findRoute(ctx, tx, server.RoutesFilter{
+		AppID: &id,
+	})
+	if err != nil {
+		return EmptyApp, err
+	}
+	app.Routing = &route
+
+	err = deleteApp(ctx, tx, app)
+	if err != nil {
+		return EmptyApp, err
+	}
+	err = deleteRoute(ctx, tx, route)
+	if err != nil {
+		return EmptyApp, err
+	}
+
+	tx.Commit()
+	return app, nil
 }
 
 func (s *AppService) FindApps(ctx context.Context, filter server.AppsFilter) ([]internal.App, error) {

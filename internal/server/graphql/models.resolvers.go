@@ -13,17 +13,23 @@ import (
 	"github.com/samber/lo"
 )
 
-func (r *appResolver) Routing(ctx context.Context, obj *internal.App) (*internal.AppRouting, error) {
-	route, err := r.Routes.FindRoute(ctx, server.RoutesFilter{
+func getAppRoute(ctx context.Context, routes server.RouteService, obj *internal.App) (*internal.AppRouting, error) {
+	if obj.Routing != nil {
+		return obj.Routing, nil
+	}
+
+	route, err := routes.FindRoute(ctx, server.RoutesFilter{
 		AppID: &obj.ID,
 	})
 	return safeReturn(&route, nil, err)
 }
 
+func (r *appResolver) Routing(ctx context.Context, obj *internal.App) (*internal.AppRouting, error) {
+	return getAppRoute(ctx, r.Routes, obj)
+}
+
 func (r *appResolver) SimpleRoute(ctx context.Context, obj *internal.App) (*string, error) {
-	route, err := r.Routes.FindRoute(ctx, server.RoutesFilter{
-		AppID: &obj.ID,
-	})
+	route, err := getAppRoute(ctx, r.Routes, obj)
 	if err != nil {
 		return nil, err
 	}

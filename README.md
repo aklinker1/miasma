@@ -15,4 +15,8 @@
 
 ### Docs
 
-<https://aklinker1.github.io/miasma/>
+<https://aklinker1.github.io/miasma>
+
+### Contributing
+
+<https://aklinker1.github.io/miasma/docs/contributing>

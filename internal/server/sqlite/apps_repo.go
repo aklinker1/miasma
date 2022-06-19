@@ -130,3 +130,8 @@ func updateApp(ctx context.Context, tx server.Tx, app internal.App) (internal.Ap
 	_, err := tx.ExecContext(ctx, sql, args...)
 	return app, err
 }
+
+func deleteApp(ctx context.Context, tx server.Tx, app internal.App) error {
+	_, err := tx.ExecContext(ctx, "DELETE FROM apps WHERE id = ?", app.ID)
+	return err
+}

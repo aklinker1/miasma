@@ -84,3 +84,8 @@ func updateRoute(ctx context.Context, tx server.Tx, route internal.AppRouting) (
 	_, err := tx.ExecContext(ctx, sql, args...)
 	return route, err
 }
+
+func deleteRoute(ctx context.Context, tx server.Tx, route internal.AppRouting) error {
+	_, err := tx.ExecContext(ctx, "DELETE FROM routes WHERE app_id = ?", route.AppID)
+	return err
+}
