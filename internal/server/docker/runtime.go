@@ -42,14 +42,14 @@ func (*RuntimeService) Stop(ctx context.Context, app internal.App) error {
 	return server.NewNotImplementedError("docker.RuntimeService.Stop")
 }
 
-// SwarmInfo implements server.RuntimeService
-func (s *RuntimeService) SwarmInfo(ctx context.Context) (*internal.SwarmInfo, error) {
+// ClusterInfo implements server.RuntimeService
+func (s *RuntimeService) ClusterInfo(ctx context.Context) (*internal.ClusterInfo, error) {
 	info, err := s.client.Info(ctx)
 	if err != nil {
 		return nil, &server.Error{
 			Code:    server.EINTERNAL,
 			Message: "Failed to run 'docker info'",
-			Op:      "docker.RuntimeService.SwarmInfo()",
+			Op:      "docker.RuntimeService.ClusterInfo()",
 			Err:     err,
 		}
 	}
@@ -60,11 +60,11 @@ func (s *RuntimeService) SwarmInfo(ctx context.Context) (*internal.SwarmInfo, er
 		return nil, &server.Error{
 			Code:    server.EINTERNAL,
 			Message: "Failed to run 'docker swarm inspect'",
-			Op:      "docker.RuntimeService.SwarmInfo()",
+			Op:      "docker.RuntimeService.ClusterInfo()",
 			Err:     err,
 		}
 	}
-	return &internal.SwarmInfo{
+	return &internal.ClusterInfo{
 		ID:          swarm.ID,
 		JoinCommand: fmt.Sprintf("docker swarm join --token %s %s:2377", swarm.JoinTokens.Worker, info.Swarm.NodeAddr),
 		// JoinCommand: fmt.Sprintf("docker swarm join --token %s <main-node-ip:port>", swarm.JoinTokens.Worker),

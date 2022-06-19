@@ -1,4 +1,4 @@
-package querybuilder
+package sqlb
 
 import (
 	"fmt"
@@ -20,10 +20,12 @@ func Insert(table string, record map[string]any) *insertBuilder {
 	columns := []string{}
 	values := []string{}
 	args := []any{}
+	i := 1
 	for column, value := range record {
 		columns = append(columns, column)
 		args = append(args, value)
-		values = append(values, "?")
+		values = append(values, fmt.Sprintf("$%d", i))
+		i++
 	}
 	return &insertBuilder{
 		table:   table,
@@ -39,6 +41,6 @@ func (b *insertBuilder) ToSQL() (sql string, args []any) {
 	columns := strings.Join(b.columns, ", ")
 	values := strings.Join(b.values, ", ")
 	sql = fmt.Sprintf(`INSERT INTO %s (%s) VALUES (%s)`, b.table, columns, values)
-	b.logger.V("SQLite Insert: %s %v", sql, args)
+	b.logger.V("SQL Insert: %s %v", sql, args)
 	return sql, args
 }

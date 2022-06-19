@@ -10,6 +10,7 @@ require (
 	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/mattn/go-sqlite3 v1.14.12
 	github.com/mitchellh/mapstructure v1.5.0
+	github.com/samber/lo v1.21.0
 	github.com/ssoroka/slice v0.0.0-20220402005549-78f0cea3df8b
 	github.com/vektah/gqlparser/v2 v2.4.2
 )
@@ -36,6 +37,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/urfave/cli/v2 v2.5.1 // indirect
+	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
 	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f // indirect
 	golang.org/x/sys v0.0.0-20220429233432-b5fbb4746d32 // indirect

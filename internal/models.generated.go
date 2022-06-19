@@ -94,25 +94,25 @@ type BoundVolumeInput struct {
 	Source string `json:"source"`
 }
 
+// The info about the docker swarm if the host running miasma is apart of one.
+type ClusterInfo struct {
+	ID          string    `json:"id"`
+	JoinCommand string    `json:"joinCommand"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+}
+
 type Health struct {
 	// Miasma server's current version
 	Version string `json:"version"`
 	// The version of docker running on the host, or null if docker is not running
 	DockerVersion string `json:"dockerVersion"`
-	// The main node's swarm information, or null if not apart of a swarm
-	Swarm *SwarmInfo `json:"swarm"`
+	// The cluster versioning and information, or `null` if not apart of a cluster
+	Cluster *ClusterInfo `json:"cluster"`
 }
 
 type Plugin struct {
 	Name string `json:"name"`
 	// Whether or not the plugin has been enabled
 	Enable bool `json:"enable"`
-}
-
-// The info about the docker swarm if the host running miasma is apart of one.
-type SwarmInfo struct {
-	ID          string    `json:"id"`
-	JoinCommand string    `json:"joinCommand"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
 }

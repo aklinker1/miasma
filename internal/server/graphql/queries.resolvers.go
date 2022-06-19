@@ -8,8 +8,10 @@ import (
 	"fmt"
 
 	"github.com/aklinker1/miasma/internal"
+	"github.com/aklinker1/miasma/internal/server"
 	"github.com/aklinker1/miasma/internal/server/gqlgen"
 	"github.com/aklinker1/miasma/internal/utils"
+	"github.com/samber/lo"
 )
 
 func (r *queryResolver) Health(ctx context.Context) (*internal.Health, error) {
@@ -19,19 +21,21 @@ func (r *queryResolver) Health(ctx context.Context) (*internal.Health, error) {
 }
 
 func (r *queryResolver) ListApps(ctx context.Context, page *int32, size *int32, showHidden *bool) ([]*internal.App, error) {
-	filter := server.GetAppFilters{
-		IncludeHidden: utils.BoolOr(showHidden, false),
-		Pagination: server.Pagination{
+	filter := server.AppsFilter{
+		IncludeHidden: showHidden,
+		Pagination: &server.Pagination{
 			Page: utils.Int32Or(page, 1),
 			Size: utils.Int32Or(size, 10),
 		},
 	}
 	apps, err := r.Apps.FindApps(ctx, filter)
-	return safeReturn(apps, nil, err)
+	return safeReturn(lo.ToSlicePtr(apps), nil, err)
 }
 
 func (r *queryResolver) GetApp(ctx context.Context, id string) (*internal.App, error) {
-	app, err := r.Apps.FindAppByName(ctx, appName)
+	app, err := r.Apps.FindApp(ctx, server.AppsFilter{
+		ID: &id,
+	})
 	return safeReturn(&app, nil, err)
 }
 

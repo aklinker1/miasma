@@ -22,11 +22,6 @@ func (r *healthResolver) DockerVersion(ctx context.Context, obj *internal.Health
 	return r.Runtime.Version(ctx)
 }
 
-func (r *healthResolver) Swarm(ctx context.Context, obj *internal.Health) (*internal.SwarmInfo, error) {
-	swarm, err := r.Runtime.SwarmInfo(ctx)
-	return safeReturn(swarm, nil, err)
-}
-
 // App returns gqlgen.AppResolver implementation.
 func (r *Resolver) App() gqlgen.AppResolver { return &appResolver{r} }
 
@@ -35,3 +30,14 @@ func (r *Resolver) Health() gqlgen.HealthResolver { return &healthResolver{r} }
 
 type appResolver struct{ *Resolver }
 type healthResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *healthResolver) ClusterInfo(ctx context.Context, obj *internal.Health) (*internal.ClusterInfo, error) {
+	swarm, err := r.Runtime.ClusterInfo(ctx)
+	return safeReturn(swarm, nil, err)
+}

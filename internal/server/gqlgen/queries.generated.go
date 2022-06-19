@@ -170,8 +170,8 @@ func (ec *executionContext) fieldContext_Query_health(ctx context.Context, field
 				return ec.fieldContext_Health_version(ctx, field)
 			case "dockerVersion":
 				return ec.fieldContext_Health_dockerVersion(ctx, field)
-			case "swarm":
-				return ec.fieldContext_Health_swarm(ctx, field)
+			case "cluster":
+				return ec.fieldContext_Health_cluster(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Health", field.Name)
 		},

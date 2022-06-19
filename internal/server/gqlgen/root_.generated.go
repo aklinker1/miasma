@@ -72,9 +72,16 @@ type ComplexityRoot struct {
 		Target func(childComplexity int) int
 	}
 
+	ClusterInfo struct {
+		CreatedAt   func(childComplexity int) int
+		ID          func(childComplexity int) int
+		JoinCommand func(childComplexity int) int
+		UpdatedAt   func(childComplexity int) int
+	}
+
 	Health struct {
+		Cluster       func(childComplexity int) int
 		DockerVersion func(childComplexity int) int
-		Swarm         func(childComplexity int) int
 		Version       func(childComplexity int) int
 	}
 
@@ -104,13 +111,6 @@ type ComplexityRoot struct {
 		Health        func(childComplexity int) int
 		ListApps      func(childComplexity int, page *int32, size *int32, showHidden *bool) int
 		ListPlugins   func(childComplexity int) int
-	}
-
-	SwarmInfo struct {
-		CreatedAt   func(childComplexity int) int
-		ID          func(childComplexity int) int
-		JoinCommand func(childComplexity int) int
-		UpdatedAt   func(childComplexity int) int
 	}
 }
 
@@ -290,19 +290,47 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.BoundVolume.Target(childComplexity), true
 
+	case "ClusterInfo.createdAt":
+		if e.complexity.ClusterInfo.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.ClusterInfo.CreatedAt(childComplexity), true
+
+	case "ClusterInfo.id":
+		if e.complexity.ClusterInfo.ID == nil {
+			break
+		}
+
+		return e.complexity.ClusterInfo.ID(childComplexity), true
+
+	case "ClusterInfo.joinCommand":
+		if e.complexity.ClusterInfo.JoinCommand == nil {
+			break
+		}
+
+		return e.complexity.ClusterInfo.JoinCommand(childComplexity), true
+
+	case "ClusterInfo.updatedAt":
+		if e.complexity.ClusterInfo.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.ClusterInfo.UpdatedAt(childComplexity), true
+
+	case "Health.cluster":
+		if e.complexity.Health.Cluster == nil {
+			break
+		}
+
+		return e.complexity.Health.Cluster(childComplexity), true
+
 	case "Health.dockerVersion":
 		if e.complexity.Health.DockerVersion == nil {
 			break
 		}
 
 		return e.complexity.Health.DockerVersion(childComplexity), true
-
-	case "Health.swarm":
-		if e.complexity.Health.Swarm == nil {
-			break
-		}
-
-		return e.complexity.Health.Swarm(childComplexity), true
 
 	case "Health.version":
 		if e.complexity.Health.Version == nil {
@@ -519,34 +547,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.ListPlugins(childComplexity), true
 
-	case "SwarmInfo.createdAt":
-		if e.complexity.SwarmInfo.CreatedAt == nil {
-			break
-		}
-
-		return e.complexity.SwarmInfo.CreatedAt(childComplexity), true
-
-	case "SwarmInfo.id":
-		if e.complexity.SwarmInfo.ID == nil {
-			break
-		}
-
-		return e.complexity.SwarmInfo.ID(childComplexity), true
-
-	case "SwarmInfo.joinCommand":
-		if e.complexity.SwarmInfo.JoinCommand == nil {
-			break
-		}
-
-		return e.complexity.SwarmInfo.JoinCommand(childComplexity), true
-
-	case "SwarmInfo.updatedAt":
-		if e.complexity.SwarmInfo.UpdatedAt == nil {
-			break
-		}
-
-		return e.complexity.SwarmInfo.UpdatedAt(childComplexity), true
-
 	}
 	return 0, false
 }
@@ -621,7 +621,7 @@ var sources = []*ast.Source{
 	{Name: "api/models.graphqls", Input: `"""
 The info about the docker swarm if the host running miasma is apart of one.
 """
-type SwarmInfo {
+type ClusterInfo {
   id: String!
   joinCommand: String!
   createdAt: Time!
@@ -633,8 +633,8 @@ type Health {
   version: String!
   "The version of docker running on the host, or null if docker is not running"
   dockerVersion: String!
-  "The main node's swarm information, or null if not apart of a swarm"
-  swarm: SwarmInfo
+  "The cluster versioning and information, or ` + "`" + `null` + "`" + ` if not apart of a cluster"
+  cluster: ClusterInfo
 }
 
 type BoundVolume {

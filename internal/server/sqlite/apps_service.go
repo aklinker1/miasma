@@ -16,39 +16,18 @@ type AppService struct {
 }
 
 func NewAppService(db server.DB) server.AppService {
-	return &AppService{
-		db: db,
-	}
+	return &AppService{db}
 }
 
 // Create implements server.AppService
-func (s *AppService) Create(ctx context.Context, app internal.AppInput) (internal.App, error) {
+func (s *AppService) Create(ctx context.Context, app internal.App) (internal.App, error) {
 	tx, err := s.db.ReadonlyTx(ctx)
 	if err != nil {
 		return EmptyApp, err
 	}
 	defer tx.Rollback()
 
-	var volumes []internal.BoundVolume
-	if len(app.Volumes) > 0 {
-		volumes = []internal.BoundVolume{}
-		for _, v := range app.Volumes {
-			volumes = append(volumes, (internal.BoundVolume)(v))
-		}
-	}
-	created, err := createApp(ctx, tx, internal.App{
-		Name:           app.Name,
-		Group:          app.Group,
-		Image:          app.Image,
-		Hidden:         app.Hidden,
-		Volumes:        volumes,
-		TargetPorts:    app.TargetPorts,
-		PublishedPorts: app.PublishedPorts,
-		Placement:      app.Placement,
-		Networks:       app.Networks,
-		Routing:        (*internal.AppRouting)(app.Routing),
-		Command:        app.Command,
-	})
+	created, err := createApp(ctx, tx, app)
 	if err != nil {
 		return EmptyApp, err
 	}
@@ -61,8 +40,7 @@ func (s *AppService) Delete(ctx context.Context, id string) (internal.App, error
 	return EmptyApp, server.NewNotImplementedError("sqlite.AppService.Delete")
 }
 
-// Get implements server.AppService
-func (s *AppService) Get(ctx context.Context, filter internal.AppsFilter) ([]internal.App, error) {
+func (s *AppService) FindApps(ctx context.Context, filter server.AppsFilter) ([]internal.App, error) {
 	tx, err := s.db.ReadonlyTx(ctx)
 	if err != nil {
 		return nil, err
@@ -71,7 +49,7 @@ func (s *AppService) Get(ctx context.Context, filter internal.AppsFilter) ([]int
 }
 
 // GetOne implements server.AppService
-func (s *AppService) GetOne(ctx context.Context, filter internal.AppsFilter) (internal.App, error) {
+func (s *AppService) FindApp(ctx context.Context, filter server.AppsFilter) (internal.App, error) {
 	tx, err := s.db.ReadonlyTx(ctx)
 	if err != nil {
 		return EmptyApp, err

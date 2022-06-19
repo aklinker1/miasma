@@ -1,12 +1,12 @@
-package querybuilder
+package sqlb
 
 import (
 	"fmt"
 	"strings"
 
-	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
 	fmt2 "github.com/aklinker1/miasma/internal/server/fmt"
+	"github.com/samber/lo"
 )
 
 type selectBuilder struct {
@@ -15,9 +15,11 @@ type selectBuilder struct {
 	scanDest          []any
 	args              []any
 	where             []string
-	sort              *internal.Sort
+	limit             string
+	offset            string
+	order             *server.Sort
 	includeSoftDelete bool
-	pagination        *internal.Pagination
+	pagination        *server.Pagination
 	logger            server.Logger
 }
 
@@ -47,12 +49,12 @@ func (b *selectBuilder) IncludeSoftDeleted() *selectBuilder {
 	return b
 }
 
-func (b *selectBuilder) OrderBy(sort internal.Sort) *selectBuilder {
-	b.sort = &sort
+func (b *selectBuilder) OrderBy(sort server.Sort) *selectBuilder {
+	b.order = &sort
 	return b
 }
 
-func (b *selectBuilder) Paginate(pagination internal.Pagination) *selectBuilder {
+func (b *selectBuilder) Paginate(pagination server.Pagination) *selectBuilder {
 	b.pagination = &pagination
 	return b
 }
@@ -63,7 +65,7 @@ func (b *selectBuilder) ToSQL() (sql string, args []any) {
 
 	var where string
 	wheres := b.where
-	if !b.includeSoftDelete && strings.Contains(columns, "deleted_at") {
+	if !b.includeSoftDelete && lo.Contains(b.columns, "deleted_at") {
 		wheres = append(wheres, "deleted_at IS NULL")
 	}
 	if len(b.where) > 0 {
@@ -71,21 +73,21 @@ func (b *selectBuilder) ToSQL() (sql string, args []any) {
 	}
 
 	var order string
-	if b.sort != nil {
+	if b.order != nil {
 		dir := "ASC"
-		if strings.ToUpper(b.sort.Direction) == "DESC" {
+		if strings.ToUpper(b.order.Direction) == "DESC" {
 			dir = "DESC"
 		}
-		order = fmt.Sprintf(" ORDER BY %s %s", b.sort.Field, dir)
+		order = fmt.Sprintf(" ORDER BY %s %s", b.order.Field, dir)
 	}
 
 	var limitOffset string
 	if b.pagination != nil {
 		limitOffset = " LIMIT ? OFFSET ?"
-		args = append(args, b.pagination.Limit(), b.pagination.Offset())
+		args = append(args, b.pagination.Limit, b.pagination.Offset)
 	}
 	sql = fmt.Sprintf(`SELECT %s FROM %s%s%s%s`, columns, b.table, where, order, limitOffset)
-	b.logger.V("SQLite Query: %s %v", sql, args)
+	b.logger.V("SQL Query: %s %v", sql, args)
 	return sql, args
 }
 

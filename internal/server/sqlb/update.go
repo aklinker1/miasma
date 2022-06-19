@@ -1,4 +1,4 @@
-package querybuilder
+package sqlb
 
 import (
 	"fmt"
@@ -34,13 +34,14 @@ func Update(table string, id any, record map[string]any) *updateBuilder {
 func (b *updateBuilder) ToSQL() (sql string, args []any) {
 	args = b.args
 	setters := []string{}
-	for _, column := range b.columns {
-		setters = append(setters, fmt.Sprintf("%s = ?", column))
+	for i, column := range b.columns {
+		setters = append(setters, fmt.Sprintf("%s = $%d", column, i+1))
 	}
 	sql = fmt.Sprintf(
-		`UPDATE %s SET %s WHERE id = ?`,
+		`UPDATE %s SET %s WHERE id = $%d`,
 		b.table,
 		strings.Join(setters, ", "),
+		len(setters)+1,
 	)
 	b.logger.V("SQL Update: %s %v", sql, args)
 	return sql, args

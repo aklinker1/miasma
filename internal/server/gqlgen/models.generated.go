@@ -24,7 +24,6 @@ type AppResolver interface {
 }
 type HealthResolver interface {
 	DockerVersion(ctx context.Context, obj *internal.Health) (string, error)
-	Swarm(ctx context.Context, obj *internal.Health) (*internal.SwarmInfo, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -1029,6 +1028,182 @@ func (ec *executionContext) fieldContext_BoundVolume_source(ctx context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _ClusterInfo_id(ctx context.Context, field graphql.CollectedField, obj *internal.ClusterInfo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClusterInfo_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClusterInfo_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClusterInfo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClusterInfo_joinCommand(ctx context.Context, field graphql.CollectedField, obj *internal.ClusterInfo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClusterInfo_joinCommand(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.JoinCommand, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClusterInfo_joinCommand(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClusterInfo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClusterInfo_createdAt(ctx context.Context, field graphql.CollectedField, obj *internal.ClusterInfo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClusterInfo_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClusterInfo_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClusterInfo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClusterInfo_updatedAt(ctx context.Context, field graphql.CollectedField, obj *internal.ClusterInfo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClusterInfo_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClusterInfo_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClusterInfo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Health_version(ctx context.Context, field graphql.CollectedField, obj *internal.Health) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Health_version(ctx, field)
 	if err != nil {
@@ -1117,8 +1292,8 @@ func (ec *executionContext) fieldContext_Health_dockerVersion(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Health_swarm(ctx context.Context, field graphql.CollectedField, obj *internal.Health) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Health_swarm(ctx, field)
+func (ec *executionContext) _Health_cluster(ctx context.Context, field graphql.CollectedField, obj *internal.Health) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Health_cluster(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1131,7 +1306,7 @@ func (ec *executionContext) _Health_swarm(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Health().Swarm(rctx, obj)
+		return obj.Cluster, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1140,29 +1315,29 @@ func (ec *executionContext) _Health_swarm(ctx context.Context, field graphql.Col
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*internal.SwarmInfo)
+	res := resTmp.(*internal.ClusterInfo)
 	fc.Result = res
-	return ec.marshalOSwarmInfo2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐSwarmInfo(ctx, field.Selections, res)
+	return ec.marshalOClusterInfo2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐClusterInfo(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Health_swarm(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Health_cluster(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Health",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_SwarmInfo_id(ctx, field)
+				return ec.fieldContext_ClusterInfo_id(ctx, field)
 			case "joinCommand":
-				return ec.fieldContext_SwarmInfo_joinCommand(ctx, field)
+				return ec.fieldContext_ClusterInfo_joinCommand(ctx, field)
 			case "createdAt":
-				return ec.fieldContext_SwarmInfo_createdAt(ctx, field)
+				return ec.fieldContext_ClusterInfo_createdAt(ctx, field)
 			case "updatedAt":
-				return ec.fieldContext_SwarmInfo_updatedAt(ctx, field)
+				return ec.fieldContext_ClusterInfo_updatedAt(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type SwarmInfo", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type ClusterInfo", field.Name)
 		},
 	}
 	return fc, nil
@@ -1251,182 +1426,6 @@ func (ec *executionContext) fieldContext_Plugin_enable(ctx context.Context, fiel
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Boolean does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SwarmInfo_id(ctx context.Context, field graphql.CollectedField, obj *internal.SwarmInfo) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SwarmInfo_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_SwarmInfo_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SwarmInfo",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SwarmInfo_joinCommand(ctx context.Context, field graphql.CollectedField, obj *internal.SwarmInfo) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SwarmInfo_joinCommand(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.JoinCommand, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_SwarmInfo_joinCommand(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SwarmInfo",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SwarmInfo_createdAt(ctx context.Context, field graphql.CollectedField, obj *internal.SwarmInfo) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SwarmInfo_createdAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CreatedAt, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(time.Time)
-	fc.Result = res
-	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_SwarmInfo_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SwarmInfo",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Time does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SwarmInfo_updatedAt(ctx context.Context, field graphql.CollectedField, obj *internal.SwarmInfo) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SwarmInfo_updatedAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UpdatedAt, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(time.Time)
-	fc.Result = res
-	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_SwarmInfo_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SwarmInfo",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Time does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1831,6 +1830,55 @@ func (ec *executionContext) _BoundVolume(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
+var clusterInfoImplementors = []string{"ClusterInfo"}
+
+func (ec *executionContext) _ClusterInfo(ctx context.Context, sel ast.SelectionSet, obj *internal.ClusterInfo) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, clusterInfoImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ClusterInfo")
+		case "id":
+
+			out.Values[i] = ec._ClusterInfo_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "joinCommand":
+
+			out.Values[i] = ec._ClusterInfo_joinCommand(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+
+			out.Values[i] = ec._ClusterInfo_createdAt(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatedAt":
+
+			out.Values[i] = ec._ClusterInfo_updatedAt(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var healthImplementors = []string{"Health"}
 
 func (ec *executionContext) _Health(ctx context.Context, sel ast.SelectionSet, obj *internal.Health) graphql.Marshaler {
@@ -1868,23 +1916,10 @@ func (ec *executionContext) _Health(ctx context.Context, sel ast.SelectionSet, o
 				return innerFunc(ctx)
 
 			})
-		case "swarm":
-			field := field
+		case "cluster":
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Health_swarm(ctx, field, obj)
-				return res
-			}
+			out.Values[i] = ec._Health_cluster(ctx, field, obj)
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -1916,55 +1951,6 @@ func (ec *executionContext) _Plugin(ctx context.Context, sel ast.SelectionSet, o
 		case "enable":
 
 			out.Values[i] = ec._Plugin_enable(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var swarmInfoImplementors = []string{"SwarmInfo"}
-
-func (ec *executionContext) _SwarmInfo(ctx context.Context, sel ast.SelectionSet, obj *internal.SwarmInfo) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, swarmInfoImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("SwarmInfo")
-		case "id":
-
-			out.Values[i] = ec._SwarmInfo_id(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "joinCommand":
-
-			out.Values[i] = ec._SwarmInfo_joinCommand(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "createdAt":
-
-			out.Values[i] = ec._SwarmInfo_createdAt(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "updatedAt":
-
-			out.Values[i] = ec._SwarmInfo_updatedAt(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -2220,18 +2206,18 @@ func (ec *executionContext) unmarshalOBoundVolumeInput2ᚕᚖgithubᚗcomᚋakli
 	return res, nil
 }
 
+func (ec *executionContext) marshalOClusterInfo2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐClusterInfo(ctx context.Context, sel ast.SelectionSet, v *internal.ClusterInfo) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ClusterInfo(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOHealth2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐHealth(ctx context.Context, sel ast.SelectionSet, v *internal.Health) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Health(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOSwarmInfo2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐSwarmInfo(ctx context.Context, sel ast.SelectionSet, v *internal.SwarmInfo) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._SwarmInfo(ctx, sel, v)
 }
 
 // endregion ***************************** type.gotpl *****************************

@@ -14,9 +14,10 @@ import (
 	"github.com/aklinker1/miasma/internal/server/gqlgen"
 	"github.com/aklinker1/miasma/internal/utils"
 	"github.com/gofrs/uuid"
+	"github.com/samber/lo"
 )
 
-func (r *mutationResolver) CreateApp(ctx context.Context, app internal.AppInput) (*internal.App, error) {
+func (r *mutationResolver) CreateApp(ctx context.Context, input internal.AppInput) (*internal.App, error) {
 	id, err := uuid.NewV4()
 	if err != nil {
 		return nil, &server.Error{
@@ -26,14 +27,14 @@ func (r *mutationResolver) CreateApp(ctx context.Context, app internal.AppInput)
 			Err:     err,
 		}
 	}
-	if app.Name = strings.TrimSpace(app.Name); app.Name == "" {
+	if input.Name = strings.TrimSpace(input.Name); input.Name == "" {
 		return nil, &server.Error{
 			Code:    server.EINVALID,
 			Message: "App name cannot be empty",
 			Op:      "createApp",
 		}
 	}
-	if app.Image = strings.TrimSpace(app.Image); app.Image == "" {
+	if input.Image = strings.TrimSpace(input.Image); input.Image == "" {
 		return nil, &server.Error{
 			Code:    server.EINVALID,
 			Message: "App image cannot be empty",
@@ -44,24 +45,32 @@ func (r *mutationResolver) CreateApp(ctx context.Context, app internal.AppInput)
 	a := internal.App{
 		ID:             id.String(),
 		CreatedAt:      time.Now(),
-		Name:           app.Name,
-		Group:          app.Group,
-		Image:          app.Image,
+		Name:           input.Name,
+		Group:          input.Group,
+		Image:          input.Image,
 		ImageDigest:    "TODO",
-		Hidden:         utils.BoolOr(app.Hidden, false),
-		TargetPorts:    app.TargetPorts,
-		PublishedPorts: app.PublishedPorts,
-		Placement:      app.Placement,
-		Volumes:        toBoundVolumes(app.Volumes),
-		Networks:       app.Networks,
-		Command:        app.Command,
+		Hidden:         utils.BoolOr(input.Hidden, false),
+		TargetPorts:    input.TargetPorts,
+		PublishedPorts: input.PublishedPorts,
+		Placement:      input.Placement,
+		Volumes: lo.Map(input.Volumes, func(v *internal.BoundVolumeInput, _ int) *internal.BoundVolume {
+			return &internal.BoundVolume{
+				Target: v.Target,
+				Source: v.Source,
+			}
+		}),
+		Networks: input.Networks,
+		Command:  input.Command,
 	}
 
-	return safeReturn(&a, nil, r.Apps.Create(ctx, a))
+	created, err := r.Apps.Create(ctx, a)
+	return safeReturn(&created, nil, err)
 }
 
 func (r *mutationResolver) EditApp(ctx context.Context, id string, changes map[string]interface{}) (*internal.App, error) {
-	newApp, err := r.Apps.GetOne(ctx, internal.AppsFilter{ID: &id})
+	newApp, err := r.Apps.FindApp(ctx, server.AppsFilter{
+		ID: &id,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +80,7 @@ func (r *mutationResolver) EditApp(ctx context.Context, id string, changes map[s
 }
 
 func (r *mutationResolver) DeleteApp(ctx context.Context, id string) (*internal.App, error) {
-	app, err := r.Apps.Delete(ctx, appName)
+	app, err := r.Apps.Delete(ctx, id)
 	return safeReturn(&app, nil, err)
 }
 

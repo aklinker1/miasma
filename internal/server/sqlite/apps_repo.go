@@ -7,20 +7,14 @@ import (
 
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
-	"github.com/aklinker1/miasma/internal/server/querybuilder"
+	"github.com/aklinker1/miasma/internal/server/sqlb"
 	"github.com/aklinker1/miasma/internal/utils"
 	"github.com/gofrs/uuid"
 )
 
-func findApps(ctx context.Context, tx server.Tx, filter internal.AppsFilter) ([]internal.App, error) {
+func findApps(ctx context.Context, tx server.Tx, filter server.AppsFilter) ([]internal.App, error) {
 	var scanned internal.App
-	var scannedPlacement StringArray
-	var scannedTargetPorts Int32Array
-	var scannedPublishedPorts Int32Array
-	var scannedVolumes BoundVolumeArray
-	var scannedNetworks StringArray
-	var scannedRouting AppRoutingBlob
-	query := querybuilder.Select("apps", map[string]any{
+	query := sqlb.Select("apps", map[string]any{
 		"id":              &scanned.ID,
 		"created_at":      &scanned.CreatedAt,
 		"updated_at":      &scanned.UpdatedAt,
@@ -29,12 +23,12 @@ func findApps(ctx context.Context, tx server.Tx, filter internal.AppsFilter) ([]
 		"image":           &scanned.Image,
 		"image_digest":    &scanned.ImageDigest,
 		"hidden":          &scanned.Hidden,
-		"target_ports":    &scannedTargetPorts,
-		"published_ports": &scannedPublishedPorts,
-		"placement":       &scannedPlacement,
-		"volumes":         &scannedVolumes,
-		"networks":        &scannedNetworks,
-		"routing":         &scannedRouting,
+		"target_ports":    &scanned.TargetPorts,
+		"published_ports": &scanned.PublishedPorts,
+		"placement":       &scanned.Placement,
+		"volumes":         &scanned.Volumes,
+		"networks":        &scanned.Networks,
+		"routing":         &scanned.Routing,
 		"command":         &scanned.Command,
 	})
 	if filter.ID != nil {
@@ -68,18 +62,12 @@ func findApps(ctx context.Context, tx server.Tx, filter internal.AppsFilter) ([]
 		if err != nil {
 			return nil, server.NewDatabaseError("findApps", err)
 		}
-		scanned.Placement = scannedPlacement
-		scanned.TargetPorts = scannedTargetPorts
-		scanned.PublishedPorts = scannedPublishedPorts
-		scanned.Volumes = scannedVolumes
-		scanned.Networks = scannedNetworks
-		scanned.Routing = (*internal.AppRouting)(&scannedRouting)
 		result = append(result, scanned)
 	}
 	return result, rows.Err()
 }
 
-func findApp(ctx context.Context, tx server.Tx, filter internal.AppsFilter) (internal.App, error) {
+func findApp(ctx context.Context, tx server.Tx, filter server.AppsFilter) (internal.App, error) {
 	apps, err := findApps(ctx, tx, filter)
 	if err != nil {
 		return EmptyApp, err
@@ -100,11 +88,11 @@ func createApp(ctx context.Context, tx server.Tx, app internal.App) (internal.Ap
 		return EmptyApp, err
 	}
 	app.ID = id.String()
-	app.CreatedAt = utils.Ptr(time.Now())
-	app.UpdatedAt = utils.Ptr(time.Now())
+	app.CreatedAt = time.Now()
+	app.UpdatedAt = time.Now()
 	fmt.Println(app.Routing)
 
-	sql, args := querybuilder.Insert("apps", map[string]any{
+	sql, args := sqlb.Insert("apps", map[string]any{
 		"id":              app.ID,
 		"created_at":      app.CreatedAt,
 		"updated_at":      app.UpdatedAt,
@@ -126,9 +114,9 @@ func createApp(ctx context.Context, tx server.Tx, app internal.App) (internal.Ap
 }
 
 func updateApp(ctx context.Context, tx server.Tx, app internal.App) (internal.App, error) {
-	app.UpdatedAt = utils.Ptr(time.Now())
+	app.UpdatedAt = time.Now()
 
-	sql, args := querybuilder.Update("apps", app.ID, map[string]any{
+	sql, args := sqlb.Update("apps", app.ID, map[string]any{
 		"updated_at":      app.UpdatedAt,
 		"name":            app.Name,
 		"\"group\"":       app.Group,

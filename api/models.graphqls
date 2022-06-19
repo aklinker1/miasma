@@ -1,7 +1,7 @@
 """
 The info about the docker swarm if the host running miasma is apart of one.
 """
-type SwarmInfo {
+type ClusterInfo {
   id: String!
   joinCommand: String!
   createdAt: Time!
@@ -13,8 +13,8 @@ type Health {
   version: String!
   "The version of docker running on the host, or null if docker is not running"
   dockerVersion: String!
-  "The main node's swarm information, or null if not apart of a swarm"
-  swarm: SwarmInfo
+  "The cluster versioning and information, or `null` if not apart of a cluster"
+  cluster: ClusterInfo
 }
 
 type BoundVolume {
