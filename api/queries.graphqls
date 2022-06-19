@@ -6,7 +6,4 @@ type Query {
 
   listPlugins: [Plugin!]!
   getPlugin(pluginName: String!): Plugin!
-
-  "Only available when the 'router' plugin is enabled"
-  getAppRouting(appId: ID!): AppRouting!
 }

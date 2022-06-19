@@ -13,20 +13,10 @@ import (
 	"github.com/aklinker1/miasma/internal/server"
 	"github.com/aklinker1/miasma/internal/server/gqlgen"
 	"github.com/aklinker1/miasma/internal/utils"
-	"github.com/gofrs/uuid"
 	"github.com/samber/lo"
 )
 
 func (r *mutationResolver) CreateApp(ctx context.Context, input internal.AppInput) (*internal.App, error) {
-	id, err := uuid.NewV4()
-	if err != nil {
-		return nil, &server.Error{
-			Code:    server.EINTERNAL,
-			Message: "Failed to generate new app's ID",
-			Op:      "sqlite.createApp",
-			Err:     err,
-		}
-	}
 	if input.Name = strings.TrimSpace(input.Name); input.Name == "" {
 		return nil, &server.Error{
 			Code:    server.EINVALID,
@@ -43,14 +33,19 @@ func (r *mutationResolver) CreateApp(ctx context.Context, input internal.AppInpu
 	}
 
 	a := internal.App{
-		ID:             id.String(),
-		CreatedAt:      time.Now(),
-		Name:           input.Name,
-		Group:          input.Group,
-		Image:          input.Image,
-		ImageDigest:    "TODO",
-		Hidden:         utils.BoolOr(input.Hidden, false),
-		Routing:        (*internal.AppRouting)(input.Routing),
+		CreatedAt:   time.Now(),
+		Name:        input.Name,
+		Group:       input.Group,
+		Image:       input.Image,
+		ImageDigest: "TODO",
+		Hidden:      utils.BoolOr(input.Hidden, false),
+		Routing: lo.If[*internal.AppRouting](input.Routing == nil, nil).ElseF(func() *internal.AppRouting {
+			return &internal.AppRouting{
+				Host:        input.Routing.Host,
+				Path:        input.Routing.Path,
+				TraefikRule: input.Routing.TraefikRule,
+			}
+		}),
 		TargetPorts:    input.TargetPorts,
 		PublishedPorts: input.PublishedPorts,
 		Placement:      input.Placement,

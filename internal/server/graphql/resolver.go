@@ -6,6 +6,7 @@ import "github.com/aklinker1/miasma/internal/server"
 
 type Resolver struct {
 	Apps    server.AppService
+	Routes  server.RouteService
 	Runtime server.RuntimeService
 	Version string
 }

@@ -26,6 +26,7 @@ type AppResolver interface {
 }
 type HealthResolver interface {
 	DockerVersion(ctx context.Context, obj *internal.Health) (string, error)
+	Cluster(ctx context.Context, obj *internal.Health) (*internal.ClusterInfo, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -425,6 +426,12 @@ func (ec *executionContext) fieldContext_App_routing(ctx context.Context, field 
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "appId":
+				return ec.fieldContext_AppRouting_appId(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_AppRouting_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_AppRouting_updatedAt(ctx, field)
 			case "host":
 				return ec.fieldContext_AppRouting_host(ctx, field)
 			case "path":
@@ -814,6 +821,138 @@ func (ec *executionContext) fieldContext_App_command(ctx context.Context, field 
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AppRouting_appId(ctx context.Context, field graphql.CollectedField, obj *internal.AppRouting) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AppRouting_appId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AppID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AppRouting_appId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AppRouting",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AppRouting_createdAt(ctx context.Context, field graphql.CollectedField, obj *internal.AppRouting) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AppRouting_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AppRouting_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AppRouting",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AppRouting_updatedAt(ctx context.Context, field graphql.CollectedField, obj *internal.AppRouting) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AppRouting_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AppRouting_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AppRouting",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1308,7 +1447,7 @@ func (ec *executionContext) _Health_cluster(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Cluster, nil
+		return ec.resolvers.Health().Cluster(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1326,8 +1465,8 @@ func (ec *executionContext) fieldContext_Health_cluster(ctx context.Context, fie
 	fc = &graphql.FieldContext{
 		Object:     "Health",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -1800,6 +1939,27 @@ func (ec *executionContext) _AppRouting(ctx context.Context, sel ast.SelectionSe
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AppRouting")
+		case "appId":
+
+			out.Values[i] = ec._AppRouting_appId(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+
+			out.Values[i] = ec._AppRouting_createdAt(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatedAt":
+
+			out.Values[i] = ec._AppRouting_updatedAt(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "host":
 
 			out.Values[i] = ec._AppRouting_host(ctx, field, obj)
@@ -1945,9 +2105,22 @@ func (ec *executionContext) _Health(ctx context.Context, sel ast.SelectionSet, o
 
 			})
 		case "cluster":
+			field := field
 
-			out.Values[i] = ec._Health_cluster(ctx, field, obj)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Health_cluster(ctx, field, obj)
+				return res
+			}
 
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2063,20 +2236,6 @@ func (ec *executionContext) unmarshalNAppChanges2map(ctx context.Context, v inte
 func (ec *executionContext) unmarshalNAppInput2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppInput(ctx context.Context, v interface{}) (internal.AppInput, error) {
 	res, err := ec.unmarshalInputAppInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNAppRouting2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppRouting(ctx context.Context, sel ast.SelectionSet, v internal.AppRouting) graphql.Marshaler {
-	return ec._AppRouting(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNAppRouting2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppRouting(ctx context.Context, sel ast.SelectionSet, v *internal.AppRouting) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._AppRouting(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNBoundVolume2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐBoundVolume(ctx context.Context, sel ast.SelectionSet, v *internal.BoundVolume) graphql.Marshaler {

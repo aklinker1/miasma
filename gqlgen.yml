@@ -39,6 +39,8 @@ models:
         resolver: true
       dockerVersion:
         resolver: true
+      cluster:
+        resolver: true
   App:
     fields:
       instances:

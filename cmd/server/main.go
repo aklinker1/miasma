@@ -28,6 +28,7 @@ func main() {
 	}
 
 	apps := sqlite.NewAppService(db)
+	routes := sqlite.NewRouteService(db)
 	runtime, err := docker.NewRuntimeService(logger)
 	if err != nil {
 		logger.E("Failed to initialize docker runtime: %v", err)
@@ -35,6 +36,7 @@ func main() {
 	}
 	resolver := &graphql.Resolver{
 		Apps:    apps,
+		Routes:  routes,
 		Runtime: runtime,
 		Version: VERSION,
 	}

@@ -16,7 +16,9 @@ type AppService struct {
 }
 
 func NewAppService(db server.DB) server.AppService {
-	return &AppService{db}
+	return &AppService{
+		db: db,
+	}
 }
 
 // Create implements server.AppService
@@ -31,6 +33,20 @@ func (s *AppService) Create(ctx context.Context, app internal.App) (internal.App
 	if err != nil {
 		return EmptyApp, err
 	}
+
+	if app.Routing != nil {
+		createdRoute, err := createRoute(ctx, tx, internal.AppRouting{
+			AppID:       created.ID,
+			Host:        app.Routing.Host,
+			Path:        app.Routing.Path,
+			TraefikRule: app.Routing.TraefikRule,
+		})
+		if err != nil {
+			return EmptyApp, err
+		}
+		created.Routing = &createdRoute
+	}
+
 	tx.Commit()
 	return created, nil
 }

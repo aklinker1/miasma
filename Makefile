@@ -5,6 +5,7 @@ BUILD=$(shell TZ=UTC git --no-pager show --quiet --abbrev=40 --format='%h')
 BUILD_HASH=$(shell TZ=UTC git --no-pager show --quiet --abbrev=8 --format='%h')
 BUILD_DATE=$(shell TZ=UTC git --no-pager show --quiet --date='format-local:%Y%m%d%H%M%S' --format='%cd')
 BUILD_VAR_PATH=main
+DATA_DIR=$(shell pwd)/data
 
 # Build the production docker image
 build:
@@ -26,7 +27,7 @@ run: build
 		--rm \
 		--env-file .env \
 		-p 3000:3000 \
-		-v "$(shell pwd)/data":/data/miasma \
+		-v "${DATA_DIR}":/data/miasma \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		aklinker1/miasma:local
 
@@ -57,3 +58,9 @@ publish:
 		--build-arg BUILD_HASH="${BUILD_HASH}" \
 		--build-arg BUILD_DATE="${BUILD_DATE}" \
 		--build-arg BUILD_VAR_PATH="${BUILD_VAR_PATH}"
+
+# Remove generated files
+clean:
+	@rm -rf "${DATA_DIR}" ; echo "Cleaned local database..."
+	@rm -rf ./bin ; echo "Cleaned output directory..."
+	@echo "Done!"

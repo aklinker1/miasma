@@ -12,10 +12,11 @@ type updateBuilder struct {
 	table   string
 	columns []string
 	args    []any
+	idField string
 	logger  server.Logger
 }
 
-func Update(table string, id any, record map[string]any) *updateBuilder {
+func Update(table string, idField string, id any, record map[string]any) *updateBuilder {
 	columns := []string{}
 	args := []any{}
 	for column, value := range record {
@@ -27,6 +28,7 @@ func Update(table string, id any, record map[string]any) *updateBuilder {
 		table:   table,
 		columns: columns,
 		args:    args,
+		idField: idField,
 		logger:  &fmt2.Logger{},
 	}
 }
@@ -34,14 +36,14 @@ func Update(table string, id any, record map[string]any) *updateBuilder {
 func (b *updateBuilder) ToSQL() (sql string, args []any) {
 	args = b.args
 	setters := []string{}
-	for i, column := range b.columns {
-		setters = append(setters, fmt.Sprintf("%s = $%d", column, i+1))
+	for _, column := range b.columns {
+		setters = append(setters, fmt.Sprintf(`"%s" = ?`, column))
 	}
 	sql = fmt.Sprintf(
-		`UPDATE %s SET %s WHERE id = $%d`,
+		`UPDATE %s SET %s WHERE "%s" = ?`,
 		b.table,
 		strings.Join(setters, ", "),
-		len(setters)+1,
+		b.idField,
 	)
 	b.logger.V("SQL Update: %s %v", sql, args)
 	return sql, args

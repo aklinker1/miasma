@@ -22,7 +22,7 @@ func Insert(table string, record map[string]any) *insertBuilder {
 	args := []any{}
 	i := 1
 	for column, value := range record {
-		columns = append(columns, column)
+		columns = append(columns, `"`+column+`"`)
 		args = append(args, value)
 		values = append(values, fmt.Sprintf("$%d", i))
 		i++

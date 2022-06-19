@@ -71,9 +71,12 @@ type AppInput struct {
 }
 
 type AppRouting struct {
-	Host        *string `json:"host"`
-	Path        *string `json:"path"`
-	TraefikRule *string `json:"traefikRule"`
+	AppID       string    `json:"appId"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+	Host        *string   `json:"host"`
+	Path        *string   `json:"path"`
+	TraefikRule *string   `json:"traefikRule"`
 }
 
 type AppRoutingInput struct {

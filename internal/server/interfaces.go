@@ -54,3 +54,11 @@ type RuntimeService interface {
 	Version(ctx context.Context) (string, error)
 	ClusterInfo(ctx context.Context) (*internal.ClusterInfo, error)
 }
+
+type RoutesFilter struct {
+	AppID *string
+}
+
+type RouteService interface {
+	FindRoute(ctx context.Context, filter RoutesFilter) (internal.AppRouting, error)
+}

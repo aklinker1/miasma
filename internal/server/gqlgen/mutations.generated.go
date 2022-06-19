@@ -957,6 +957,12 @@ func (ec *executionContext) fieldContext_Mutation_setAppRouting(ctx context.Cont
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "appId":
+				return ec.fieldContext_AppRouting_appId(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_AppRouting_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_AppRouting_updatedAt(ctx, field)
 			case "host":
 				return ec.fieldContext_AppRouting_host(ctx, field)
 			case "path":
@@ -1017,6 +1023,12 @@ func (ec *executionContext) fieldContext_Mutation_removeAppRouting(ctx context.C
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "appId":
+				return ec.fieldContext_AppRouting_appId(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_AppRouting_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_AppRouting_updatedAt(ctx, field)
 			case "host":
 				return ec.fieldContext_AppRouting_host(ctx, field)
 			case "path":

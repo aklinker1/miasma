@@ -62,9 +62,12 @@ type ComplexityRoot struct {
 	}
 
 	AppRouting struct {
+		AppID       func(childComplexity int) int
+		CreatedAt   func(childComplexity int) int
 		Host        func(childComplexity int) int
 		Path        func(childComplexity int) int
 		TraefikRule func(childComplexity int) int
+		UpdatedAt   func(childComplexity int) int
 	}
 
 	BoundVolume struct {
@@ -105,12 +108,11 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetApp        func(childComplexity int, id string) int
-		GetAppRouting func(childComplexity int, appID string) int
-		GetPlugin     func(childComplexity int, pluginName string) int
-		Health        func(childComplexity int) int
-		ListApps      func(childComplexity int, page *int32, size *int32, showHidden *bool) int
-		ListPlugins   func(childComplexity int) int
+		GetApp      func(childComplexity int, id string) int
+		GetPlugin   func(childComplexity int, pluginName string) int
+		Health      func(childComplexity int) int
+		ListApps    func(childComplexity int, page *int32, size *int32, showHidden *bool) int
+		ListPlugins func(childComplexity int) int
 	}
 }
 
@@ -255,6 +257,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.App.Volumes(childComplexity), true
 
+	case "AppRouting.appId":
+		if e.complexity.AppRouting.AppID == nil {
+			break
+		}
+
+		return e.complexity.AppRouting.AppID(childComplexity), true
+
+	case "AppRouting.createdAt":
+		if e.complexity.AppRouting.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.AppRouting.CreatedAt(childComplexity), true
+
 	case "AppRouting.host":
 		if e.complexity.AppRouting.Host == nil {
 			break
@@ -275,6 +291,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AppRouting.TraefikRule(childComplexity), true
+
+	case "AppRouting.updatedAt":
+		if e.complexity.AppRouting.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.AppRouting.UpdatedAt(childComplexity), true
 
 	case "BoundVolume.source":
 		if e.complexity.BoundVolume.Source == nil {
@@ -496,18 +519,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetApp(childComplexity, args["id"].(string)), true
-
-	case "Query.getAppRouting":
-		if e.complexity.Query.GetAppRouting == nil {
-			break
-		}
-
-		args, err := ec.field_Query_getAppRouting_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.GetAppRouting(childComplexity, args["appId"].(string)), true
 
 	case "Query.getPlugin":
 		if e.complexity.Query.GetPlugin == nil {
@@ -743,6 +754,9 @@ type Plugin {
 }
 
 type AppRouting {
+  appId: ID!
+  createdAt: Time!
+  updatedAt: Time!
   host: String
   path: String
   traefikRule: String
@@ -789,9 +803,6 @@ input AppRoutingInput {
 
   listPlugins: [Plugin!]!
   getPlugin(pluginName: String!): Plugin!
-
-  "Only available when the 'router' plugin is enabled"
-  getAppRouting(appId: ID!): AppRouting!
 }
 `, BuiltIn: false},
 	{Name: "api/scalars.graphqls", Input: `scalar Map

@@ -47,10 +47,6 @@ func (r *queryResolver) GetPlugin(ctx context.Context, pluginName string) (*inte
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) GetAppRouting(ctx context.Context, appID string) (*internal.AppRouting, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
 // Query returns gqlgen.QueryResolver implementation.
 func (r *Resolver) Query() gqlgen.QueryResolver { return &queryResolver{r} }
 

@@ -123,6 +123,9 @@ type Plugin {
 }
 
 type AppRouting {
+  appId: ID!
+  createdAt: Time!
+  updatedAt: Time!
   host: String
   path: String
   traefikRule: String

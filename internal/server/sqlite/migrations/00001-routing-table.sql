@@ -1,8 +1,8 @@
-CREATE TABLE routing(
+CREATE TABLE routes(
     "app_id" text PRIMARY KEY NOT NULL,
     "created_at" timestamp NOT NULL,
     "updated_at" timestamp NOT NULL,
     "host" text,
     "path" text,
-    "traefikRule" text
+    "traefik_rule" text
 );

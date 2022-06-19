@@ -113,7 +113,7 @@ func createApp(ctx context.Context, tx server.Tx, app internal.App) (internal.Ap
 func updateApp(ctx context.Context, tx server.Tx, app internal.App) (internal.App, error) {
 	app.UpdatedAt = time.Now()
 
-	sql, args := sqlb.Update("apps", app.ID, map[string]any{
+	sql, args := sqlb.Update("apps", "id", app.ID, map[string]any{
 		"updated_at":      app.UpdatedAt,
 		"name":            app.Name,
 		"group":           app.Group,
