@@ -14,17 +14,20 @@ var (
 type AppService struct {
 	db      server.DB
 	runtime server.RuntimeService
+	logger  server.Logger
 }
 
-func NewAppService(db server.DB, runtime server.RuntimeService) server.AppService {
+func NewAppService(db server.DB, runtime server.RuntimeService, logger server.Logger) server.AppService {
 	return &AppService{
 		db:      db,
 		runtime: runtime,
+		logger:  logger,
 	}
 }
 
 // Create implements server.AppService
 func (s *AppService) Create(ctx context.Context, app internal.App) (internal.App, error) {
+	s.logger.D("Creating app: %s", app.Name)
 	tx, err := s.db.ReadonlyTx(ctx)
 	if err != nil {
 		return EmptyApp, err
@@ -70,6 +73,7 @@ func (s *AppService) Create(ctx context.Context, app internal.App) (internal.App
 
 // Delete implements server.AppService
 func (s *AppService) Delete(ctx context.Context, id string) (internal.App, error) {
+	s.logger.D("Creating app: %s", id)
 	tx, err := s.db.ReadWriteTx(ctx)
 	if err != nil {
 		return EmptyApp, err
@@ -115,6 +119,7 @@ func (s *AppService) Delete(ctx context.Context, id string) (internal.App, error
 }
 
 func (s *AppService) FindApps(ctx context.Context, filter server.AppsFilter) ([]internal.App, error) {
+	s.logger.D("Finding apps that match: %+v", filter)
 	tx, err := s.db.ReadonlyTx(ctx)
 	if err != nil {
 		return nil, err
@@ -124,6 +129,7 @@ func (s *AppService) FindApps(ctx context.Context, filter server.AppsFilter) ([]
 
 // GetOne implements server.AppService
 func (s *AppService) FindApp(ctx context.Context, filter server.AppsFilter) (internal.App, error) {
+	s.logger.D("Finding an app that matches: %+v", filter)
 	tx, err := s.db.ReadonlyTx(ctx)
 	if err != nil {
 		return EmptyApp, err
@@ -133,6 +139,7 @@ func (s *AppService) FindApp(ctx context.Context, filter server.AppsFilter) (int
 
 // Update implements server.AppService
 func (s *AppService) Update(ctx context.Context, app internal.App, newImage *string) (internal.App, error) {
+	s.logger.D("Updating app: %s", app.Name)
 	tx, err := s.db.ReadonlyTx(ctx)
 	if err != nil {
 		return EmptyApp, err

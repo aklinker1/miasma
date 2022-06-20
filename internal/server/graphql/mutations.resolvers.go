@@ -87,20 +87,42 @@ func (r *mutationResolver) DeleteApp(ctx context.Context, id string) (*internal.
 	return safeReturn(&app, nil, err)
 }
 
-func (r *mutationResolver) StartApp(ctx context.Context, id string) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) StartApp(ctx context.Context, id string) (*internal.App, error) {
+	app, err := r.Apps.FindApp(ctx, server.AppsFilter{ID: &id})
+	if err != nil {
+		return nil, err
+	}
+	err = r.Runtime.Start(ctx, app)
+	return safeReturn(&app, nil, err)
 }
 
-func (r *mutationResolver) StopApp(ctx context.Context, id string) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) StopApp(ctx context.Context, id string) (*internal.App, error) {
+	app, err := r.Apps.FindApp(ctx, server.AppsFilter{ID: &id})
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.Runtime.Stop(ctx, app)
+	return safeReturn(&app, nil, err)
 }
 
-func (r *mutationResolver) ReloadApp(ctx context.Context, id string) (*internal.App, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) RestartApp(ctx context.Context, id string) (*internal.App, error) {
+	app, err := r.Apps.FindApp(ctx, server.AppsFilter{ID: &id})
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.Runtime.Restart(ctx, app)
+	return safeReturn(&app, nil, err)
 }
 
 func (r *mutationResolver) UpgradeApp(ctx context.Context, id string) (*internal.App, error) {
-	panic(fmt.Errorf("not implemented"))
+	app, err := r.Apps.FindApp(ctx, server.AppsFilter{ID: &id})
+	if err != nil {
+		return nil, err
+	}
+	updated, err := r.Apps.Update(ctx, app, &app.Image)
+	return safeReturn(&updated, nil, err)
 }
 
 func (r *mutationResolver) EnablePlugin(ctx context.Context, name string) (*internal.Plugin, error) {

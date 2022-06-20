@@ -47,7 +47,7 @@ type App {
   "Whether or not the application is running, stopped, or starting up"
   status: String!
   "The number of instances running vs what should be running"
-  instances: String!
+  instances: AppInstances!
   """
   The ports that the app is listening to inside the container. If no target
   ports are specified, then the container should respect the `PORT` env var.
@@ -135,4 +135,9 @@ input AppRoutingInput {
   host: String
   path: String
   traefikRule: String
+}
+
+type AppInstances {
+  running: Int!
+  total: Int!
 }

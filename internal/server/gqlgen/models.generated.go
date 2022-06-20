@@ -22,7 +22,7 @@ type AppResolver interface {
 	Routing(ctx context.Context, obj *internal.App) (*internal.AppRouting, error)
 	SimpleRoute(ctx context.Context, obj *internal.App) (*string, error)
 	Status(ctx context.Context, obj *internal.App) (string, error)
-	Instances(ctx context.Context, obj *internal.App) (string, error)
+	Instances(ctx context.Context, obj *internal.App) (*internal.AppInstances, error)
 }
 type HealthResolver interface {
 	DockerVersion(ctx context.Context, obj *internal.Health) (string, error)
@@ -556,9 +556,9 @@ func (ec *executionContext) _App_instances(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*internal.AppInstances)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNAppInstances2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppInstances(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_App_instances(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -568,7 +568,13 @@ func (ec *executionContext) fieldContext_App_instances(ctx context.Context, fiel
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			switch field.Name {
+			case "running":
+				return ec.fieldContext_AppInstances_running(ctx, field)
+			case "total":
+				return ec.fieldContext_AppInstances_total(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AppInstances", field.Name)
 		},
 	}
 	return fc, nil
@@ -821,6 +827,94 @@ func (ec *executionContext) fieldContext_App_command(ctx context.Context, field 
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AppInstances_running(ctx context.Context, field graphql.CollectedField, obj *internal.AppInstances) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AppInstances_running(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Running, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int32)
+	fc.Result = res
+	return ec.marshalNInt2int32(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AppInstances_running(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AppInstances",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AppInstances_total(ctx context.Context, field graphql.CollectedField, obj *internal.AppInstances) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AppInstances_total(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Total, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int32)
+	fc.Result = res
+	return ec.marshalNInt2int32(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AppInstances_total(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AppInstances",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1929,6 +2023,41 @@ func (ec *executionContext) _App(ctx context.Context, sel ast.SelectionSet, obj 
 	return out
 }
 
+var appInstancesImplementors = []string{"AppInstances"}
+
+func (ec *executionContext) _AppInstances(ctx context.Context, sel ast.SelectionSet, obj *internal.AppInstances) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, appInstancesImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AppInstances")
+		case "running":
+
+			out.Values[i] = ec._AppInstances_running(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "total":
+
+			out.Values[i] = ec._AppInstances_total(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var appRoutingImplementors = []string{"AppRouting"}
 
 func (ec *executionContext) _AppRouting(ctx context.Context, sel ast.SelectionSet, obj *internal.AppRouting) graphql.Marshaler {
@@ -2236,6 +2365,20 @@ func (ec *executionContext) unmarshalNAppChanges2map(ctx context.Context, v inte
 func (ec *executionContext) unmarshalNAppInput2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppInput(ctx context.Context, v interface{}) (internal.AppInput, error) {
 	res, err := ec.unmarshalInputAppInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNAppInstances2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppInstances(ctx context.Context, sel ast.SelectionSet, v internal.AppInstances) graphql.Marshaler {
+	return ec._AppInstances(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAppInstances2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppInstances(ctx context.Context, sel ast.SelectionSet, v *internal.AppInstances) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AppInstances(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNBoundVolume2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐBoundVolume(ctx context.Context, sel ast.SelectionSet, v *internal.BoundVolume) graphql.Marshaler {

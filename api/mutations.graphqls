@@ -6,11 +6,11 @@ type Mutation {
   "Stop and delete an app"
   deleteApp(id: ID!): App!
   "Start a stopped app"
-  startApp(id: ID!): String!
+  startApp(id: ID!): App!
   "Stop a running app"
-  stopApp(id: ID!): String!
+  stopApp(id: ID!): App!
   "Stop and restart an app"
-  reloadApp(id: ID!): App!
+  restartApp(id: ID!): App!
   "Pull the latest version of the app's image and then restart"
   upgradeApp(id: ID!): App!
 

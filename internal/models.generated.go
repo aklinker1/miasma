@@ -27,7 +27,7 @@ type App struct {
 	// Whether or not the application is running, stopped, or starting up
 	Status string `json:"status"`
 	// The number of instances running vs what should be running
-	Instances string `json:"instances"`
+	Instances *AppInstances `json:"instances"`
 	// The ports that the app is listening to inside the container. If no target
 	// ports are specified, then the container should respect the `PORT` env var.
 	TargetPorts []int32 `json:"targetPorts"`
@@ -68,6 +68,11 @@ type AppInput struct {
 	Networks       []string            `json:"networks"`
 	Routing        *AppRoutingInput    `json:"routing"`
 	Command        *string             `json:"command"`
+}
+
+type AppInstances struct {
+	Running int32 `json:"running"`
+	Total   int32 `json:"total"`
 }
 
 type AppRouting struct {

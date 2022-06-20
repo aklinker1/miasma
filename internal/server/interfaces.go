@@ -50,10 +50,17 @@ type AppService interface {
 	Delete(ctx context.Context, name string) (internal.App, error)
 }
 
+type RuntimeAppInfo struct {
+	Instances internal.AppInstances
+	Status    string
+}
+
 // RuntimeService defines how the server runs the apps
 type RuntimeService interface {
 	// Start the app
 	Start(ctx context.Context, app internal.App) error
+	// ServiceDetails returns runtime details like instance count and status
+	GetRuntimeAppInfo(ctx context.Context, app internal.App) (RuntimeAppInfo, error)
 	// Restart stops and starts the app
 	Restart(ctx context.Context, app internal.App) error
 	// Stop stops the app if it's running

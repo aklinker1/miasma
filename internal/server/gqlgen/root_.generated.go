@@ -61,6 +61,11 @@ type ComplexityRoot struct {
 		Volumes        func(childComplexity int) int
 	}
 
+	AppInstances struct {
+		Running func(childComplexity int) int
+		Total   func(childComplexity int) int
+	}
+
 	AppRouting struct {
 		AppID       func(childComplexity int) int
 		CreatedAt   func(childComplexity int) int
@@ -94,8 +99,8 @@ type ComplexityRoot struct {
 		DisablePlugin    func(childComplexity int, name string) int
 		EditApp          func(childComplexity int, id string, changes map[string]interface{}) int
 		EnablePlugin     func(childComplexity int, name string) int
-		ReloadApp        func(childComplexity int, id string) int
 		RemoveAppRouting func(childComplexity int, appID string) int
+		RestartApp       func(childComplexity int, id string) int
 		SetAppRouting    func(childComplexity int, appID string, routing *internal.AppRoutingInput) int
 		StartApp         func(childComplexity int, id string) int
 		StopApp          func(childComplexity int, id string) int
@@ -256,6 +261,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.App.Volumes(childComplexity), true
+
+	case "AppInstances.running":
+		if e.complexity.AppInstances.Running == nil {
+			break
+		}
+
+		return e.complexity.AppInstances.Running(childComplexity), true
+
+	case "AppInstances.total":
+		if e.complexity.AppInstances.Total == nil {
+			break
+		}
+
+		return e.complexity.AppInstances.Total(childComplexity), true
 
 	case "AppRouting.appId":
 		if e.complexity.AppRouting.AppID == nil {
@@ -422,18 +441,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.EnablePlugin(childComplexity, args["name"].(string)), true
 
-	case "Mutation.reloadApp":
-		if e.complexity.Mutation.ReloadApp == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_reloadApp_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.ReloadApp(childComplexity, args["id"].(string)), true
-
 	case "Mutation.removeAppRouting":
 		if e.complexity.Mutation.RemoveAppRouting == nil {
 			break
@@ -445,6 +452,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.RemoveAppRouting(childComplexity, args["appId"].(string)), true
+
+	case "Mutation.restartApp":
+		if e.complexity.Mutation.RestartApp == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_restartApp_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RestartApp(childComplexity, args["id"].(string)), true
 
 	case "Mutation.setAppRouting":
 		if e.complexity.Mutation.SetAppRouting == nil {
@@ -678,7 +697,7 @@ type App {
   "Whether or not the application is running, stopped, or starting up"
   status: String!
   "The number of instances running vs what should be running"
-  instances: String!
+  instances: AppInstances!
   """
   The ports that the app is listening to inside the container. If no target
   ports are specified, then the container should respect the ` + "`" + `PORT` + "`" + ` env var.
@@ -767,6 +786,11 @@ input AppRoutingInput {
   path: String
   traefikRule: String
 }
+
+type AppInstances {
+  running: Int!
+  total: Int!
+}
 `, BuiltIn: false},
 	{Name: "api/mutations.graphqls", Input: `type Mutation {
   "Create and start a new app"
@@ -776,11 +800,11 @@ input AppRoutingInput {
   "Stop and delete an app"
   deleteApp(id: ID!): App!
   "Start a stopped app"
-  startApp(id: ID!): String!
+  startApp(id: ID!): App!
   "Stop a running app"
-  stopApp(id: ID!): String!
+  stopApp(id: ID!): App!
   "Stop and restart an app"
-  reloadApp(id: ID!): App!
+  restartApp(id: ID!): App!
   "Pull the latest version of the app's image and then restart"
   upgradeApp(id: ID!): App!
 

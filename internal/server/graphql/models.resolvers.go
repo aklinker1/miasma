@@ -13,23 +13,6 @@ import (
 	"github.com/samber/lo"
 )
 
-func getAppRoute(ctx context.Context, routes server.RouteService, obj *internal.App) (*internal.AppRouting, error) {
-	if obj.Routing != nil {
-		return obj.Routing, nil
-	}
-
-	route, err := routes.FindRoute(ctx, server.RoutesFilter{
-		AppID: &obj.ID,
-	})
-	if server.ErrorCode(err) == server.ENOTFOUND {
-		return nil, nil
-	} else if err != nil {
-		return nil, err
-	} else {
-		return &route, nil
-	}
-}
-
 func (r *appResolver) Routing(ctx context.Context, obj *internal.App) (*internal.AppRouting, error) {
 	return getAppRoute(ctx, r.Routes, obj)
 }
@@ -51,11 +34,23 @@ func (r *appResolver) SimpleRoute(ctx context.Context, obj *internal.App) (*stri
 }
 
 func (r *appResolver) Status(ctx context.Context, obj *internal.App) (string, error) {
-	return "TODO", nil
+	info, err := r.Runtime.GetRuntimeAppInfo(ctx, *obj)
+	if server.ErrorCode(err) == server.ENOTFOUND {
+		return "Stopped", nil
+	} else if err != nil {
+		return "", err
+	}
+	return info.Status, nil
 }
 
-func (r *appResolver) Instances(ctx context.Context, obj *internal.App) (string, error) {
-	return "TODO", nil
+func (r *appResolver) Instances(ctx context.Context, obj *internal.App) (*internal.AppInstances, error) {
+	info, err := r.Runtime.GetRuntimeAppInfo(ctx, *obj)
+	if server.ErrorCode(err) == server.ENOTFOUND {
+		return &internal.AppInstances{}, nil
+	} else if err != nil {
+		return nil, err
+	}
+	return &info.Instances, nil
 }
 
 func (r *healthResolver) DockerVersion(ctx context.Context, obj *internal.Health) (string, error) {

@@ -19,7 +19,8 @@ import (
 )
 
 var (
-	EmptyService = swarm.Service{}
+	EmptyService               = swarm.Service{}
+	EmptyRuntimeServiceDetails = server.RuntimeAppInfo{}
 )
 
 var (
@@ -100,7 +101,7 @@ func (s *RuntimeService) Restart(ctx context.Context, app internal.App) error {
 // Start implements server.RuntimeService
 func (s *RuntimeService) Start(ctx context.Context, app internal.App) error {
 	s.logger.D("Starting app: %s", app.Name)
-	existingService, err := s.getExistingService(ctx, app)
+	existingService, err := s.getExistingService(ctx, app, false)
 	if err != nil {
 		return err
 	}
@@ -137,9 +138,10 @@ func (s *RuntimeService) Start(ctx context.Context, app internal.App) error {
 }
 
 // Returns the existing service for the app or nil if it doesn't exist
-func (s *RuntimeService) getExistingService(ctx context.Context, app internal.App) (*swarm.Service, error) {
+func (s *RuntimeService) getExistingService(ctx context.Context, app internal.App, includeStatus bool) (*swarm.Service, error) {
 	running, err := s.client.ServiceList(ctx, types.ServiceListOptions{
 		Filters: filters.NewArgs(filters.KeyValuePair{Key: "name", Value: s.getServiceName(app)}),
+		Status:  includeStatus,
 	})
 	if err != nil {
 		return nil, err
@@ -213,7 +215,7 @@ func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App) (
 // Stop implements server.RuntimeService
 func (s *RuntimeService) Stop(ctx context.Context, app internal.App) error {
 	s.logger.D("Stopping app: %s", app.Name)
-	existing, err := s.getExistingService(ctx, app)
+	existing, err := s.getExistingService(ctx, app, false)
 	if err != nil {
 		return err
 	}
@@ -261,4 +263,26 @@ func (s *RuntimeService) Version(ctx context.Context) (string, error) {
 	s.logger.D("Getting docker version")
 	info, err := s.client.Info(ctx)
 	return info.ServerVersion, err
+}
+
+// GetRuntimeAppInfo implements server.RuntimeService
+func (s *RuntimeService) GetRuntimeAppInfo(ctx context.Context, app internal.App) (server.RuntimeAppInfo, error) {
+	service, err := s.getExistingService(ctx, app, true)
+	if err != nil {
+		return EmptyRuntimeServiceDetails, err
+	} else if service == nil {
+		return EmptyRuntimeServiceDetails, &server.Error{
+			Code:    server.ENOTFOUND,
+			Message: "No running service found",
+			Op:      "docker.RuntimeService.GetService",
+		}
+	}
+
+	return server.RuntimeAppInfo{
+		Instances: internal.AppInstances{
+			Total:   int32(service.ServiceStatus.DesiredTasks),
+			Running: int32(service.ServiceStatus.RunningTasks),
+		},
+		Status: "running",
+	}, nil
 }

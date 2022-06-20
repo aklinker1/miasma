@@ -12,17 +12,20 @@ var (
 )
 
 type RouteService struct {
-	db server.DB
+	db     server.DB
+	logger server.Logger
 }
 
-func NewRouteService(db server.DB) server.RouteService {
+func NewRouteService(db server.DB, logger server.Logger) server.RouteService {
 	return &RouteService{
-		db: db,
+		db:     db,
+		logger: logger,
 	}
 }
 
 // FindRoute implements server.RouteService
 func (s *RouteService) FindRoute(ctx context.Context, filter server.RoutesFilter) (internal.AppRouting, error) {
+	s.logger.D("Finding route that matches: %+v", filter)
 	tx, err := s.db.ReadonlyTx(ctx)
 	if err != nil {
 		return EmptyRoute, err
