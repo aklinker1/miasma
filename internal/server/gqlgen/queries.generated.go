@@ -390,8 +390,8 @@ func (ec *executionContext) fieldContext_Query_listPlugins(ctx context.Context, 
 			switch field.Name {
 			case "name":
 				return ec.fieldContext_Plugin_name(ctx, field)
-			case "enable":
-				return ec.fieldContext_Plugin_enable(ctx, field)
+			case "enabled":
+				return ec.fieldContext_Plugin_enabled(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Plugin", field.Name)
 		},
@@ -440,8 +440,8 @@ func (ec *executionContext) fieldContext_Query_getPlugin(ctx context.Context, fi
 			switch field.Name {
 			case "name":
 				return ec.fieldContext_Plugin_name(ctx, field)
-			case "enable":
-				return ec.fieldContext_Plugin_enable(ctx, field)
+			case "enabled":
+				return ec.fieldContext_Plugin_enabled(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Plugin", field.Name)
 		},

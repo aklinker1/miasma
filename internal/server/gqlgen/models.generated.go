@@ -1622,8 +1622,8 @@ func (ec *executionContext) fieldContext_Plugin_name(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Plugin_enable(ctx context.Context, field graphql.CollectedField, obj *internal.Plugin) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Plugin_enable(ctx, field)
+func (ec *executionContext) _Plugin_enabled(ctx context.Context, field graphql.CollectedField, obj *internal.Plugin) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Plugin_enabled(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1636,7 +1636,7 @@ func (ec *executionContext) _Plugin_enable(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Enable, nil
+		return obj.Enabled, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1653,7 +1653,7 @@ func (ec *executionContext) _Plugin_enable(ctx context.Context, field graphql.Co
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Plugin_enable(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Plugin_enabled(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Plugin",
 		Field:      field,
@@ -2278,9 +2278,9 @@ func (ec *executionContext) _Plugin(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "enable":
+		case "enabled":
 
-			out.Values[i] = ec._Plugin_enable(ctx, field, obj)
+			out.Values[i] = ec._Plugin_enabled(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++

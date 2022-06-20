@@ -40,7 +40,8 @@ func (r *queryResolver) GetApp(ctx context.Context, id string) (*internal.App, e
 }
 
 func (r *queryResolver) ListPlugins(ctx context.Context) ([]*internal.Plugin, error) {
-	panic(fmt.Errorf("not implemented"))
+	plugins, err := r.Plugins.FindPlugins(ctx, server.PluginsFilter{})
+	return safeReturn(lo.ToSlicePtr(plugins), nil, err)
 }
 
 func (r *queryResolver) GetPlugin(ctx context.Context, pluginName string) (*internal.Plugin, error) {

@@ -915,8 +915,8 @@ func (ec *executionContext) fieldContext_Mutation_enablePlugin(ctx context.Conte
 			switch field.Name {
 			case "name":
 				return ec.fieldContext_Plugin_name(ctx, field)
-			case "enable":
-				return ec.fieldContext_Plugin_enable(ctx, field)
+			case "enabled":
+				return ec.fieldContext_Plugin_enabled(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Plugin", field.Name)
 		},
@@ -976,8 +976,8 @@ func (ec *executionContext) fieldContext_Mutation_disablePlugin(ctx context.Cont
 			switch field.Name {
 			case "name":
 				return ec.fieldContext_Plugin_name(ctx, field)
-			case "enable":
-				return ec.fieldContext_Plugin_enable(ctx, field)
+			case "enabled":
+				return ec.fieldContext_Plugin_enabled(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Plugin", field.Name)
 		},

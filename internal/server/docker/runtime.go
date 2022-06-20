@@ -24,7 +24,8 @@ var (
 )
 
 var (
-	miasmaIdLabel = "miasma-id"
+	miasmaIdLabel           = "miasma-id"
+	miasmaServiceNamePrefix = "miasma-"
 )
 
 type pullImageStatus struct {
@@ -37,9 +38,9 @@ type RuntimeService struct {
 }
 
 func NewRuntimeService(logger server.Logger) (server.RuntimeService, error) {
-	c, err := client.NewClientWithOpts(client.FromEnv)
+	client, err := client.NewClientWithOpts(client.FromEnv)
 	return &RuntimeService{
-		client: c,
+		client: client,
 		logger: logger,
 	}, err
 }
@@ -157,7 +158,7 @@ func (s *RuntimeService) getExistingService(ctx context.Context, app internal.Ap
 }
 
 func (s *RuntimeService) getServiceName(app internal.App) string {
-	return "miasma-" + app.Name
+	return miasmaServiceNamePrefix + app.Name
 }
 
 // Convert an app into a docker service
@@ -285,4 +286,29 @@ func (s *RuntimeService) GetRuntimeAppInfo(ctx context.Context, app internal.App
 		},
 		Status: "running",
 	}, nil
+}
+
+// RestartRunningApps implements server.RuntimeService
+func (s *RuntimeService) RestartRunningApps(ctx context.Context, apps []internal.App) error {
+	all, err := s.client.ServiceList(ctx, types.ServiceListOptions{
+		Status: true,
+	})
+	if err != nil {
+		return err
+	}
+
+	for _, service := range all {
+		isRunning := service.ServiceStatus != nil && service.ServiceStatus.DesiredTasks >= 0
+		app, hasApp := lo.Find(apps, func(app internal.App) bool {
+			return service.Spec.Annotations.Labels[miasmaIdLabel] == app.ID
+		})
+		if isRunning && hasApp {
+			err = s.Restart(ctx, app)
+			if err != nil {
+				s.logger.W("Failed to restart app '%s': %v", app.Name, err)
+			}
+		}
+	}
+
+	return nil
 }

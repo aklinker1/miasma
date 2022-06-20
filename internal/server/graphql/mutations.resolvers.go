@@ -126,11 +126,27 @@ func (r *mutationResolver) UpgradeApp(ctx context.Context, id string) (*internal
 }
 
 func (r *mutationResolver) EnablePlugin(ctx context.Context, name string) (*internal.Plugin, error) {
-	panic(fmt.Errorf("not implemented"))
+	plugin, err := r.Plugins.FindPlugin(ctx, server.PluginsFilter{
+		Name: &name,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	updated, err := r.Plugins.EnablePlugin(ctx, plugin)
+	return safeReturn(&updated, nil, err)
 }
 
 func (r *mutationResolver) DisablePlugin(ctx context.Context, name string) (*internal.Plugin, error) {
-	panic(fmt.Errorf("not implemented"))
+	plugin, err := r.Plugins.FindPlugin(ctx, server.PluginsFilter{
+		Name: &name,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	updated, err := r.Plugins.DisablePlugin(ctx, plugin)
+	return safeReturn(&updated, nil, err)
 }
 
 func (r *mutationResolver) SetAppRouting(ctx context.Context, appID string, routing *internal.AppRoutingInput) (*internal.AppRouting, error) {

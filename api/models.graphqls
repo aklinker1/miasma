@@ -119,7 +119,7 @@ input AppChanges {
 type Plugin {
   name: String!
   "Whether or not the plugin has been enabled"
-  enable: Boolean!
+  enabled: Boolean!
 }
 
 type AppRouting {

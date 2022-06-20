@@ -108,8 +108,8 @@ type ComplexityRoot struct {
 	}
 
 	Plugin struct {
-		Enable func(childComplexity int) int
-		Name   func(childComplexity int) int
+		Enabled func(childComplexity int) int
+		Name    func(childComplexity int) int
 	}
 
 	Query struct {
@@ -513,12 +513,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpgradeApp(childComplexity, args["id"].(string)), true
 
-	case "Plugin.enable":
-		if e.complexity.Plugin.Enable == nil {
+	case "Plugin.enabled":
+		if e.complexity.Plugin.Enabled == nil {
 			break
 		}
 
-		return e.complexity.Plugin.Enable(childComplexity), true
+		return e.complexity.Plugin.Enabled(childComplexity), true
 
 	case "Plugin.name":
 		if e.complexity.Plugin.Name == nil {
@@ -769,7 +769,7 @@ input AppChanges {
 type Plugin {
   name: String!
   "Whether or not the plugin has been enabled"
-  enable: Boolean!
+  enabled: Boolean!
 }
 
 type AppRouting {

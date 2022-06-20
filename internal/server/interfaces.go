@@ -50,6 +50,23 @@ type AppService interface {
 	Delete(ctx context.Context, name string) (internal.App, error)
 }
 
+type PluginsFilter struct {
+	Name         *string
+	NameContains *string
+	Enabled      *bool
+}
+
+type PluginService interface {
+	// FindPlugins searches the list of built-in plugins
+	FindPlugins(ctx context.Context, filter PluginsFilter) ([]internal.Plugin, error)
+	// FindApp searches the list of built-in plugins for the first plugin that matches the criteria
+	FindPlugin(ctx context.Context, filter PluginsFilter) (internal.Plugin, error)
+	// Enabled a plugin and restart all applications
+	EnablePlugin(ctx context.Context, plugin internal.Plugin) (internal.Plugin, error)
+	// Disable a plugin and restart all applications
+	DisablePlugin(ctx context.Context, plugin internal.Plugin) (internal.Plugin, error)
+}
+
 type RuntimeAppInfo struct {
 	Instances internal.AppInstances
 	Status    string
@@ -71,6 +88,7 @@ type RuntimeService interface {
 	Version(ctx context.Context) (string, error)
 	// ClusterInfo returns details about the device cluster
 	ClusterInfo(ctx context.Context) (*internal.ClusterInfo, error)
+	RestartRunningApps(ctx context.Context, apps []internal.App) error
 }
 
 type RoutesFilter struct {

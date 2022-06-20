@@ -122,5 +122,5 @@ type Health struct {
 type Plugin struct {
 	Name string `json:"name"`
 	// Whether or not the plugin has been enabled
-	Enable bool `json:"enable"`
+	Enabled bool `json:"enabled"`
 }
