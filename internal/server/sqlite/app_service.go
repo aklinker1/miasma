@@ -47,22 +47,8 @@ func (s *AppService) Create(ctx context.Context, app internal.App) (internal.App
 		return EmptyApp, err
 	}
 
-	// Create routing if necessary
-	if app.Routing != nil {
-		createdRoute, err := createRoute(ctx, tx, internal.AppRouting{
-			AppID:       created.ID,
-			Host:        app.Routing.Host,
-			Path:        app.Routing.Path,
-			TraefikRule: app.Routing.TraefikRule,
-		})
-		if err != nil {
-			return EmptyApp, err
-		}
-		created.Routing = &createdRoute
-	}
-
 	// Start the app
-	err = s.runtime.Start(ctx, created)
+	err = s.runtime.Start(ctx, created, nil)
 	if err != nil {
 		return EmptyApp, err
 	}
@@ -95,7 +81,7 @@ func (s *AppService) Delete(ctx context.Context, id string) (internal.App, error
 	} else if err != nil {
 		return EmptyApp, err
 	} else {
-		app.Routing = &route
+		app.Route = &route
 	}
 
 	// Remove DB models
@@ -162,16 +148,23 @@ func (s *AppService) Update(ctx context.Context, app internal.App, newImage *str
 		app.ImageDigest = newDigest
 	}
 
-	created, err := updateApp(ctx, tx, app)
+	updated, err := updateApp(ctx, tx, app)
 	if err != nil {
 		return EmptyApp, err
 	}
 
-	err = s.runtime.Restart(ctx, app)
+	route, err := findRouteOrNil(ctx, tx, server.RoutesFilter{
+		AppID: &updated.ID,
+	})
+	if err != nil {
+		return EmptyApp, err
+	}
+
+	err = s.runtime.Restart(ctx, app, route)
 	if err != nil {
 		return EmptyApp, err
 	}
 
 	tx.Commit()
-	return created, nil
+	return updated, nil
 }

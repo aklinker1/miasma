@@ -5,7 +5,6 @@ package graphql
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
@@ -33,18 +32,11 @@ func (r *mutationResolver) CreateApp(ctx context.Context, input internal.AppInpu
 	}
 
 	a := internal.App{
-		CreatedAt: time.Now(),
-		Name:      input.Name,
-		Group:     input.Group,
-		Image:     input.Image,
-		Hidden:    utils.ValueOr(input.Hidden, false),
-		Routing: lo.If[*internal.AppRouting](input.Routing == nil, nil).ElseF(func() *internal.AppRouting {
-			return &internal.AppRouting{
-				Host:        input.Routing.Host,
-				Path:        input.Routing.Path,
-				TraefikRule: input.Routing.TraefikRule,
-			}
-		}),
+		CreatedAt:      time.Now(),
+		Name:           input.Name,
+		Group:          input.Group,
+		Image:          input.Image,
+		Hidden:         utils.ValueOr(input.Hidden, false),
 		TargetPorts:    input.TargetPorts,
 		PublishedPorts: input.PublishedPorts,
 		Placement:      input.Placement,
@@ -92,7 +84,15 @@ func (r *mutationResolver) StartApp(ctx context.Context, id string) (*internal.A
 	if err != nil {
 		return nil, err
 	}
-	err = r.Runtime.Start(ctx, app)
+
+	route, err := r.Routes.FindRouteOrNil(ctx, server.RoutesFilter{
+		AppID: &id,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.Runtime.Start(ctx, app, route)
 	return safeReturn(&app, nil, err)
 }
 
@@ -111,8 +111,12 @@ func (r *mutationResolver) RestartApp(ctx context.Context, id string) (*internal
 	if err != nil {
 		return nil, err
 	}
+	route, err := r.Routes.FindRouteOrNil(ctx, server.RoutesFilter{AppID: &id})
+	if err != nil {
+		return nil, err
+	}
 
-	err = r.Runtime.Restart(ctx, app)
+	err = r.Runtime.Restart(ctx, app, route)
 	return safeReturn(&app, nil, err)
 }
 
@@ -149,12 +153,37 @@ func (r *mutationResolver) DisablePlugin(ctx context.Context, name internal.Plug
 	return safeReturn(&updated, nil, err)
 }
 
-func (r *mutationResolver) SetAppRouting(ctx context.Context, appID string, routing *internal.AppRoutingInput) (*internal.AppRouting, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) SetAppRoute(ctx context.Context, appID string, route *internal.RouteInput) (*internal.Route, error) {
+	existing, err := r.Routes.FindRoute(ctx, server.RoutesFilter{AppID: &appID})
+
+	if server.ErrorCode(err) == server.ENOTFOUND {
+		// Create a new route
+		created, err := r.Routes.Create(ctx, internal.Route{
+			AppID:       appID,
+			Host:        route.Host,
+			Path:        route.Path,
+			TraefikRule: route.TraefikRule,
+		})
+		return safeReturn(&created, nil, err)
+	} else if err == nil {
+		// Update existing route
+		existing.Host = route.Host
+		existing.Path = route.Path
+		existing.TraefikRule = route.TraefikRule
+		updated, err := r.Routes.Update(ctx, existing)
+		return safeReturn(&updated, nil, err)
+	}
+
+	return nil, err
 }
 
-func (r *mutationResolver) RemoveAppRouting(ctx context.Context, appID string) (*internal.AppRouting, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) RemoveAppRoute(ctx context.Context, appID string) (*internal.Route, error) {
+	existing, err := r.Routes.FindRoute(ctx, server.RoutesFilter{AppID: &appID})
+	if err != nil {
+		return nil, err
+	}
+	deleted, err := r.Routes.Delete(ctx, existing)
+	return safeReturn(&deleted, nil, err)
 }
 
 // Mutation returns gqlgen.MutationResolver implementation.

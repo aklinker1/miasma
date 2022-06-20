@@ -53,7 +53,7 @@ type ComplexityRoot struct {
 		Networks       func(childComplexity int) int
 		Placement      func(childComplexity int) int
 		PublishedPorts func(childComplexity int) int
-		Routing        func(childComplexity int) int
+		Route          func(childComplexity int) int
 		SimpleRoute    func(childComplexity int) int
 		Status         func(childComplexity int) int
 		System         func(childComplexity int) int
@@ -65,15 +65,6 @@ type ComplexityRoot struct {
 	AppInstances struct {
 		Running func(childComplexity int) int
 		Total   func(childComplexity int) int
-	}
-
-	AppRouting struct {
-		AppID       func(childComplexity int) int
-		CreatedAt   func(childComplexity int) int
-		Host        func(childComplexity int) int
-		Path        func(childComplexity int) int
-		TraefikRule func(childComplexity int) int
-		UpdatedAt   func(childComplexity int) int
 	}
 
 	BoundVolume struct {
@@ -95,17 +86,17 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateApp        func(childComplexity int, input internal.AppInput) int
-		DeleteApp        func(childComplexity int, id string) int
-		DisablePlugin    func(childComplexity int, name internal.PluginName) int
-		EditApp          func(childComplexity int, id string, changes map[string]interface{}) int
-		EnablePlugin     func(childComplexity int, name internal.PluginName) int
-		RemoveAppRouting func(childComplexity int, appID string) int
-		RestartApp       func(childComplexity int, id string) int
-		SetAppRouting    func(childComplexity int, appID string, routing *internal.AppRoutingInput) int
-		StartApp         func(childComplexity int, id string) int
-		StopApp          func(childComplexity int, id string) int
-		UpgradeApp       func(childComplexity int, id string) int
+		CreateApp      func(childComplexity int, input internal.AppInput) int
+		DeleteApp      func(childComplexity int, id string) int
+		DisablePlugin  func(childComplexity int, name internal.PluginName) int
+		EditApp        func(childComplexity int, id string, changes map[string]interface{}) int
+		EnablePlugin   func(childComplexity int, name internal.PluginName) int
+		RemoveAppRoute func(childComplexity int, appID string) int
+		RestartApp     func(childComplexity int, id string) int
+		SetAppRoute    func(childComplexity int, appID string, route *internal.RouteInput) int
+		StartApp       func(childComplexity int, id string) int
+		StopApp        func(childComplexity int, id string) int
+		UpgradeApp     func(childComplexity int, id string) int
 	}
 
 	Plugin struct {
@@ -119,6 +110,15 @@ type ComplexityRoot struct {
 		Health      func(childComplexity int) int
 		ListApps    func(childComplexity int, page *int32, size *int32, showHidden *bool) int
 		ListPlugins func(childComplexity int) int
+	}
+
+	Route struct {
+		AppID       func(childComplexity int) int
+		CreatedAt   func(childComplexity int) int
+		Host        func(childComplexity int) int
+		Path        func(childComplexity int) int
+		TraefikRule func(childComplexity int) int
+		UpdatedAt   func(childComplexity int) int
 	}
 }
 
@@ -221,12 +221,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.App.PublishedPorts(childComplexity), true
 
-	case "App.routing":
-		if e.complexity.App.Routing == nil {
+	case "App.route":
+		if e.complexity.App.Route == nil {
 			break
 		}
 
-		return e.complexity.App.Routing(childComplexity), true
+		return e.complexity.App.Route(childComplexity), true
 
 	case "App.simpleRoute":
 		if e.complexity.App.SimpleRoute == nil {
@@ -283,48 +283,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AppInstances.Total(childComplexity), true
-
-	case "AppRouting.appId":
-		if e.complexity.AppRouting.AppID == nil {
-			break
-		}
-
-		return e.complexity.AppRouting.AppID(childComplexity), true
-
-	case "AppRouting.createdAt":
-		if e.complexity.AppRouting.CreatedAt == nil {
-			break
-		}
-
-		return e.complexity.AppRouting.CreatedAt(childComplexity), true
-
-	case "AppRouting.host":
-		if e.complexity.AppRouting.Host == nil {
-			break
-		}
-
-		return e.complexity.AppRouting.Host(childComplexity), true
-
-	case "AppRouting.path":
-		if e.complexity.AppRouting.Path == nil {
-			break
-		}
-
-		return e.complexity.AppRouting.Path(childComplexity), true
-
-	case "AppRouting.traefikRule":
-		if e.complexity.AppRouting.TraefikRule == nil {
-			break
-		}
-
-		return e.complexity.AppRouting.TraefikRule(childComplexity), true
-
-	case "AppRouting.updatedAt":
-		if e.complexity.AppRouting.UpdatedAt == nil {
-			break
-		}
-
-		return e.complexity.AppRouting.UpdatedAt(childComplexity), true
 
 	case "BoundVolume.source":
 		if e.complexity.BoundVolume.Source == nil {
@@ -449,17 +407,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.EnablePlugin(childComplexity, args["name"].(internal.PluginName)), true
 
-	case "Mutation.removeAppRouting":
-		if e.complexity.Mutation.RemoveAppRouting == nil {
+	case "Mutation.removeAppRoute":
+		if e.complexity.Mutation.RemoveAppRoute == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_removeAppRouting_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_removeAppRoute_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.RemoveAppRouting(childComplexity, args["appId"].(string)), true
+		return e.complexity.Mutation.RemoveAppRoute(childComplexity, args["appId"].(string)), true
 
 	case "Mutation.restartApp":
 		if e.complexity.Mutation.RestartApp == nil {
@@ -473,17 +431,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RestartApp(childComplexity, args["id"].(string)), true
 
-	case "Mutation.setAppRouting":
-		if e.complexity.Mutation.SetAppRouting == nil {
+	case "Mutation.setAppRoute":
+		if e.complexity.Mutation.SetAppRoute == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_setAppRouting_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_setAppRoute_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.SetAppRouting(childComplexity, args["appId"].(string), args["routing"].(*internal.AppRoutingInput)), true
+		return e.complexity.Mutation.SetAppRoute(childComplexity, args["appId"].(string), args["route"].(*internal.RouteInput)), true
 
 	case "Mutation.startApp":
 		if e.complexity.Mutation.StartApp == nil {
@@ -585,6 +543,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.ListPlugins(childComplexity), true
 
+	case "Route.appId":
+		if e.complexity.Route.AppID == nil {
+			break
+		}
+
+		return e.complexity.Route.AppID(childComplexity), true
+
+	case "Route.createdAt":
+		if e.complexity.Route.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Route.CreatedAt(childComplexity), true
+
+	case "Route.host":
+		if e.complexity.Route.Host == nil {
+			break
+		}
+
+		return e.complexity.Route.Host(childComplexity), true
+
+	case "Route.path":
+		if e.complexity.Route.Path == nil {
+			break
+		}
+
+		return e.complexity.Route.Path(childComplexity), true
+
+	case "Route.traefikRule":
+		if e.complexity.Route.TraefikRule == nil {
+			break
+		}
+
+		return e.complexity.Route.TraefikRule(childComplexity), true
+
+	case "Route.updatedAt":
+		if e.complexity.Route.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Route.UpdatedAt(childComplexity), true
+
 	}
 	return 0, false
 }
@@ -594,8 +594,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAppInput,
-		ec.unmarshalInputAppRoutingInput,
 		ec.unmarshalInputBoundVolumeInput,
+		ec.unmarshalInputRouteInput,
 	)
 	first := true
 
@@ -700,9 +700,9 @@ type App {
   imageDigest: String!
   "Whether or not the app is returned during regular requests."
   hidden: Boolean!
-  "If the app has routing, this is the routing config."
-  routing: AppRouting
-  "If the app has routing, a simple string representing that route."
+  "If the app has a route and the traefik plugin is enabled, this is it's config."
+  route: Route
+  "If the app has a route and the traefik plugin is enabled, this is a simple representation of it."
   simpleRoute: String
   "Whether or not the application is running, stopped, or starting up."
   status: String!
@@ -741,7 +741,7 @@ type App {
   service that accesses the other needs the other network added.
   """
   networks: [String!]
-  command: String
+  command: [String!]
 }
 
 input BoundVolumeInput {
@@ -759,8 +759,7 @@ input AppInput {
   placement: [String!]
   volumes: [BoundVolumeInput!]
   networks: [String!]
-  routing: AppRoutingInput
-  command: String
+  command: [String!]
 }
 
 input AppChanges {
@@ -773,7 +772,7 @@ input AppChanges {
   placement: [String!]
   volumes: [BoundVolumeInput!]
   networks: [String!]
-  command: String
+  command: [String!]
 }
 
 type Plugin {
@@ -782,7 +781,7 @@ type Plugin {
   enabled: Boolean!
 }
 
-type AppRouting {
+type Route {
   appId: ID!
   createdAt: Time!
   updatedAt: Time!
@@ -791,7 +790,7 @@ type AppRouting {
   traefikRule: String
 }
 
-input AppRoutingInput {
+input RouteInput {
   host: String
   path: String
   traefikRule: String
@@ -828,9 +827,9 @@ enum PluginName {
   disablePlugin(name: PluginName!): Plugin!
 
   "Only available when the 'router' plugin is enabled"
-  setAppRouting(appId: ID!, routing: AppRoutingInput): AppRouting
+  setAppRoute(appId: ID!, route: RouteInput): Route
   "Only available when the 'router' plugin is enabled"
-  removeAppRouting(appId: ID!): AppRouting
+  removeAppRoute(appId: ID!): Route
 }
 `, BuiltIn: false},
 	{Name: "api/queries.graphqls", Input: `type Query {

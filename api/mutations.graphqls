@@ -20,7 +20,7 @@ type Mutation {
   disablePlugin(name: PluginName!): Plugin!
 
   "Only available when the 'router' plugin is enabled"
-  setAppRouting(appId: ID!, routing: AppRoutingInput): AppRouting
+  setAppRoute(appId: ID!, route: RouteInput): Route
   "Only available when the 'router' plugin is enabled"
-  removeAppRouting(appId: ID!): AppRouting
+  removeAppRoute(appId: ID!): Route
 }

@@ -24,8 +24,8 @@ type MutationResolver interface {
 	UpgradeApp(ctx context.Context, id string) (*internal.App, error)
 	EnablePlugin(ctx context.Context, name internal.PluginName) (*internal.Plugin, error)
 	DisablePlugin(ctx context.Context, name internal.PluginName) (*internal.Plugin, error)
-	SetAppRouting(ctx context.Context, appID string, routing *internal.AppRoutingInput) (*internal.AppRouting, error)
-	RemoveAppRouting(ctx context.Context, appID string) (*internal.AppRouting, error)
+	SetAppRoute(ctx context.Context, appID string, route *internal.RouteInput) (*internal.Route, error)
+	RemoveAppRoute(ctx context.Context, appID string) (*internal.Route, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -116,7 +116,7 @@ func (ec *executionContext) field_Mutation_enablePlugin_args(ctx context.Context
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_removeAppRouting_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_removeAppRoute_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -146,7 +146,7 @@ func (ec *executionContext) field_Mutation_restartApp_args(ctx context.Context, 
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_setAppRouting_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_setAppRoute_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -158,15 +158,15 @@ func (ec *executionContext) field_Mutation_setAppRouting_args(ctx context.Contex
 		}
 	}
 	args["appId"] = arg0
-	var arg1 *internal.AppRoutingInput
-	if tmp, ok := rawArgs["routing"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("routing"))
-		arg1, err = ec.unmarshalOAppRoutingInput2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppRoutingInput(ctx, tmp)
+	var arg1 *internal.RouteInput
+	if tmp, ok := rawArgs["route"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("route"))
+		arg1, err = ec.unmarshalORouteInput2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐRouteInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["routing"] = arg1
+	args["route"] = arg1
 	return args, nil
 }
 
@@ -280,8 +280,8 @@ func (ec *executionContext) fieldContext_Mutation_createApp(ctx context.Context,
 				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
-			case "routing":
-				return ec.fieldContext_App_routing(ctx, field)
+			case "route":
+				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
 			case "status":
@@ -375,8 +375,8 @@ func (ec *executionContext) fieldContext_Mutation_editApp(ctx context.Context, f
 				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
-			case "routing":
-				return ec.fieldContext_App_routing(ctx, field)
+			case "route":
+				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
 			case "status":
@@ -470,8 +470,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteApp(ctx context.Context,
 				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
-			case "routing":
-				return ec.fieldContext_App_routing(ctx, field)
+			case "route":
+				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
 			case "status":
@@ -565,8 +565,8 @@ func (ec *executionContext) fieldContext_Mutation_startApp(ctx context.Context, 
 				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
-			case "routing":
-				return ec.fieldContext_App_routing(ctx, field)
+			case "route":
+				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
 			case "status":
@@ -660,8 +660,8 @@ func (ec *executionContext) fieldContext_Mutation_stopApp(ctx context.Context, f
 				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
-			case "routing":
-				return ec.fieldContext_App_routing(ctx, field)
+			case "route":
+				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
 			case "status":
@@ -755,8 +755,8 @@ func (ec *executionContext) fieldContext_Mutation_restartApp(ctx context.Context
 				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
-			case "routing":
-				return ec.fieldContext_App_routing(ctx, field)
+			case "route":
+				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
 			case "status":
@@ -850,8 +850,8 @@ func (ec *executionContext) fieldContext_Mutation_upgradeApp(ctx context.Context
 				return ec.fieldContext_App_imageDigest(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
-			case "routing":
-				return ec.fieldContext_App_routing(ctx, field)
+			case "route":
+				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
 			case "status":
@@ -1010,8 +1010,8 @@ func (ec *executionContext) fieldContext_Mutation_disablePlugin(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_setAppRouting(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_setAppRouting(ctx, field)
+func (ec *executionContext) _Mutation_setAppRoute(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_setAppRoute(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1024,7 +1024,7 @@ func (ec *executionContext) _Mutation_setAppRouting(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().SetAppRouting(rctx, fc.Args["appId"].(string), fc.Args["routing"].(*internal.AppRoutingInput))
+		return ec.resolvers.Mutation().SetAppRoute(rctx, fc.Args["appId"].(string), fc.Args["route"].(*internal.RouteInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1033,12 +1033,12 @@ func (ec *executionContext) _Mutation_setAppRouting(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*internal.AppRouting)
+	res := resTmp.(*internal.Route)
 	fc.Result = res
-	return ec.marshalOAppRouting2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppRouting(ctx, field.Selections, res)
+	return ec.marshalORoute2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐRoute(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_setAppRouting(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_setAppRoute(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -1047,19 +1047,19 @@ func (ec *executionContext) fieldContext_Mutation_setAppRouting(ctx context.Cont
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "appId":
-				return ec.fieldContext_AppRouting_appId(ctx, field)
+				return ec.fieldContext_Route_appId(ctx, field)
 			case "createdAt":
-				return ec.fieldContext_AppRouting_createdAt(ctx, field)
+				return ec.fieldContext_Route_createdAt(ctx, field)
 			case "updatedAt":
-				return ec.fieldContext_AppRouting_updatedAt(ctx, field)
+				return ec.fieldContext_Route_updatedAt(ctx, field)
 			case "host":
-				return ec.fieldContext_AppRouting_host(ctx, field)
+				return ec.fieldContext_Route_host(ctx, field)
 			case "path":
-				return ec.fieldContext_AppRouting_path(ctx, field)
+				return ec.fieldContext_Route_path(ctx, field)
 			case "traefikRule":
-				return ec.fieldContext_AppRouting_traefikRule(ctx, field)
+				return ec.fieldContext_Route_traefikRule(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type AppRouting", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Route", field.Name)
 		},
 	}
 	defer func() {
@@ -1069,15 +1069,15 @@ func (ec *executionContext) fieldContext_Mutation_setAppRouting(ctx context.Cont
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_setAppRouting_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_setAppRoute_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_removeAppRouting(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_removeAppRouting(ctx, field)
+func (ec *executionContext) _Mutation_removeAppRoute(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_removeAppRoute(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1090,7 +1090,7 @@ func (ec *executionContext) _Mutation_removeAppRouting(ctx context.Context, fiel
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().RemoveAppRouting(rctx, fc.Args["appId"].(string))
+		return ec.resolvers.Mutation().RemoveAppRoute(rctx, fc.Args["appId"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1099,12 +1099,12 @@ func (ec *executionContext) _Mutation_removeAppRouting(ctx context.Context, fiel
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*internal.AppRouting)
+	res := resTmp.(*internal.Route)
 	fc.Result = res
-	return ec.marshalOAppRouting2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppRouting(ctx, field.Selections, res)
+	return ec.marshalORoute2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐRoute(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_removeAppRouting(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_removeAppRoute(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -1113,19 +1113,19 @@ func (ec *executionContext) fieldContext_Mutation_removeAppRouting(ctx context.C
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "appId":
-				return ec.fieldContext_AppRouting_appId(ctx, field)
+				return ec.fieldContext_Route_appId(ctx, field)
 			case "createdAt":
-				return ec.fieldContext_AppRouting_createdAt(ctx, field)
+				return ec.fieldContext_Route_createdAt(ctx, field)
 			case "updatedAt":
-				return ec.fieldContext_AppRouting_updatedAt(ctx, field)
+				return ec.fieldContext_Route_updatedAt(ctx, field)
 			case "host":
-				return ec.fieldContext_AppRouting_host(ctx, field)
+				return ec.fieldContext_Route_host(ctx, field)
 			case "path":
-				return ec.fieldContext_AppRouting_path(ctx, field)
+				return ec.fieldContext_Route_path(ctx, field)
 			case "traefikRule":
-				return ec.fieldContext_AppRouting_traefikRule(ctx, field)
+				return ec.fieldContext_Route_traefikRule(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type AppRouting", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Route", field.Name)
 		},
 	}
 	defer func() {
@@ -1135,7 +1135,7 @@ func (ec *executionContext) fieldContext_Mutation_removeAppRouting(ctx context.C
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_removeAppRouting_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_removeAppRoute_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -1254,16 +1254,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "setAppRouting":
+		case "setAppRoute":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_setAppRouting(ctx, field)
+				return ec._Mutation_setAppRoute(ctx, field)
 			})
 
-		case "removeAppRouting":
+		case "removeAppRoute":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_removeAppRouting(ctx, field)
+				return ec._Mutation_removeAppRoute(ctx, field)
 			})
 
 		default:

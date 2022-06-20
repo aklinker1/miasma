@@ -23,6 +23,11 @@ var (
 		ImageDigest:    "sha256:fdff55caa91ac7ff217ff03b93f3673844b3b88ad993e023ab43f6004021697c",
 		TargetPorts:    []int32{80, 8080},
 		PublishedPorts: []int32{80, 8080},
+		Volumes: []*internal.BoundVolume{{
+			Source: "/var/run/docker.sock",
+			Target: "/var/run/docker.sock",
+		}},
+		Command: []string{"traefik", "--api.insecure=true", "--providers.docker", "--providers.docker.swarmmode"},
 	}
 )
 
@@ -75,7 +80,20 @@ func (s *PluginService) setEnabled(ctx context.Context, plugin internal.Plugin, 
 	if err != nil {
 		return EmptyPlugin, err
 	}
-	s.runtime.RestartRunningApps(ctx, apps)
+	params := []server.StartAppParams{}
+	for _, app := range apps {
+		route, err := findRouteOrNil(ctx, tx, server.RoutesFilter{
+			AppID: &app.ID,
+		})
+		if err != nil {
+			return EmptyPlugin, err
+		}
+		params = append(params, server.StartAppParams{
+			App:   app,
+			Route: route,
+		})
+	}
+	s.runtime.RestartRunningApps(ctx, params)
 	if err != nil {
 		return EmptyPlugin, err
 	}
@@ -122,7 +140,13 @@ func (s *PluginService) onEnabled(ctx context.Context, tx server.Tx, pluginName 
 		if err != nil {
 			return err
 		}
-		return s.runtime.Start(ctx, created)
+		route, err := findRouteOrNil(ctx, tx, server.RoutesFilter{
+			AppID: &created.ID,
+		})
+		if err != nil {
+			return err
+		}
+		return s.runtime.Start(ctx, created, route)
 	default:
 		s.logger.V("No onEnabled hook for %v", pluginName)
 	}

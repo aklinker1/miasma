@@ -93,14 +93,19 @@ type RuntimeAppInfo struct {
 	Status    string
 }
 
+type StartAppParams struct {
+	App   internal.App
+	Route *internal.Route
+}
+
 // RuntimeService defines how the server runs the apps
 type RuntimeService interface {
 	// Start the app
-	Start(ctx context.Context, app internal.App) error
+	Start(ctx context.Context, app internal.App, route *internal.Route) error
 	// ServiceDetails returns runtime details like instance count and status
 	GetRuntimeAppInfo(ctx context.Context, app internal.App) (RuntimeAppInfo, error)
 	// Restart stops and starts the app
-	Restart(ctx context.Context, app internal.App) error
+	Restart(ctx context.Context, app internal.App, route *internal.Route) error
 	// Stop stops the app if it's running
 	Stop(ctx context.Context, app internal.App) error
 	// PullLatest grabs the latest image and returns it's digest
@@ -109,7 +114,7 @@ type RuntimeService interface {
 	Version(ctx context.Context) (string, error)
 	// ClusterInfo returns details about the device cluster
 	ClusterInfo(ctx context.Context) (*internal.ClusterInfo, error)
-	RestartRunningApps(ctx context.Context, apps []internal.App) error
+	RestartRunningApps(ctx context.Context, params []StartAppParams) error
 }
 
 type RoutesFilter struct {
@@ -118,5 +123,9 @@ type RoutesFilter struct {
 
 type RouteService interface {
 	// FindRoute returns the first route matching the filter
-	FindRoute(ctx context.Context, filter RoutesFilter) (internal.AppRouting, error)
+	FindRoute(ctx context.Context, filter RoutesFilter) (internal.Route, error)
+	FindRouteOrNil(ctx context.Context, filter RoutesFilter) (*internal.Route, error)
+	Create(ctx context.Context, route internal.Route) (internal.Route, error)
+	Update(ctx context.Context, route internal.Route) (internal.Route, error)
+	Delete(ctx context.Context, route internal.Route) (internal.Route, error)
 }

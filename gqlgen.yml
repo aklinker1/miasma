@@ -47,7 +47,7 @@ models:
         resolver: true
       status:
         resolver: true
-      routing:
+      route:
         resolver: true
       simpleRoute:
         resolver: true

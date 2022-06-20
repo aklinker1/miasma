@@ -28,7 +28,7 @@ func findApps(ctx context.Context, tx server.Tx, filter server.AppsFilter) ([]in
 		"published_ports": sqlitetypes.Int32Array(&scanned.PublishedPorts),
 		"placement":       sqlitetypes.StringArray(&scanned.Placement),
 		"volumes":         sqlitetypes.BoundVolumeArray(&scanned.Volumes),
-		"command":         &scanned.Command,
+		"command":         sqlitetypes.StringArray(&scanned.Command),
 		"networks":        sqlitetypes.StringArray(&scanned.Networks),
 	})
 	if filter.ID != nil {
@@ -107,7 +107,7 @@ func createApp(ctx context.Context, tx server.Tx, app internal.App) (internal.Ap
 		"published_ports": sqlitetypes.Int32Array(app.PublishedPorts),
 		"placement":       sqlitetypes.StringArray(app.Placement),
 		"volumes":         sqlitetypes.BoundVolumeArray(app.Volumes),
-		"command":         app.Command,
+		"command":         sqlitetypes.StringArray(app.Command),
 		"networks":        sqlitetypes.StringArray(app.Networks),
 	}).ToSQL()
 	_, err := tx.ExecContext(ctx, sql, args...)
@@ -129,7 +129,7 @@ func updateApp(ctx context.Context, tx server.Tx, app internal.App) (internal.Ap
 		"published_ports": sqlitetypes.Int32Array(app.PublishedPorts),
 		"placement":       sqlitetypes.StringArray(app.Placement),
 		"volumes":         sqlitetypes.BoundVolumeArray(app.Volumes),
-		"command":         app.Command,
+		"command":         sqlitetypes.StringArray(app.Command),
 		"networks":        sqlitetypes.StringArray(app.Networks),
 	}).ToSQL()
 	_, err := tx.ExecContext(ctx, sql, args...)

@@ -94,17 +94,17 @@ func (s *RuntimeService) PullLatest(ctx context.Context, image string) (string, 
 }
 
 // Restart implements server.RuntimeService
-func (s *RuntimeService) Restart(ctx context.Context, app internal.App) error {
+func (s *RuntimeService) Restart(ctx context.Context, app internal.App, route *internal.Route) error {
 	s.logger.D("Restarting app: %s", app.Name)
 	err := s.Stop(ctx, app)
 	if err != nil {
 		return err
 	}
-	return s.Start(ctx, app)
+	return s.Start(ctx, app, route)
 }
 
 // Start implements server.RuntimeService
-func (s *RuntimeService) Start(ctx context.Context, app internal.App) error {
+func (s *RuntimeService) Start(ctx context.Context, app internal.App, route *internal.Route) error {
 	s.logger.D("Starting app: %s", app.Name)
 	existingService, err := s.getExistingService(ctx, app, false)
 	if err != nil {
@@ -112,7 +112,7 @@ func (s *RuntimeService) Start(ctx context.Context, app internal.App) error {
 	}
 
 	// Define the service
-	spec, err := s.getServiceSpec(ctx, app)
+	spec, err := s.getServiceSpec(ctx, app, route)
 	if err != nil {
 		return err
 	}
@@ -192,7 +192,7 @@ func (s *RuntimeService) getNetworkName(base string) string {
 }
 
 // Convert an app into a docker service
-func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App) (swarm.ServiceSpec, error) {
+func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App, route *internal.Route) (swarm.ServiceSpec, error) {
 	// TODO: get real environment
 	env := map[string]string{}
 
@@ -205,10 +205,7 @@ func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App) (
 	}
 	image := imageNoTag + "@" + app.ImageDigest
 
-	command := []string{}
-	if app.Command != nil {
-		command = append(command, *app.Command)
-	}
+	command := app.Command
 
 	ports, err := s.getPorts(ctx, app)
 	if err != nil {
@@ -223,18 +220,18 @@ func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App) (
 		miasmaIdLabel:   app.ID,
 		miasmaFlagLabel: "true",
 	}
-	if app.Routing != nil {
+	if route != nil {
 		labels["traefik.enable"] = "true"
 		labels["traefik.docker.network"] = s.getNetworkName(defaultNetwork)
 		labels["traefik.http.services."+name+"-service.loadbalancer.server.port"] = fmt.Sprint(ports[0].TargetPort)
 
 		ruleLabel := "traefik.http.routers." + name + ".rule"
-		if app.Routing.TraefikRule != nil {
-			labels[ruleLabel] = *app.Routing.TraefikRule
-		} else if app.Routing.Host != nil && app.Routing.Path != nil {
-			labels[ruleLabel] = fmt.Sprintf("(Host(`%s`) && PathPrefix(`%s`))", *app.Routing.Host, *app.Routing.Path)
-		} else if app.Routing.Host != nil {
-			labels[ruleLabel] = fmt.Sprintf("Host(`%s`)", *app.Routing.Host)
+		if route.TraefikRule != nil {
+			labels[ruleLabel] = *route.TraefikRule
+		} else if route.Host != nil && route.Path != nil {
+			labels[ruleLabel] = fmt.Sprintf("(Host(`%s`) && PathPrefix(`%s`))", *route.Host, *route.Path)
+		} else if route.Host != nil {
+			labels[ruleLabel] = fmt.Sprintf("Host(`%s`)", *route.Host)
 		}
 	}
 
@@ -454,7 +451,7 @@ func (s *RuntimeService) findOpenPorts(ctx context.Context, count int) ([]uint32
 }
 
 // RestartRunningApps implements server.RuntimeService
-func (s *RuntimeService) RestartRunningApps(ctx context.Context, apps []internal.App) error {
+func (s *RuntimeService) RestartRunningApps(ctx context.Context, params []server.StartAppParams) error {
 	all, err := s.client.ServiceList(ctx, types.ServiceListOptions{
 		Status: true,
 	})
@@ -464,13 +461,13 @@ func (s *RuntimeService) RestartRunningApps(ctx context.Context, apps []internal
 
 	for _, service := range all {
 		isRunning := service.ServiceStatus != nil && service.ServiceStatus.DesiredTasks >= 0
-		app, hasApp := lo.Find(apps, func(app internal.App) bool {
-			return service.Spec.Annotations.Labels[miasmaIdLabel] == app.ID
+		param, ok := lo.Find(params, func(p server.StartAppParams) bool {
+			return service.Spec.Annotations.Labels[miasmaIdLabel] == p.App.ID
 		})
-		if isRunning && hasApp {
-			err = s.Restart(ctx, app)
+		if isRunning && ok {
+			err = s.Restart(ctx, param.App, param.Route)
 			if err != nil {
-				s.logger.W("Failed to restart app '%s': %v", app.Name, err)
+				s.logger.W("Failed to restart app '%s': %v", param.App.Name, err)
 			}
 		}
 	}

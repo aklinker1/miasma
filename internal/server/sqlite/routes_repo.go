@@ -7,10 +7,11 @@ import (
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
 	"github.com/aklinker1/miasma/internal/server/sqlite/sqlb"
+	"github.com/samber/lo"
 )
 
-func findRoutes(ctx context.Context, tx server.Tx, filter server.RoutesFilter) ([]internal.AppRouting, error) {
-	var scanned internal.AppRouting
+func findRoutes(ctx context.Context, tx server.Tx, filter server.RoutesFilter) ([]internal.Route, error) {
+	var scanned internal.Route
 	query := sqlb.Select("routes", map[string]any{
 		"app_id":       &scanned.AppID,
 		"created_at":   &scanned.CreatedAt,
@@ -29,7 +30,7 @@ func findRoutes(ctx context.Context, tx server.Tx, filter server.RoutesFilter) (
 		return nil, server.NewDatabaseError("findRoutes", err)
 	}
 	dest := query.ScanDest()
-	result := make([]internal.AppRouting, 0)
+	result := make([]internal.Route, 0)
 	for rows.Next() {
 		err = rows.Scan(dest...)
 		if err != nil {
@@ -40,7 +41,7 @@ func findRoutes(ctx context.Context, tx server.Tx, filter server.RoutesFilter) (
 	return result, rows.Err()
 }
 
-func findRoute(ctx context.Context, tx server.Tx, filter server.RoutesFilter) (internal.AppRouting, error) {
+func findRoute(ctx context.Context, tx server.Tx, filter server.RoutesFilter) (internal.Route, error) {
 	routes, err := findRoutes(ctx, tx, filter)
 	if err != nil {
 		return EmptyRoute, err
@@ -55,7 +56,17 @@ func findRoute(ctx context.Context, tx server.Tx, filter server.RoutesFilter) (i
 	return routes[0], nil
 }
 
-func createRoute(ctx context.Context, tx server.Tx, route internal.AppRouting) (internal.AppRouting, error) {
+func findRouteOrNil(ctx context.Context, tx server.Tx, filter server.RoutesFilter) (*internal.Route, error) {
+	routes, err := findRoutes(ctx, tx, filter)
+	if err != nil {
+		return nil, err
+	} else if len(routes) == 0 {
+		return nil, nil
+	}
+	return lo.ToPtr(routes[0]), nil
+}
+
+func createRoute(ctx context.Context, tx server.Tx, route internal.Route) (internal.Route, error) {
 	route.CreatedAt = time.Now()
 	route.UpdatedAt = time.Now()
 
@@ -71,7 +82,7 @@ func createRoute(ctx context.Context, tx server.Tx, route internal.AppRouting) (
 	return route, err
 }
 
-func updateRoute(ctx context.Context, tx server.Tx, route internal.AppRouting) (internal.AppRouting, error) {
+func updateRoute(ctx context.Context, tx server.Tx, route internal.Route) (internal.Route, error) {
 	route.UpdatedAt = time.Now()
 
 	sql, args := sqlb.Update("routes", "app_id", route.AppID, map[string]any{
@@ -85,7 +96,7 @@ func updateRoute(ctx context.Context, tx server.Tx, route internal.AppRouting) (
 	return route, err
 }
 
-func deleteRoute(ctx context.Context, tx server.Tx, route internal.AppRouting) error {
+func deleteRoute(ctx context.Context, tx server.Tx, route internal.Route) error {
 	_, err := tx.ExecContext(ctx, "DELETE FROM routes WHERE app_id = ?", route.AppID)
 	return err
 }

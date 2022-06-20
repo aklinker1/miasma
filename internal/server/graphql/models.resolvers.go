@@ -13,7 +13,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func (r *appResolver) Routing(ctx context.Context, obj *internal.App) (*internal.AppRouting, error) {
+func (r *appResolver) Route(ctx context.Context, obj *internal.App) (*internal.Route, error) {
 	return r.getAppRoute(ctx, obj)
 }
 
@@ -28,9 +28,12 @@ func (r *appResolver) SimpleRoute(ctx context.Context, obj *internal.App) (*stri
 
 	if route.TraefikRule != nil {
 		return route.TraefikRule, nil
-	} else {
+	} else if route.Host != nil && route.Path != nil {
 		return lo.ToPtr(fmt.Sprintf("%s/%s", *route.Host, *route.Path)), nil
+	} else if route.Host != nil {
+		return route.Host, nil
 	}
+	return nil, nil
 }
 
 func (r *appResolver) Status(ctx context.Context, obj *internal.App) (string, error) {

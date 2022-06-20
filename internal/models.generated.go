@@ -25,9 +25,9 @@ type App struct {
 	ImageDigest string `json:"imageDigest"`
 	// Whether or not the app is returned during regular requests.
 	Hidden bool `json:"hidden"`
-	// If the app has routing, this is the routing config.
-	Routing *AppRouting `json:"routing"`
-	// If the app has routing, a simple string representing that route.
+	// If the app has a route and the traefik plugin is enabled, this is it's config.
+	Route *Route `json:"route"`
+	// If the app has a route and the traefik plugin is enabled, this is a simple representation of it.
 	SimpleRoute *string `json:"simpleRoute"`
 	// Whether or not the application is running, stopped, or starting up.
 	Status string `json:"status"`
@@ -58,7 +58,7 @@ type App struct {
 	// name and docker's internal DNS. Services don't have to be two way; only the
 	// service that accesses the other needs the other network added.
 	Networks []string `json:"networks"`
-	Command  *string  `json:"command"`
+	Command  []string `json:"command"`
 }
 
 type AppInput struct {
@@ -71,28 +71,12 @@ type AppInput struct {
 	Placement      []string            `json:"placement"`
 	Volumes        []*BoundVolumeInput `json:"volumes"`
 	Networks       []string            `json:"networks"`
-	Routing        *AppRoutingInput    `json:"routing"`
-	Command        *string             `json:"command"`
+	Command        []string            `json:"command"`
 }
 
 type AppInstances struct {
 	Running int32 `json:"running"`
 	Total   int32 `json:"total"`
-}
-
-type AppRouting struct {
-	AppID       string    `json:"appId"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
-	Host        *string   `json:"host"`
-	Path        *string   `json:"path"`
-	TraefikRule *string   `json:"traefikRule"`
-}
-
-type AppRoutingInput struct {
-	Host        *string `json:"host"`
-	Path        *string `json:"path"`
-	TraefikRule *string `json:"traefikRule"`
 }
 
 type BoundVolume struct {
@@ -128,6 +112,21 @@ type Plugin struct {
 	Name PluginName `json:"name"`
 	// Whether or not the plugin has been enabled.
 	Enabled bool `json:"enabled"`
+}
+
+type Route struct {
+	AppID       string    `json:"appId"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+	Host        *string   `json:"host"`
+	Path        *string   `json:"path"`
+	TraefikRule *string   `json:"traefikRule"`
+}
+
+type RouteInput struct {
+	Host        *string `json:"host"`
+	Path        *string `json:"path"`
+	TraefikRule *string `json:"traefikRule"`
 }
 
 type PluginName string
