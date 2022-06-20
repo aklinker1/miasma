@@ -61,6 +61,6 @@ publish:
 
 # Remove generated files
 clean:
-	@rm -rf "${DATA_DIR}" ; echo "Cleaned local database..."
+	@rm -rf "${DATA_DIR}/apps".* ; echo "Cleaned local database..."
 	@rm -rf ./bin ; echo "Cleaned output directory..."
 	@echo "Done!"
