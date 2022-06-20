@@ -5,10 +5,25 @@ import (
 
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
+	"github.com/samber/lo"
 )
 
 var (
 	EmptyPlugin = internal.Plugin{}
+)
+
+var (
+	traefikApp = internal.App{
+		ID:             "plugin-traefik",
+		Name:           "Traefik",
+		Group:          lo.ToPtr("System"),
+		System:         true,
+		Hidden:         true,
+		Image:          "traefik:2.7",
+		ImageDigest:    "sha256:fdff55caa91ac7ff217ff03b93f3673844b3b88ad993e023ab43f6004021697c",
+		TargetPorts:    []int32{80, 8080},
+		PublishedPorts: []int32{80, 8080},
+	}
 )
 
 type PluginService struct {
@@ -28,6 +43,11 @@ func NewPluginService(db server.DB, apps server.AppService, runtime server.Runti
 }
 
 func (s *PluginService) setEnabled(ctx context.Context, plugin internal.Plugin, enabled bool) (internal.Plugin, error) {
+	if plugin.Enabled == enabled {
+		s.logger.W("Plugin already %s", lo.Ternary(enabled, "enabled", "disabled"))
+		return plugin, nil
+	}
+
 	tx, err := s.db.ReadWriteTx(ctx)
 	if err != nil {
 		return EmptyPlugin, err
@@ -36,6 +56,16 @@ func (s *PluginService) setEnabled(ctx context.Context, plugin internal.Plugin, 
 
 	plugin.Enabled = enabled
 	updated, err := updatePlugin(ctx, tx, plugin)
+	if err != nil {
+		return EmptyPlugin, err
+	}
+
+	// Execute setup/teardown
+	if enabled {
+		err = s.onEnabled(ctx, tx, updated.Name)
+	} else {
+		err = s.onDisabled(ctx, tx, updated.Name)
+	}
 	if err != nil {
 		return EmptyPlugin, err
 	}
@@ -82,4 +112,34 @@ func (s *PluginService) FindPlugin(ctx context.Context, filter server.PluginsFil
 		return EmptyPlugin, err
 	}
 	return findPlugin(ctx, tx, filter)
+}
+
+func (s *PluginService) onEnabled(ctx context.Context, tx server.Tx, pluginName internal.PluginName) error {
+	s.logger.D("On plugin enabled: %v", pluginName)
+	switch pluginName {
+	case internal.PluginNameTraefik:
+		created, err := createApp(ctx, tx, traefikApp)
+		if err != nil {
+			return err
+		}
+		return s.runtime.Start(ctx, created)
+	default:
+		s.logger.V("No onEnabled hook for %v", pluginName)
+	}
+	return nil
+}
+
+func (s *PluginService) onDisabled(ctx context.Context, tx server.Tx, pluginName internal.PluginName) error {
+	s.logger.D("On plugin disabled: %v", pluginName)
+	switch pluginName {
+	case internal.PluginNameTraefik:
+		err := deleteApp(ctx, tx, traefikApp)
+		if err != nil {
+			return err
+		}
+		return s.runtime.Stop(ctx, traefikApp)
+	default:
+		s.logger.V("No onDisabled hook for %v", pluginName)
+	}
+	return nil
 }

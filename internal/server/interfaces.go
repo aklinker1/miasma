@@ -2,9 +2,30 @@ package server
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/aklinker1/miasma/internal"
 )
+
+type Tx = *sql.Tx
+
+type DB interface {
+	Open() error
+	ReadonlyTx(ctx context.Context) (Tx, error)
+	ReadWriteTx(ctx context.Context) (Tx, error)
+}
+
+type Server interface {
+	ServeGraphql() error
+}
+
+type Logger interface {
+	D(format string, args ...any)
+	V(format string, args ...any)
+	I(format string, args ...any)
+	W(format string, args ...any)
+	E(format string, args ...any)
+}
 
 type Pagination struct {
 	Page int32

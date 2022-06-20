@@ -10,6 +10,7 @@ import (
 
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
+	"github.com/aklinker1/miasma/internal/utils"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/mount"
@@ -25,7 +26,10 @@ var (
 
 var (
 	miasmaIdLabel           = "miasma-id"
+	miasmaFlagLabel         = "miasma"
 	miasmaServiceNamePrefix = "miasma-"
+	miasmaNetworkNamePrefix = "miasma-"
+	defaultNetwork          = "default"
 )
 
 type pullImageStatus struct {
@@ -107,16 +111,33 @@ func (s *RuntimeService) Start(ctx context.Context, app internal.App) error {
 		return err
 	}
 
-	// Ensure the app's network exists
-	// TODO
+	// Define the service
+	spec, err := s.getServiceSpec(ctx, app)
+	if err != nil {
+		return err
+	}
 
-	// Ensure the traefik plugin's network exists
-	// TODO
+	// Ensure the network exists for intra-app communication
+	err = s.ensureNetwork(ctx, defaultNetwork)
+	if err != nil {
+		return err
+	}
 
-	// Delete the existing service
-	// TODO: Update and start the existing service if it already exists
 	if existingService != nil {
-		err = s.client.ServiceRemove(ctx, existingService.ID)
+		// Update the existing service
+		var swarm swarm.Swarm
+		swarm, err = s.client.SwarmInspect(ctx)
+		if err != nil {
+			return &server.Error{
+				Code:    server.EINTERNAL,
+				Message: "Failed to get inspect docker swarm",
+				Op:      "docker.RuntimeService.Start",
+				Err:     err,
+			}
+		}
+		_, err = s.client.ServiceUpdate(ctx, existingService.ID, swarm.Version, spec, types.ServiceUpdateOptions{
+			QueryRegistry: true,
+		})
 		if err != nil {
 			return &server.Error{
 				Code:    server.EINTERNAL,
@@ -125,17 +146,22 @@ func (s *RuntimeService) Start(ctx context.Context, app internal.App) error {
 				Err:     err,
 			}
 		}
+	} else {
+		// Create (and start) a new service
+		_, err = s.client.ServiceCreate(ctx, spec, types.ServiceCreateOptions{
+			QueryRegistry: true,
+		})
+		if err != nil {
+			return &server.Error{
+				Code:    server.EINTERNAL,
+				Message: "Failed to create service",
+				Op:      "docker.RuntimeService.Start",
+				Err:     err,
+			}
+		}
 	}
 
-	// Create and start the service
-	spec, err := s.getServiceSpec(ctx, app)
-	if err != nil {
-		return err
-	}
-	_, err = s.client.ServiceCreate(ctx, spec, types.ServiceCreateOptions{
-		QueryRegistry: true,
-	})
-	return err
+	return nil
 }
 
 // Returns the existing service for the app or nil if it doesn't exist
@@ -161,10 +187,16 @@ func (s *RuntimeService) getServiceName(app internal.App) string {
 	return miasmaServiceNamePrefix + app.Name
 }
 
+func (s *RuntimeService) getNetworkName(base string) string {
+	return miasmaNetworkNamePrefix + base
+}
+
 // Convert an app into a docker service
 func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App) (swarm.ServiceSpec, error) {
 	// TODO: get real environment
 	env := map[string]string{}
+
+	name := s.getServiceName(app)
 
 	// Strip custom tag and use digest instead
 	imageNoTag := app.Image
@@ -173,13 +205,37 @@ func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App) (
 	}
 	image := imageNoTag + "@" + app.ImageDigest
 
-	labels := map[string]string{
-		miasmaIdLabel: app.ID,
-	}
-
 	command := []string{}
 	if app.Command != nil {
 		command = append(command, *app.Command)
+	}
+
+	ports, err := s.getPorts(ctx, app)
+	if err != nil {
+		return swarm.ServiceSpec{}, err
+	}
+	env["PORT"] = fmt.Sprint(ports[0].TargetPort)
+	for i := 0; i < len(ports); i++ {
+		env[fmt.Sprintf("PORT_%d", i+1)] = fmt.Sprint(ports[i].TargetPort)
+	}
+
+	labels := map[string]string{
+		miasmaIdLabel:   app.ID,
+		miasmaFlagLabel: "true",
+	}
+	if app.Routing != nil {
+		labels["traefik.enable"] = "true"
+		labels["traefik.docker.network"] = s.getNetworkName(defaultNetwork)
+		labels["traefik.http.services."+name+"-service.loadbalancer.server.port"] = fmt.Sprint(ports[0].TargetPort)
+
+		ruleLabel := "traefik.http.routers." + name + ".rule"
+		if app.Routing.TraefikRule != nil {
+			labels[ruleLabel] = *app.Routing.TraefikRule
+		} else if app.Routing.Host != nil && app.Routing.Path != nil {
+			labels[ruleLabel] = fmt.Sprintf("(Host(`%s`) && PathPrefix(`%s`))", *app.Routing.Host, *app.Routing.Path)
+		} else if app.Routing.Host != nil {
+			labels[ruleLabel] = fmt.Sprintf("Host(`%s`)", *app.Routing.Host)
+		}
 	}
 
 	mounts := lo.Map(app.Volumes, func(volume *internal.BoundVolume, i int) mount.Mount {
@@ -194,9 +250,18 @@ func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App) (
 		return fmt.Sprintf("%s=%s", entry.Key, fmt.Sprint(entry.Value))
 	})
 
+	networks := lo.Map(app.Networks, func(networkName string, _ int) swarm.NetworkAttachmentConfig {
+		return swarm.NetworkAttachmentConfig{
+			Target: networkName, // Don't use s.getNetworkName here, these are specified by the user
+		}
+	})
+	networks = append(networks, swarm.NetworkAttachmentConfig{
+		Target: s.getNetworkName(defaultNetwork),
+	})
+
 	return swarm.ServiceSpec{
 		Annotations: swarm.Annotations{
-			Name:   s.getServiceName(app),
+			Name:   name,
 			Labels: labels,
 		},
 		TaskTemplate: swarm.TaskSpec{
@@ -209,6 +274,10 @@ func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App) (
 				Command: command,
 				Mounts:  mounts,
 			},
+			Networks: networks,
+		},
+		EndpointSpec: &swarm.EndpointSpec{
+			Ports: ports,
 		},
 	}, nil
 }
@@ -286,6 +355,102 @@ func (s *RuntimeService) GetRuntimeAppInfo(ctx context.Context, app internal.App
 		},
 		Status: "running",
 	}, nil
+}
+
+func (s *RuntimeService) ensureNetwork(ctx context.Context, networkName string) error {
+	s.logger.D("Ensuring network exists: %s", s.getNetworkName(networkName))
+	networks, err := s.client.NetworkList(ctx, types.NetworkListOptions{
+		Filters: filters.NewArgs(filters.KeyValuePair{
+			Key: "name", Value: s.getNetworkName(networkName),
+		}),
+	})
+	if err != nil {
+		return err
+	}
+
+	s.logger.V("Queried networks: %+v", networks)
+	if len(networks) > 0 {
+		if networks[0].Driver == "overlay" && networks[0].Scope == "swarm" && networks[0].Labels[miasmaFlagLabel] == "true" {
+			s.logger.V("Network already exists and is configured correctly")
+			return nil
+		}
+		err = s.client.NetworkRemove(ctx, networks[0].ID)
+		if err != nil {
+			return err
+		}
+	}
+
+	_, err = s.client.NetworkCreate(ctx, s.getNetworkName(networkName), types.NetworkCreate{
+		Driver: "overlay",
+		Scope:  "swarm",
+		Labels: map[string]string{
+			miasmaFlagLabel: "true",
+		},
+	})
+	return err
+}
+
+func (s *RuntimeService) getPorts(ctx context.Context, app internal.App) ([]swarm.PortConfig, error) {
+	required := len(app.TargetPorts)
+	if len(app.PublishedPorts) > required {
+		required = len(app.PublishedPorts)
+	}
+	if required == 0 {
+		required = 1
+	}
+
+	toUint32 := func(port int32, _ int) uint32 {
+		return uint32(port)
+	}
+	target := lo.Map(app.TargetPorts, toUint32)
+	for len(target) < required {
+		target = append(target, utils.RandUInt32(3000, 4000))
+	}
+
+	published := lo.Map(app.PublishedPorts, toUint32)
+	if required != len(published) {
+		openPorts, err := s.findOpenPorts(ctx, required-len(published))
+		if err != nil {
+			return nil, err
+		}
+		published = append(published, openPorts...)
+	}
+
+	ports := []swarm.PortConfig{}
+	for i := 0; i < required; i++ {
+		ports = append(ports, swarm.PortConfig{
+			PublishedPort: published[i],
+			TargetPort:    target[i],
+		})
+	}
+
+	s.logger.V("Target ports: %+v", target)
+	s.logger.V("Published ports: %+v", published)
+	return ports, nil
+}
+
+func (s *RuntimeService) findOpenPorts(ctx context.Context, count int) ([]uint32, error) {
+	s.logger.D("Finding %d open port%s", count, lo.Ternary(count == 1, "", "s"))
+	services, err := s.client.ServiceList(ctx, types.ServiceListOptions{})
+	if err != nil {
+		return nil, err
+	}
+	filledPorts := map[uint32]bool{}
+	for _, service := range services {
+		for _, port := range service.Endpoint.Ports {
+			filledPorts[port.PublishedPort] = true
+		}
+	}
+	results := []uint32{}
+	for port := uint32(3001); port < 4000 && len(results) < count; port++ {
+		if _, ok := filledPorts[port]; !ok {
+			results = append(results, port)
+		}
+	}
+	if len(results) < count {
+		return nil, fmt.Errorf("Not enough available ports to start the service (required=%d, available=%d)", count, len(results))
+	}
+	return results, nil
 }
 
 // RestartRunningApps implements server.RuntimeService

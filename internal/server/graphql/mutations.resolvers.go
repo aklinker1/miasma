@@ -37,7 +37,7 @@ func (r *mutationResolver) CreateApp(ctx context.Context, input internal.AppInpu
 		Name:      input.Name,
 		Group:     input.Group,
 		Image:     input.Image,
-		Hidden:    utils.BoolOr(input.Hidden, false),
+		Hidden:    utils.ValueOr(input.Hidden, false),
 		Routing: lo.If[*internal.AppRouting](input.Routing == nil, nil).ElseF(func() *internal.AppRouting {
 			return &internal.AppRouting{
 				Host:        input.Routing.Host,

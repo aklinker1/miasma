@@ -1,19 +1,8 @@
 package utils
 
-func Int32Or(ptr *int32, defaultValue int32) int32 {
+func ValueOr[T any](ptr *T, defaultValue T) T {
 	if ptr == nil {
 		return defaultValue
 	}
 	return *ptr
-}
-
-func BoolOr(ptr *bool, defaultValue bool) bool {
-	if ptr == nil {
-		return defaultValue
-	}
-	return *ptr
-}
-
-func Ptr[T any](t T) *T {
-	return &t
 }

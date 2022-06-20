@@ -270,6 +270,8 @@ func (ec *executionContext) fieldContext_Mutation_createApp(ctx context.Context,
 				return ec.fieldContext_App_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_App_name(ctx, field)
+			case "system":
+				return ec.fieldContext_App_system(ctx, field)
 			case "group":
 				return ec.fieldContext_App_group(ctx, field)
 			case "image":
@@ -363,6 +365,8 @@ func (ec *executionContext) fieldContext_Mutation_editApp(ctx context.Context, f
 				return ec.fieldContext_App_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_App_name(ctx, field)
+			case "system":
+				return ec.fieldContext_App_system(ctx, field)
 			case "group":
 				return ec.fieldContext_App_group(ctx, field)
 			case "image":
@@ -456,6 +460,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteApp(ctx context.Context,
 				return ec.fieldContext_App_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_App_name(ctx, field)
+			case "system":
+				return ec.fieldContext_App_system(ctx, field)
 			case "group":
 				return ec.fieldContext_App_group(ctx, field)
 			case "image":
@@ -549,6 +555,8 @@ func (ec *executionContext) fieldContext_Mutation_startApp(ctx context.Context, 
 				return ec.fieldContext_App_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_App_name(ctx, field)
+			case "system":
+				return ec.fieldContext_App_system(ctx, field)
 			case "group":
 				return ec.fieldContext_App_group(ctx, field)
 			case "image":
@@ -642,6 +650,8 @@ func (ec *executionContext) fieldContext_Mutation_stopApp(ctx context.Context, f
 				return ec.fieldContext_App_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_App_name(ctx, field)
+			case "system":
+				return ec.fieldContext_App_system(ctx, field)
 			case "group":
 				return ec.fieldContext_App_group(ctx, field)
 			case "image":
@@ -735,6 +745,8 @@ func (ec *executionContext) fieldContext_Mutation_restartApp(ctx context.Context
 				return ec.fieldContext_App_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_App_name(ctx, field)
+			case "system":
+				return ec.fieldContext_App_system(ctx, field)
 			case "group":
 				return ec.fieldContext_App_group(ctx, field)
 			case "image":
@@ -828,6 +840,8 @@ func (ec *executionContext) fieldContext_Mutation_upgradeApp(ctx context.Context
 				return ec.fieldContext_App_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_App_name(ctx, field)
+			case "system":
+				return ec.fieldContext_App_system(ctx, field)
 			case "group":
 				return ec.fieldContext_App_group(ctx, field)
 			case "image":

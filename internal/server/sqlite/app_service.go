@@ -146,6 +146,14 @@ func (s *AppService) Update(ctx context.Context, app internal.App, newImage *str
 	}
 	defer tx.Rollback()
 
+	if app.System {
+		return EmptyApp, &server.Error{
+			Code:    server.EINVALID,
+			Message: "Cannot edit Miasma's system apps",
+			Op:      "sqlite.AppService.Update",
+		}
+	}
+
 	if newImage != nil {
 		newDigest, err := s.runtime.PullLatest(ctx, *newImage)
 		if err != nil {

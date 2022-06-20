@@ -210,6 +210,8 @@ func (ec *executionContext) fieldContext_Query_listApps(ctx context.Context, fie
 				return ec.fieldContext_App_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_App_name(ctx, field)
+			case "system":
+				return ec.fieldContext_App_system(ctx, field)
 			case "group":
 				return ec.fieldContext_App_group(ctx, field)
 			case "image":
@@ -303,6 +305,8 @@ func (ec *executionContext) fieldContext_Query_getApp(ctx context.Context, field
 				return ec.fieldContext_App_updatedAt(ctx, field)
 			case "name":
 				return ec.fieldContext_App_name(ctx, field)
+			case "system":
+				return ec.fieldContext_App_system(ctx, field)
 			case "group":
 				return ec.fieldContext_App_group(ctx, field)
 			case "image":

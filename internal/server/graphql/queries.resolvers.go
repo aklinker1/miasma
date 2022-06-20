@@ -24,8 +24,8 @@ func (r *queryResolver) ListApps(ctx context.Context, page *int32, size *int32, 
 	filter := server.AppsFilter{
 		IncludeHidden: showHidden,
 		Pagination: &server.Pagination{
-			Page: utils.Int32Or(page, 1),
-			Size: utils.Int32Or(size, 10),
+			Page: utils.ValueOr(page, 1),
+			Size: utils.ValueOr(size, 10),
 		},
 	}
 	apps, err := r.Apps.FindApps(ctx, filter)

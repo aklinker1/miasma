@@ -56,6 +56,7 @@ type ComplexityRoot struct {
 		Routing        func(childComplexity int) int
 		SimpleRoute    func(childComplexity int) int
 		Status         func(childComplexity int) int
+		System         func(childComplexity int) int
 		TargetPorts    func(childComplexity int) int
 		UpdatedAt      func(childComplexity int) int
 		Volumes        func(childComplexity int) int
@@ -240,6 +241,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.App.Status(childComplexity), true
+
+	case "App.system":
+		if e.complexity.App.System == nil {
+			break
+		}
+
+		return e.complexity.App.System(childComplexity), true
 
 	case "App.targetPorts":
 		if e.complexity.App.TargetPorts == nil {
@@ -659,18 +667,18 @@ type ClusterInfo {
 }
 
 type Health {
-  "Miasma server's current version"
+  "Miasma server's current version."
   version: String!
-  "The version of docker running on the host, or null if docker is not running"
+  "The version of docker running on the host, or null if docker is not running."
   dockerVersion: String!
-  "The cluster versioning and information, or ` + "`" + `null` + "`" + ` if not apart of a cluster"
+  "The cluster versioning and information, or ` + "`" + `null` + "`" + ` if not apart of a cluster."
   cluster: ClusterInfo
 }
 
 type BoundVolume {
-  "The path inside the container that the data is served from"
+  "The path inside the container that the data is served from."
   target: String!
-  "The volume name or directory on the host that the data is stored in"
+  "The volume name or directory on the host that the data is stored in."
   source: String!
 }
 
@@ -679,24 +687,26 @@ type App {
   createdAt: Time!
   updatedAt: Time!
   name: String!
+  "Whether or not the application is managed by the system. You cannot edit or delete system apps."
+  system: Boolean!
   group: String
-  "The image and tag the application runs"
+  "The image and tag the application runs."
   image: String!
   """
   The currently running image digest (hash). Used internally when running
   applications instead of the tag because the when a new image is pushed, the
-  tag stays the same but the digest changes
+  tag stays the same but the digest changes.
   """
   imageDigest: String!
-  "Whether or not the app is returned during regular requests"
+  "Whether or not the app is returned during regular requests."
   hidden: Boolean!
-  "If the app has routing, this is the routing config"
+  "If the app has routing, this is the routing config."
   routing: AppRouting
-  "If the app has routing, a simple string representing that route"
+  "If the app has routing, a simple string representing that route."
   simpleRoute: String
-  "Whether or not the application is running, stopped, or starting up"
+  "Whether or not the application is running, stopped, or starting up."
   status: String!
-  "The number of instances running vs what should be running"
+  "The number of instances running vs what should be running."
   instances: AppInstances!
   """
   The ports that the app is listening to inside the container. If no target
@@ -720,10 +730,10 @@ type App {
   """
   The placement constraints specifying which nodes the app will be ran on. Any
   valid value for the [` + "`" + `--constraint` + "`" + ` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints)
-  is valid item in this list
+  is valid item in this list.
   """
   placement: [String!]
-  "Volume bindings for the app"
+  "Volume bindings for the app."
   volumes: [BoundVolume!]
   """
   A list of other apps that the service communicates with using their service
@@ -768,7 +778,7 @@ input AppChanges {
 
 type Plugin {
   name: PluginName!
-  "Whether or not the plugin has been enabled"
+  "Whether or not the plugin has been enabled."
   enabled: Boolean!
 }
 

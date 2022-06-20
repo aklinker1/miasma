@@ -20,6 +20,7 @@ func findApps(ctx context.Context, tx server.Tx, filter server.AppsFilter) ([]in
 		"updated_at":      &scanned.UpdatedAt,
 		"name":            &scanned.Name,
 		"group":           &scanned.Group,
+		"system":          &scanned.System,
 		"image":           &scanned.Image,
 		"image_digest":    &scanned.ImageDigest,
 		"hidden":          &scanned.Hidden,
@@ -39,7 +40,7 @@ func findApps(ctx context.Context, tx server.Tx, filter server.AppsFilter) ([]in
 	if filter.NameContains != nil {
 		query.Where("name ILIKE ?", "%"+*filter.NameContains+"%")
 	}
-	if !utils.BoolOr(filter.IncludeHidden, false) {
+	if !utils.ValueOr(filter.IncludeHidden, false) {
 		query.Where("(hidden = ? OR hidden IS NULL)", 0)
 	}
 	if filter.Pagination != nil {
@@ -82,11 +83,13 @@ func findApp(ctx context.Context, tx server.Tx, filter server.AppsFilter) (inter
 }
 
 func createApp(ctx context.Context, tx server.Tx, app internal.App) (internal.App, error) {
-	id, err := uuid.NewV4()
-	if err != nil {
-		return EmptyApp, err
+	if app.ID == "" {
+		id, err := uuid.NewV4()
+		if err != nil {
+			return EmptyApp, err
+		}
+		app.ID = id.String()
 	}
-	app.ID = id.String()
 	app.CreatedAt = time.Now()
 	app.UpdatedAt = time.Now()
 
@@ -96,6 +99,7 @@ func createApp(ctx context.Context, tx server.Tx, app internal.App) (internal.Ap
 		"updated_at":      app.UpdatedAt,
 		"name":            app.Name,
 		"group":           app.Group,
+		"system":          app.System,
 		"image":           app.Image,
 		"image_digest":    app.ImageDigest,
 		"hidden":          app.Hidden,
@@ -106,7 +110,7 @@ func createApp(ctx context.Context, tx server.Tx, app internal.App) (internal.Ap
 		"command":         app.Command,
 		"networks":        sqlitetypes.StringArray(app.Networks),
 	}).ToSQL()
-	_, err = tx.ExecContext(ctx, sql, args...)
+	_, err := tx.ExecContext(ctx, sql, args...)
 	return app, err
 }
 
@@ -117,6 +121,7 @@ func updateApp(ctx context.Context, tx server.Tx, app internal.App) (internal.Ap
 		"updated_at":      app.UpdatedAt,
 		"name":            app.Name,
 		"group":           app.Group,
+		"system":          app.System,
 		"image":           app.Image,
 		"image_digest":    app.ImageDigest,
 		"hidden":          app.Hidden,

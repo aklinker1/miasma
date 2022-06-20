@@ -4,6 +4,7 @@ CREATE TABLE apps(
     "updated_at" timestamp NOT NULL,
     "name" text NOT NULL,
     "group" text,
+    "system" boolean NOT NULL,
     "image" text NOT NULL,
     "image_digest" text NOT NULL,
     "hidden" boolean NOT NULL,

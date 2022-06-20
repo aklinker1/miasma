@@ -14,11 +14,11 @@ import (
 )
 
 func (r *appResolver) Routing(ctx context.Context, obj *internal.App) (*internal.AppRouting, error) {
-	return getAppRoute(ctx, r.Routes, obj)
+	return r.getAppRoute(ctx, obj)
 }
 
 func (r *appResolver) SimpleRoute(ctx context.Context, obj *internal.App) (*string, error) {
-	route, err := getAppRoute(ctx, r.Routes, obj)
+	route, err := r.getAppRoute(ctx, obj)
 	if err != nil {
 		return nil, err
 	}

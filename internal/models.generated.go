@@ -14,22 +14,24 @@ type App struct {
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 	Name      string    `json:"name"`
-	Group     *string   `json:"group"`
-	// The image and tag the application runs
+	// Whether or not the application is managed by the system. You cannot edit or delete system apps.
+	System bool    `json:"system"`
+	Group  *string `json:"group"`
+	// The image and tag the application runs.
 	Image string `json:"image"`
 	// The currently running image digest (hash). Used internally when running
 	// applications instead of the tag because the when a new image is pushed, the
-	// tag stays the same but the digest changes
+	// tag stays the same but the digest changes.
 	ImageDigest string `json:"imageDigest"`
-	// Whether or not the app is returned during regular requests
+	// Whether or not the app is returned during regular requests.
 	Hidden bool `json:"hidden"`
-	// If the app has routing, this is the routing config
+	// If the app has routing, this is the routing config.
 	Routing *AppRouting `json:"routing"`
-	// If the app has routing, a simple string representing that route
+	// If the app has routing, a simple string representing that route.
 	SimpleRoute *string `json:"simpleRoute"`
-	// Whether or not the application is running, stopped, or starting up
+	// Whether or not the application is running, stopped, or starting up.
 	Status string `json:"status"`
-	// The number of instances running vs what should be running
+	// The number of instances running vs what should be running.
 	Instances *AppInstances `json:"instances"`
 	// The ports that the app is listening to inside the container. If no target
 	// ports are specified, then the container should respect the `PORT` env var.
@@ -48,9 +50,9 @@ type App struct {
 	PublishedPorts []int32 `json:"publishedPorts"`
 	// The placement constraints specifying which nodes the app will be ran on. Any
 	// valid value for the [`--constraint` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints)
-	// is valid item in this list
+	// is valid item in this list.
 	Placement []string `json:"placement"`
-	// Volume bindings for the app
+	// Volume bindings for the app.
 	Volumes []*BoundVolume `json:"volumes"`
 	// A list of other apps that the service communicates with using their service
 	// name and docker's internal DNS. Services don't have to be two way; only the
@@ -94,9 +96,9 @@ type AppRoutingInput struct {
 }
 
 type BoundVolume struct {
-	// The path inside the container that the data is served from
+	// The path inside the container that the data is served from.
 	Target string `json:"target"`
-	// The volume name or directory on the host that the data is stored in
+	// The volume name or directory on the host that the data is stored in.
 	Source string `json:"source"`
 }
 
@@ -114,17 +116,17 @@ type ClusterInfo struct {
 }
 
 type Health struct {
-	// Miasma server's current version
+	// Miasma server's current version.
 	Version string `json:"version"`
-	// The version of docker running on the host, or null if docker is not running
+	// The version of docker running on the host, or null if docker is not running.
 	DockerVersion string `json:"dockerVersion"`
-	// The cluster versioning and information, or `null` if not apart of a cluster
+	// The cluster versioning and information, or `null` if not apart of a cluster.
 	Cluster *ClusterInfo `json:"cluster"`
 }
 
 type Plugin struct {
 	Name PluginName `json:"name"`
-	// Whether or not the plugin has been enabled
+	// Whether or not the plugin has been enabled.
 	Enabled bool `json:"enabled"`
 }
 

@@ -138,11 +138,10 @@ func PluginName(s any) any {
 }
 
 // Scan implements the sql.Scanner interface.
-func (a *pluginName) Scan(src interface{}) error {
-	fmt.Println(src)
+func (name *pluginName) Scan(src interface{}) error {
 	if str, ok := src.(string); ok {
 		if str == internal.PluginNameTraefik.String() {
-			*a = pluginName(internal.PluginNameTraefik)
+			*name = pluginName(internal.PluginNameTraefik)
 			return nil
 		}
 	}
@@ -155,6 +154,6 @@ func (a *pluginName) Scan(src interface{}) error {
 }
 
 // Value implements the driver.Valuer interface.
-func (array pluginName) Value() (driver.Value, error) {
-	return json.Marshal(array)
+func (name pluginName) Value() (driver.Value, error) {
+	return string(name), nil
 }
