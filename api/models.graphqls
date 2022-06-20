@@ -117,7 +117,7 @@ input AppChanges {
 }
 
 type Plugin {
-  name: String!
+  name: PluginName!
   "Whether or not the plugin has been enabled"
   enabled: Boolean!
 }
@@ -140,4 +140,8 @@ input AppRoutingInput {
 type AppInstances {
   running: Int!
   total: Int!
+}
+
+enum PluginName {
+  TRAEFIK
 }

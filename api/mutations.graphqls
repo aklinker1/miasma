@@ -15,9 +15,9 @@ type Mutation {
   upgradeApp(id: ID!): App!
 
   "Install one of Miasma's plugins"
-  enablePlugin(name: String!): Plugin!
+  enablePlugin(name: PluginName!): Plugin!
   "Disable one of Miasma's plugins"
-  disablePlugin(name: String!): Plugin!
+  disablePlugin(name: PluginName!): Plugin!
 
   "Only available when the 'router' plugin is enabled"
   setAppRouting(appId: ID!, routing: AppRoutingInput): AppRouting

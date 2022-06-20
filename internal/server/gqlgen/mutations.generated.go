@@ -22,8 +22,8 @@ type MutationResolver interface {
 	StopApp(ctx context.Context, id string) (*internal.App, error)
 	RestartApp(ctx context.Context, id string) (*internal.App, error)
 	UpgradeApp(ctx context.Context, id string) (*internal.App, error)
-	EnablePlugin(ctx context.Context, name string) (*internal.Plugin, error)
-	DisablePlugin(ctx context.Context, name string) (*internal.Plugin, error)
+	EnablePlugin(ctx context.Context, name internal.PluginName) (*internal.Plugin, error)
+	DisablePlugin(ctx context.Context, name internal.PluginName) (*internal.Plugin, error)
 	SetAppRouting(ctx context.Context, appID string, routing *internal.AppRoutingInput) (*internal.AppRouting, error)
 	RemoveAppRouting(ctx context.Context, appID string) (*internal.AppRouting, error)
 }
@@ -65,10 +65,10 @@ func (ec *executionContext) field_Mutation_deleteApp_args(ctx context.Context, r
 func (ec *executionContext) field_Mutation_disablePlugin_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
+	var arg0 internal.PluginName
 	if tmp, ok := rawArgs["name"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		arg0, err = ec.unmarshalNPluginName2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐPluginName(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -104,10 +104,10 @@ func (ec *executionContext) field_Mutation_editApp_args(ctx context.Context, raw
 func (ec *executionContext) field_Mutation_enablePlugin_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
+	var arg0 internal.PluginName
 	if tmp, ok := rawArgs["name"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		arg0, err = ec.unmarshalNPluginName2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐPluginName(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -888,7 +888,7 @@ func (ec *executionContext) _Mutation_enablePlugin(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().EnablePlugin(rctx, fc.Args["name"].(string))
+		return ec.resolvers.Mutation().EnablePlugin(rctx, fc.Args["name"].(internal.PluginName))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -949,7 +949,7 @@ func (ec *executionContext) _Mutation_disablePlugin(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DisablePlugin(rctx, fc.Args["name"].(string))
+		return ec.resolvers.Mutation().DisablePlugin(rctx, fc.Args["name"].(internal.PluginName))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

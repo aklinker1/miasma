@@ -76,7 +76,7 @@ func (a *int32Array) Scan(src interface{}) error {
 	return &server.Error{
 		Code:    server.EINTERNAL,
 		Message: fmt.Sprintf("Failed to scan %+v (%T) into a []int32", src, src),
-		Op:      "Int32Array.Scan",
+		Op:      "int32Array.Scan",
 	}
 }
 
@@ -119,6 +119,42 @@ func (a *boundVolumeArray) Scan(src interface{}) error {
 	return &server.Error{
 		Code:    server.EINTERNAL,
 		Message: fmt.Sprintf("Failed to scan %+v (%T) into a []*internal.BoundVolume", src, src),
-		Op:      "BoundVolumeArray.Scan",
+		Op:      "boundVolumeArray.Scan",
 	}
+}
+
+// string -> internal.PluginName
+
+type pluginName internal.PluginName
+
+func PluginName(s any) any {
+	switch s := s.(type) {
+	case internal.PluginName:
+		return (*pluginName)(&s)
+	case *internal.PluginName:
+		return (*pluginName)(s)
+	}
+	return nil
+}
+
+// Scan implements the sql.Scanner interface.
+func (a *pluginName) Scan(src interface{}) error {
+	fmt.Println(src)
+	if str, ok := src.(string); ok {
+		if str == internal.PluginNameTraefik.String() {
+			*a = pluginName(internal.PluginNameTraefik)
+			return nil
+		}
+	}
+
+	return &server.Error{
+		Code:    server.EINTERNAL,
+		Message: fmt.Sprintf("Failed to scan %+v (%T) into a internal.PluginName", src, src),
+		Op:      "pluginName.Scan",
+	}
+}
+
+// Value implements the driver.Valuer interface.
+func (array pluginName) Value() (driver.Value, error) {
+	return json.Marshal(array)
 }

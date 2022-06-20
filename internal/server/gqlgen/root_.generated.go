@@ -96,9 +96,9 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateApp        func(childComplexity int, input internal.AppInput) int
 		DeleteApp        func(childComplexity int, id string) int
-		DisablePlugin    func(childComplexity int, name string) int
+		DisablePlugin    func(childComplexity int, name internal.PluginName) int
 		EditApp          func(childComplexity int, id string, changes map[string]interface{}) int
-		EnablePlugin     func(childComplexity int, name string) int
+		EnablePlugin     func(childComplexity int, name internal.PluginName) int
 		RemoveAppRouting func(childComplexity int, appID string) int
 		RestartApp       func(childComplexity int, id string) int
 		SetAppRouting    func(childComplexity int, appID string, routing *internal.AppRoutingInput) int
@@ -415,7 +415,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DisablePlugin(childComplexity, args["name"].(string)), true
+		return e.complexity.Mutation.DisablePlugin(childComplexity, args["name"].(internal.PluginName)), true
 
 	case "Mutation.editApp":
 		if e.complexity.Mutation.EditApp == nil {
@@ -439,7 +439,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.EnablePlugin(childComplexity, args["name"].(string)), true
+		return e.complexity.Mutation.EnablePlugin(childComplexity, args["name"].(internal.PluginName)), true
 
 	case "Mutation.removeAppRouting":
 		if e.complexity.Mutation.RemoveAppRouting == nil {
@@ -767,7 +767,7 @@ input AppChanges {
 }
 
 type Plugin {
-  name: String!
+  name: PluginName!
   "Whether or not the plugin has been enabled"
   enabled: Boolean!
 }
@@ -791,6 +791,10 @@ type AppInstances {
   running: Int!
   total: Int!
 }
+
+enum PluginName {
+  TRAEFIK
+}
 `, BuiltIn: false},
 	{Name: "api/mutations.graphqls", Input: `type Mutation {
   "Create and start a new app"
@@ -809,9 +813,9 @@ type AppInstances {
   upgradeApp(id: ID!): App!
 
   "Install one of Miasma's plugins"
-  enablePlugin(name: String!): Plugin!
+  enablePlugin(name: PluginName!): Plugin!
   "Disable one of Miasma's plugins"
-  disablePlugin(name: String!): Plugin!
+  disablePlugin(name: PluginName!): Plugin!
 
   "Only available when the 'router' plugin is enabled"
   setAppRouting(appId: ID!, routing: AppRoutingInput): AppRouting

@@ -6,13 +6,14 @@ import (
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
 	"github.com/aklinker1/miasma/internal/server/sqlite/sqlb"
+	"github.com/aklinker1/miasma/internal/server/sqlite/sqlitetypes"
 	"github.com/samber/lo"
 )
 
 func findPlugins(ctx context.Context, tx server.Tx, filter server.PluginsFilter) ([]internal.Plugin, error) {
 	var scanned internal.Plugin
 	query := sqlb.Select("plugins", map[string]any{
-		"name":    &scanned.Name,
+		"name":    sqlitetypes.PluginName(&scanned.Name),
 		"enabled": &scanned.Enabled,
 	})
 	if filter.Name != nil {
@@ -58,7 +59,7 @@ func findPlugin(ctx context.Context, tx server.Tx, filter server.PluginsFilter) 
 }
 
 func updatePlugin(ctx context.Context, tx server.Tx, plugin internal.Plugin) (internal.Plugin, error) {
-	sql, args := sqlb.Update("plugins", "name", plugin.Name, map[string]any{
+	sql, args := sqlb.Update("plugins", "name", sqlitetypes.PluginName(plugin.Name), map[string]any{
 		"enabled": plugin.Enabled,
 	}).ToSQL()
 	_, err := tx.ExecContext(ctx, sql, args...)

@@ -3,6 +3,9 @@
 package internal
 
 import (
+	"fmt"
+	"io"
+	"strconv"
 	"time"
 )
 
@@ -120,7 +123,46 @@ type Health struct {
 }
 
 type Plugin struct {
-	Name string `json:"name"`
+	Name PluginName `json:"name"`
 	// Whether or not the plugin has been enabled
 	Enabled bool `json:"enabled"`
+}
+
+type PluginName string
+
+const (
+	PluginNameTraefik PluginName = "TRAEFIK"
+)
+
+var AllPluginName = []PluginName{
+	PluginNameTraefik,
+}
+
+func (e PluginName) IsValid() bool {
+	switch e {
+	case PluginNameTraefik:
+		return true
+	}
+	return false
+}
+
+func (e PluginName) String() string {
+	return string(e)
+}
+
+func (e *PluginName) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = PluginName(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid PluginName", str)
+	}
+	return nil
+}
+
+func (e PluginName) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

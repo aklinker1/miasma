@@ -51,7 +51,7 @@ type AppService interface {
 }
 
 type PluginsFilter struct {
-	Name         *string
+	Name         *internal.PluginName
 	NameContains *string
 	Enabled      *bool
 }

@@ -1604,9 +1604,9 @@ func (ec *executionContext) _Plugin_name(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(internal.PluginName)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNPluginName2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐPluginName(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Plugin_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1616,7 +1616,7 @@ func (ec *executionContext) fieldContext_Plugin_name(ctx context.Context, field 
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type PluginName does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2452,6 +2452,16 @@ func (ec *executionContext) marshalNPlugin2ᚖgithubᚗcomᚋaklinker1ᚋmiasma�
 		return graphql.Null
 	}
 	return ec._Plugin(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNPluginName2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐPluginName(ctx context.Context, v interface{}) (internal.PluginName, error) {
+	var res internal.PluginName
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPluginName2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐPluginName(ctx context.Context, sel ast.SelectionSet, v internal.PluginName) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) marshalOAppRouting2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppRouting(ctx context.Context, sel ast.SelectionSet, v *internal.AppRouting) graphql.Marshaler {
