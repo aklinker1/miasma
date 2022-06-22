@@ -10,6 +10,7 @@ import (
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
 	"github.com/aklinker1/miasma/internal/server/gqlgen"
+	"github.com/aklinker1/miasma/internal/utils"
 	"github.com/samber/lo"
 )
 
@@ -34,6 +35,11 @@ func (r *appResolver) SimpleRoute(ctx context.Context, obj *internal.App) (*stri
 		return route.Host, nil
 	}
 	return nil, nil
+}
+
+func (r *appResolver) Env(ctx context.Context, obj *internal.App) (map[string]interface{}, error) {
+	env, err := r.EnvService.FindEnv(ctx, server.EnvFilter{AppID: &obj.ID})
+	return safeReturn(utils.ToAnyMap(env), nil, err)
 }
 
 func (r *appResolver) Status(ctx context.Context, obj *internal.App) (string, error) {

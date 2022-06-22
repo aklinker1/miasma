@@ -20,6 +20,9 @@ type Mutation {
   disablePlugin(name: PluginName!): Plugin!
 
   "Only available when the 'router' plugin is enabled"
+  setAppEnv(appId: ID!, newEnv: Map): Map
+
+  "Only available when the 'router' plugin is enabled"
   setAppRoute(appId: ID!, route: RouteInput): Route
   "Only available when the 'router' plugin is enabled"
   removeAppRoute(appId: ID!): Route

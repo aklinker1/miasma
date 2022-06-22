@@ -46,6 +46,8 @@ type App {
   route: Route
   "If the app has a route and the traefik plugin is enabled, this is a simple representation of it."
   simpleRoute: String
+  "The environment variables configured for this app."
+  env: Map
   "Whether or not the application is running, stopped, or starting up."
   status: String!
   "The number of instances running vs what should be running."

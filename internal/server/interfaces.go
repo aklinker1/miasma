@@ -96,16 +96,17 @@ type RuntimeAppInfo struct {
 type StartAppParams struct {
 	App   internal.App
 	Route *internal.Route
+	Env   internal.EnvMap
 }
 
 // RuntimeService defines how the server runs the apps
 type RuntimeService interface {
 	// Start the app
-	Start(ctx context.Context, app internal.App, route *internal.Route) error
+	Start(ctx context.Context, app internal.App, route *internal.Route, env map[string]string) error
 	// ServiceDetails returns runtime details like instance count and status
 	GetRuntimeAppInfo(ctx context.Context, app internal.App) (RuntimeAppInfo, error)
 	// Restart stops and starts the app
-	Restart(ctx context.Context, app internal.App, route *internal.Route) error
+	Restart(ctx context.Context, app internal.App, route *internal.Route, env map[string]string) error
 	// Stop stops the app if it's running
 	Stop(ctx context.Context, app internal.App) error
 	// PullLatest grabs the latest image and returns it's digest
@@ -128,4 +129,13 @@ type RouteService interface {
 	Create(ctx context.Context, route internal.Route) (internal.Route, error)
 	Update(ctx context.Context, route internal.Route) (internal.Route, error)
 	Delete(ctx context.Context, route internal.Route) (internal.Route, error)
+}
+
+type EnvFilter struct {
+	AppID *string
+}
+
+type EnvService interface {
+	FindEnv(ctx context.Context, filter EnvFilter) (internal.EnvMap, error)
+	SetAppEnv(ctx context.Context, appID string, newEnv internal.EnvMap) (internal.EnvMap, error)
 }

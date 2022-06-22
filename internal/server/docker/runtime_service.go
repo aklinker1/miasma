@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"regexp"
 	"strings"
 
 	"github.com/aklinker1/miasma/internal"
@@ -23,6 +24,7 @@ var (
 	EmptyService               = swarm.Service{}
 	EmptyRuntimeServiceDetails = server.RuntimeAppInfo{}
 )
+var dockerEnvKeyRegex = regexp.MustCompile("^[0-9A-Z_]+$")
 
 var (
 	miasmaIdLabel           = "miasma-id"
@@ -94,17 +96,17 @@ func (s *RuntimeService) PullLatest(ctx context.Context, image string) (string, 
 }
 
 // Restart implements server.RuntimeService
-func (s *RuntimeService) Restart(ctx context.Context, app internal.App, route *internal.Route) error {
+func (s *RuntimeService) Restart(ctx context.Context, app internal.App, route *internal.Route, env map[string]string) error {
 	s.logger.D("Restarting app: %s", app.Name)
 	err := s.Stop(ctx, app)
 	if err != nil {
 		return err
 	}
-	return s.Start(ctx, app, route)
+	return s.Start(ctx, app, route, env)
 }
 
 // Start implements server.RuntimeService
-func (s *RuntimeService) Start(ctx context.Context, app internal.App, route *internal.Route) error {
+func (s *RuntimeService) Start(ctx context.Context, app internal.App, route *internal.Route, env map[string]string) error {
 	s.logger.D("Starting app: %s", app.Name)
 	existingService, err := s.getExistingService(ctx, app, false)
 	if err != nil {
@@ -112,7 +114,7 @@ func (s *RuntimeService) Start(ctx context.Context, app internal.App, route *int
 	}
 
 	// Define the service
-	spec, err := s.getServiceSpec(ctx, app, route)
+	spec, err := s.getServiceSpec(ctx, app, route, env)
 	if err != nil {
 		return err
 	}
@@ -192,11 +194,15 @@ func (s *RuntimeService) getNetworkName(base string) string {
 }
 
 // Convert an app into a docker service
-func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App, route *internal.Route) (swarm.ServiceSpec, error) {
-	// TODO: get real environment
-	env := map[string]string{}
-
+func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App, route *internal.Route, readonlyEnv map[string]string) (swarm.ServiceSpec, error) {
 	name := s.getServiceName(app)
+
+	env := map[string]string{}
+	if readonlyEnv != nil {
+		for key, value := range readonlyEnv {
+			env[key] = value
+		}
+	}
 
 	// Strip custom tag and use digest instead
 	imageNoTag := app.Image
@@ -243,10 +249,6 @@ func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App, r
 		}
 	})
 
-	envSlice := lo.Map(lo.Entries(env), func(entry lo.Entry[string, string], _ int) string {
-		return fmt.Sprintf("%s=%s", entry.Key, fmt.Sprint(entry.Value))
-	})
-
 	networks := lo.Map(app.Networks, func(networkName string, _ int) swarm.NetworkAttachmentConfig {
 		return swarm.NetworkAttachmentConfig{
 			Target: networkName, // Don't use s.getNetworkName here, these are specified by the user
@@ -255,6 +257,24 @@ func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App, r
 	networks = append(networks, swarm.NetworkAttachmentConfig{
 		Target: s.getNetworkName(defaultNetwork),
 	})
+
+	for key := range env {
+		if !dockerEnvKeyRegex.Match([]byte(key)) {
+			return EmptyService.Spec, &server.Error{
+				Code: server.EINVALID,
+				Message: fmt.Sprintf(
+					"Docker environment variables must match /%s/, but '%s' did not",
+					dockerEnvKeyRegex.String(),
+					key,
+				),
+				Op: "docker.RuntimeService.getServiceSpec",
+			}
+		}
+	}
+	envSlice := lo.Map(lo.Entries(env), func(entry lo.Entry[string, string], _ int) string {
+		return fmt.Sprintf("%s=%s", entry.Key, fmt.Sprint(entry.Value))
+	})
+	s.logger.W("Slice: %v", envSlice)
 
 	return swarm.ServiceSpec{
 		Annotations: swarm.Annotations{
@@ -465,7 +485,7 @@ func (s *RuntimeService) RestartRunningApps(ctx context.Context, params []server
 			return service.Spec.Annotations.Labels[miasmaIdLabel] == p.App.ID
 		})
 		if isRunning && ok {
-			err = s.Restart(ctx, param.App, param.Route)
+			err = s.Restart(ctx, param.App, param.Route, param.Env)
 			if err != nil {
 				s.logger.W("Failed to restart app '%s': %v", param.App.Name, err)
 			}

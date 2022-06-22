@@ -224,6 +224,8 @@ func (ec *executionContext) fieldContext_Query_listApps(ctx context.Context, fie
 				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
+			case "env":
+				return ec.fieldContext_App_env(ctx, field)
 			case "status":
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":
@@ -319,6 +321,8 @@ func (ec *executionContext) fieldContext_Query_getApp(ctx context.Context, field
 				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
+			case "env":
+				return ec.fieldContext_App_env(ctx, field)
 			case "status":
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":

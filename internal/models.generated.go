@@ -29,6 +29,8 @@ type App struct {
 	Route *Route `json:"route"`
 	// If the app has a route and the traefik plugin is enabled, this is a simple representation of it.
 	SimpleRoute *string `json:"simpleRoute"`
+	// The environment variables configured for this app.
+	Env map[string]interface{} `json:"env"`
 	// Whether or not the application is running, stopped, or starting up.
 	Status string `json:"status"`
 	// The number of instances running vs what should be running.

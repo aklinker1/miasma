@@ -48,7 +48,7 @@ func (s *AppService) Create(ctx context.Context, app internal.App) (internal.App
 	}
 
 	// Start the app
-	err = s.runtime.Start(ctx, created, nil)
+	err = s.runtime.Start(ctx, created, nil, nil)
 	if err != nil {
 		return EmptyApp, err
 	}
@@ -153,14 +153,14 @@ func (s *AppService) Update(ctx context.Context, app internal.App, newImage *str
 		return EmptyApp, err
 	}
 
-	route, err := findRouteOrNil(ctx, tx, server.RoutesFilter{
-		AppID: &updated.ID,
+	_, route, env, err := findStartParams(ctx, tx, updated.ID, startParamKnowns{
+		app:      updated,
+		knownApp: true,
 	})
 	if err != nil {
 		return EmptyApp, err
 	}
-
-	err = s.runtime.Restart(ctx, app, route)
+	err = s.runtime.Restart(ctx, updated, route, env)
 	if err != nil {
 		return EmptyApp, err
 	}

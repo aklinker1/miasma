@@ -88,9 +88,16 @@ func (s *PluginService) setEnabled(ctx context.Context, plugin internal.Plugin, 
 		if err != nil {
 			return EmptyPlugin, err
 		}
+		env, err := findEnvMap(ctx, tx, server.EnvFilter{
+			AppID: &app.ID,
+		})
+		if err != nil {
+			return EmptyPlugin, err
+		}
 		params = append(params, server.StartAppParams{
 			App:   app,
 			Route: route,
+			Env:   env,
 		})
 	}
 	s.runtime.RestartRunningApps(ctx, params)
@@ -146,7 +153,13 @@ func (s *PluginService) onEnabled(ctx context.Context, tx server.Tx, pluginName 
 		if err != nil {
 			return err
 		}
-		return s.runtime.Start(ctx, created, route)
+		env, err := findEnvMap(ctx, tx, server.EnvFilter{
+			AppID: &created.ID,
+		})
+		if err != nil {
+			return err
+		}
+		return s.runtime.Start(ctx, created, route, env)
 	default:
 		s.logger.V("No onEnabled hook for %v", pluginName)
 	}

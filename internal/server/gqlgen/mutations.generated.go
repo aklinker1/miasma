@@ -4,6 +4,7 @@ package gqlgen
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -24,6 +25,7 @@ type MutationResolver interface {
 	UpgradeApp(ctx context.Context, id string) (*internal.App, error)
 	EnablePlugin(ctx context.Context, name internal.PluginName) (*internal.Plugin, error)
 	DisablePlugin(ctx context.Context, name internal.PluginName) (*internal.Plugin, error)
+	SetAppEnv(ctx context.Context, appID string, newEnv map[string]interface{}) (map[string]interface{}, error)
 	SetAppRoute(ctx context.Context, appID string, route *internal.RouteInput) (*internal.Route, error)
 	RemoveAppRoute(ctx context.Context, appID string) (*internal.Route, error)
 }
@@ -143,6 +145,30 @@ func (ec *executionContext) field_Mutation_restartApp_args(ctx context.Context, 
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_setAppEnv_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["appId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appId"))
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["appId"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["newEnv"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("newEnv"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["newEnv"] = arg1
 	return args, nil
 }
 
@@ -284,6 +310,8 @@ func (ec *executionContext) fieldContext_Mutation_createApp(ctx context.Context,
 				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
+			case "env":
+				return ec.fieldContext_App_env(ctx, field)
 			case "status":
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":
@@ -379,6 +407,8 @@ func (ec *executionContext) fieldContext_Mutation_editApp(ctx context.Context, f
 				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
+			case "env":
+				return ec.fieldContext_App_env(ctx, field)
 			case "status":
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":
@@ -474,6 +504,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteApp(ctx context.Context,
 				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
+			case "env":
+				return ec.fieldContext_App_env(ctx, field)
 			case "status":
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":
@@ -569,6 +601,8 @@ func (ec *executionContext) fieldContext_Mutation_startApp(ctx context.Context, 
 				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
+			case "env":
+				return ec.fieldContext_App_env(ctx, field)
 			case "status":
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":
@@ -664,6 +698,8 @@ func (ec *executionContext) fieldContext_Mutation_stopApp(ctx context.Context, f
 				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
+			case "env":
+				return ec.fieldContext_App_env(ctx, field)
 			case "status":
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":
@@ -759,6 +795,8 @@ func (ec *executionContext) fieldContext_Mutation_restartApp(ctx context.Context
 				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
+			case "env":
+				return ec.fieldContext_App_env(ctx, field)
 			case "status":
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":
@@ -854,6 +892,8 @@ func (ec *executionContext) fieldContext_Mutation_upgradeApp(ctx context.Context
 				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
+			case "env":
+				return ec.fieldContext_App_env(ctx, field)
 			case "status":
 				return ec.fieldContext_App_status(ctx, field)
 			case "instances":
@@ -1004,6 +1044,58 @@ func (ec *executionContext) fieldContext_Mutation_disablePlugin(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_disablePlugin_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_setAppEnv(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_setAppEnv(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().SetAppEnv(rctx, fc.Args["appId"].(string), fc.Args["newEnv"].(map[string]interface{}))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(map[string]interface{})
+	fc.Result = res
+	return ec.marshalOMap2map(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_setAppEnv(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Map does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_setAppEnv_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -1254,6 +1346,12 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "setAppEnv":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_setAppEnv(ctx, field)
+			})
+
 		case "setAppRoute":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {

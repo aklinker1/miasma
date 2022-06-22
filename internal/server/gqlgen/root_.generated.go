@@ -43,6 +43,7 @@ type ComplexityRoot struct {
 	App struct {
 		Command        func(childComplexity int) int
 		CreatedAt      func(childComplexity int) int
+		Env            func(childComplexity int) int
 		Group          func(childComplexity int) int
 		Hidden         func(childComplexity int) int
 		ID             func(childComplexity int) int
@@ -93,6 +94,7 @@ type ComplexityRoot struct {
 		EnablePlugin   func(childComplexity int, name internal.PluginName) int
 		RemoveAppRoute func(childComplexity int, appID string) int
 		RestartApp     func(childComplexity int, id string) int
+		SetAppEnv      func(childComplexity int, appID string, newEnv map[string]interface{}) int
 		SetAppRoute    func(childComplexity int, appID string, route *internal.RouteInput) int
 		StartApp       func(childComplexity int, id string) int
 		StopApp        func(childComplexity int, id string) int
@@ -150,6 +152,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.App.CreatedAt(childComplexity), true
+
+	case "App.env":
+		if e.complexity.App.Env == nil {
+			break
+		}
+
+		return e.complexity.App.Env(childComplexity), true
 
 	case "App.group":
 		if e.complexity.App.Group == nil {
@@ -431,6 +440,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RestartApp(childComplexity, args["id"].(string)), true
 
+	case "Mutation.setAppEnv":
+		if e.complexity.Mutation.SetAppEnv == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_setAppEnv_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.SetAppEnv(childComplexity, args["appId"].(string), args["newEnv"].(map[string]interface{})), true
+
 	case "Mutation.setAppRoute":
 		if e.complexity.Mutation.SetAppRoute == nil {
 			break
@@ -704,6 +725,8 @@ type App {
   route: Route
   "If the app has a route and the traefik plugin is enabled, this is a simple representation of it."
   simpleRoute: String
+  "The environment variables configured for this app."
+  env: Map
   "Whether or not the application is running, stopped, or starting up."
   status: String!
   "The number of instances running vs what should be running."
@@ -825,6 +848,9 @@ enum PluginName {
   enablePlugin(name: PluginName!): Plugin!
   "Disable one of Miasma's plugins"
   disablePlugin(name: PluginName!): Plugin!
+
+  "Only available when the 'router' plugin is enabled"
+  setAppEnv(appId: ID!, newEnv: Map): Map
 
   "Only available when the 'router' plugin is enabled"
   setAppRoute(appId: ID!, route: RouteInput): Route

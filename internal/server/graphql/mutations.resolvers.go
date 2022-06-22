@@ -92,7 +92,14 @@ func (r *mutationResolver) StartApp(ctx context.Context, id string) (*internal.A
 		return nil, err
 	}
 
-	err = r.Runtime.Start(ctx, app, route)
+	env, err := r.EnvService.FindEnv(ctx, server.EnvFilter{
+		AppID: &id,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.Runtime.Start(ctx, app, route, env)
 	return safeReturn(&app, nil, err)
 }
 
@@ -115,8 +122,12 @@ func (r *mutationResolver) RestartApp(ctx context.Context, id string) (*internal
 	if err != nil {
 		return nil, err
 	}
+	env, err := r.EnvService.FindEnv(ctx, server.EnvFilter{AppID: &id})
+	if err != nil {
+		return nil, err
+	}
 
-	err = r.Runtime.Restart(ctx, app, route)
+	err = r.Runtime.Restart(ctx, app, route, env)
 	return safeReturn(&app, nil, err)
 }
 
@@ -151,6 +162,11 @@ func (r *mutationResolver) DisablePlugin(ctx context.Context, name internal.Plug
 
 	updated, err := r.Plugins.DisablePlugin(ctx, plugin)
 	return safeReturn(&updated, nil, err)
+}
+
+func (r *mutationResolver) SetAppEnv(ctx context.Context, appID string, newEnv map[string]interface{}) (map[string]interface{}, error) {
+	created, err := r.EnvService.SetAppEnv(ctx, appID, utils.ToEnvMap(newEnv))
+	return safeReturn(utils.ToAnyMap(created), nil, err)
 }
 
 func (r *mutationResolver) SetAppRoute(ctx context.Context, appID string, route *internal.RouteInput) (*internal.Route, error) {
