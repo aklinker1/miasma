@@ -11,8 +11,12 @@
 ### What makes Miasma unique?
 
 - The only PaaS that supports both **clusters** and **ARM devices**
-- Built for a home network of Raspberry Pis (and other computers) in your basement closet
+- Built for a home network of Raspberry Pis (and other computers) in your closet
 
 ### Docs
 
-<https://aklinker1.github.io/miasma/>
+<https://aklinker1.github.io/miasma>
+
+### Contributing
+
+<https://aklinker1.github.io/miasma/docs/contributing>

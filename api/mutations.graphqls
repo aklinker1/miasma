@@ -1,0 +1,29 @@
+type Mutation {
+  "Create and start a new app"
+  createApp(input: AppInput!): App!
+  "Edit app metadata unrelated to how the container(s) that are run"
+  editApp(id: ID!, changes: AppChanges!): App!
+  "Stop and delete an app"
+  deleteApp(id: ID!): App!
+  "Start a stopped app"
+  startApp(id: ID!): App!
+  "Stop a running app"
+  stopApp(id: ID!): App!
+  "Stop and restart an app"
+  restartApp(id: ID!): App!
+  "Pull the latest version of the app's image and then restart"
+  upgradeApp(id: ID!): App!
+
+  "Enable one of Miasma's plugins"
+  enablePlugin(name: PluginName!): Plugin!
+  "Disable one of Miasma's plugins"
+  disablePlugin(name: PluginName!): Plugin!
+
+  "Only available when the 'router' plugin is enabled"
+  setAppEnv(appId: ID!, newEnv: Map): Map
+
+  "Only available when the 'router' plugin is enabled"
+  setAppRoute(appId: ID!, route: RouteInput): Route
+  "Only available when the 'router' plugin is enabled"
+  removeAppRoute(appId: ID!): Route
+}

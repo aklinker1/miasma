@@ -1,10 +1,13 @@
+.git/
 .vscode/
 .github/
 bin/
 .gitignore
 .env
+.env.*
 *.md
 modd.conf
 /docs
 node_modules
 web/dist
+Makefile

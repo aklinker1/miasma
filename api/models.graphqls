@@ -1,0 +1,150 @@
+"""
+The info about the docker swarm if the host running miasma is apart of one.
+"""
+type ClusterInfo {
+  id: String!
+  joinCommand: String!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type Health {
+  "Miasma server's current version."
+  version: String!
+  "The version of docker running on the host, or null if docker is not running."
+  dockerVersion: String!
+  "The cluster versioning and information, or `null` if not apart of a cluster."
+  cluster: ClusterInfo
+}
+
+type BoundVolume {
+  "The path inside the container that the data is served from."
+  target: String!
+  "The volume name or directory on the host that the data is stored in."
+  source: String!
+}
+
+type App {
+  id: ID!
+  createdAt: Time!
+  updatedAt: Time!
+  name: String!
+  "Whether or not the application is managed by the system. You cannot edit or delete system apps."
+  system: Boolean!
+  group: String
+  "The image and tag the application runs."
+  image: String!
+  """
+  The currently running image digest (hash). Used internally when running
+  applications instead of the tag because the when a new image is pushed, the
+  tag stays the same but the digest changes.
+  """
+  imageDigest: String!
+  "Whether or not the app is returned during regular requests."
+  hidden: Boolean!
+  "If the app has a route and the traefik plugin is enabled, this is it's config."
+  route: Route
+  "If the app has a route and the traefik plugin is enabled, this is a simple representation of it."
+  simpleRoute: String
+  "The environment variables configured for this app."
+  env: Map
+  "Whether or not the application is running, stopped, or starting up."
+  status: String!
+  "The number of instances running vs what should be running."
+  instances: AppInstances!
+  """
+  The ports that the app is listening to inside the container. If no target
+  ports are specified, then the container should respect the `PORT` env var.
+  """
+  targetPorts: [Int!]
+  """
+  The ports that you access the app through in the swarm. This field can, and
+  should be left empty. Miasma automatically manages assigning published ports
+  between 3001-4999. If you need to specify a port, make sure it's outside that
+  range or the port has not been taken. Plugins have set ports starting with
+  4000, so avoid 4000-4020 if you want to add a plugin at a later date.
+
+  If these ports are ever cleared, the app will continue using the same ports it
+  was published to before, so that the ports don't change unnecessarily. If you
+  removed it to clear a port for another app/plugin, make sure to restart the
+  app and a new, random port will be allocated for the app, freeing the old
+  port.
+  """
+  publishedPorts: [Int!]
+  """
+  The placement constraints specifying which nodes the app will be ran on. Any
+  valid value for the [`--constraint` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints)
+  is valid item in this list.
+  """
+  placement: [String!]
+  "Volume bindings for the app."
+  volumes: [BoundVolume!]
+  """
+  A list of other apps that the service communicates with using their service
+  name and docker's internal DNS. Services don't have to be two way; only the
+  service that accesses the other needs the other network added.
+  """
+  networks: [String!]
+  command: [String!]
+}
+
+input BoundVolumeInput {
+  target: String!
+  source: String!
+}
+
+input AppInput {
+  name: String!
+  image: String!
+  group: String
+  hidden: Boolean
+  targetPorts: [Int!]
+  publishedPorts: [Int!]
+  placement: [String!]
+  volumes: [BoundVolumeInput!]
+  networks: [String!]
+  command: [String!]
+}
+
+input AppChanges {
+  name: String
+  image: String
+  group: String
+  hidden: Boolean
+  targetPorts: [Int!]
+  publishedPorts: [Int!]
+  placement: [String!]
+  volumes: [BoundVolumeInput!]
+  networks: [String!]
+  command: [String!]
+}
+
+type Plugin {
+  name: PluginName!
+  "Whether or not the plugin has been enabled."
+  enabled: Boolean!
+}
+
+type Route {
+  appId: ID!
+  createdAt: Time!
+  updatedAt: Time!
+  host: String
+  path: String
+  traefikRule: String
+}
+
+input RouteInput {
+  host: String
+  path: String
+  traefikRule: String
+}
+
+type AppInstances {
+  running: Int!
+  total: Int!
+}
+
+enum PluginName {
+  TRAEFIK
+}
