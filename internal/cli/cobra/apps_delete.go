@@ -8,31 +8,32 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var appsRestartCmd = &cobra.Command{
-	Use:   "apps:restart",
-	Short: "Restart an application or start it if it's not already running",
+var appsDeleteCmd = &cobra.Command{
+	Use:   "apps:delete",
+	Short: "Delete an existing application",
+	Long:  `Delete an existing application. If the app is running, it is stopped first`,
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		appName, deferable := flags.GetAppFlag(cmd)
 		defer deferable()
 
-		reloadApp(appName)
+		deleteApp(appName)
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(appsRestartCmd)
-	flags.UseAppFlag(appsRestartCmd)
+	RootCmd.AddCommand(appsDeleteCmd)
+	flags.UseAppFlag(appsDeleteCmd)
 }
 
-func reloadApp(appName string) {
+func deleteApp(appName string) {
 	ctx := context.Background()
-	title.Printf("\nRestarting %s...\n", appName)
+	title.Printf("\nDeleting %s...\n", appName)
 
 	app, err := api.GetApp(ctx, appName, `{ id name }`)
 	checkErr(err)
 
-	err = api.RestartApp(ctx, app.ID)
+	err = api.DeleteApp(ctx, app.ID)
 	checkErr(err)
 
 	fmt.Printf("Done!\n\n")

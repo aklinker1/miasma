@@ -95,7 +95,7 @@ func (c *MiasmaAPIClient) Health(ctx context.Context, gql string) (internal.Heal
 	health := internal.Health{}
 	err := c.post(
 		ctx,
-		`query Health {
+		`query {
 			health %s
 		}`,
 		gql,
@@ -108,7 +108,34 @@ func (c *MiasmaAPIClient) Health(ctx context.Context, gql string) (internal.Heal
 
 // CreateApp implements cli.APIService
 func (c *MiasmaAPIClient) CreateApp(ctx context.Context, app internal.AppInput) error {
-	panic("unimplemented")
+	return c.post(
+		ctx,
+		`mutation ($input: AppInput!) {
+			createApp(input: $input) %s
+		}`,
+		`{ id }`,
+		map[string]any{
+			"input": app,
+		},
+		"startApp",
+		&internal.App{},
+	)
+}
+
+// DeleteApp implements cli.APIService
+func (c *MiasmaAPIClient) DeleteApp(ctx context.Context, appID string) error {
+	return c.post(
+		ctx,
+		`mutation ($id: ID!) {
+			deleteApp(id: $id) %s
+		}`,
+		`{ id }`,
+		map[string]any{
+			"id": appID,
+		},
+		"startApp",
+		&internal.App{},
+	)
 }
 
 // DisablePlugin implements cli.APIService
@@ -140,7 +167,7 @@ func (c *MiasmaAPIClient) ListApps(ctx context.Context, options cli.ListAppsOpti
 	apps := []internal.App{}
 	err := c.post(
 		ctx,
-		`query ListApps($showHidden: Boolean) {
+		`query ($showHidden: Boolean) {
 			apps: listApps(showHidden: $showHidden) %s
 		}`,
 		gql,
@@ -175,7 +202,7 @@ func (c *MiasmaAPIClient) SetAppRoute(ctx context.Context, appID string, route i
 func (c *MiasmaAPIClient) StartApp(ctx context.Context, appID string) error {
 	return c.post(
 		ctx,
-		`mutation StartApp($id: ID!) {
+		`mutation ($id: ID!) {
 			startApp(id: $id) %s
 		}`,
 		`{ id }`,
@@ -191,7 +218,7 @@ func (c *MiasmaAPIClient) StartApp(ctx context.Context, appID string) error {
 func (c *MiasmaAPIClient) StopApp(ctx context.Context, appID string) error {
 	return c.post(
 		ctx,
-		`mutation StopApp($id: ID!) {
+		`mutation ($id: ID!) {
 			stopApp(id: $id) %s
 		}`,
 		`{ id }`,
@@ -207,7 +234,7 @@ func (c *MiasmaAPIClient) StopApp(ctx context.Context, appID string) error {
 func (c *MiasmaAPIClient) RestartApp(ctx context.Context, appID string) error {
 	return c.post(
 		ctx,
-		`mutation RestartApp($id: ID!) {
+		`mutation ($id: ID!) {
 			restartApp(id: $id) %s
 		}`,
 		`{ id }`,
