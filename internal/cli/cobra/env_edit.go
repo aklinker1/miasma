@@ -53,7 +53,7 @@ func editEnv(appName string) {
 	err = api.SetAppEnv(ctx, app.ID, newEnv)
 	checkErr(err)
 
-	fmt.Printf("Done!\n\n")
+	done("Set new environment")
 }
 
 func editEnvInEditor(ctx context.Context, text string) (internal.EnvMap, error) {

@@ -2,7 +2,6 @@ package cobra
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/aklinker1/miasma/internal/cli/flags"
 	"github.com/spf13/cobra"
@@ -35,5 +34,5 @@ func reloadApp(appName string) {
 	err = api.RestartApp(ctx, app.ID)
 	checkErr(err)
 
-	fmt.Printf("Done!\n\n")
+	done("%s restarted", appName)
 }

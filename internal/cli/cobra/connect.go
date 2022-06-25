@@ -46,5 +46,5 @@ func connectToServer(baseURL string) {
 
 	err = viper.WriteConfig()
 	checkErr(err)
-	fmt.Printf("%s added to %s\n\n", baseURL, viper.ConfigFileUsed())
+	done("%s added to %s\n\n", baseURL, viper.ConfigFileUsed())
 }

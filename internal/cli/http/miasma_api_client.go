@@ -138,6 +138,25 @@ func (c *MiasmaAPIClient) DeleteApp(ctx context.Context, appID string) error {
 	)
 }
 
+// EditApp implements cli.APIService
+func (c *MiasmaAPIClient) EditApp(ctx context.Context, appID string, changes map[string]any, gql string) (internal.App, error) {
+	app := internal.App{}
+	err := c.post(
+		ctx,
+		`mutation ($id: ID!, $changes: AppChanges!) {
+			editApp(id: $id, changes: $changes) %s
+		}`,
+		gql,
+		map[string]any{
+			"id":      appID,
+			"changes": changes,
+		},
+		"editApp",
+		&app,
+	)
+	return app, err
+}
+
 // DisablePlugin implements cli.APIService
 func (c *MiasmaAPIClient) DisablePlugin(ctx context.Context, pluginName string) error {
 	panic("unimplemented")

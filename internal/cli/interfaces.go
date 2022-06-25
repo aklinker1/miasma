@@ -29,6 +29,7 @@ type APIService interface {
 	StartApp(ctx context.Context, appID string) error
 	StopApp(ctx context.Context, appID string) error
 	RestartApp(ctx context.Context, appID string) error
+	EditApp(ctx context.Context, appID string, changes map[string]any, gql string) (internal.App, error)
 
 	SetAppEnv(ctx context.Context, appID string, newEnv internal.EnvMap) error
 

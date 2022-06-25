@@ -2,7 +2,6 @@ package cobra
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/aklinker1/miasma/internal/cli/flags"
 	"github.com/spf13/cobra"
@@ -35,5 +34,5 @@ func stopApp(appName string) {
 	err = api.StopApp(ctx, app.ID)
 	checkErr(err)
 
-	fmt.Printf("Done!\n\n")
+	done("%s stopped", appName)
 }

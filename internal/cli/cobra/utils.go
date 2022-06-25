@@ -1,6 +1,8 @@
 package cobra
 
 import (
+	"fmt"
+
 	"github.com/fatih/color"
 )
 
@@ -18,4 +20,9 @@ func checkErr(err error) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func done(format string, args ...any) {
+	coloredFormat := fmt.Sprintf(green("✔ %s\n\n"), format)
+	fmt.Printf(coloredFormat, args...)
 }

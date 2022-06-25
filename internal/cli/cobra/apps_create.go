@@ -2,7 +2,6 @@ package cobra
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/cli/flags"
@@ -44,5 +43,5 @@ func createApp(appName string, image string, hidden bool) {
 	})
 	checkErr(err)
 
-	fmt.Printf("%s started\n\n", appName)
+	done("%s started", appName)
 }

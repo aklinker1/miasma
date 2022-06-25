@@ -2,7 +2,6 @@ package cobra
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/aklinker1/miasma/internal/cli/flags"
 	"github.com/spf13/cobra"
@@ -36,5 +35,5 @@ func deleteApp(appName string) {
 	err = api.DeleteApp(ctx, app.ID)
 	checkErr(err)
 
-	fmt.Printf("Done!\n\n")
+	done("%s deleted", appName)
 }
