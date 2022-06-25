@@ -14,6 +14,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/aklinker1/miasma/internal/server"
 	"github.com/aklinker1/miasma/internal/server/gqlgen"
+	"github.com/aklinker1/miasma/web"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 )
@@ -49,11 +50,11 @@ func (s *graphqlServer) ServeGraphql() error {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
-	// r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
 	r.Handle("/graphql", s.createGraphqlHandler())
-	r.Handle("/playground", playground.Handler("Anime Skip", "/graphql"))
+	r.Handle("/playground", playground.Handler("Miasma", "/graphql"))
+	r.Get("/*", web.Handler("/"))
 
 	s.logger.I("Miasma server started at :%d", s.port)
 	return http.ListenAndServe(fmt.Sprintf(":%d", s.port), r)

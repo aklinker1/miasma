@@ -10,7 +10,7 @@ DATA_DIR=$(shell pwd)/data
 # Build the production docker image
 build:
 	@docker build . -f Dockerfile \
-		-t aklinker1/miasma:local \
+		-t aklinker1/miasma \
 		--build-arg VERSION="${API_VERSION}" \
 		--build-arg BUILD="${BUILD}" \
 		--build-arg BUILD_HASH="${BUILD_HASH}" \
@@ -18,7 +18,26 @@ build:
 		--build-arg BUILD_VAR_PATH="${BUILD_VAR_PATH}"
 
 # Run the production docker image
-run: build
+preview: build
+	@echo "Starting Miasma Server..."
+	@echo
+	@docker run \
+		-i \
+		--rm \
+		--env-file .env \
+		-p 3000:3000 \
+		-v "${DATA_DIR}":/data/miasma \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		aklinker1/miasma
+
+run:
+	@docker build . -f Dockerfile.dev \
+		-t aklinker1/miasma:local \
+		--build-arg VERSION="${API_VERSION}" \
+		--build-arg BUILD="${BUILD}" \
+		--build-arg BUILD_HASH="${BUILD_HASH}" \
+		--build-arg BUILD_DATE="${BUILD_DATE}" \
+		--build-arg BUILD_VAR_PATH="${BUILD_VAR_PATH}"
 	@echo
 	@echo "Starting Miasma Server..."
 	@echo
@@ -31,6 +50,10 @@ run: build
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		aklinker1/miasma:local
 
+# Run just the frontend in HMR mode
+ui:
+	@cd web && pnpm dev
+
 cli:
 	@go build \
 		-ldflags "-X ${BUILD_VAR_PATH}.VERSION=${CLI_VERSION} -X ${BUILD_VAR_PATH}.BUILD=${BUILD} -X ${BUILD_VAR_PATH}.BUILD_HASH=${BUILD_HASH} -X ${BUILD_VAR_PATH}.BUILD_DATE=${BUILD_DATE}" \
@@ -40,10 +63,6 @@ cli:
 
 # Run just the backend
 dev-backend:
-	@echo "TODO - waiting for frontend"
-
-# Run just the frontend in HMR mode
-dev-frontend:
 	@echo "TODO - waiting for frontend"
 
 # Generate code (GQLGen)
