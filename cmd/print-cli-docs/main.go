@@ -19,7 +19,7 @@ func printCommand(cmd *cobra.Command, headerPrefix string) {
 	fmt.Println(strings.Join([]string{
 		fmt.Sprintf("%s `%s`", headerPrefix, cmd.Name()),
 		"",
-		"```",
+		"```text:no-line-numbers",
 	}, "\n"))
 	cmd.Help()
 	fmt.Println(strings.Join([]string{
