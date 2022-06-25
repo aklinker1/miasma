@@ -63,8 +63,8 @@ cli:
 	@cp bin/cli "${GOPATH}/bin/miasma-dev"
 
 # Run just the docs website in dev mode
-ui:
-	@cd web && pnpm dev
+doc:
+	@cd docs && pnpm dev
 
 # Generate code (GQLGen)
 gen:

@@ -1,13 +1,46 @@
-import { defaultTheme, defineUserConfig } from "vuepress";
-import fs from "fs/promises";
+import { defaultTheme, defineUserConfig, Page, Plugin } from "vuepress";
 import { searchPlugin } from "@vuepress/plugin-search";
+import { execSync } from "child_process";
 
-async function generateGraphqlDocs() {
-  await fs.writeFile("docs/generated/graphql-schema.md", "");
-}
+function generateCodePlugin(): Plugin {
+  async function executeTemplate(
+    page: Page,
+    variables: Record<string, string>
+  ) {
+    for (const [key, value] of Object.entries(variables)) {
+      const templateKey = `{{ ${key} }}`;
+      while (page.contentRendered.includes(templateKey))
+        page.contentRendered = page.contentRendered.replace(templateKey, value);
+    }
+  }
 
-async function generateCliDocs() {
-  await fs.writeFile("docs/generated/cli-help.md", "");
+  async function generateGraphqlSchema(): Promise<string> {
+    console.log("Generating GraphQL schema docs...");
+    return ":::danger\nTODO\n:::";
+  }
+
+  async function generateCliHelp(): Promise<string> {
+    console.log("Generating CLI help docs...");
+    return execSync("go run cmd/print-cli-docs/main.go", {
+      cwd: "..",
+      encoding: "utf-8",
+    });
+  }
+
+  return {
+    name: "GeneratedCode",
+
+    async extendsPage(page, app) {
+      if (page.path === "/reference/cli.html") {
+        const help = app.markdown.render(await generateCliHelp());
+        await executeTemplate(page, { help });
+      }
+      if (page.path === "/reference/graphql.html") {
+        const schema = app.markdown.render(await generateGraphqlSchema());
+        await executeTemplate(page, { schema });
+      }
+    },
+  };
 }
 
 export default defineUserConfig({
@@ -15,6 +48,7 @@ export default defineUserConfig({
   title: "Miasma",
   description: "A Heroku-like, docker based PaaS with cluster and ARM support",
   plugins: [
+    generateCodePlugin(),
     searchPlugin({
       locales: {
         "/": {
@@ -23,10 +57,6 @@ export default defineUserConfig({
       },
     }),
   ],
-  async onInitialized() {
-    await generateGraphqlDocs();
-    await generateCliDocs();
-  },
   theme: defaultTheme({
     docsRepo: "https://github.com/aklinker1/miasma",
     docsDir: "docs",
@@ -60,6 +90,7 @@ export default defineUserConfig({
         "/faq.md",
         "/contributing.md",
       ],
+      "/reference/": ["/reference/cli.md", "/reference/graphql.md"],
     },
   }),
 });

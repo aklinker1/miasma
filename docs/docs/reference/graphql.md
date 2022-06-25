@@ -17,3 +17,7 @@ The API includes a GraphiQL playground that lets you experiment with the API fro
 ## Introspection
 
 The API also supports introspection so you can get docs inside a HTTP client like Insomnia or Postman.
+
+## Schema
+
+{{ schema }}
