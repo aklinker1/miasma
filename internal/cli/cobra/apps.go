@@ -24,11 +24,13 @@ func init() {
 	flags.UseAllFlag(appsCmd)
 }
 
-func listApps(includeHidden bool) {
+func listApps(showHidden bool) {
 	ctx := context.Background()
 	apps, err := api.ListApps(
 		ctx,
-		cli.ListAppsOptions{},
+		cli.ListAppsOptions{
+			ShowHidden: &showHidden,
+		},
 		`{
 			name
 			group
@@ -46,7 +48,7 @@ func listApps(includeHidden bool) {
 	prevGroup := ""
 	for _, app := range apps {
 		if app.Group != nil && *app.Group != prevGroup {
-			color.Magenta("\n%s", *app.Group)
+			title.Printf("\n%s\n", *app.Group)
 		}
 		status := green("●")
 		if app.Status == "stopped" {

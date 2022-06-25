@@ -33,7 +33,7 @@ func editEnv(appName string) {
 	ctx := context.Background()
 	title.Printf("\nSetting %s's env...\n", appName)
 
-	app, err := api.GetApp(ctx, appName, `{ id, name, env }`)
+	app, err := api.GetApp(ctx, appName, `{ id name env }`)
 	checkErr(err)
 	env, err := getEnvEntries(ctx, app)
 	checkErr(err)

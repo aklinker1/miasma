@@ -259,7 +259,19 @@ func (c *MiasmaAPIClient) SetAppEnv(ctx context.Context, appID string, newEnv in
 
 // SetAppRoute implements cli.APIService
 func (c *MiasmaAPIClient) SetAppRoute(ctx context.Context, appID string, route internal.RouteInput) error {
-	panic("unimplemented")
+	return c.post(
+		ctx,
+		`mutation ($appId: ID!, $route: RouteInput!) {
+			setAppRoute(appId: $appId, route: $route) %s
+		}`,
+		`{ updatedAt }`,
+		map[string]any{
+			"appId": appID,
+			"route": route,
+		},
+		"setAppRoute",
+		&internal.Plugin{},
+	)
 }
 
 // StartApp implements cli.APIService

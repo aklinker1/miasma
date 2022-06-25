@@ -54,6 +54,7 @@ func GetSetTraefikFlags(cmd *cobra.Command) *SetTraefik {
 		rulePtr = &ruleTrimmed
 	}
 
+	fmt.Println(hostPtr, pathPtr, rulePtr)
 	return &SetTraefik{
 		Host: hostPtr,
 		Path: pathPtr,

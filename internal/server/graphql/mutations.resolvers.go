@@ -5,6 +5,7 @@ package graphql
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"time"
 
@@ -170,6 +171,10 @@ func (r *mutationResolver) SetAppEnv(ctx context.Context, appID string, newEnv m
 }
 
 func (r *mutationResolver) SetAppRoute(ctx context.Context, appID string, route *internal.RouteInput) (*internal.Route, error) {
+	if route.Host == nil && route.TraefikRule == nil {
+		return nil, errors.New("You must pass either a host or traefik rule")
+	}
+
 	existing, err := r.Routes.FindRoute(ctx, server.RoutesFilter{AppID: &appID})
 
 	if server.ErrorCode(err) == server.ENOTFOUND {
