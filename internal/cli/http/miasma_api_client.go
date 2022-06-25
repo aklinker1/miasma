@@ -189,8 +189,20 @@ func (c *MiasmaAPIClient) RemoveAppRoute(ctx context.Context, appID string) erro
 }
 
 // SetAppEnv implements cli.APIService
-func (c *MiasmaAPIClient) SetAppEnv(ctx context.Context, env internal.EnvMap) error {
-	panic("unimplemented")
+func (c *MiasmaAPIClient) SetAppEnv(ctx context.Context, appID string, newEnv internal.EnvMap) error {
+	return c.post(
+		ctx,
+		`mutation ($appId: ID!, $newEnv: Map) {
+			setAppEnv(appId: $appId, newEnv: $newEnv) %s
+		}`,
+		``,
+		map[string]any{
+			"appId":  appID,
+			"newEnv": newEnv,
+		},
+		"setAppEnv",
+		&map[string]any{},
+	)
 }
 
 // SetAppRoute implements cli.APIService

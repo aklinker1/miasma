@@ -3,6 +3,7 @@ package cobra
 import (
 	"fmt"
 	"os"
+	"runtime/debug"
 
 	"github.com/aklinker1/miasma/internal/cli"
 	"github.com/aklinker1/miasma/internal/cli/config"
@@ -39,7 +40,7 @@ func Execute(
 		err := recover()
 		if err != nil {
 			fmt.Printf(red(bold("Fatal error: %v\n\n")), err)
-			// fmt.Println(dim(string(debug.Stack())))
+			fmt.Println(dim(string(debug.Stack())))
 			os.Exit(1)
 		}
 	}()

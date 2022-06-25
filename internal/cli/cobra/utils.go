@@ -1,6 +1,8 @@
 package cobra
 
-import "github.com/fatih/color"
+import (
+	"github.com/fatih/color"
+)
 
 var yellow = color.New(color.FgHiYellow).SprintFunc()
 var green = color.New(color.FgHiGreen).SprintFunc()
@@ -10,6 +12,7 @@ var bold = color.New(color.Bold).SprintFunc()
 var dim = color.New(color.Faint).SprintFunc()
 
 var title = color.New(color.FgHiMagenta, color.Bold)
+var fatal = color.New(color.FgHiRed, color.Bold)
 
 func checkErr(err error) {
 	if err != nil {

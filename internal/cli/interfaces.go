@@ -30,7 +30,7 @@ type APIService interface {
 	StopApp(ctx context.Context, appID string) error
 	RestartApp(ctx context.Context, appID string) error
 
-	SetAppEnv(ctx context.Context, env internal.EnvMap) error
+	SetAppEnv(ctx context.Context, appID string, newEnv internal.EnvMap) error
 
 	SetAppRoute(ctx context.Context, appID string, route internal.RouteInput) error
 	RemoveAppRoute(ctx context.Context, appID string) error
