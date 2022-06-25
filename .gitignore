@@ -2,6 +2,7 @@
 /data
 /scratch
 node_modules
+dist
 
 *.log
 TODO.md

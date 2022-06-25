@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-//go:embed dist
+//go:embed all:dist
 var rawEmbed embed.FS
 
 func Handler(public string) http.HandlerFunc {
