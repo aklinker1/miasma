@@ -34,7 +34,7 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        working-directory: web
+        working-directory: docs
 
       - name: Build CLI
         run: make cli
