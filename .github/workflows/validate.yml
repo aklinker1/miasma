@@ -25,5 +25,9 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: web
 
+      - name: Cache Docker Layers
+        uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
+
       - name: Build
         run: make
