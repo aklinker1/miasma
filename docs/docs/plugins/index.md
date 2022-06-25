@@ -1,13 +1,13 @@
 ---
-id: plugins
-title: Plugins Overview
-slug: /plugins
+title: Overview
 ---
 
-Plugins are predefined apps that have additional setup steps or integrations with docker that normal apps do not have.
+# Plugins
+
+Plugins are predefined apps that have additional setup steps or integrations with Docker or Miasma that normal apps do not.
 
 Currently, there is only 1 plugin:
 
-- [`traefik`](/docs/plugins/traefik): ingress router
+- [`TRAEFIK`: ingress router](./traefik.md)
 
-This is because everything else (databases, registries, other "common" apps) can be configured and managed as plain apps.
+This is because everything else (databases, registries, other "common" apps) can be configured and managed as plain apps - See templates.

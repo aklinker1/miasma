@@ -1,0 +1,27 @@
+:root {
+    --c-brand: #8B5CF6;
+    --c-brand-light: #A78BFA;
+    --c-tip: #10B981;
+    --c-warning: #F59E0B;
+    --c-warning-bg: var(--c-tip-bg);
+    --c-warning-title: #B45309;
+    --c-warning-text: var(--c-tip-text);
+    --c-danger: #F43F5E;
+    --c-danger-bg: var(--c-tip-bg);
+    --c-danger-title: #BE123C;
+    --c-danger-text: var(--c-tip-text);
+}
+
+html.dark {
+    --c-brand: #A78BFA;
+    --c-brand-light: #C4B5FD;
+    --c-tip: #34D399;
+    --c-warning: #FBBF24;
+    --c-warning-bg: var(--c-tip-bg);
+    --c-warning-title: #FBBF24;
+    --c-warning-text: var(--c-tip-text);
+    --c-danger: #FB7185;
+    --c-danger-bg: var(--c-tip-bg);
+    --c-danger-title: #FB7185;
+    --c-danger-text: var(--c-tip-text);
+}

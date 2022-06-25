@@ -1,33 +1,16 @@
 {
-  "name": "docsaurus",
+  "name": "docs",
   "private": true,
   "scripts": {
-    "docusaurus": "docusaurus",
-    "start": "docusaurus start --port 8888",
-    "build": "docusaurus build",
-    "swizzle": "docusaurus swizzle",
-    "deploy": "GIT_USER=aklinker1 USE_SSH=true docusaurus deploy",
-    "serve": "docusaurus serve",
-    "clear": "docusaurus clear"
+    "dev": "cross-env DEV=true vuepress dev docs",
+    "build": "vuepress build docs"
   },
-  "dependencies": {
-    "@docusaurus/core": "2.0.0-alpha.70",
-    "@docusaurus/preset-classic": "2.0.0-alpha.70",
-    "@mdx-js/react": "^1.6.21",
-    "clsx": "^1.1.1",
-    "react": "^16.8.4",
-    "react-dom": "^16.8.4"
-  },
-  "browserslist": {
-    "production": [
-      ">0.5%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "devDependencies": {
+    "@vuepress/client": "2.0.0-beta.48",
+    "@vuepress/plugin-search": "2.0.0-beta.48",
+    "cross-env": "^7.0.3",
+    "markdown-it": "^13.0.1",
+    "vue": "^3.2.37",
+    "vuepress": "2.0.0-beta.48"
   }
 }
