@@ -37,6 +37,7 @@ func listApps(includeHidden bool) {
 				running
 				total
 			}
+			simpleRoute
 		}`,
 	)
 	checkErr(err)
@@ -60,6 +61,9 @@ func listApps(includeHidden bool) {
 				appDetails,
 				fmt.Sprintf("%d/%d running", app.Instances.Running, app.Instances.Total),
 			)
+		}
+		if app.SimpleRoute != nil {
+			appDetails = append(appDetails, color.New(color.Underline).Sprint(*app.SimpleRoute))
 		}
 		appDetailsStr := fmt.Sprintf("(%s)", strings.Join(appDetails, ", "))
 		fmt.Printf(" %s %s %s\n", status, bold(app.Name), dim(appDetailsStr))
