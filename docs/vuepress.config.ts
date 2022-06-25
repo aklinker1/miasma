@@ -47,6 +47,8 @@ export default defineUserConfig({
   lang: "en-US",
   title: "Miasma",
   description: "A Heroku-like, docker based PaaS with cluster and ARM support",
+  // @ts-expect-error: Untyped env var doesn't match /string/
+  base: process.env.VUE_PRESS_BASE,
   plugins: [
     generateCodePlugin(),
     searchPlugin({
