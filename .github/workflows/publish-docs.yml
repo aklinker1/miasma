@@ -27,11 +27,18 @@ jobs:
           cache: pnpm
           cache-dependency-path: docs/pnpm-lock.yaml
 
+      - name: Setup Go 1.18
+        uses: actions/setup-go@v3
+        with:
+          go-version: "1.18"
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
         working-directory: web
 
-      # run build script
+      - name: Build CLI
+        run: make cli
+
       - name: Build VuePress site
         run: pnpm build
         working-directory: docs

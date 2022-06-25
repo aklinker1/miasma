@@ -1,5 +1,4 @@
 ---
-id: traefik
 title: Traefik Routing
 ---
 
@@ -7,13 +6,13 @@ title: Traefik Routing
 
 [Traefik](https://traefik.io) (pronounced "traffic") is a modern ingress router used to define hostname and path routing. To get started, add the plugin via the CLI:
 
-```bash
-$ miasma plugins:add traefik
-Installing traefik...
+```bash:no-line-numbers{1}
+$ miasma plugins:enable TRAEFIK
+Enabling TRAEFIK...
 Done!
 ```
 
-You can view Traefik's dashboard at `http://<main-node-ip>:4000` in a browser.
+You can view Traefik's dashboard at `http://<server-ip>:8080` in a browser.
 
 ## Example
 
@@ -49,7 +48,7 @@ Here are the custom DNS mappings you need to setup for this example:
 
 From here on, it's easy to setup the routes for our 4 apps using the Misama CLI.
 
-```bash
+```bash:no-line-numbers{1,4,7,10}
 $ miasma traefik:set -a web-1 --host home.io
 Done!
 
@@ -63,8 +62,8 @@ $ miasma traefik:set -a api-2 --host web2.home.io --path /api
 Done!
 ```
 
-And the routes are setup! Give it a minute, and watch the HTTP Routers on the Traefik dashboard (<http://swarm-ip:4000/dashboard/#/http/routers>) to see when they've been registered.
+And the routes are setup! Give it a minute, and watch the HTTP Routers on the Traefik dashboard (<http://swarm-ip:8080/dashboard/#/http/routers>) to see when they've been registered.
 
-:::info
-After adding or updating routes, traefik automatically picks up on them. This process can take up to 2 minutes, so don't restart the app wondering why the route is not working immediately.
+:::tip
+After adding or updating routes, Traefik will automatically discover them. This process can take up to 2 minutes, so don't restart the app wondering why the route is not working immediately.
 :::

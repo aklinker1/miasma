@@ -29,7 +29,8 @@ preview: build
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		aklinker1/miasma
 
-run:
+# Run the GraphQL API in dev mode
+api:
 	@docker build . -f Dockerfile.dev \
 		-t aklinker1/miasma:local \
 		--build-arg VERSION="${API_VERSION}" \
@@ -49,20 +50,21 @@ run:
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		aklinker1/miasma:local
 
-# Run just the frontend in HMR mode
+# Run the web UI in dev mode
 ui:
 	@cd web && pnpm dev
 
+# Compile the CLI and install it to $GOPATH
 cli:
 	@go build \
 		-ldflags "-X ${BUILD_VAR_PATH}.VERSION=${CLI_VERSION} -X ${BUILD_VAR_PATH}.BUILD=${BUILD} -X ${BUILD_VAR_PATH}.BUILD_HASH=${BUILD_HASH} -X ${BUILD_VAR_PATH}.BUILD_DATE=${BUILD_DATE}" \
 		-o bin/cli \
 		cmd/cli/main.go
-	@cp bin/cli "${GOPATH}/bin/miasma"
+	@cp bin/cli "${GOPATH}/bin/miasma-dev"
 
-# Run just the backend
-dev-backend:
-	@echo "TODO - waiting for frontend"
+# Run just the docs website in dev mode
+ui:
+	@cd web && pnpm dev
 
 # Generate code (GQLGen)
 gen:

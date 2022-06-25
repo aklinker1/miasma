@@ -1,20 +1,19 @@
 ---
-id: get-started
-title: Get Started
-slug: /
+title: Installation
 ---
 
-Miasma is setup in a couple easy steps:
+# Installation
 
-1. Deploy the [server](/docs/server)
-2. (Optional) Add more nodes to the cluster
-3. Install the [CLI](/docs/cli) on your dev computer
+Miasma is setup in two easy steps:
+
+1. Deploy the Miasma Server
+1. Install the Miasma CLI on your dev computer
 
 ## Deploy the server
 
 To deploy the server, you will need at least one device running on one of the supported architectures. Setting up this device is outside the scope of this tutorial. This device will be the main node of the cluster if you choose to add more nodes.
 
-:::note
+:::tip
 My device and OS of choice a **Raspberry Pi 3b (or higher) running 64bit Ubuntu Server**.
 :::
 
@@ -58,31 +57,7 @@ If you don't trust the install script, or it did not succeed, you may have to in
    > - `-v $HOME/.miasma:/data/miasma`: Bind another volume, this time the server's config directory
    > - `aklinker1/miasma`: The name of the latest stable version of the [Miasma server docker image](https://hub.docker.com/r/aklinker1/miasma/tags)
 
-1. Ping the health endpoint of the server to make sure it's up and running.
-
-   ```bash
-   $ curl localhost:3000/api/health
-   {
-      "dockerVersion": "19.03.13-4484c46",
-      "swarm": {
-         "createdAt": "2020-11-15 21:44:20.898473606 +0000 UTC",
-         "id": "yk39px7m8pql5apr6qx8cekak",
-         "joinCommand": "docker swarm join --token <some-long-string> <miasma-ip:port>",
-         "updatedAt": "2021-02-13 16:31:13.583995176 +0000 UTC"
-      },
-      "version": "<some-version>"
-   }
-   ```
-
-   > The health endpoint also returns the "join command" used in the next step to add more nodes to the cluster.
-
-## Add More Nodes
-
-Adding more nodes (or devices) to the cluster is simple. Using the join command from the server install step, run the command on any devices you want to add to the cluster:
-
-```bash
-$ docker swarm join --token <some-token> <main-node-ip:port>
-```
+1. Open the GraphiQL playground to make sure the server is up and running: `http://<server-ip>:3000/playground`
 
 ## Install the CLI
 
@@ -98,7 +73,19 @@ Finally, connect the CLI to the miasma server running on the main node:
 
 ```bash
 $ miasma connect 192.168.1.0:3000
+Join cluster:
+
+  docker swarm join --token <some-token> <server-ip:port>
+
 Connected to miasma!
+```
+
+## Add More Nodes (Optional)
+
+Adding more nodes (or devices) to the cluster is simple. Run the join command printed while connecting the CLI to the server on any devices you want to add to the cluster:
+
+```bash file=Node
+$ docker swarm join --token <some-token> <server-ip:port>
 ```
 
 ---

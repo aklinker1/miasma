@@ -1,5 +1,4 @@
 ---
-id: postgres
 title: PostgreSQL
 ---
 

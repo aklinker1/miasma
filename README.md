@@ -16,14 +16,14 @@
   </a>
 </p>
 
-### Huh? What does that even mean?
+#### Huh? What does that even mean?
 
 - Deploy apps from a CLI similar to Heroku (UI coming soon)
 - Apps are ran in Docker Swarm as docker containers
 - You can add as many nodes/devices as you want to form a cluster
 - The `aklinker1/miasma` docker image is published with ARM support
 
-### What makes Miasma unique?
+#### What makes Miasma unique?
 
 - The only PaaS that supports both **clusters** and **ARM devices**
 - Built for a home network of Raspberry Pis (and other computers) in your closet
