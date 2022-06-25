@@ -14,7 +14,7 @@ type Mutation {
   "Pull the latest version of the app's image and then restart"
   upgradeApp(id: ID!): App!
 
-  "Install one of Miasma's plugins"
+  "Enable one of Miasma's plugins"
   enablePlugin(name: PluginName!): Plugin!
   "Disable one of Miasma's plugins"
   disablePlugin(name: PluginName!): Plugin!

@@ -45,7 +45,7 @@ func (r *appResolver) Env(ctx context.Context, obj *internal.App) (map[string]in
 func (r *appResolver) Status(ctx context.Context, obj *internal.App) (string, error) {
 	info, err := r.Runtime.GetRuntimeAppInfo(ctx, *obj)
 	if server.ErrorCode(err) == server.ENOTFOUND {
-		return "Stopped", nil
+		return "stopped", nil
 	} else if err != nil {
 		return "", err
 	}
