@@ -20,3 +20,9 @@
 ### Contributing
 
 <https://aklinker1.github.io/miasma/docs/contributing>
+
+#### Contributors
+
+<a href="https://github.com/aklinker1/miasma/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=aklinker1/miasma" />
+</a>
