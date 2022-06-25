@@ -159,12 +159,34 @@ func (c *MiasmaAPIClient) EditApp(ctx context.Context, appID string, changes map
 
 // DisablePlugin implements cli.APIService
 func (c *MiasmaAPIClient) DisablePlugin(ctx context.Context, pluginName string) error {
-	panic("unimplemented")
+	return c.post(
+		ctx,
+		`mutation ($name: PluginName!) {
+			disablePlugin(name: $name) %s
+		}`,
+		`{ name }`,
+		map[string]any{
+			"name": pluginName,
+		},
+		"disablePlugin",
+		&internal.Plugin{},
+	)
 }
 
 // EnablePlugin implements cli.APIService
 func (c *MiasmaAPIClient) EnablePlugin(ctx context.Context, pluginName string) error {
-	panic("unimplemented")
+	return c.post(
+		ctx,
+		`mutation ($name: PluginName!) {
+			enablePlugin(name: $name) %s
+		}`,
+		`{ name }`,
+		map[string]any{
+			"name": pluginName,
+		},
+		"enablePlugin",
+		&internal.Plugin{},
+	)
 }
 
 // GetApp implements cli.APIService
@@ -199,7 +221,18 @@ func (c *MiasmaAPIClient) ListApps(ctx context.Context, options cli.ListAppsOpti
 
 // ListPlugins implements cli.APIService
 func (c *MiasmaAPIClient) ListPlugins(ctx context.Context, gql string) ([]internal.Plugin, error) {
-	panic("unimplemented")
+	plugins := []internal.Plugin{}
+	err := c.post(
+		ctx,
+		`query {
+			plugins: listPlugins %s
+		}`,
+		gql,
+		nil,
+		"plugins",
+		&plugins,
+	)
+	return plugins, err
 }
 
 // RemoveAppRoute implements cli.APIService
