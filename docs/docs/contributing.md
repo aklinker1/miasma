@@ -168,7 +168,7 @@ The app is written in [Vue](https://v2.vuepress.vuejs.org/) and bundled by [Vite
 ### Docs
 
 ```bash:no-line-numbers
-make docs
+make doc
 ```
 
 This runs the docs website on port `8081`.

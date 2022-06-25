@@ -2,7 +2,7 @@
 title: Traefik Routing
 ---
 
-## Installing
+## Enabling
 
 [Traefik](https://traefik.io) (pronounced "traffic") is a modern ingress router used to define hostname and path routing. To get started, add the plugin via the CLI:
 
@@ -14,7 +14,7 @@ Done!
 
 You can view Traefik's dashboard at `http://<server-ip>:8080` in a browser.
 
-## Example
+## Example Usage
 
 Let's say you want to host 4 apps on the `home.io` domain in the following locations:
 

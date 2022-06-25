@@ -19,8 +19,8 @@ My device and OS of choice a **Raspberry Pi 3b (or higher) running 64bit Ubuntu 
 
 After your device is up and running, run the install script from that device:
 
-```bash
-$ curl -o- https://raw.githubusercontent.com/aklinker1/miasma/main/scripts/install-server.sh | bash
+```bash:no-line-numbers
+curl -o- https://raw.githubusercontent.com/aklinker1/miasma/main/scripts/install-server.sh | bash
 ```
 
 Once it finishes, the Miasma server is up and running on port `3000`! The script will also print a "join command" used in the next step to add more nodes to the cluster.
@@ -33,14 +33,14 @@ If you don't trust the install script, or it did not succeed, you may have to in
 
 1. Initialize the docker swarm (see [Docker's docs](https://docs.docker.com/engine/swarm/swarm-tutorial/create-swarm/) for more details)
 
-   ```bash
-   $ docker swarm init
+   ```bash:no-line-numbers
+   docker swarm init
    ```
 
 1. Start the Miasma server
 
-   ```bash
-   $ docker run -d \
+   ```bash:no-line-numbers
+   docker run -d \
        --restart unless-stopped \
        -p 3000:3000 \
        -v /var/run/docker.sock:/var/run/docker.sock \
@@ -65,13 +65,13 @@ You should install the CLI on any computer you want to manage apps from, or duri
 
 First, use the install script to install the CLI on your `$PATH`:
 
-```bash
-$ curl -o- https://raw.githubusercontent.com/aklinker1/miasma/main/scripts/install-cli.sh | bash
+```bash:no-line-numbers
+curl -o- https://raw.githubusercontent.com/aklinker1/miasma/main/scripts/install-cli.sh | bash
 ```
 
 Finally, connect the CLI to the miasma server running on the main node:
 
-```bash
+```bash:no-line-numbers{1}
 $ miasma connect 192.168.1.0:3000
 Join cluster:
 
@@ -84,8 +84,8 @@ Connected to miasma!
 
 Adding more nodes (or devices) to the cluster is simple. Run the join command printed while connecting the CLI to the server on any devices you want to add to the cluster:
 
-```bash file=Node
-$ docker swarm join --token <some-token> <server-ip:port>
+```bash:no-line-numbers
+docker swarm join --token <some-token> <server-ip:port>
 ```
 
 ---
