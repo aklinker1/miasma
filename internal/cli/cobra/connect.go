@@ -40,11 +40,15 @@ func connectToServer(baseURL string) {
 	checkErr(err)
 
 	title.Println("\nConnected to miasma!")
-	fmt.Println(dim("  Miasma Server Version ", health.Version))
-	fmt.Println(dim("  Docker Version ", health.DockerVersion))
-	fmt.Println(dim("  Cluster Enabled? ", health.Cluster != nil))
+	fmt.Println(dim("  Miasma Server Version:"), health.Version)
+	fmt.Println(dim("  Docker Version:"), health.DockerVersion)
+	fmt.Println(dim("  Cluster Enabled?"), health.Cluster != nil)
+	if health.Cluster != nil {
+		fmt.Println(dim("  Join Command:"), health.Cluster.JoinCommand)
+	}
+	fmt.Println()
 
 	err = viper.WriteConfig()
 	checkErr(err)
-	done("%s added to %s\n\n", baseURL, viper.ConfigFileUsed())
+	done("%s added to %s", baseURL, viper.ConfigFileUsed())
 }
