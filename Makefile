@@ -1,4 +1,4 @@
-API_VERSION=$(shell node -p -e "require('./meta.json').apiVersion")
+SERVER_VERSION=$(shell node -p -e "require('./meta.json').serverVersion")
 CLI_VERSION=$(shell node -p -e "require('./meta.json').cliVersion")
 BUILD=$(shell TZ=UTC git --no-pager show --quiet --abbrev=40 --format='%h')
 BUILD_HASH=$(shell TZ=UTC git --no-pager show --quiet --abbrev=8 --format='%h')
@@ -6,11 +6,13 @@ BUILD_DATE=$(shell TZ=UTC git --no-pager show --quiet --date='format-local:%Y%m%
 BUILD_VAR_PATH=main
 DATA_DIR=$(shell pwd)/data
 
+DOCKER_TAG ?= nightly
+
 # Build the production docker image
 build:
 	@docker build . -f Dockerfile \
 		-t aklinker1/miasma \
-		--build-arg VERSION="${API_VERSION}" \
+		--build-arg VERSION="${SERVER_VERSION}" \
 		--build-arg BUILD="${BUILD}" \
 		--build-arg BUILD_HASH="${BUILD_HASH}" \
 		--build-arg BUILD_DATE="${BUILD_DATE}" \
@@ -33,7 +35,7 @@ preview: build
 run:
 	@docker build . -f Dockerfile.dev \
 		-t aklinker1/miasma:local \
-		--build-arg VERSION="${API_VERSION}" \
+		--build-arg VERSION="${SERVER_VERSION}" \
 		--build-arg BUILD="${BUILD}" \
 		--build-arg BUILD_HASH="${BUILD_HASH}" \
 		--build-arg BUILD_DATE="${BUILD_DATE}" \
@@ -76,8 +78,8 @@ publish:
 	@docker buildx build . -f Dockerfile \
 		--push \
 		--platform linux/arm/v7,linux/arm64/v8,linux/amd64 \
-		--tag aklinker1/miasma:nightly \
-		--build-arg VERSION="${API_VERSION}" \
+		--tag aklinker1/miasma:${DOCKER_TAG} \
+		--build-arg VERSION="${SERVER_VERSION}" \
 		--build-arg BUILD="${BUILD}" \
 		--build-arg BUILD_HASH="${BUILD_HASH}" \
 		--build-arg BUILD_DATE="${BUILD_DATE}" \

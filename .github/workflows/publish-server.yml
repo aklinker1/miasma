@@ -1,0 +1,125 @@
+# 1. Publish server docker image
+#     - Bump version
+#     - Create release (for `api` and `ui` scopes)
+#     - Publish docker image
+
+name: Publish Server
+on:
+  workflow_dispatch:
+    inputs:
+      newVersion:
+        type: string
+        description: The version to bump to (no 'v' prefix)
+        required: true
+
+jobs:
+  validate:
+    uses: ./.github/workflows/validate.yml
+
+  release:
+    runs-on: ubuntu-22.04
+    needs: [validate]
+    outputs:
+      skipped: ${{ steps.filtered-changelog.outputs.skipped }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 16
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - id: changelog
+        name: Conventional Changelog Action
+        uses: TriPSs/conventional-changelog-action@v3
+        with:
+          github-token: ${{ secrets.github_token }}
+          git-message: "chore(release): Miasma server {version}"
+          output-file: "false"
+          git-push: "false"
+          version-file: "./meta.json"
+          version-path: "serverVersion"
+          skip-version-file: "true"
+          skip-commit: "true"
+
+      - id: filtered-changelog
+        name: Filter Changelog
+        run: |
+          API_CHANGES=$(echo "${{ steps.changelog.outputs.clean_changelog }}" | grep "api:")
+          UI_CHANGES=$(echo "${{ steps.changelog.outputs.clean_changelog }}" | grep "ui:")
+          if [[ "$API_CHANGES$UI_CHANGES" = "" ]]; then
+            IS_EMPTY='true'
+          else 
+            IS_EMPTY='false'
+          fi
+          echo "::set-output name=skipped::$IS_EMPTY"
+          CHANGELOG="$API_CHANGES\n$UI_CHANGES"
+          echo "Changelog:"
+          echo "$CHANGELOG"
+          echo "::set-output name=changelog::$CHANGELOG"
+
+      - name: Bump Version
+        if: ${{ steps.filtered-changelog.outputs.skipped == 'false' }}
+        run: |
+          node -p -e "
+            const meta = JSON.parse(\`$(cat meta.json)\`);
+            meta.serverVersion = '${{ github.event.inputs.newVersion }}';
+            JSON.stringify(meta, null, 2);
+          " > meta.json
+          echo "Updated meta.json:"
+          cat ./meta.json
+          git add ./meta.json
+          git commit -m "chore(release): Server v${{ github.event.inputs.newVersion }}"
+          git push
+
+      - name: Create Tag
+        run: |
+          git tag "server-v${{ github.event.inputs.newVersion }}"
+          git push --tags
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        if: ${{ steps.filtered-changelog.outputs.skipped == 'false' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        with:
+          tag_name: server-v${{ github.event.inputs.newVersion }}
+          release_name: Server v${{ github.event.inputs.newVersion }}
+          body: ${{ steps.filtered-changelog.outputs.changelog }}
+
+  publish:
+    runs-on: ubuntu-22.04
+    needs: [release]
+    if: ${{ needs.release.outputs.skipped == 'false' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: server-v${{ github.event.inputs.newVersion }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - id: buildx
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Inspect builder
+        run: |
+          echo "Name:      ${{ steps.buildx.outputs.name }}"
+          echo "Endpoint:  ${{ steps.buildx.outputs.endpoint }}"
+          echo "Status:    ${{ steps.buildx.outputs.status }}"
+          echo "Flags:     ${{ steps.buildx.outputs.flags }}"
+          echo "Platforms: ${{ steps.buildx.outputs.platforms }}"
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push to Docker Hub
+        run: make publish
