@@ -1,0 +1,17 @@
+name: Filter Changelog
+description: Filter changelog down to specific scopes
+inputs:
+  changelog:
+    description: The input changelog
+    required: true
+  scopes:
+    description: Comma separated list of scopes to filter the changelog down to
+    required: true
+outputs:
+  changelog:
+    description: The filtered changelog
+  empty:
+    description: Whether or not the changelog is empty
+runs:
+  using: node16
+  main: dist/index.js

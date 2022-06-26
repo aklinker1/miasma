@@ -3,6 +3,7 @@
 /scratch
 node_modules
 dist
+!.github/actions/*/dist
 .temp
 .cache
 

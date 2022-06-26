@@ -13,14 +13,14 @@ on:
         required: true
 
 jobs:
-  validate:
-    uses: ./.github/workflows/validate.yml
+  # validate:
+  #   uses: ./.github/workflows/validate.yml
 
   release:
     runs-on: ubuntu-22.04
-    needs: [validate]
+    # needs: [validate]
     outputs:
-      skipped: ${{ steps.filtered-changelog.outputs.skipped }}
+      empty: ${{ steps.filtered-changelog.outputs.empty }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
@@ -46,23 +46,13 @@ jobs:
           skip-commit: "true"
 
       - id: filtered-changelog
-        name: Filter Changelog
-        run: |
-          API_CHANGES=$(echo "${{ steps.changelog.outputs.clean_changelog }}" | grep "api:")
-          UI_CHANGES=$(echo "${{ steps.changelog.outputs.clean_changelog }}" | grep "ui:")
-          if [[ "$API_CHANGES$UI_CHANGES" = "" ]]; then
-            IS_EMPTY='true'
-          else 
-            IS_EMPTY='false'
-          fi
-          echo "::set-output name=skipped::$IS_EMPTY"
-          CHANGELOG="$API_CHANGES\n$UI_CHANGES"
-          echo "Changelog:"
-          echo "$CHANGELOG"
-          echo "::set-output name=changelog::$CHANGELOG"
+        uses: ./.github/actions/filter-changelog
+        with:
+          changelog: ${{ steps.changelog.outputs.clean_changelog }}
+          scopes: api, ui
 
       - name: Bump Version
-        if: ${{ steps.filtered-changelog.outputs.skipped == 'false' }}
+        if: ${{ steps.filtered-changelog.outputs.empty == 'false' }}
         run: |
           node -p -e "
             const meta = JSON.parse(\`$(cat meta.json)\`);
@@ -72,7 +62,7 @@ jobs:
           echo "Updated meta.json:"
           cat ./meta.json
           git add ./meta.json
-          git commit -m "chore(release): Server v${{ github.event.inputs.newVersion }}"
+          git commit --allow-empty -m "chore(release): Server v${{ github.event.inputs.newVersion }}"
           git push
 
       - name: Create Tag
@@ -82,7 +72,7 @@ jobs:
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
-        if: ${{ steps.filtered-changelog.outputs.skipped == 'false' }}
+        if: ${{ steps.filtered-changelog.outputs.empty == 'false' }}
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
         with:
@@ -93,7 +83,7 @@ jobs:
   publish:
     runs-on: ubuntu-22.04
     needs: [release]
-    if: ${{ needs.release.outputs.skipped == 'false' }}
+    if: ${{ needs.release.outputs.empty == 'false' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
