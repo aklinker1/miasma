@@ -17,6 +17,7 @@ import (
 	"github.com/aklinker1/miasma/web"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 )
 
 const (
@@ -51,6 +52,10 @@ func (s *graphqlServer) ServeGraphql() error {
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"POST"},
+	}))
 
 	r.Handle("/graphql", s.createGraphqlHandler())
 	r.Handle("/playground", playground.Handler("Miasma", "/graphql"))

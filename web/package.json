@@ -7,12 +7,27 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.2.25"
+    "@apollo/client": "^3.6.9",
+    "@tailwindcss/typography": "^0.5.2",
+    "@vue/apollo-composable": "4.0.0-alpha.18",
+    "daisyui": "^2.17.0",
+    "graphql": "^16.5.0",
+    "graphql-tag": "^2.12.6",
+    "unplugin-icons": "^0.14.5",
+    "unplugin-vue-components": "^0.19.9",
+    "vue": "^3.2.25",
+    "vue-router": "^4.0.16",
+    "vue3-lottie": "^2.2.5"
   },
   "devDependencies": {
+    "@iconify-json/mdi": "^1.1.23",
     "@vitejs/plugin-vue": "^2.3.3",
+    "autoprefixer": "^10.4.7",
+    "postcss": "^8.4.14",
+    "tailwindcss": "^3.1.4",
     "typescript": "^4.7.4",
     "vite": "^2.9.9",
+    "vue-global-api": "^0.4.1",
     "vue-tsc": "^0.38.1"
   }
 }

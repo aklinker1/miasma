@@ -140,7 +140,7 @@ To develop and run Miasma locally, it's best to run each "part" individually. Th
 ### GraphQL API
 
 ```bash:no-line-numbers
-make api
+make run
 ```
 
 This runs the Miasma Server in development mode on port `3000`, which excludes the Web UI. Including the Web UI in this process really slows down this command.
