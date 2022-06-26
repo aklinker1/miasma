@@ -10,7 +10,10 @@ try {
     .map((s) => s.trim());
 
   // Filter Changelog
-  const outputLines = [];
+  const outputLines = [
+    "Download via [Docker Hub](https://hub.docker.com/r/aklinker1/miasma)",
+    "",
+  ];
   let scopedCount = 0;
   inputLines.forEach((line) => {
     // Line isn't a bullet point

@@ -62,7 +62,7 @@ jobs:
           echo "Updated meta.json:"
           cat ./meta.json
           git add ./meta.json
-          git commit --allow-empty -m "chore(release): Server v${{ github.event.inputs.newVersion }}"
+          git commit -m "chore(release): server-v${{ github.event.inputs.newVersion }}"
           git push
 
       - name: Create Tag
@@ -112,4 +112,4 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push to Docker Hub
-        run: make publish
+        run: PUBLISH_TAGS="--tag aklinker1/miasma:nightly --tag aklinker1/miasma:latest --tag aklinker1/miasma:${{ github.event.inputs.newVersion }}" make publish

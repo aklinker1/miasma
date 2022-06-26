@@ -6,7 +6,7 @@ BUILD_DATE=$(shell TZ=UTC git --no-pager show --quiet --date='format-local:%Y%m%
 BUILD_VAR_PATH=main
 DATA_DIR=$(shell pwd)/data
 
-DOCKER_TAG ?= nightly
+PUBLISH_TAGS ?= --tag aklinker1/miasma:nightly
 
 # Build the production docker image
 build:
@@ -75,10 +75,10 @@ gen:
 # Publish to Docker Hub
 publish:
 	@docker login
-	@docker buildx build . -f Dockerfile \
+	docker buildx build . -f Dockerfile \
 		--push \
-		--platform linux/arm/v7,linux/arm64/v8,linux/amd64 \
-		--tag aklinker1/miasma:${DOCKER_TAG} \
+		--platform linux/arm/v7,linux/arm64,linux/amd64 \
+		${PUBLISH_TAGS} \
 		--build-arg VERSION="${SERVER_VERSION}" \
 		--build-arg BUILD="${BUILD}" \
 		--build-arg BUILD_HASH="${BUILD_HASH}" \
