@@ -1,6 +1,8 @@
 <h1 align="center">Miasma</h1>
 <p align="center"><i>A Heroku-like, docker based PaaS with cluster and ARM support</i><p>
 
+![Miasma Web UI](./.github/assets/ui.png)
+
 <p align="center">
   <a href="https://github.com/aklinker1/miasma/actions/workflows/validate.yml">
     <img src="https://github.com/aklinker1/miasma/actions/workflows/validate.yml/badge.svg" alt="Validate" />
