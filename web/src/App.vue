@@ -14,7 +14,7 @@ const isPlugins = computed(() => route.path.startsWith("/plugins"));
           to="/apps"
           class="gap-2"
           :class="{
-            'active accent-red-500': isApps,
+            active: isApps,
           }"
           ><i-mdi-cube />Apps</router-link
         >

@@ -7,13 +7,8 @@ import "vue-global-api";
 import "./index.css";
 import { router } from "./router";
 
-createApp({
-  setup() {
-    provide(DefaultApolloClient, apolloClient);
-  },
-
-  render: () => h(App),
-})
+createApp(App)
+  .provide(DefaultApolloClient, apolloClient)
   .use(Vue3Lottie)
   .use(router)
   .mount("#app");
