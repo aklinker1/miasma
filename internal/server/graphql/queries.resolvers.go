@@ -48,6 +48,11 @@ func (r *queryResolver) GetPlugin(ctx context.Context, pluginName string) (*inte
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *queryResolver) Nodes(ctx context.Context) ([]*internal.Node, error) {
+	nodes, err := r.Runtime.ListNodes(ctx)
+	return safeReturn(lo.ToSlicePtr(nodes), nil, err)
+}
+
 // Query returns gqlgen.QueryResolver implementation.
 func (r *Resolver) Query() gqlgen.QueryResolver { return &queryResolver{r} }
 

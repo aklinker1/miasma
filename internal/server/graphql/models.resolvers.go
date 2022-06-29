@@ -71,11 +71,22 @@ func (r *healthResolver) Cluster(ctx context.Context, obj *internal.Health) (*in
 	return safeReturn(swarm, nil, err)
 }
 
+func (r *nodeResolver) Services(ctx context.Context, obj *internal.Node) ([]*internal.RunningContainer, error) {
+	services, err := r.Runtime.ListServices(ctx, server.ListServicesFilter{
+		NodeID: &obj.ID,
+	})
+	return safeReturn(lo.ToSlicePtr(services), nil, err)
+}
+
 // App returns gqlgen.AppResolver implementation.
 func (r *Resolver) App() gqlgen.AppResolver { return &appResolver{r} }
 
 // Health returns gqlgen.HealthResolver implementation.
 func (r *Resolver) Health() gqlgen.HealthResolver { return &healthResolver{r} }
 
+// Node returns gqlgen.NodeResolver implementation.
+func (r *Resolver) Node() gqlgen.NodeResolver { return &nodeResolver{r} }
+
 type appResolver struct{ *Resolver }
 type healthResolver struct{ *Resolver }
+type nodeResolver struct{ *Resolver }

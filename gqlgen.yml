@@ -57,3 +57,7 @@ models:
         resolver: true
   AppChanges:
     model: map[string]interface{}
+  Node:
+    fields:
+      services:
+        resolver: true

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/aklinker1/miasma/internal"
@@ -493,4 +494,64 @@ func (s *RuntimeService) RestartRunningApps(ctx context.Context, params []server
 	}
 
 	return nil
+}
+
+// ListNodes implements server.RuntimeService
+func (s *RuntimeService) ListNodes(ctx context.Context) ([]internal.Node, error) {
+	nodes, err := s.client.NodeList(ctx, types.NodeListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	return lo.Map(nodes, func(n swarm.Node, _ int) internal.Node {
+		var statusMessage *string
+		if n.Status.Message != "" {
+			statusMessage = lo.ToPtr(n.Status.Message)
+		}
+		return internal.Node{
+			ID:            n.ID,
+			Os:            n.Description.Platform.OS,
+			Architecture:  n.Description.Platform.Architecture,
+			Status:        string(n.Status.State),
+			StatusMessage: statusMessage,
+			Hostname:      n.Description.Hostname,
+			IP:            n.Status.Addr,
+			Labels:        utils.ToAnyMap(n.Spec.Labels),
+		}
+	}), nil
+}
+
+// ListServices implements server.RuntimeService
+func (s *RuntimeService) ListServices(ctx context.Context, filter server.ListServicesFilter) ([]internal.RunningContainer, error) {
+	filterArgs := []filters.KeyValuePair{}
+	if filter.NodeID != nil {
+		filterArgs = append(filterArgs, filters.KeyValuePair{Key: "node", Value: *filter.NodeID})
+	}
+	tasks, err := s.client.TaskList(ctx, types.TaskListOptions{
+		Filters: filters.NewArgs(filterArgs...),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	compareTask := func(i, j int) bool {
+		return tasks[i].CreatedAt.Before(tasks[j].CreatedAt)
+	}
+	sort.SliceStable(tasks, compareTask)
+
+	containers := lo.Filter(tasks, func(task swarm.Task, _ int) bool {
+		return task.Status.State == swarm.TaskStateRunning
+	})
+
+	finalTasks := []internal.RunningContainer{}
+	for _, container := range containers {
+		service, _, err := s.client.ServiceInspectWithRaw(ctx, container.ServiceID, types.ServiceInspectOptions{})
+		if err != nil {
+			return nil, err
+		}
+		finalTasks = append(finalTasks, internal.RunningContainer{
+			Name: strings.Replace(service.Spec.Name, miasmaServiceNamePrefix, "", 1),
+		})
+	}
+	return finalTasks, nil
 }

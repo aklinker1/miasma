@@ -99,6 +99,10 @@ type StartAppParams struct {
 	Env   internal.EnvMap
 }
 
+type ListServicesFilter struct {
+	NodeID *string
+}
+
 // RuntimeService defines how the server runs the apps
 type RuntimeService interface {
 	// Start the app
@@ -116,6 +120,8 @@ type RuntimeService interface {
 	// ClusterInfo returns details about the device cluster
 	ClusterInfo(ctx context.Context) (*internal.ClusterInfo, error)
 	RestartRunningApps(ctx context.Context, params []StartAppParams) error
+	ListNodes(ctx context.Context) ([]internal.Node, error)
+	ListServices(ctx context.Context, filter ListServicesFilter) ([]internal.RunningContainer, error)
 }
 
 type RoutesFilter struct {
