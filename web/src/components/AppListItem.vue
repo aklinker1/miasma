@@ -3,9 +3,8 @@ import IDatabase from "~icons/mdi/database";
 import ICube from "~icons/mdi/cube";
 import IEarth from "~icons/mdi/earth";
 import ITools from "~icons/mdi/tools";
-import { useMutation } from "@vue/apollo-composable";
-import { appFragment } from "../utils/apollo-client";
-import { gql } from "@apollo/client/core";
+import { useStartAppMutation } from "../composition/start-app-mutation";
+import { useStopAppMutation } from "../composition/stop-app-mutation";
 
 const props = defineProps<{
   id: string;
@@ -40,36 +39,18 @@ const icon = computed(() => {
   return ICube;
 });
 
-const { mutate: stopApp, loading: stoppingApp } = useMutation(
-  gql`
-    mutation stopApp($id: ID!) {
-      app: stopApp(id: $id) {
-        ...AppListApp
-      }
-    }
-    ${appFragment}
-  `
-);
-
-const { mutate: startApp, loading: startingApp } = useMutation(
-  gql`
-    mutation startApp($id: ID!) {
-      app: startApp(id: $id) {
-        ...AppListApp
-      }
-    }
-    ${appFragment}
-  `
-);
+const a = useStopAppMutation();
+const { mutate: stopApp, loading: stoppingApp } = useStopAppMutation();
+const { mutate: startApp, loading: startingApp } = useStartAppMutation();
 </script>
 
 <template>
   <tr class="hover">
     <th>
-      <icon class="w-6 h-6 ml-2" />
+      <app-icon class="w-6 h-6 ml-2" :name="name" />
     </th>
     <td>
-      <router-link :to="`/apps/${id}`">
+      <router-link :to="`/apps/${name}`">
         <p class="text-lg">
           {{ name }}
         </p>

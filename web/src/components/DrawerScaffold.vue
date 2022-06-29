@@ -6,13 +6,13 @@ defineProps<{
 
 <template>
   <div class="drawer">
-    <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
+    <input id="drawer-toggle" type="checkbox" class="drawer-toggle" />
     <div class="drawer-content flex flex-col">
       <!-- Navbar -->
-      <div class="w-full navbar bg-base-300">
+      <div class="w-full navbar bg-base-300 shrink-0">
         <div class="w-full max-w-screen-lg mx-auto">
           <div class="flex-none sm:hidden">
-            <label for="my-drawer-3" class="btn btn-circle btn-ghost">
+            <label for="drawer-toggle" class="btn btn-circle btn-ghost">
               <i-mdi-menu class="w-6 h-6" />
             </label>
           </div>
@@ -29,12 +29,12 @@ defineProps<{
         </div>
       </div>
 
-      <div class="w-full max-w-screen-lg mx-auto py-8 px-16">
+      <div class="w-full max-w-screen-lg mx-auto p-8">
         <slot name="content" />
       </div>
     </div>
     <div class="drawer-side">
-      <label for="my-drawer-3" class="drawer-overlay"></label>
+      <label for="drawer-toggle" class="drawer-overlay"></label>
       <ul class="menu p-4 overflow-y-auto w-80 bg-base-100">
         <slot name="drawer-items" />
       </ul>

@@ -1,32 +1,16 @@
 <script lang="ts" setup>
-import { gql } from "@apollo/client/core";
-import { useQuery } from "@vue/apollo-composable";
 import { computed } from "vue";
-import { appFragment } from "../utils/apollo-client";
+import { useAppListQuery } from "../composition/list-apps-query";
 
 const props = defineProps<{
   showHidden?: boolean;
 }>();
 const showHidden = computed(() => props.showHidden);
 
-const { result } = useQuery(
-  gql`
-    query listApps($showHidden: Boolean) {
-      apps: listApps(showHidden: $showHidden) {
-        ...AppListApp
-      }
-    }
-
-    ${appFragment}
-  `,
-  { showHidden },
-  {
-    pollInterval: 2e3,
-  }
-);
+const { result } = useAppListQuery({ showHidden });
 
 const groups = computed(() => {
-  const apps = result.value.apps;
+  const apps = result.value?.apps;
   if (apps == null) return null;
 
   return Object.entries<any[]>(
