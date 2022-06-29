@@ -110,6 +110,18 @@ type Health struct {
 	Cluster *ClusterInfo `json:"cluster"`
 }
 
+type Node struct {
+	ID            string                 `json:"id"`
+	Os            string                 `json:"os"`
+	Architecture  string                 `json:"architecture"`
+	Hostname      string                 `json:"hostname"`
+	IP            string                 `json:"ip"`
+	Status        string                 `json:"status"`
+	StatusMessage *string                `json:"statusMessage"`
+	Labels        map[string]interface{} `json:"labels"`
+	Services      []*RunningContainer    `json:"services"`
+}
+
 type Plugin struct {
 	Name PluginName `json:"name"`
 	// Whether or not the plugin has been enabled.
@@ -129,6 +141,10 @@ type RouteInput struct {
 	Host        *string `json:"host"`
 	Path        *string `json:"path"`
 	TraefikRule *string `json:"traefikRule"`
+}
+
+type RunningContainer struct {
+	Name string `json:"name"`
 }
 
 type PluginName string

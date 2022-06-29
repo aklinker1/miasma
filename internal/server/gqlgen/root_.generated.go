@@ -33,6 +33,7 @@ type ResolverRoot interface {
 	App() AppResolver
 	Health() HealthResolver
 	Mutation() MutationResolver
+	Node() NodeResolver
 	Query() QueryResolver
 }
 
@@ -101,6 +102,18 @@ type ComplexityRoot struct {
 		UpgradeApp     func(childComplexity int, id string) int
 	}
 
+	Node struct {
+		Architecture  func(childComplexity int) int
+		Hostname      func(childComplexity int) int
+		ID            func(childComplexity int) int
+		IP            func(childComplexity int) int
+		Labels        func(childComplexity int) int
+		Os            func(childComplexity int) int
+		Services      func(childComplexity int) int
+		Status        func(childComplexity int) int
+		StatusMessage func(childComplexity int) int
+	}
+
 	Plugin struct {
 		Enabled func(childComplexity int) int
 		Name    func(childComplexity int) int
@@ -112,6 +125,7 @@ type ComplexityRoot struct {
 		Health      func(childComplexity int) int
 		ListApps    func(childComplexity int, page *int32, size *int32, showHidden *bool) int
 		ListPlugins func(childComplexity int) int
+		Nodes       func(childComplexity int) int
 	}
 
 	Route struct {
@@ -121,6 +135,10 @@ type ComplexityRoot struct {
 		Path        func(childComplexity int) int
 		TraefikRule func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
+	}
+
+	RunningContainer struct {
+		Name func(childComplexity int) int
 	}
 }
 
@@ -500,6 +518,69 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpgradeApp(childComplexity, args["id"].(string)), true
 
+	case "Node.architecture":
+		if e.complexity.Node.Architecture == nil {
+			break
+		}
+
+		return e.complexity.Node.Architecture(childComplexity), true
+
+	case "Node.hostname":
+		if e.complexity.Node.Hostname == nil {
+			break
+		}
+
+		return e.complexity.Node.Hostname(childComplexity), true
+
+	case "Node.id":
+		if e.complexity.Node.ID == nil {
+			break
+		}
+
+		return e.complexity.Node.ID(childComplexity), true
+
+	case "Node.ip":
+		if e.complexity.Node.IP == nil {
+			break
+		}
+
+		return e.complexity.Node.IP(childComplexity), true
+
+	case "Node.labels":
+		if e.complexity.Node.Labels == nil {
+			break
+		}
+
+		return e.complexity.Node.Labels(childComplexity), true
+
+	case "Node.os":
+		if e.complexity.Node.Os == nil {
+			break
+		}
+
+		return e.complexity.Node.Os(childComplexity), true
+
+	case "Node.services":
+		if e.complexity.Node.Services == nil {
+			break
+		}
+
+		return e.complexity.Node.Services(childComplexity), true
+
+	case "Node.status":
+		if e.complexity.Node.Status == nil {
+			break
+		}
+
+		return e.complexity.Node.Status(childComplexity), true
+
+	case "Node.statusMessage":
+		if e.complexity.Node.StatusMessage == nil {
+			break
+		}
+
+		return e.complexity.Node.StatusMessage(childComplexity), true
+
 	case "Plugin.enabled":
 		if e.complexity.Plugin.Enabled == nil {
 			break
@@ -564,6 +645,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.ListPlugins(childComplexity), true
 
+	case "Query.nodes":
+		if e.complexity.Query.Nodes == nil {
+			break
+		}
+
+		return e.complexity.Query.Nodes(childComplexity), true
+
 	case "Route.appId":
 		if e.complexity.Route.AppID == nil {
 			break
@@ -605,6 +693,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Route.UpdatedAt(childComplexity), true
+
+	case "RunningContainer.name":
+		if e.complexity.RunningContainer.Name == nil {
+			break
+		}
+
+		return e.complexity.RunningContainer.Name(childComplexity), true
 
 	}
 	return 0, false
@@ -827,6 +922,22 @@ type AppInstances {
 enum PluginName {
   TRAEFIK
 }
+
+type RunningContainer {
+  name: String!
+}
+
+type Node {
+  id: String!
+  os: String!
+  architecture: String!
+  hostname: String!
+  ip: String!
+  status: String!
+  statusMessage: String
+  labels: Map!
+  services: [RunningContainer!]!
+}
 `, BuiltIn: false},
 	{Name: "api/mutations.graphqls", Input: `type Mutation {
   "Create and start a new app"
@@ -844,7 +955,7 @@ enum PluginName {
   "Pull the latest version of the app's image and then restart"
   upgradeApp(id: ID!): App!
 
-  "Install one of Miasma's plugins"
+  "Enable one of Miasma's plugins"
   enablePlugin(name: PluginName!): Plugin!
   "Disable one of Miasma's plugins"
   disablePlugin(name: PluginName!): Plugin!
@@ -866,6 +977,8 @@ enum PluginName {
 
   listPlugins: [Plugin!]!
   getPlugin(pluginName: String!): Plugin!
+
+  nodes: [Node!]!
 }
 `, BuiltIn: false},
 	{Name: "api/scalars.graphqls", Input: `scalar Map
