@@ -25,5 +25,9 @@ export const router = createRouter({
       path: "/plugins",
       component: () => import("./pages/PluginsIndex.vue"),
     },
+    {
+      path: "/nodes",
+      component: () => import("./pages/NodesIndex.vue"),
+    },
   ],
 });

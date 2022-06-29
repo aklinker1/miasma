@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@apollo/client': ^3.6.9
   '@iconify-json/mdi': ^1.1.23
+  '@iconify-json/ri': ^1.1.3
   '@tailwindcss/typography': ^0.5.2
   '@vitejs/plugin-vue': ^2.3.3
   '@vue/apollo-composable': 4.0.0-alpha.18
@@ -37,6 +38,7 @@ dependencies:
 
 devDependencies:
   '@iconify-json/mdi': 1.1.23
+  '@iconify-json/ri': 1.1.3
   '@vitejs/plugin-vue': 2.3.3_vite@2.9.12+vue@3.2.37
   autoprefixer: 10.4.7_postcss@8.4.14
   postcss: 8.4.14
@@ -117,6 +119,12 @@ packages:
 
   /@iconify-json/mdi/1.1.23:
     resolution: {integrity: sha512-XQoziNijzXAkQWyuowyQmrUJg9BnjVvlwl2xqt7Olx1mL66CIQVH0HNy81poH/+halr5Y/jCpwXvAk2R6uwhMg==}
+    dependencies:
+      '@iconify/types': 1.1.0
+    dev: true
+
+  /@iconify-json/ri/1.1.3:
+    resolution: {integrity: sha512-YQ45kQNpuHc2bso4fDGhooWou43qy7njD/I5l7vpjcujb+P/K2BfLASbWYTTUKu6lMersuFmO8F7NdGzy6eGWw==}
     dependencies:
       '@iconify/types': 1.1.0
     dev: true
