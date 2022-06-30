@@ -61,7 +61,7 @@ export default defineUserConfig({
   ],
   theme: defaultTheme({
     docsRepo: "https://github.com/aklinker1/miasma",
-    docsDir: "docs",
+    docsDir: "docs/docs",
     editLink: true,
     repo: "https://github.com/aklinker1/miasma",
     navbar: [
