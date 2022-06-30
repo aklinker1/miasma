@@ -143,7 +143,7 @@ To develop and run Miasma locally, it's best to run each "part" individually. Th
 make run
 ```
 
-This runs the Miasma Server in development mode on port `3000`, which excludes the Web UI. Including the Web UI in this process really slows down this command.
+This runs the Miasma Server in development mode on port `3000`, excluding the web UI. Including the web UI in this process really slows down this command.
 
 **This is the only dev command does not reload on save**. You have to stop and start it manually.
 
