@@ -20,7 +20,7 @@ const { mutate: startApp, loading: startingApp } = useStartAppMutation();
       <app-icon class="w-6 h-6 ml-2" :name="app.name" />
     </th>
     <td>
-      <router-link :to="`/apps/${app.name}`">
+      <router-link :to="`/apps/${app.id}`">
         <p class="text-lg">
           {{ app.name }}
         </p>

@@ -1,3 +1,11 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import { useRoute } from "vue-router";
 
-<template></template>
+const route = useRoute();
+
+const appId = computed(() => route.params["appId"] as string);
+</script>
+
+<template>
+  <p>{{ appId }}</p>
+</template>
