@@ -5,11 +5,12 @@ const route = useRoute();
 const isApps = computed(() => route.path.startsWith("/apps"));
 const isPlugins = computed(() => route.path.startsWith("/plugins"));
 const isNodes = computed(() => route.path.startsWith("/nodes"));
+const isLogin = computed(() => route.path.startsWith("/login"));
 </script>
 
 <template>
   <drawer-scaffold nav-title="Miasma">
-    <template #nav-items>
+    <template #nav-items v-if="!isLogin">
       <li>
         <router-link
           to="/apps"
@@ -42,7 +43,7 @@ const isNodes = computed(() => route.path.startsWith("/nodes"));
       </li>
     </template>
 
-    <template #drawer-items>
+    <template #drawer-items v-if="!isLogin">
       <li>
         <router-link
           to="/apps"
