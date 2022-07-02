@@ -43,6 +43,7 @@ func main() {
 		Plugins:    plugins,
 		Runtime:    runtime,
 		Version:    VERSION,
+		Logger:     logger,
 	}
 
 	server := graphql.NewServer(logger, db, resolver)

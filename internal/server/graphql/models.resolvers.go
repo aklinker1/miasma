@@ -27,14 +27,33 @@ func (r *appResolver) SimpleRoute(ctx context.Context, obj *internal.App) (*stri
 		return nil, nil
 	}
 
-	if route.TraefikRule != nil {
-		return route.TraefikRule, nil
-	} else if route.Host != nil && route.Path != nil {
-		return lo.ToPtr(fmt.Sprintf("%s/%s", *route.Host, *route.Path)), nil
+	if route.Host != nil && route.Path != nil {
+		return lo.ToPtr(fmt.Sprintf("http://%s/%s", *route.Host, *route.Path)), nil
 	} else if route.Host != nil {
-		return route.Host, nil
+		return lo.ToPtr(fmt.Sprintf("http://%s", *route.Host)), nil
 	}
 	return nil, nil
+}
+
+func (r *appResolver) AvailableAt(ctx context.Context, obj *internal.App, clusterIPAddress string) ([]string, error) {
+	routes := []string{}
+	simpleRoute, err := r.SimpleRoute(ctx, obj)
+	if err != nil {
+		return nil, err
+	}
+	if simpleRoute != nil {
+		routes = append(routes, *simpleRoute)
+	}
+
+	runtimeInfo, err := r.Runtime.GetRuntimeAppInfo(ctx, *obj)
+	for _, port := range runtimeInfo.PublishedPorts {
+		routes = append(routes, fmt.Sprintf("http://%s:%d", clusterIPAddress, port))
+	}
+	if err != nil {
+		r.Logger.W("Failed to load runtime information: %v", err)
+	}
+
+	return routes, nil
 }
 
 func (r *appResolver) Env(ctx context.Context, obj *internal.App) (map[string]interface{}, error) {

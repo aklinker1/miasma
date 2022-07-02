@@ -46,6 +46,10 @@ type App {
   route: Route
   "If the app has a route and the traefik plugin is enabled, this is a simple representation of it."
   simpleRoute: String
+  """
+  A list of URLs the application can be accessed at, including the `simpleRoute`, and all the published ports
+  """
+  availableAt(clusterIpAddress: String!): [String!]!
   "The environment variables configured for this app."
   env: Map
   "Whether or not the application is running, stopped, or starting up."

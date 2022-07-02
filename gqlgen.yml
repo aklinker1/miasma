@@ -55,6 +55,8 @@ models:
         resolver: true
       env:
         resolver: true
+      availableAt:
+        resolver: true
   AppChanges:
     model: map[string]interface{}
   Node:

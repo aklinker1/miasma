@@ -310,6 +310,8 @@ func (ec *executionContext) fieldContext_Mutation_createApp(ctx context.Context,
 				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
+			case "availableAt":
+				return ec.fieldContext_App_availableAt(ctx, field)
 			case "env":
 				return ec.fieldContext_App_env(ctx, field)
 			case "status":
@@ -407,6 +409,8 @@ func (ec *executionContext) fieldContext_Mutation_editApp(ctx context.Context, f
 				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
+			case "availableAt":
+				return ec.fieldContext_App_availableAt(ctx, field)
 			case "env":
 				return ec.fieldContext_App_env(ctx, field)
 			case "status":
@@ -504,6 +508,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteApp(ctx context.Context,
 				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
+			case "availableAt":
+				return ec.fieldContext_App_availableAt(ctx, field)
 			case "env":
 				return ec.fieldContext_App_env(ctx, field)
 			case "status":
@@ -601,6 +607,8 @@ func (ec *executionContext) fieldContext_Mutation_startApp(ctx context.Context, 
 				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
+			case "availableAt":
+				return ec.fieldContext_App_availableAt(ctx, field)
 			case "env":
 				return ec.fieldContext_App_env(ctx, field)
 			case "status":
@@ -698,6 +706,8 @@ func (ec *executionContext) fieldContext_Mutation_stopApp(ctx context.Context, f
 				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
+			case "availableAt":
+				return ec.fieldContext_App_availableAt(ctx, field)
 			case "env":
 				return ec.fieldContext_App_env(ctx, field)
 			case "status":
@@ -795,6 +805,8 @@ func (ec *executionContext) fieldContext_Mutation_restartApp(ctx context.Context
 				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
+			case "availableAt":
+				return ec.fieldContext_App_availableAt(ctx, field)
 			case "env":
 				return ec.fieldContext_App_env(ctx, field)
 			case "status":
@@ -892,6 +904,8 @@ func (ec *executionContext) fieldContext_Mutation_upgradeApp(ctx context.Context
 				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
+			case "availableAt":
+				return ec.fieldContext_App_availableAt(ctx, field)
 			case "env":
 				return ec.fieldContext_App_env(ctx, field)
 			case "status":

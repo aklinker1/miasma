@@ -89,8 +89,9 @@ type PluginService interface {
 }
 
 type RuntimeAppInfo struct {
-	Instances internal.AppInstances
-	Status    string
+	Instances      internal.AppInstances
+	Status         string
+	PublishedPorts []uint32
 }
 
 type StartAppParams struct {

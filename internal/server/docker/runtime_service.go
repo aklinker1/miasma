@@ -23,7 +23,9 @@ import (
 
 var (
 	EmptyService               = swarm.Service{}
-	EmptyRuntimeServiceDetails = server.RuntimeAppInfo{}
+	EmptyRuntimeServiceDetails = server.RuntimeAppInfo{
+		PublishedPorts: []uint32{},
+	}
 )
 var dockerEnvKeyRegex = regexp.MustCompile("^[0-9A-Z_]+$")
 
@@ -372,6 +374,9 @@ func (s *RuntimeService) GetRuntimeAppInfo(ctx context.Context, app internal.App
 			Running: int32(service.ServiceStatus.RunningTasks),
 		},
 		Status: "running",
+		PublishedPorts: lo.Map(service.Endpoint.Ports, func(config swarm.PortConfig, _ int) uint32 {
+			return config.PublishedPort
+		}),
 	}, nil
 }
 

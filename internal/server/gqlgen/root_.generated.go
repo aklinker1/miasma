@@ -42,6 +42,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	App struct {
+		AvailableAt    func(childComplexity int, clusterIPAddress string) int
 		Command        func(childComplexity int) int
 		CreatedAt      func(childComplexity int) int
 		Env            func(childComplexity int) int
@@ -156,6 +157,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "App.availableAt":
+		if e.complexity.App.AvailableAt == nil {
+			break
+		}
+
+		args, err := ec.field_App_availableAt_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.App.AvailableAt(childComplexity, args["clusterIpAddress"].(string)), true
 
 	case "App.command":
 		if e.complexity.App.Command == nil {
@@ -820,6 +833,10 @@ type App {
   route: Route
   "If the app has a route and the traefik plugin is enabled, this is a simple representation of it."
   simpleRoute: String
+  """
+  A list of URLs the application can be accessed at, including the ` + "`" + `simpleRoute` + "`" + `, and all the published ports
+  """
+  availableAt(clusterIpAddress: String!): [String!]!
   "The environment variables configured for this app."
   env: Map
   "Whether or not the application is running, stopped, or starting up."
