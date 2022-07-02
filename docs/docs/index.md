@@ -6,6 +6,8 @@ title: Introduction
 
 Miasma was designed as a simple way to manage applications running on my cluster of Raspberry Pis in my closet.
 
+![UI](https://github.com/aklinker1/miasma/raw/main/.github/assets/ui.png)
+
 It has two components: a **lightweight server**, and a **CLI tool**. The server is responsible for managing everything docker related, while CLI talks with the server via it's GraphQL API.
 
 ## Features

@@ -84,6 +84,7 @@ export default defineUserConfig({
         "/index.md",
         "/guide/installation.md",
         "/guide/first-app.md",
+        "/authorization.md",
         {
           text: "Plugins",
           children: ["/plugins/index.md", "/plugins/traefik.md"],
