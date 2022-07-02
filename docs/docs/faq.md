@@ -4,6 +4,8 @@ title: FAQ
 
 # Frequently Asked Questions
 
+[[toc]]
+
 ## Why not Kubernetes?
 
 I don't need Kubernetes in my closest. I made Miasma as a little project to host test and IoT applications for my home. Nothing extremely complex, so solutions like Kubernetes are just over the top.
