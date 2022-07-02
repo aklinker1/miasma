@@ -87,4 +87,5 @@ func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 	config.ReadConfig()
 	api.SetBaseURL(viper.GetString("host"))
+	api.SetAccessToken(viper.GetString("accessToken"))
 }

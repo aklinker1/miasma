@@ -19,6 +19,7 @@ type ListAppsOptions struct {
 
 type APIService interface {
 	SetBaseURL(baseURL string)
+	SetAccessToken(accessToken string)
 
 	Health(ctx context.Context, gql string) (internal.Health, error)
 

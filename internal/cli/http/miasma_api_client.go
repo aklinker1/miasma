@@ -24,8 +24,9 @@ type GraphQLResponse struct {
 }
 
 type MiasmaAPIClient struct {
-	baseURL string
-	client  *http.Client
+	baseURL     string
+	accessToken string
+	client      *http.Client
 }
 
 var (
@@ -63,7 +64,15 @@ func (c *MiasmaAPIClient) post(
 	if !strings.Contains(url, "://") {
 		url = "http://" + url
 	}
-	res, err := http.Post(url, "application/json", bytes.NewBuffer(body))
+
+	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(body))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.accessToken))
+	req.Header.Set("Content-Type", "application/json")
+
+	res, err := c.client.Do(req)
 	if err != nil {
 		return err
 	}
@@ -88,6 +97,11 @@ func (c *MiasmaAPIClient) post(
 // SetBaseURL implements cli.APIService
 func (c *MiasmaAPIClient) SetBaseURL(baseURL string) {
 	c.baseURL = baseURL
+}
+
+// SetBaseURL implements cli.APIService
+func (c *MiasmaAPIClient) SetAccessToken(accessToken string) {
+	c.accessToken = accessToken
 }
 
 // Health implements cli.APIService
