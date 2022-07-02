@@ -8,6 +8,10 @@ export const router = createRouter({
       redirect: "/apps",
     },
     {
+      path: "/login",
+      component: () => import("./pages/Login.vue"),
+    },
+    {
       path: "/apps",
       component: () => import("./pages/AppsIndex.vue"),
       children: [
