@@ -17,6 +17,11 @@ var (
 	BUILD_DATE string
 )
 
+// Environment Variables
+var (
+	ACCESS_TOKEN = os.Getenv("ACCESS_TOKEN")
+)
+
 func main() {
 	logger := &fmt.Logger{}
 
@@ -46,7 +51,7 @@ func main() {
 		Logger:     logger,
 	}
 
-	server := graphql.NewServer(logger, db, resolver)
+	server := graphql.NewServer(logger, db, resolver, ACCESS_TOKEN)
 
 	server.ServeGraphql()
 }
