@@ -6,8 +6,9 @@ const props = defineProps<{
   showHidden?: boolean;
 }>();
 const showHidden = computed(() => props.showHidden);
+const clusterIpAddress = location.hostname;
 
-const { result } = useAppListQuery({ showHidden });
+const { result } = useAppListQuery({ showHidden, clusterIpAddress });
 
 const groups = computed(() => {
   const apps = result.value?.apps;
@@ -42,15 +43,7 @@ const groups = computed(() => {
         </thead>
 
         <tbody>
-          <app-list-item
-            v-for="app of apps"
-            :key="app.id"
-            :id="app.id"
-            :name="app.name"
-            :status="app.status"
-            :total="app.instances.total"
-            :running="app.instances.running"
-          />
+          <app-list-item v-for="app of apps" :key="app.id" :app="app" />
         </tbody>
       </table>
     </div>
