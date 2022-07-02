@@ -47,7 +47,7 @@ func listApps(showHidden bool) {
 	title.Println("\nApps")
 	prevGroup := ""
 	for _, app := range apps {
-		if app.Group != nil && *app.Group != prevGroup {
+		if app.Group != nil && strings.ToLower(*app.Group) != strings.ToLower(prevGroup) {
 			title.Printf("\n%s\n", *app.Group)
 		}
 		status := green("●")
