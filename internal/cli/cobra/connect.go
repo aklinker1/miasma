@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/aklinker1/miasma/internal/cli/flags"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -14,18 +15,25 @@ var connectCmd = &cobra.Command{
 	Args:    cobra.ExactArgs(1),
 	Example: "miasma connect localhost:3000",
 	Run: func(cmd *cobra.Command, args []string) {
-		connectToServer(args[0])
+		baseURL := args[0]
+		accessToken := flags.GetAuthFlag(cmd)
+		connectToServer(baseURL, accessToken)
 	},
 }
 
 func init() {
 	RootCmd.AddCommand(connectCmd)
+	flags.UseAuthFlag(connectCmd)
 }
 
-func connectToServer(baseURL string) {
+func connectToServer(baseURL string, accessToken string) {
 	ctx := context.Background()
 	api.SetBaseURL(baseURL)
 	viper.Set("host", baseURL)
+	if accessToken != "" {
+		api.SetAccessToken(accessToken)
+		viper.Set("accessToken", accessToken)
+	}
 
 	health, err := api.Health(ctx, `{
 		version
@@ -50,5 +58,9 @@ func connectToServer(baseURL string) {
 
 	err = viper.WriteConfig()
 	checkErr(err)
-	done("%s added to %s", baseURL, viper.ConfigFileUsed())
+
+	if accessToken != "" {
+		warn("Access token is stored un-encrypted in %s", viper.ConfigFileUsed())
+	}
+	done("Connected to server")
 }

@@ -26,3 +26,8 @@ func done(format string, args ...any) {
 	coloredFormat := fmt.Sprintf(green("✔ %s\n\n"), format)
 	fmt.Printf(coloredFormat, args...)
 }
+
+func warn(format string, args ...any) {
+	coloredFormat := fmt.Sprintf(bold(yellow("⚠ %s\n")), format)
+	fmt.Printf(coloredFormat, args...)
+}
