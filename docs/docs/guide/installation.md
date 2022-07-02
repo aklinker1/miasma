@@ -61,6 +61,12 @@ If you don't trust the install script, or it did not succeed, you may have to in
 
 ## Install the CLI
 
+:::danger
+TODO: Right now you have to build the CLI from source
+:::
+
+<!---
+
 You should install the CLI on any computer you want to manage apps from, or during CI.
 
 First, use the install script to install the CLI on your `$PATH`:
@@ -79,6 +85,8 @@ Join cluster:
 
 Connected to miasma!
 ```
+
+--->
 
 ## Add More Nodes (Optional)
 
