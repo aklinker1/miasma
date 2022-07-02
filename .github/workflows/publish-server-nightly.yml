@@ -1,4 +1,4 @@
-name: Publish Server
+name: Publish Server (nightly Cron)
 on:
   schedule:
     - cron: "0 0 * * *" # Nightly at midnight
