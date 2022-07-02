@@ -1,45 +1,15 @@
 <script lang="ts" setup>
-import IDatabase from "~icons/mdi/database";
-import ICube from "~icons/mdi/cube";
-import IEarth from "~icons/mdi/earth";
-import ITools from "~icons/mdi/tools";
 import { useStartAppMutation } from "../composition/start-app-mutation";
 import { useStopAppMutation } from "../composition/stop-app-mutation";
+import { App } from "../composition/list-apps-query";
 
 const props = defineProps<{
-  id: string;
-  name: string;
-  status: string;
-  running?: number;
-  total?: number;
-  simpleRoute?: string;
+  app: App;
 }>();
 
-const isRunning = computed(() => props.status === "running");
-const isStopped = computed(() => props.status === "stopped");
+const isRunning = computed(() => props.app.status === "running");
+const isStopped = computed(() => props.app.status === "stopped");
 
-const openLink = computed(() => {
-  if (isRunning.value) {
-    if (props.simpleRoute) return `https://${props.simpleRoute}`;
-  }
-  return undefined;
-});
-
-const iconKeywords = {
-  database: ["database", "postgres", "sql", "mongo", "redis"],
-  website: ["web", "www", ".com"],
-  tool: ["daemon", "worker", "helper", "scheduler"],
-};
-
-const icon = computed(() => {
-  const name = props.name.toLowerCase();
-  if (iconKeywords.database.find((w) => name.includes(w))) return IDatabase;
-  if (iconKeywords.website.find((w) => name.includes(w))) return IEarth;
-  if (iconKeywords.tool.find((w) => name.includes(w))) return ITools;
-  return ICube;
-});
-
-const a = useStopAppMutation();
 const { mutate: stopApp, loading: stoppingApp } = useStopAppMutation();
 const { mutate: startApp, loading: startingApp } = useStartAppMutation();
 </script>
@@ -47,42 +17,76 @@ const { mutate: startApp, loading: startingApp } = useStartAppMutation();
 <template>
   <tr class="hover">
     <th>
-      <app-icon class="w-6 h-6 ml-2" :name="name" />
+      <app-icon class="w-6 h-6 ml-2" :name="app.name" />
     </th>
     <td>
-      <router-link :to="`/apps/${name}`">
+      <router-link :to="`/apps/${app.name}`">
         <p class="text-lg">
-          {{ name }}
+          {{ app.name }}
         </p>
         <p
           class="text-sm text-success uppercase"
           :class="{
             'text-success': isRunning,
             'text-error font-medium': isStopped,
-            'text-warning': total != null && total !== running,
+            'text-warning':
+              app.instances?.total != null &&
+              app.instances.total !== app.instances.running,
           }"
         >
-          {{ status }}
+          {{ app.status }}
         </p>
       </router-link>
     </td>
     <td>
-      <p v-if="total" class="text-lg text-center">
-        <span>{{ running ?? 0 }}</span>
+      <p v-if="app.instances?.total" class="text-lg text-center">
+        <span>{{ app.instances.running }}</span>
         /
-        <span>{{ total }}</span>
+        <span>{{ app.instances.total }}</span>
       </p>
     </td>
     <td class="space-x-3 text-right">
-      <a
-        v-if="openLink"
-        class="btn btn-circle btn-outline"
-        title="Open in new tab"
-        target="_blank"
-        :href="openLink"
-      >
-        <i-mdi-open-in-new class="w-5 h-5" />
-      </a>
+      <template v-if="isRunning && app.availableAt != null">
+        <a
+          v-if="app.availableAt.length === 1"
+          class="btn btn-circle btn-outline"
+          title="Open in new tab"
+          target="_blank"
+          :href="app.availableAt[0]"
+        >
+          <i-mdi-open-in-new class="w-5 h-5" />
+        </a>
+        <div v-else class="overflow-visible btn-circle inline">
+          <div class="dropdown dropdown-end">
+            <label tabindex="0" class="btn btn-circle btn-outline">
+              <i-mdi-open-in-new class="w-5 h-5" />
+            </label>
+            <ul
+              tabindex="0"
+              class="dropdown-content menu p-2 shadow bg-base-200 rounded-box w-52"
+            >
+              <li v-for="link of app.availableAt">
+                <a
+                  :href="link"
+                  target="_blank"
+                  class="link link-primary link-hover"
+                  >{{ link }}</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <!-- TODO: Support multiple links in a dropdown -->
+        <!-- <a
+          v-else
+          class="btn btn-circle btn-outline"
+          title="Open in new tab"
+          target="_blank"
+          :href="availableAt![0]"
+        >
+          <i-mdi-open-in-new class="w-5 h-5" />
+        </a> -->
+      </template>
       <button
         v-if="isRunning"
         class="btn btn-circle btn-outline hover:btn-error"
@@ -90,7 +94,7 @@ const { mutate: startApp, loading: startingApp } = useStartAppMutation();
           'loading disabled': stoppingApp,
         }"
         title="Stop"
-        @click="stopApp({ id })"
+        @click="stopApp(app)"
       >
         <i-mdi-stop v-if="!stoppingApp" class="w-5 h-5" />
       </button>
@@ -101,7 +105,7 @@ const { mutate: startApp, loading: startingApp } = useStartAppMutation();
           'loading disabled': startingApp,
         }"
         title="Start"
-        @click="startApp({ id })"
+        @click="startApp(app)"
       >
         <i-mdi-play v-if="!startingApp" class="w-5 h-5" />
       </button>

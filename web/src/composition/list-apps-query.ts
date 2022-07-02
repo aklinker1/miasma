@@ -13,18 +13,21 @@ export interface App {
     running: number;
     total: number;
   };
+  availableAt: string[];
 }
 
 interface ListAppArgs {
   showHidden: Ref<boolean | undefined>;
+  clusterIpAddress: String;
 }
 
 export function useAppListQuery(args: ListAppArgs) {
   return useQuery<{ apps: App[] }, ListAppArgs>(
     gql`
-      query listApps($showHidden: Boolean) {
+      query listApps($showHidden: Boolean, $clusterIpAddress: String!) {
         apps: listApps(showHidden: $showHidden) {
           ...AppListApp
+          availableAt(clusterIpAddress: $clusterIpAddress)
         }
       }
 
