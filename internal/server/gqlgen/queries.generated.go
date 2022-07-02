@@ -225,6 +225,8 @@ func (ec *executionContext) fieldContext_Query_listApps(ctx context.Context, fie
 				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
+			case "availableAt":
+				return ec.fieldContext_App_availableAt(ctx, field)
 			case "env":
 				return ec.fieldContext_App_env(ctx, field)
 			case "status":
@@ -322,6 +324,8 @@ func (ec *executionContext) fieldContext_Query_getApp(ctx context.Context, field
 				return ec.fieldContext_App_route(ctx, field)
 			case "simpleRoute":
 				return ec.fieldContext_App_simpleRoute(ctx, field)
+			case "availableAt":
+				return ec.fieldContext_App_availableAt(ctx, field)
 			case "env":
 				return ec.fieldContext_App_env(ctx, field)
 			case "status":

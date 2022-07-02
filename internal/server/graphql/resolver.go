@@ -10,5 +10,6 @@ type Resolver struct {
 	EnvService server.EnvService
 	Plugins    server.PluginService
 	Runtime    server.RuntimeService
+	Logger     server.Logger
 	Version    string
 }
