@@ -68,14 +68,14 @@ func (s *EnvService) SetAppEnv(ctx context.Context, appID string, newEnv interna
 	}
 
 	// Restart the app
-	app, route, _, err := findStartParams(ctx, tx, appID, startParamKnowns{
+	app, route, _, plugins, err := findStartParams(ctx, tx, appID, startParamKnowns{
 		env:      newEnv,
 		knownEnv: true,
 	})
 	if err != nil {
 		return EmptyEnvMap, err
 	}
-	err = s.runtime.Restart(ctx, app, route, newEnv)
+	err = s.runtime.Restart(ctx, app, route, newEnv, plugins)
 	if err != nil {
 		return EmptyEnvMap, err
 	}

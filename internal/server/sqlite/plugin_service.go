@@ -187,7 +187,11 @@ func (s *PluginService) onEnabled(ctx context.Context, tx server.Tx, plugin inte
 		if err != nil {
 			return err
 		}
-		return s.runtime.Start(ctx, created, route, env)
+		allPlugins, err := findPlugins(ctx, tx, server.PluginsFilter{})
+		if err != nil {
+			return err
+		}
+		return s.runtime.Start(ctx, created, route, env, allPlugins)
 	default:
 		s.logger.V("No onEnabled hook for %v", plugin.Name)
 	}

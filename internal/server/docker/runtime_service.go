@@ -98,17 +98,17 @@ func (s *RuntimeService) PullLatest(ctx context.Context, image string) (string, 
 }
 
 // Restart implements server.RuntimeService
-func (s *RuntimeService) Restart(ctx context.Context, app internal.App, route *internal.Route, env map[string]string) error {
+func (s *RuntimeService) Restart(ctx context.Context, app internal.App, route *internal.Route, env map[string]string, plugins []internal.Plugin) error {
 	s.logger.D("Restarting app: %s", app.Name)
 	err := s.Stop(ctx, app)
 	if err != nil {
 		return err
 	}
-	return s.Start(ctx, app, route, env)
+	return s.Start(ctx, app, route, env, plugins)
 }
 
 // Start implements server.RuntimeService
-func (s *RuntimeService) Start(ctx context.Context, app internal.App, route *internal.Route, env map[string]string) error {
+func (s *RuntimeService) Start(ctx context.Context, app internal.App, route *internal.Route, env map[string]string, plugins []internal.Plugin) error {
 	s.logger.D("Starting app: %s", app.Name)
 	existingService, err := s.getExistingService(ctx, app, false)
 	if err != nil {
@@ -116,7 +116,7 @@ func (s *RuntimeService) Start(ctx context.Context, app internal.App, route *int
 	}
 
 	// Define the service
-	spec, err := s.getServiceSpec(ctx, app, route, env)
+	spec, err := s.getServiceSpec(ctx, app, route, env, plugins)
 	if err != nil {
 		return err
 	}
@@ -192,7 +192,7 @@ func (s *RuntimeService) getNetworkName(base string) string {
 }
 
 // Convert an app into a docker service
-func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App, route *internal.Route, readonlyEnv map[string]string) (swarm.ServiceSpec, error) {
+func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App, route *internal.Route, readonlyEnv map[string]string, plugins []internal.Plugin) (swarm.ServiceSpec, error) {
 	name := app.Name
 
 	env := map[string]string{}
@@ -224,7 +224,11 @@ func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App, r
 		miasmaIdLabel:   app.ID,
 		miasmaFlagLabel: "true",
 	}
-	if route != nil {
+
+	traefikPlugin, ok := lo.Find(plugins, func(plugin internal.Plugin) bool {
+		return plugin.Name == internal.PluginNameTraefik
+	})
+	if ok && traefikPlugin.Enabled && route != nil {
 		labels["traefik.enable"] = "true"
 		labels["traefik.docker.network"] = s.getNetworkName(defaultNetwork)
 		labels["traefik.http.services."+name+"-service.loadbalancer.server.port"] = fmt.Sprint(ports[0].TargetPort)
@@ -272,7 +276,6 @@ func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App, r
 	envSlice := lo.Map(lo.Entries(env), func(entry lo.Entry[string, string], _ int) string {
 		return fmt.Sprintf("%s=%s", entry.Key, fmt.Sprint(entry.Value))
 	})
-	s.logger.W("Slice: %v", envSlice)
 
 	return swarm.ServiceSpec{
 		Annotations: swarm.Annotations{
@@ -486,7 +489,7 @@ func (s *RuntimeService) RestartRunningApps(ctx context.Context, params []server
 			return service.Spec.Annotations.Labels[miasmaIdLabel] == p.App.ID
 		})
 		if isRunning && ok {
-			err = s.Restart(ctx, param.App, param.Route, param.Env)
+			err = s.Restart(ctx, param.App, param.Route, param.Env, param.Plugins)
 			if err != nil {
 				s.logger.W("Failed to restart app '%s': %v", param.App.Name, err)
 			}

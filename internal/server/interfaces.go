@@ -60,7 +60,7 @@ type AppsFilter struct {
 
 type AppService interface {
 	// Create and start a new app
-	Create(ctx context.Context, app internal.App) (internal.App, error)
+	Create(ctx context.Context, app internal.App, plugins []internal.Plugin) (internal.App, error)
 	// FindApps searches the list of managed applications
 	FindApps(ctx context.Context, filter AppsFilter) ([]internal.App, error)
 	// FindApp searches the list of managed applications for the first app that matches the criteria
@@ -95,9 +95,10 @@ type RuntimeAppInfo struct {
 }
 
 type StartAppParams struct {
-	App   internal.App
-	Route *internal.Route
-	Env   internal.EnvMap
+	App     internal.App
+	Route   *internal.Route
+	Env     internal.EnvMap
+	Plugins []internal.Plugin
 }
 
 type ListServicesFilter struct {
@@ -107,11 +108,11 @@ type ListServicesFilter struct {
 // RuntimeService defines how the server runs the apps
 type RuntimeService interface {
 	// Start the app
-	Start(ctx context.Context, app internal.App, route *internal.Route, env map[string]string) error
+	Start(ctx context.Context, app internal.App, route *internal.Route, env map[string]string, plugins []internal.Plugin) error
 	// ServiceDetails returns runtime details like instance count and status
 	GetRuntimeAppInfo(ctx context.Context, app internal.App) (RuntimeAppInfo, error)
 	// Restart stops and starts the app
-	Restart(ctx context.Context, app internal.App, route *internal.Route, env map[string]string) error
+	Restart(ctx context.Context, app internal.App, route *internal.Route, env map[string]string, plugins []internal.Plugin) error
 	// Stop stops the app if it's running
 	Stop(ctx context.Context, app internal.App) error
 	// PullLatest grabs the latest image and returns it's digest

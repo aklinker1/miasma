@@ -8,22 +8,24 @@ import (
 )
 
 type startParamKnowns struct {
-	app        internal.App
-	knownApp   bool
-	route      *internal.Route
-	knownRoute bool
-	env        internal.EnvMap
-	knownEnv   bool
+	app          internal.App
+	knownApp     bool
+	route        *internal.Route
+	knownRoute   bool
+	env          internal.EnvMap
+	knownEnv     bool
+	plugins      []internal.Plugin
+	knownPlugins bool
 }
 
-func findStartParams(ctx context.Context, tx server.Tx, appID string, known startParamKnowns) (internal.App, *internal.Route, internal.EnvMap, error) {
+func findStartParams(ctx context.Context, tx server.Tx, appID string, known startParamKnowns) (internal.App, *internal.Route, internal.EnvMap, []internal.Plugin, error) {
 	var err error
 	app := known.app
 	if !known.knownApp {
 		app, err = findApp(ctx, tx, server.AppsFilter{ID: &appID})
 	}
 	if err != nil {
-		return known.app, known.route, known.env, err
+		return known.app, known.route, known.env, known.plugins, err
 	}
 
 	route := known.route
@@ -31,7 +33,7 @@ func findStartParams(ctx context.Context, tx server.Tx, appID string, known star
 		route, err = findRouteOrNil(ctx, tx, server.RoutesFilter{AppID: &appID})
 	}
 	if err != nil {
-		return known.app, known.route, known.env, err
+		return known.app, known.route, known.env, known.plugins, err
 	}
 
 	env := known.env
@@ -39,8 +41,16 @@ func findStartParams(ctx context.Context, tx server.Tx, appID string, known star
 		env, err = findEnvMap(ctx, tx, server.EnvFilter{AppID: &appID})
 	}
 	if err != nil {
-		return known.app, known.route, known.env, err
+		return known.app, known.route, known.env, known.plugins, err
 	}
 
-	return app, route, env, nil
+	plugins := known.plugins
+	if !known.knownPlugins {
+		plugins, err = findPlugins(ctx, tx, server.PluginsFilter{})
+	}
+	if err != nil {
+		return known.app, known.route, known.env, known.plugins, err
+	}
+
+	return app, route, env, plugins, nil
 }

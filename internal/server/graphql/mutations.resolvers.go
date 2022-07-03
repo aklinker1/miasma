@@ -51,7 +51,12 @@ func (r *mutationResolver) CreateApp(ctx context.Context, input internal.AppInpu
 		Command:  input.Command,
 	}
 
-	created, err := r.Apps.Create(ctx, a)
+	plugins, err := r.Plugins.FindPlugins(ctx, server.PluginsFilter{})
+	if err != nil {
+		return nil, err
+	}
+
+	created, err := r.Apps.Create(ctx, a, plugins)
 	return safeReturn(&created, nil, err)
 }
 
@@ -100,7 +105,12 @@ func (r *mutationResolver) StartApp(ctx context.Context, id string) (*internal.A
 		return nil, err
 	}
 
-	err = r.Runtime.Start(ctx, app, route, env)
+	plugins, err := r.Plugins.FindPlugins(ctx, server.PluginsFilter{})
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.Runtime.Start(ctx, app, route, env, plugins)
 	return safeReturn(&app, nil, err)
 }
 
@@ -127,8 +137,12 @@ func (r *mutationResolver) RestartApp(ctx context.Context, id string) (*internal
 	if err != nil {
 		return nil, err
 	}
+	plugins, err := r.Plugins.FindPlugins(ctx, server.PluginsFilter{})
+	if err != nil {
+		return nil, err
+	}
 
-	err = r.Runtime.Restart(ctx, app, route, env)
+	err = r.Runtime.Restart(ctx, app, route, env, plugins)
 	return safeReturn(&app, nil, err)
 }
 
