@@ -41,15 +41,17 @@ type pullImageStatus struct {
 }
 
 type RuntimeService struct {
-	client client.APIClient
-	logger server.Logger
+	client           client.APIClient
+	logger           server.Logger
+	certResolverName string
 }
 
-func NewRuntimeService(logger server.Logger) (server.RuntimeService, error) {
+func NewRuntimeService(logger server.Logger, certResolverName string) (server.RuntimeService, error) {
 	client, err := client.NewClientWithOpts(client.FromEnv)
 	return &RuntimeService{
-		client: client,
-		logger: logger,
+		client:           client,
+		logger:           logger,
+		certResolverName: certResolverName,
 	}, err
 }
 
@@ -240,6 +242,15 @@ func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App, r
 			labels[ruleLabel] = fmt.Sprintf("(Host(`%s`) && PathPrefix(`%s`))", *route.Host, *route.Path)
 		} else if route.Host != nil {
 			labels[ruleLabel] = fmt.Sprintf("Host(`%s`)", *route.Host)
+		}
+
+		// HTTPS
+		enableHttps, hasEnableHttps := traefikPlugin.Config["enableHttps"].(bool)
+		if hasEnableHttps && enableHttps {
+			tlsLabel := fmt.Sprintf("traefik.http.routers.%s.tls", name)
+			labels[tlsLabel] = "true"
+			tlsResolverLabel := fmt.Sprintf("traefik.http.routers.%s.tls.certresolver", name)
+			labels[tlsResolverLabel] = s.certResolverName
 		}
 	}
 
