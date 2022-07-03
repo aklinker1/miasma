@@ -24,8 +24,7 @@ var (
 
 // Other constants
 var (
-	dataDir          = "/data/miasma"
-	databasePath     = dataDir + "/apps.db"
+	databasePath     = "/data/miasma/apps.db"
 	certResolverName = "miasmaresolver"
 )
 
