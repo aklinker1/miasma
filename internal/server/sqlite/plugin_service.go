@@ -23,13 +23,12 @@ type PluginService struct {
 	certResolverName string
 }
 
-func NewPluginService(db server.DB, apps server.AppService, runtime server.RuntimeService, logger server.Logger, dataDir string, certResolverName string) server.PluginService {
+func NewPluginService(db server.DB, apps server.AppService, runtime server.RuntimeService, logger server.Logger, certResolverName string) server.PluginService {
 	return &PluginService{
 		db:               db,
 		logger:           logger,
 		apps:             apps,
 		runtime:          runtime,
-		dataDir:          dataDir,
 		certResolverName: certResolverName,
 	}
 }
@@ -52,7 +51,7 @@ func (s *PluginService) getTraefikApp(config internal.TraefikConfig) (internal.A
 			"--entrypoints.web.address=:80",
 			"--entrypoints.websecure.address=:443",
 			fmt.Sprintf("--certificatesresolvers.%s.acme.email=%s", s.certResolverName, config.CertEmail),
-			fmt.Sprintf("--certificatesresolvers.%s.acme.storage=%s/acme.json", s.certResolverName, s.dataDir),
+			fmt.Sprintf("--certificatesresolvers.%s.acme.storage=/letsencrypt/acme.json", s.certResolverName),
 			fmt.Sprintf("--certificatesresolvers.%s.acme.httpchallenge.entrypoint=web", s.certResolverName),
 		)
 	}
@@ -64,6 +63,17 @@ func (s *PluginService) getTraefikApp(config internal.TraefikConfig) (internal.A
 	}
 	ports = append(ports, 8080)
 
+	volumes := []*internal.BoundVolume{{
+		Source: "/var/run/docker.sock",
+		Target: "/var/run/docker.sock",
+	}}
+	if config.EnableHttps {
+		volumes = append(volumes, &internal.BoundVolume{
+			Source: config.DataDir,
+			Target: "/letsencrypt",
+		})
+	}
+
 	return internal.App{
 		ID:             "plugin-traefik",
 		Name:           "Traefik",
@@ -74,11 +84,8 @@ func (s *PluginService) getTraefikApp(config internal.TraefikConfig) (internal.A
 		ImageDigest:    "sha256:fdff55caa91ac7ff217ff03b93f3673844b3b88ad993e023ab43f6004021697c",
 		TargetPorts:    ports,
 		PublishedPorts: ports,
-		Volumes: []*internal.BoundVolume{{
-			Source: "/var/run/docker.sock",
-			Target: "/var/run/docker.sock",
-		}},
-		Command: command,
+		Volumes:        volumes,
+		Command:        command,
 	}, nil
 }
 

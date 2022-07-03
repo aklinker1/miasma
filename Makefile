@@ -4,7 +4,7 @@ BUILD=$(shell TZ=UTC git --no-pager show --quiet --abbrev=40 --format='%h')
 BUILD_HASH=$(shell TZ=UTC git --no-pager show --quiet --abbrev=8 --format='%h')
 BUILD_DATE=$(shell TZ=UTC git --no-pager show --quiet --date='format-local:%Y%m%d%H%M%S' --format='%cd')
 BUILD_VAR_PATH=main
-DATA_DIR=$(shell pwd)/data
+DATA_DIR=$(shell pwd)/data/database
 
 PUBLISH_TAGS ?= --tag aklinker1/miasma:nightly
 
@@ -22,7 +22,8 @@ build:
 preview: build
 	@echo "Starting Miasma Server..."
 	@echo
-	@mkdir -p data
+	@mkdir -p data/sqlite
+	@mkdir -p data/letsencrypt
 	@docker run \
 		-i \
 		--rm \
@@ -44,7 +45,8 @@ run:
 	@echo
 	@echo "Starting Miasma Server..."
 	@echo
-	@mkdir -p data
+	@mkdir -p data/sqlite
+	@mkdir -p data/letsencrypt
 	@docker run \
 		-i \
 		--rm \

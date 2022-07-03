@@ -12,6 +12,7 @@ type RunningContainer struct {
 type TraefikConfig struct {
 	EnableHttps bool   `mapstructure:"enableHttps"`
 	CertEmail   string `mapstructure:"certEmail"`
+	DataDir     string `mapstructure:"dataDir"`
 }
 
 func (p Plugin) ConfigForTraefik() TraefikConfig {

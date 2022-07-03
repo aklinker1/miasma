@@ -43,7 +43,7 @@ func main() {
 	apps := sqlite.NewAppService(db, runtime, logger)
 	env := sqlite.NewEnvService(db, runtime, logger)
 	routes := sqlite.NewRouteService(db, logger)
-	plugins := sqlite.NewPluginService(db, apps, runtime, logger, dataDir, certResolverName)
+	plugins := sqlite.NewPluginService(db, apps, runtime, logger, certResolverName)
 	if err != nil {
 		logger.E("Failed to initialize docker runtime: %v", err)
 		os.Exit(1)
