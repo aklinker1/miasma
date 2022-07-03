@@ -4,98 +4,99 @@ title: Installation
 
 # Installation
 
-Miasma is setup in two easy steps:
+[[toc]]
 
-1. Deploy the Miasma Server
-1. Install the Miasma CLI on your dev computer
+## Deploy the Miasma Server
 
-## Deploy the server
+Run the following commands on the main machine you want to host applications on. If you are planning on adding more nodes to the cluster, this device will be the main manager node.
 
-To deploy the server, you will need at least one device running on one of the supported architectures. Setting up this device is outside the scope of this tutorial. This device will be the main node of the cluster if you choose to add more nodes.
+:::tip Machine OS
+Before starting, make sure the machine you're installing the server on is one of the [supported architectures](https://hub.docker.com/r/aklinker1/miasma/tags).
 
-:::tip
-My device and OS of choice a **Raspberry Pi 3b (or higher) running 64bit Ubuntu Server**.
+For example, `linux/arm64` is published, so if you want to install the server on a Raspberry Pi, it needs to be running a 64bit OS, like Ubuntu Server 64bit.
 :::
 
-After your device is up and running, run the install script from that device:
-
-```bash:no-line-numbers
-curl -o- https://raw.githubusercontent.com/aklinker1/miasma/main/scripts/install-server.sh | bash
-```
-
-Once it finishes, the Miasma server is up and running on port `3000`! The script will also print a "join command" used in the next step to add more nodes to the cluster.
-
-### Manual Install
-
-If you don't trust the install script, or it did not succeed, you may have to install the dependencies and manually start the server on your main node:
-
-1. [Install Docker](https://docs.docker.com/get-docker/)
-
-1. Initialize the docker swarm (see [Docker's docs](https://docs.docker.com/engine/swarm/swarm-tutorial/create-swarm/) for more details)
-
+1. Install Docker
+   ```bash:no-line-numbers
+   curl -fsSL https://get.docker.com -o get-docker.sh
+   sh get-docker.sh
+   ```
+1. Initialize the swarm (**this is required** even if you aren't planning on using multiple nodes)
    ```bash:no-line-numbers
    docker swarm init
    ```
-
-1. Start the Miasma server
-
+1. Run the server's Docker image
    ```bash:no-line-numbers
+   # Minimal configuration
    docker run -d \
        --restart unless-stopped \
        -p 3000:3000 \
        -v /var/run/docker.sock:/var/run/docker.sock \
-       -v $HOME/.miasma:/data/miasma \
+       -v $HOME/.miasma/database:/data/miasma \
        aklinker1/miasma
    ```
+   :::details What are all those parameters for?
+   - **`-d`**
+   - **`--restart unless-stopped`** - Always restart the container (on reboot, crash, etc) until you explicitly call `docker container stop <id>`
+   - **`-v /var/run/docker.sock:/var/run/docker.sock`** - Bind a special volume that lets Miasma talk to the docker daemon running on the host machine so it can do things like start/stop apps 
+   - **`-v $HOME/.miasma:/data/miasma`** - Bind a volume so Miasma can persist it's configuration and remember what apps have been setup if the container is stopped and restarted
+   - [`aklinker1/miasma`](https://hub.docker.com/r/aklinker1/miasma) - The name of the docker image to run. To use a different version of the image, include a `:tag` suffix
+   :::
 
-   > If you're unfamiliar with Docker, here's what's happening:
-   >
-   > - `-d`: Start the server in a background daemon rather than the foreground so the process doesn't block your terminal
-   > - `--restart unless-stopped`: Restart the server unless you tell it to stop, ensuring the server restarts if it crashes or the device restarts
-   > - `-p 3000:3000`: Exposes port `3000` on the main node, and mapping it to port `3000` in the container (the port the server runs on)
-   > - `-v /var/run/docker.sock:/var/run/docker.sock`: Bind a special volume to the container, allowing Miasma to communicate with docker on your behalf
-   > - `-v $HOME/.miasma:/data/miasma`: Bind another volume, this time the server's config directory
-   > - `aklinker1/miasma`: The name of the latest stable version of the [Miasma server docker image](https://hub.docker.com/r/aklinker1/miasma/tags)
+And you're server is setup!
 
-1. Open the GraphiQL playground to make sure the server is up and running: `http://<server-ip>:3000/playground`
+To verify the server is setup properly, open up the GraphQL playground, `http://<machine-ip>:3000/playground`, and run the following query:
+
+```graphql:no-line-numbers
+{
+  health {
+    version
+    dockerVersion
+    cluster {
+      joinCommand
+      createdAt
+    }
+  }
+}
+```
+
+
+If everything is setup correctly, you should see a response like this:
+```json:no-line-numbers
+{
+  "data": {
+    "health": {
+      "version": "1.1.0",
+      "dockerVersion": "20.10.17",
+      "cluster": {
+        "joinCommand": "docker swarm join --token SWMTKN-1-1hgnz90jzs1xytc8chcxdlcqn1r1p38xtlus4mzyr7wx3lnuie-ejy87vthuum7hc36cw0xr4wjq 192.168.0.3:2377",
+        "createdAt": "2022-05-05T07:11:01.82641567Z"
+      }
+    }
+  }
+}
+```
+
+### Add More Nodes (Optional)
+
+1. SSH into the machine to add
+  ```bash:no-line-numbers
+  ssh user@<machine-ip>
+  ```
+2. Install Docker (same as before)
+  ```bash:no-line-numbers
+  curl -fsSL https://get.docker.com -o get-docker.sh
+  sh get-docker.sh
+  ```
+3. Join the swarm using the join command from the health query
+  ```bash:no-line-numbers
+  docker swarm join --token <some-token> <machine-ip>:2377
+  ```
+
+Depending on the network your machines are located in, you might need to use a different IP address that what is returned from the health query.
 
 ## Install the CLI
 
-:::danger
-TODO: Right now you have to build the CLI from source
+:::warning TODO
+Right now you have to build the CLI from source. See [contributing docs](/contributing) to get started, then run `make cli BINARY=miasma` to build `miasma` instead of `miasma-dev`
 :::
-
-<!---
-
-You should install the CLI on any computer you want to manage apps from, or during CI.
-
-First, use the install script to install the CLI on your `$PATH`:
-
-```bash:no-line-numbers
-curl -o- https://raw.githubusercontent.com/aklinker1/miasma/main/scripts/install-cli.sh | bash
-```
-
-Finally, connect the CLI to the miasma server running on the main node:
-
-```bash:no-line-numbers{1}
-$ miasma connect 192.168.1.0:3000
-Join cluster:
-
-  docker swarm join --token <some-token> <server-ip:port>
-
-Connected to miasma!
-```
-
---->
-
-## Add More Nodes (Optional)
-
-Adding more nodes (or devices) to the cluster is simple. Run the join command printed while connecting the CLI to the server on any devices you want to add to the cluster:
-
-```bash:no-line-numbers
-docker swarm join --token <some-token> <server-ip:port>
-```
-
----
-
-**Great work, that's the end of the setup!** You're ready to deploy your first app.

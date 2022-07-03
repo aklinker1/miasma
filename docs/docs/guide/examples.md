@@ -86,3 +86,13 @@ miasma apps:edit \
     --add-volume "/dir/path/on/physical/machine":/var/lib/postgresql/data \
     --add-target-ports 5432 --add-published-ports 5432
 ```
+
+## Nginx Based Website
+
+A common way to host a static website in Docker is with the [`nginx`](https://hub.docker.com/_/nginx/) image.
+
+```bash:no-line-numbers
+miasma apps:create example-website -i nginxdemos/hello:plain-text # or your custom image
+# Nginx runs on port 80, and is difficult to change, so just target that port instead
+miasma apps:edit -a example-website --add-target-ports 80
+```

@@ -7,6 +7,7 @@ BUILD_VAR_PATH=main
 DATA_DIR=$(shell pwd)/data/database
 
 PUBLISH_TAGS ?= --tag aklinker1/miasma:nightly
+BINARY ?= miasma-dev
 
 # Build the production docker image
 build:
@@ -66,7 +67,7 @@ cli:
 		-ldflags "-X ${BUILD_VAR_PATH}.VERSION=${CLI_VERSION} -X ${BUILD_VAR_PATH}.BUILD=${BUILD} -X ${BUILD_VAR_PATH}.BUILD_HASH=${BUILD_HASH} -X ${BUILD_VAR_PATH}.BUILD_DATE=${BUILD_DATE}" \
 		-o bin/cli \
 		cmd/cli/main.go
-	@cp bin/cli "${GOPATH}/bin/miasma-dev"
+	@cp bin/cli "${GOPATH}/bin/${BINARY}"
 
 # Run just the docs website in dev mode
 doc:

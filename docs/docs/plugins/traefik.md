@@ -1,5 +1,5 @@
 ---
-title: Traefik Routing
+title: Traefik Ingress Router
 ---
 
 ## Enabling
