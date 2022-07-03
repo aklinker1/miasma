@@ -63,3 +63,5 @@ models:
     fields:
       services:
         resolver: true
+      apps:
+        resolver: true

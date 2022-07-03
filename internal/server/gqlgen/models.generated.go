@@ -31,7 +31,7 @@ type HealthResolver interface {
 	Cluster(ctx context.Context, obj *internal.Health) (*internal.ClusterInfo, error)
 }
 type NodeResolver interface {
-	Services(ctx context.Context, obj *internal.Node) ([]*internal.RunningContainer, error)
+	Services(ctx context.Context, obj *internal.Node, showHidden *bool) ([]*internal.App, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -50,6 +50,21 @@ func (ec *executionContext) field_App_availableAt_args(ctx context.Context, rawA
 		}
 	}
 	args["clusterIpAddress"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Node_services_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *bool
+	if tmp, ok := rawArgs["showHidden"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("showHidden"))
+		arg0, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["showHidden"] = arg0
 	return args, nil
 }
 
@@ -1846,7 +1861,7 @@ func (ec *executionContext) _Node_services(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Node().Services(rctx, obj)
+		return ec.resolvers.Node().Services(rctx, obj, fc.Args["showHidden"].(*bool))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1858,9 +1873,9 @@ func (ec *executionContext) _Node_services(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*internal.RunningContainer)
+	res := resTmp.([]*internal.App)
 	fc.Result = res
-	return ec.marshalNRunningContainer2ᚕᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐRunningContainerᚄ(ctx, field.Selections, res)
+	return ec.marshalNApp2ᚕᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐAppᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Node_services(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1871,11 +1886,62 @@ func (ec *executionContext) fieldContext_Node_services(ctx context.Context, fiel
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "id":
+				return ec.fieldContext_App_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_App_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_App_updatedAt(ctx, field)
 			case "name":
-				return ec.fieldContext_RunningContainer_name(ctx, field)
+				return ec.fieldContext_App_name(ctx, field)
+			case "system":
+				return ec.fieldContext_App_system(ctx, field)
+			case "group":
+				return ec.fieldContext_App_group(ctx, field)
+			case "image":
+				return ec.fieldContext_App_image(ctx, field)
+			case "imageDigest":
+				return ec.fieldContext_App_imageDigest(ctx, field)
+			case "hidden":
+				return ec.fieldContext_App_hidden(ctx, field)
+			case "route":
+				return ec.fieldContext_App_route(ctx, field)
+			case "simpleRoute":
+				return ec.fieldContext_App_simpleRoute(ctx, field)
+			case "availableAt":
+				return ec.fieldContext_App_availableAt(ctx, field)
+			case "env":
+				return ec.fieldContext_App_env(ctx, field)
+			case "status":
+				return ec.fieldContext_App_status(ctx, field)
+			case "instances":
+				return ec.fieldContext_App_instances(ctx, field)
+			case "targetPorts":
+				return ec.fieldContext_App_targetPorts(ctx, field)
+			case "publishedPorts":
+				return ec.fieldContext_App_publishedPorts(ctx, field)
+			case "placement":
+				return ec.fieldContext_App_placement(ctx, field)
+			case "volumes":
+				return ec.fieldContext_App_volumes(ctx, field)
+			case "networks":
+				return ec.fieldContext_App_networks(ctx, field)
+			case "command":
+				return ec.fieldContext_App_command(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type RunningContainer", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type App", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Node_services_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -2213,50 +2279,6 @@ func (ec *executionContext) _Route_traefikRule(ctx context.Context, field graphq
 func (ec *executionContext) fieldContext_Route_traefikRule(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Route",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _RunningContainer_name(ctx context.Context, field graphql.CollectedField, obj *internal.RunningContainer) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_RunningContainer_name(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_RunningContainer_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "RunningContainer",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -3027,34 +3049,6 @@ func (ec *executionContext) _Route(ctx context.Context, sel ast.SelectionSet, ob
 	return out
 }
 
-var runningContainerImplementors = []string{"RunningContainer"}
-
-func (ec *executionContext) _RunningContainer(ctx context.Context, sel ast.SelectionSet, obj *internal.RunningContainer) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, runningContainerImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("RunningContainer")
-		case "name":
-
-			out.Values[i] = ec._RunningContainer_name(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 // endregion **************************** object.gotpl ****************************
 
 // region    ***************************** type.gotpl *****************************
@@ -3275,60 +3269,6 @@ func (ec *executionContext) unmarshalNPluginName2githubᚗcomᚋaklinker1ᚋmias
 
 func (ec *executionContext) marshalNPluginName2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐPluginName(ctx context.Context, sel ast.SelectionSet, v internal.PluginName) graphql.Marshaler {
 	return v
-}
-
-func (ec *executionContext) marshalNRunningContainer2ᚕᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐRunningContainerᚄ(ctx context.Context, sel ast.SelectionSet, v []*internal.RunningContainer) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNRunningContainer2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐRunningContainer(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) marshalNRunningContainer2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐRunningContainer(ctx context.Context, sel ast.SelectionSet, v *internal.RunningContainer) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._RunningContainer(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOBoundVolume2ᚕᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐBoundVolumeᚄ(ctx context.Context, sel ast.SelectionSet, v []*internal.BoundVolume) graphql.Marshaler {

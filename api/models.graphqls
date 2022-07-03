@@ -153,10 +153,6 @@ enum PluginName {
   TRAEFIK
 }
 
-type RunningContainer {
-  name: String!
-}
-
 type Node {
   id: String!
   os: String!
@@ -166,5 +162,5 @@ type Node {
   status: String!
   statusMessage: String
   labels: Map!
-  services: [RunningContainer!]!
+  services(showHidden: Boolean): [App!]!
 }
