@@ -63,13 +63,16 @@ func (s *graphqlServer) ServeGraphql() error {
 		AllowedMethods: []string{"POST"},
 		AllowedHeaders: []string{"Accept", "Content-Type", "Content-Length", "Accept-Encoding", "Authorization"},
 	}))
-	if requireCredentials {
-		r.Use(s.tokenAuthMiddleware)
-	} else {
-		s.logger.W("Server running without credentials")
-	}
 
 	r.Handle("/graphql", s.createGraphqlHandler())
+	r.Route("/graphql", func(r chi.Router) {
+		if requireCredentials {
+			r.Use(s.tokenAuthMiddleware)
+		} else {
+			s.logger.W("Server running without credentials")
+		}
+		r.Handle("/", s.createGraphqlHandler())
+	})
 	r.Handle("/playground", playground.Handler("Miasma", "/graphql"))
 	r.Get("/*", web.Handler("/"))
 
