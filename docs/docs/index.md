@@ -24,7 +24,6 @@ It has two components: a **lightweight server**, and a **CLI tool**. The server 
 
 ## Not Features
 
-- **Built-in TLS/SSL** - this means no HTTPS
 - **Complete docker service configuration** - some functionality, like advanced network and volume configuration, are missing
 
 :::warning ⚠️&emsp;Miasma was not designed for an enterprise environment
