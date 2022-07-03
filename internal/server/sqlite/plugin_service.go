@@ -6,7 +6,6 @@ import (
 
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
-	"github.com/mitchellh/mapstructure"
 	"github.com/samber/lo"
 )
 
@@ -35,17 +34,12 @@ func NewPluginService(db server.DB, apps server.AppService, runtime server.Runti
 	}
 }
 
-func (s *PluginService) getTraefikApp(config map[string]any) (internal.App, error) {
-	var traefikConfig internal.TraefikConfig
-	s.logger.I("raw config: %+v", config)
-	if config != nil {
-		mapstructure.Decode(config, &traefikConfig)
-	}
-	s.logger.V("Traefik config: %+v -> %+v", config, traefikConfig)
+func (s *PluginService) getTraefikApp(config internal.TraefikConfig) (internal.App, error) {
+	s.logger.V("Traefik app config: %+v", config)
 
 	command := []string{"traefik"}
-	if traefikConfig.EnableHttps {
-		if traefikConfig.CertEmail == "" {
+	if config.EnableHttps {
+		if config.CertEmail == "" {
 			return EmptyApp, &server.Error{
 				Code:    server.EINVALID,
 				Message: "Certificate email is missing, did you provide \"certEmail\" in the config?",
@@ -57,7 +51,7 @@ func (s *PluginService) getTraefikApp(config map[string]any) (internal.App, erro
 			command,
 			"--entrypoints.web.address=:80",
 			"--entrypoints.websecure.address=:443",
-			fmt.Sprintf("--certificatesresolvers.%s.acme.email=%s", s.certResolverName, traefikConfig.CertEmail),
+			fmt.Sprintf("--certificatesresolvers.%s.acme.email=%s", s.certResolverName, config.CertEmail),
 			fmt.Sprintf("--certificatesresolvers.%s.acme.storage=%s/acme.json", s.certResolverName, s.dataDir),
 			fmt.Sprintf("--certificatesresolvers.%s.acme.httpchallenge.entrypoint=web", s.certResolverName),
 		)
@@ -65,7 +59,7 @@ func (s *PluginService) getTraefikApp(config map[string]any) (internal.App, erro
 	command = append(command, "--api.insecure=true", "--api.insecure=true", "--providers.docker", "--providers.docker.swarmmode")
 
 	ports := []int32{80}
-	if traefikConfig.EnableHttps {
+	if config.EnableHttps {
 		ports = append(ports, 443)
 	}
 	ports = append(ports, 8080)
@@ -185,7 +179,7 @@ func (s *PluginService) onEnabled(ctx context.Context, tx server.Tx, plugin inte
 	s.logger.D("On plugin enabled: %v", plugin.Name)
 	switch plugin.Name {
 	case internal.PluginNameTraefik:
-		app, err := s.getTraefikApp(plugin.Config)
+		app, err := s.getTraefikApp(plugin.ConfigForTraefik())
 		if err != nil {
 			return err
 		}
@@ -220,7 +214,7 @@ func (s *PluginService) onDisabled(ctx context.Context, tx server.Tx, plugin int
 	s.logger.D("On plugin disabled: %v", plugin)
 	switch plugin.Name {
 	case internal.PluginNameTraefik:
-		app, err := s.getTraefikApp(plugin.Config)
+		app, err := s.getTraefikApp(plugin.ConfigForTraefik())
 		if err != nil {
 			return err
 		}

@@ -245,8 +245,8 @@ func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App, r
 		}
 
 		// HTTPS
-		enableHttps, hasEnableHttps := traefikPlugin.Config["enableHttps"].(bool)
-		if hasEnableHttps && enableHttps {
+		traefikConfig := traefikPlugin.ConfigForTraefik()
+		if traefikConfig.EnableHttps {
 			tlsLabel := fmt.Sprintf("traefik.http.routers.%s.tls", name)
 			labels[tlsLabel] = "true"
 			tlsResolverLabel := fmt.Sprintf("traefik.http.routers.%s.tls.certresolver", name)
