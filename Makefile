@@ -22,6 +22,7 @@ build:
 preview: build
 	@echo "Starting Miasma Server..."
 	@echo
+	@mkdir -p data
 	@docker run \
 		-i \
 		--rm \
@@ -43,6 +44,7 @@ run:
 	@echo
 	@echo "Starting Miasma Server..."
 	@echo
+	@mkdir -p data
 	@docker run \
 		-i \
 		--rm \
