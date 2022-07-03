@@ -32,7 +32,7 @@ For example, `linux/arm64` is published, so if you want to install the server on
        --restart unless-stopped \
        -p 3000:3000 \
        -v /var/run/docker.sock:/var/run/docker.sock \
-       -v $HOME/.miasma/database:/data/miasma \
+       -v $HOME/.miasma:/data/miasma \
        aklinker1/miasma
    ```
    :::details What are all those parameters for?
@@ -45,7 +45,8 @@ For example, `linux/arm64` is published, so if you want to install the server on
 
 And you're server is setup!
 
-To verify the server is setup properly, open up the GraphQL playground, `http://<machine-ip>:3000/playground`, and run the following query:
+:::details Verify Setup
+Open up the GraphQL playground, `http://<machine-ip>:3000/playground`, and run the following query:
 
 ```graphql:no-line-numbers
 {
@@ -76,6 +77,7 @@ If everything is setup correctly, you should see a response like this:
   }
 }
 ```
+:::
 
 ### Add More Nodes (Optional)
 
@@ -88,12 +90,10 @@ If everything is setup correctly, you should see a response like this:
   curl -fsSL https://get.docker.com -o get-docker.sh
   sh get-docker.sh
   ```
-3. Join the swarm using the join command from the health query
+3. Join the swarm using the join command output during `docker swarm init`
   ```bash:no-line-numbers
-  docker swarm join --token <some-token> <machine-ip>:2377
+  docker swarm join --token <some-token> <swarm-ip>:2377
   ```
-
-Depending on the network your machines are located in, you might need to use a different IP address that what is returned from the health query.
 
 ## Install the CLI
 
