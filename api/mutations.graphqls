@@ -15,7 +15,7 @@ type Mutation {
   upgradeApp(id: ID!): App!
 
   "Enable one of Miasma's plugins"
-  enablePlugin(name: PluginName!): Plugin!
+  enablePlugin(name: PluginName!, config: Map): Plugin!
   "Disable one of Miasma's plugins"
   disablePlugin(name: PluginName!): Plugin!
 

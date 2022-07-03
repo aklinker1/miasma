@@ -127,6 +127,7 @@ type Plugin {
   name: PluginName!
   "Whether or not the plugin has been enabled."
   enabled: Boolean!
+  config: Map!
 }
 
 type Route {

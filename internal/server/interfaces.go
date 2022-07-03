@@ -83,7 +83,7 @@ type PluginService interface {
 	// FindApp searches the list of built-in plugins for the first plugin that matches the criteria
 	FindPlugin(ctx context.Context, filter PluginsFilter) (internal.Plugin, error)
 	// Enabled a plugin and restart all applications
-	EnablePlugin(ctx context.Context, plugin internal.Plugin) (internal.Plugin, error)
+	EnablePlugin(ctx context.Context, plugin internal.Plugin, config map[string]any) (internal.Plugin, error)
 	// Disable a plugin and restart all applications
 	DisablePlugin(ctx context.Context, plugin internal.Plugin) (internal.Plugin, error)
 }

@@ -93,7 +93,7 @@ type ComplexityRoot struct {
 		DeleteApp      func(childComplexity int, id string) int
 		DisablePlugin  func(childComplexity int, name internal.PluginName) int
 		EditApp        func(childComplexity int, id string, changes map[string]interface{}) int
-		EnablePlugin   func(childComplexity int, name internal.PluginName) int
+		EnablePlugin   func(childComplexity int, name internal.PluginName, config map[string]interface{}) int
 		RemoveAppRoute func(childComplexity int, appID string) int
 		RestartApp     func(childComplexity int, id string) int
 		SetAppEnv      func(childComplexity int, appID string, newEnv map[string]interface{}) int
@@ -116,6 +116,7 @@ type ComplexityRoot struct {
 	}
 
 	Plugin struct {
+		Config  func(childComplexity int) int
 		Enabled func(childComplexity int) int
 		Name    func(childComplexity int) int
 	}
@@ -441,7 +442,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.EnablePlugin(childComplexity, args["name"].(internal.PluginName)), true
+		return e.complexity.Mutation.EnablePlugin(childComplexity, args["name"].(internal.PluginName), args["config"].(map[string]interface{})), true
 
 	case "Mutation.removeAppRoute":
 		if e.complexity.Mutation.RemoveAppRoute == nil {
@@ -594,6 +595,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Node.StatusMessage(childComplexity), true
+
+	case "Plugin.config":
+		if e.complexity.Plugin.Config == nil {
+			break
+		}
+
+		return e.complexity.Plugin.Config(childComplexity), true
 
 	case "Plugin.enabled":
 		if e.complexity.Plugin.Enabled == nil {
@@ -908,6 +916,7 @@ type Plugin {
   name: PluginName!
   "Whether or not the plugin has been enabled."
   enabled: Boolean!
+  config: Map
 }
 
 type Route {
@@ -963,7 +972,7 @@ type Node {
   upgradeApp(id: ID!): App!
 
   "Enable one of Miasma's plugins"
-  enablePlugin(name: PluginName!): Plugin!
+  enablePlugin(name: PluginName!, config: Map): Plugin!
   "Disable one of Miasma's plugins"
   disablePlugin(name: PluginName!): Plugin!
 

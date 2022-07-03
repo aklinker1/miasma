@@ -141,7 +141,7 @@ func (r *mutationResolver) UpgradeApp(ctx context.Context, id string) (*internal
 	return safeReturn(&updated, nil, err)
 }
 
-func (r *mutationResolver) EnablePlugin(ctx context.Context, name internal.PluginName) (*internal.Plugin, error) {
+func (r *mutationResolver) EnablePlugin(ctx context.Context, name internal.PluginName, config map[string]interface{}) (*internal.Plugin, error) {
 	plugin, err := r.Plugins.FindPlugin(ctx, server.PluginsFilter{
 		Name: &name,
 	})
@@ -149,7 +149,7 @@ func (r *mutationResolver) EnablePlugin(ctx context.Context, name internal.Plugi
 		return nil, err
 	}
 
-	updated, err := r.Plugins.EnablePlugin(ctx, plugin)
+	updated, err := r.Plugins.EnablePlugin(ctx, plugin, config)
 	return safeReturn(&updated, nil, err)
 }
 
