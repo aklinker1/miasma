@@ -3,6 +3,7 @@ package cobra
 import (
 	"context"
 
+	"github.com/aklinker1/miasma/internal/cli/flags"
 	"github.com/spf13/cobra"
 )
 
@@ -13,19 +14,22 @@ var pluginEnableCmd = &cobra.Command{
 	Args:      cobra.ExactValidArgs(1),
 	ValidArgs: []string{"TRAEFIK"},
 	Run: func(cmd *cobra.Command, args []string) {
-		enablePlugin(args[0])
+		pluginConfig := flags.GetPluginConfigFlag(cmd)
+		pluginName := args[0]
+		enablePlugin(pluginName, pluginConfig)
 	},
 }
 
 func init() {
 	RootCmd.AddCommand(pluginEnableCmd)
+	flags.UsePluginConfigFlag(pluginEnableCmd)
 }
 
-func enablePlugin(pluginName string) {
+func enablePlugin(pluginName string, pluginConfig map[string]any) {
 	ctx := context.Background()
 	title.Printf("\nEnabling %s...\n", pluginName)
 
-	err := api.EnablePlugin(ctx, pluginName)
+	err := api.EnablePlugin(ctx, pluginName, pluginConfig)
 	checkErr(err)
 
 	done("%s enabled", pluginName)

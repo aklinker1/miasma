@@ -12,11 +12,11 @@ func UseAuthFlag(cmd *cobra.Command) {
 }
 
 func GetAuthFlag(cmd *cobra.Command) string {
-	hidden, err := cmd.Flags().GetString("auth")
+	v, err := cmd.Flags().GetString("auth")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	return hidden
+	return v
 }
