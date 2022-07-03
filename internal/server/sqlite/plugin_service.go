@@ -5,30 +5,13 @@ import (
 
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
+	"github.com/mitchellh/mapstructure"
 	"github.com/samber/lo"
 )
 
 var (
-	EmptyPlugin = internal.Plugin{}
-)
-
-var (
-	traefikApp = internal.App{
-		ID:             "plugin-traefik",
-		Name:           "Traefik",
-		Group:          lo.ToPtr("System"),
-		System:         true,
-		Hidden:         true,
-		Image:          "traefik:2.7",
-		ImageDigest:    "sha256:fdff55caa91ac7ff217ff03b93f3673844b3b88ad993e023ab43f6004021697c",
-		TargetPorts:    []int32{80, 8080},
-		PublishedPorts: []int32{80, 8080},
-		Volumes: []*internal.BoundVolume{{
-			Source: "/var/run/docker.sock",
-			Target: "/var/run/docker.sock",
-		}},
-		Command: []string{"traefik", "--api.insecure=true", "--providers.docker", "--providers.docker.swarmmode"},
-	}
+	EmptyPlugin    = internal.Plugin{}
+	PluginAppGroup = lo.ToPtr("System")
 )
 
 type PluginService struct {
@@ -45,6 +28,46 @@ func NewPluginService(db server.DB, apps server.AppService, runtime server.Runti
 		apps:    apps,
 		runtime: runtime,
 	}
+}
+
+func (s *PluginService) getTraefikApp(config map[string]any) (internal.App, error) {
+	var traefikConfig internal.TraefikConfig
+	if config != nil {
+		mapstructure.Decode(config, &traefikConfig)
+	}
+	s.logger.V("Traefik config: %+v -> %+v", config, traefikConfig)
+
+	command := []string{"traefik"}
+	if traefikConfig.EnableHttps {
+		s.logger.W("TLS/HTTPS is not implemented yet")
+		if traefikConfig.CertEmail == "" {
+			return EmptyApp, &server.Error{
+				Code:    server.EINVALID,
+				Message: "Certificate email is missing, did you provide \"certEmail\" in the config?",
+				Op:      "sqlite.PluginService.traefikApp",
+			}
+		}
+	} else {
+		command = append(command, "--api.insecure=true")
+	}
+	command = append(command, "--providers.docker", "--providers.docker.swarmmode")
+
+	return internal.App{
+		ID:             "plugin-traefik",
+		Name:           "Traefik",
+		Group:          PluginAppGroup,
+		System:         true,
+		Hidden:         true,
+		Image:          "traefik:2.7",
+		ImageDigest:    "sha256:fdff55caa91ac7ff217ff03b93f3673844b3b88ad993e023ab43f6004021697c",
+		TargetPorts:    []int32{80, 443, 8080},
+		PublishedPorts: []int32{80, 443, 8080},
+		Volumes: []*internal.BoundVolume{{
+			Source: "/var/run/docker.sock",
+			Target: "/var/run/docker.sock",
+		}},
+		Command: command,
+	}, nil
 }
 
 func (s *PluginService) setEnabled(ctx context.Context, plugin internal.Plugin, enabled bool) (internal.Plugin, error) {
@@ -67,9 +90,9 @@ func (s *PluginService) setEnabled(ctx context.Context, plugin internal.Plugin, 
 
 	// Execute setup/teardown
 	if enabled {
-		err = s.onEnabled(ctx, tx, updated.Name)
+		err = s.onEnabled(ctx, tx, updated)
 	} else {
-		err = s.onDisabled(ctx, tx, updated.Name)
+		err = s.onDisabled(ctx, tx, updated)
 	}
 	if err != nil {
 		return EmptyPlugin, err
@@ -115,7 +138,8 @@ func (s *PluginService) DisablePlugin(ctx context.Context, plugin internal.Plugi
 }
 
 // EnablePlugin implements server.PluginService
-func (s *PluginService) EnablePlugin(ctx context.Context, plugin internal.Plugin) (internal.Plugin, error) {
+func (s *PluginService) EnablePlugin(ctx context.Context, plugin internal.Plugin, config map[string]any) (internal.Plugin, error) {
+	plugin.Config = config
 	return s.setEnabled(ctx, plugin, true)
 }
 
@@ -139,11 +163,15 @@ func (s *PluginService) FindPlugin(ctx context.Context, filter server.PluginsFil
 	return findPlugin(ctx, tx, filter)
 }
 
-func (s *PluginService) onEnabled(ctx context.Context, tx server.Tx, pluginName internal.PluginName) error {
-	s.logger.D("On plugin enabled: %v", pluginName)
-	switch pluginName {
+func (s *PluginService) onEnabled(ctx context.Context, tx server.Tx, plugin internal.Plugin) error {
+	s.logger.D("On plugin enabled: %v", plugin.Name)
+	switch plugin.Name {
 	case internal.PluginNameTraefik:
-		created, err := createApp(ctx, tx, traefikApp)
+		app, err := s.getTraefikApp(plugin.Config)
+		if err != nil {
+			return err
+		}
+		created, err := createApp(ctx, tx, app)
 		if err != nil {
 			return err
 		}
@@ -161,22 +189,26 @@ func (s *PluginService) onEnabled(ctx context.Context, tx server.Tx, pluginName 
 		}
 		return s.runtime.Start(ctx, created, route, env)
 	default:
-		s.logger.V("No onEnabled hook for %v", pluginName)
+		s.logger.V("No onEnabled hook for %v", plugin.Name)
 	}
 	return nil
 }
 
-func (s *PluginService) onDisabled(ctx context.Context, tx server.Tx, pluginName internal.PluginName) error {
-	s.logger.D("On plugin disabled: %v", pluginName)
-	switch pluginName {
+func (s *PluginService) onDisabled(ctx context.Context, tx server.Tx, plugin internal.Plugin) error {
+	s.logger.D("On plugin disabled: %v", plugin)
+	switch plugin.Name {
 	case internal.PluginNameTraefik:
-		err := deleteApp(ctx, tx, traefikApp)
+		app, err := s.getTraefikApp(plugin.Config)
 		if err != nil {
 			return err
 		}
-		return s.runtime.Stop(ctx, traefikApp)
+		err = deleteApp(ctx, tx, app)
+		if err != nil {
+			return err
+		}
+		return s.runtime.Stop(ctx, app)
 	default:
-		s.logger.V("No onDisabled hook for %v", pluginName)
+		s.logger.V("No onDisabled hook for %v", plugin)
 	}
 	return nil
 }

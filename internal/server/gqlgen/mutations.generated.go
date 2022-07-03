@@ -23,7 +23,7 @@ type MutationResolver interface {
 	StopApp(ctx context.Context, id string) (*internal.App, error)
 	RestartApp(ctx context.Context, id string) (*internal.App, error)
 	UpgradeApp(ctx context.Context, id string) (*internal.App, error)
-	EnablePlugin(ctx context.Context, name internal.PluginName) (*internal.Plugin, error)
+	EnablePlugin(ctx context.Context, name internal.PluginName, config map[string]interface{}) (*internal.Plugin, error)
 	DisablePlugin(ctx context.Context, name internal.PluginName) (*internal.Plugin, error)
 	SetAppEnv(ctx context.Context, appID string, newEnv map[string]interface{}) (map[string]interface{}, error)
 	SetAppRoute(ctx context.Context, appID string, route *internal.RouteInput) (*internal.Route, error)
@@ -115,6 +115,15 @@ func (ec *executionContext) field_Mutation_enablePlugin_args(ctx context.Context
 		}
 	}
 	args["name"] = arg0
+	var arg1 map[string]interface{}
+	if tmp, ok := rawArgs["config"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("config"))
+		arg1, err = ec.unmarshalOMap2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["config"] = arg1
 	return args, nil
 }
 
@@ -956,7 +965,7 @@ func (ec *executionContext) _Mutation_enablePlugin(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().EnablePlugin(rctx, fc.Args["name"].(internal.PluginName))
+		return ec.resolvers.Mutation().EnablePlugin(rctx, fc.Args["name"].(internal.PluginName), fc.Args["config"].(map[string]interface{}))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -985,6 +994,8 @@ func (ec *executionContext) fieldContext_Mutation_enablePlugin(ctx context.Conte
 				return ec.fieldContext_Plugin_name(ctx, field)
 			case "enabled":
 				return ec.fieldContext_Plugin_enabled(ctx, field)
+			case "config":
+				return ec.fieldContext_Plugin_config(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Plugin", field.Name)
 		},
@@ -1046,6 +1057,8 @@ func (ec *executionContext) fieldContext_Mutation_disablePlugin(ctx context.Cont
 				return ec.fieldContext_Plugin_name(ctx, field)
 			case "enabled":
 				return ec.fieldContext_Plugin_enabled(ctx, field)
+			case "config":
+				return ec.fieldContext_Plugin_config(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Plugin", field.Name)
 		},

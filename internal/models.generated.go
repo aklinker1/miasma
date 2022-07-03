@@ -127,7 +127,8 @@ type Node struct {
 type Plugin struct {
 	Name PluginName `json:"name"`
 	// Whether or not the plugin has been enabled.
-	Enabled bool `json:"enabled"`
+	Enabled bool                   `json:"enabled"`
+	Config  map[string]interface{} `json:"config"`
 }
 
 type Route struct {

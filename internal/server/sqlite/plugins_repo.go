@@ -15,6 +15,7 @@ func findPlugins(ctx context.Context, tx server.Tx, filter server.PluginsFilter)
 	query := sqlb.Select("plugins", map[string]any{
 		"name":    sqlitetypes.PluginName(&scanned.Name),
 		"enabled": &scanned.Enabled,
+		"config":  sqlitetypes.JSON(&scanned.Config),
 	})
 	if filter.Name != nil {
 		query.Where("name = ?", *filter.Name)
@@ -59,9 +60,11 @@ func findPlugin(ctx context.Context, tx server.Tx, filter server.PluginsFilter) 
 }
 
 func updatePlugin(ctx context.Context, tx server.Tx, plugin internal.Plugin) (internal.Plugin, error) {
-	sql, args := sqlb.Update("plugins", "name", sqlitetypes.PluginName(plugin.Name), map[string]any{
+	data := map[string]any{
 		"enabled": plugin.Enabled,
-	}).ToSQL()
+		"config":  sqlitetypes.JSON(plugin.Config),
+	}
+	sql, args := sqlb.Update("plugins", "name", sqlitetypes.PluginName(plugin.Name), data).ToSQL()
 	_, err := tx.ExecContext(ctx, sql, args...)
 	return plugin, err
 }
