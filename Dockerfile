@@ -1,6 +1,9 @@
 # Setup base images
 FROM alpine as base-image
 RUN mkdir -p /data/miasma
+RUN adduser -D -g '' user
+RUN chown user /data/miasma
+USER user
 WORKDIR /app
 
 FROM node:16-alpine as web-builder-base
