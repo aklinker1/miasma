@@ -38,6 +38,6 @@ type APIService interface {
 	RemoveAppRoute(ctx context.Context, appID string) error
 
 	ListPlugins(ctx context.Context, gql string) ([]internal.Plugin, error)
-	EnablePlugin(ctx context.Context, pluginName string) error
+	EnablePlugin(ctx context.Context, pluginName string, pluginConfig map[string]any) error
 	DisablePlugin(ctx context.Context, pluginName string) error
 }

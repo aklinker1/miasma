@@ -188,15 +188,16 @@ func (c *MiasmaAPIClient) DisablePlugin(ctx context.Context, pluginName string) 
 }
 
 // EnablePlugin implements cli.APIService
-func (c *MiasmaAPIClient) EnablePlugin(ctx context.Context, pluginName string) error {
+func (c *MiasmaAPIClient) EnablePlugin(ctx context.Context, pluginName string, pluginConfig map[string]any) error {
 	return c.post(
 		ctx,
-		`mutation ($name: PluginName!) {
-			enablePlugin(name: $name) %s
+		`mutation ($name: PluginName!, $config: Map) {
+			enablePlugin(name: $name, config: $config) %s
 		}`,
 		`{ name }`,
 		map[string]any{
-			"name": pluginName,
+			"name":   pluginName,
+			"config": pluginConfig,
 		},
 		"enablePlugin",
 		&internal.Plugin{},
