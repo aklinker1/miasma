@@ -30,10 +30,10 @@ const labels = computed(() => {
     </div>
 
     <ul class="menu rounded-box p-2">
-      <li v-for="service of node.services" :key="service.name">
-        <router-link :to="`/apps/${service.name}`">
-          <app-icon class="w-6 h-6" :name="service.name" />
-          {{ service.name }}
+      <li v-for="app of node.services" :key="app.id">
+        <router-link :to="`/apps/${app.id}`">
+          <app-icon class="w-6 h-6" :name="app.name" />
+          {{ app.name }}
         </router-link>
       </li>
     </ul>

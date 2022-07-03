@@ -1,6 +1,11 @@
 import { gql } from "graphql-tag";
 import { useQuery } from "@vue/apollo-composable";
 
+interface NodeService {
+  id: string;
+  name: string;
+}
+
 export interface Node {
   id: string;
   os: string;
@@ -10,9 +15,7 @@ export interface Node {
   hostname: string;
   labels: Record<string, string>;
   ip: string;
-  services: Array<{
-    name: string;
-  }>;
+  services: NodeService[];
 }
 
 export function useNodesQuery() {
@@ -29,7 +32,7 @@ export function useNodesQuery() {
           labels
           ip
           services {
-            name
+            ...AppListApp
           }
         }
       }
