@@ -22,7 +22,7 @@ build:
 preview: build
 	@echo "Starting Miasma Server..."
 	@echo
-	@mkdir -p data/sqlite
+	@mkdir -p data/database
 	@mkdir -p data/letsencrypt
 	@docker run \
 		-i \
@@ -45,7 +45,7 @@ run:
 	@echo
 	@echo "Starting Miasma Server..."
 	@echo
-	@mkdir -p data/sqlite
+	@mkdir -p data/database
 	@mkdir -p data/letsencrypt
 	@docker run \
 		-i \
