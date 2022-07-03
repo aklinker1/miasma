@@ -67,3 +67,35 @@ And the routes are setup! Give it a minute, and watch the HTTP Routers on the Tr
 :::tip
 After adding or updating routes, Traefik will automatically discover them. This process can take up to 2 minutes, so don't restart the app wondering why the route is not working immediately.
 :::
+
+## HTTPS & TLS Support
+
+If you're using Miasma with public IP addresses that can be accessed from the internet like any other web app, you'll want to make sure your apps use HTTPS.
+
+The Traefik plugin can be configured to use HTTPS. Behind the scenes, Traefik is managing and auto-renewing certificates via [LetsEncrypt](https://letsencrypt.org/).
+
+```bash:no-line-numbers
+miasma plugins:enable TRAEFIK --plugin-config '{
+    "enableHttps": true,
+    "certEmail": "<your-email>",
+    "dataDir": "/path/to/certs"
+}'
+```
+
+:::tip
+If you've already enabled the plugin, disable it first and re-enable it with the additional config.
+:::
+
+All three fields are required to enable HTTPS.
+
+- `enableHttps` - Self explanitory. Set to `true` to enable HTTPS
+- `certEmail` - The email you'd like to use for the LetsEncrypt certificates
+- `dataDir` - The path on your manager node to where you want to store certificates. It must be absolute  
+
+You don't have to specify any domains. Certs are generated automatically for all domains configured on running apps.
+
+And that's it!
+
+:::warning
+Self managed certs are not supported at this time. Feel free to open a PR!
+:::
