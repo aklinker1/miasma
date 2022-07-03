@@ -41,17 +41,15 @@ type pullImageStatus struct {
 }
 
 type RuntimeService struct {
-	client           client.APIClient
-	logger           server.Logger
-	certResolverName string
+	client client.APIClient
+	logger server.Logger
 }
 
-func NewRuntimeService(logger server.Logger, certResolverName string) (server.RuntimeService, error) {
+func NewRuntimeService(logger server.Logger) (server.RuntimeService, error) {
 	client, err := client.NewClientWithOpts(client.FromEnv)
 	return &RuntimeService{
-		client:           client,
-		logger:           logger,
-		certResolverName: certResolverName,
+		client: client,
+		logger: logger,
 	}, err
 }
 
@@ -230,8 +228,7 @@ func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App, r
 	traefikPlugin, ok := lo.Find(plugins, func(plugin internal.Plugin) bool {
 		return plugin.Name == internal.PluginNameTraefik
 	})
-	s.logger.I("Treafik plugin: %+v", traefikPlugin)
-	if ok && route != nil {
+	if ok && route != nil && traefikPlugin.Enabled {
 		labels["traefik.enable"] = "true"
 		labels["traefik.docker.network"] = s.getNetworkName(defaultNetwork)
 		labels["traefik.http.services."+name+"-service.loadbalancer.server.port"] = fmt.Sprint(ports[0].TargetPort)
@@ -243,15 +240,6 @@ func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App, r
 			labels[ruleLabel] = fmt.Sprintf("(Host(`%s`) && PathPrefix(`%s`))", *route.Host, *route.Path)
 		} else if route.Host != nil {
 			labels[ruleLabel] = fmt.Sprintf("Host(`%s`)", *route.Host)
-		}
-
-		// HTTPS
-		enableHttps, hasEnableHttps := traefikPlugin.Config["enableHttps"].(bool)
-		if hasEnableHttps && enableHttps {
-			tlsLabel := fmt.Sprintf("traefik.http.routers.%s.tls", name)
-			labels[tlsLabel] = "true"
-			tlsResolverLabel := fmt.Sprintf("traefik.http.routers.%s.tls.certresolver", name)
-			labels[tlsResolverLabel] = s.certResolverName
 		}
 	}
 

@@ -22,28 +22,21 @@ var (
 	ACCESS_TOKEN = os.Getenv("ACCESS_TOKEN")
 )
 
-// Other constants
-var (
-	dataDir          = "/data/miasma"
-	databasePath     = dataDir + "/apps.db"
-	certResolverName = "miasmaresolver"
-)
-
 func main() {
 	logger := &fmt.Logger{}
 
-	db := sqlite.NewDB(databasePath, logger)
+	db := sqlite.NewDB("/data/miasma/apps.db", logger)
 	err := db.Open()
 	if err != nil {
 		logger.E("Failed to open database: %v", err)
 		os.Exit(1)
 	}
 
-	runtime, err := docker.NewRuntimeService(logger, certResolverName)
+	runtime, err := docker.NewRuntimeService(logger)
 	apps := sqlite.NewAppService(db, runtime, logger)
 	env := sqlite.NewEnvService(db, runtime, logger)
 	routes := sqlite.NewRouteService(db, logger)
-	plugins := sqlite.NewPluginService(db, apps, runtime, logger, dataDir, certResolverName)
+	plugins := sqlite.NewPluginService(db, apps, runtime, logger)
 	if err != nil {
 		logger.E("Failed to initialize docker runtime: %v", err)
 		os.Exit(1)
