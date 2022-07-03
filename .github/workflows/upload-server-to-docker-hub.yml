@@ -42,4 +42,4 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push to Docker Hub
-        run: PUBLISH_TAGS="{{ inputs.publishTags }}" make publish
+        run: PUBLISH_TAGS="${{ inputs.publishTags }}" make publish
