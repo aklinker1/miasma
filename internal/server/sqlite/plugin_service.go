@@ -39,6 +39,7 @@ func (s *PluginService) getTraefikApp(config map[string]any) (internal.App, erro
 
 	command := []string{"traefik"}
 	if traefikConfig.EnableHttps {
+		s.logger.W("TLS/HTTPS is not implemented yet")
 		if traefikConfig.CertEmail == "" {
 			return EmptyApp, &server.Error{
 				Code:    server.EINVALID,
@@ -46,8 +47,10 @@ func (s *PluginService) getTraefikApp(config map[string]any) (internal.App, erro
 				Op:      "sqlite.PluginService.traefikApp",
 			}
 		}
+	} else {
+		command = append(command, "--api.insecure=true")
 	}
-	command = append(command, "--api.insecure=true", "--api.insecure=true", "--providers.docker", "--providers.docker.swarmmode")
+	command = append(command, "--providers.docker", "--providers.docker.swarmmode")
 
 	return internal.App{
 		ID:             "plugin-traefik",

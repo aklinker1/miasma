@@ -228,7 +228,7 @@ func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App, r
 	traefikPlugin, ok := lo.Find(plugins, func(plugin internal.Plugin) bool {
 		return plugin.Name == internal.PluginNameTraefik
 	})
-	if ok && route != nil && traefikPlugin.Enabled {
+	if ok && traefikPlugin.Enabled && route != nil {
 		labels["traefik.enable"] = "true"
 		labels["traefik.docker.network"] = s.getNetworkName(defaultNetwork)
 		labels["traefik.http.services."+name+"-service.loadbalancer.server.port"] = fmt.Sprint(ports[0].TargetPort)
