@@ -26,7 +26,7 @@ func NewAppService(db server.DB, runtime server.RuntimeService, logger server.Lo
 }
 
 // Create implements server.AppService
-func (s *AppService) Create(ctx context.Context, app internal.App) (internal.App, error) {
+func (s *AppService) Create(ctx context.Context, app internal.App, plugins []internal.Plugin) (internal.App, error) {
 	s.logger.D("Creating app: %s", app.Name)
 	tx, err := s.db.ReadonlyTx(ctx)
 	if err != nil {
@@ -48,7 +48,7 @@ func (s *AppService) Create(ctx context.Context, app internal.App) (internal.App
 	}
 
 	// Start the app
-	err = s.runtime.Start(ctx, created, nil, nil)
+	err = s.runtime.Start(ctx, created, nil, nil, plugins)
 	if err != nil {
 		return EmptyApp, err
 	}
@@ -153,14 +153,14 @@ func (s *AppService) Update(ctx context.Context, app internal.App, newImage *str
 		return EmptyApp, err
 	}
 
-	_, route, env, err := findStartParams(ctx, tx, updated.ID, startParamKnowns{
+	_, route, env, plugins, err := findStartParams(ctx, tx, updated.ID, startParamKnowns{
 		app:      updated,
 		knownApp: true,
 	})
 	if err != nil {
 		return EmptyApp, err
 	}
-	err = s.runtime.Restart(ctx, updated, route, env)
+	err = s.runtime.Restart(ctx, updated, route, env, plugins)
 	if err != nil {
 		return EmptyApp, err
 	}

@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
@@ -15,23 +16,28 @@ var (
 )
 
 type PluginService struct {
-	db      server.DB
-	logger  server.Logger
-	apps    server.AppService
-	runtime server.RuntimeService
+	db               server.DB
+	logger           server.Logger
+	apps             server.AppService
+	runtime          server.RuntimeService
+	dataDir          string
+	certResolverName string
 }
 
-func NewPluginService(db server.DB, apps server.AppService, runtime server.RuntimeService, logger server.Logger) server.PluginService {
+func NewPluginService(db server.DB, apps server.AppService, runtime server.RuntimeService, logger server.Logger, dataDir string, certResolverName string) server.PluginService {
 	return &PluginService{
-		db:      db,
-		logger:  logger,
-		apps:    apps,
-		runtime: runtime,
+		db:               db,
+		logger:           logger,
+		apps:             apps,
+		runtime:          runtime,
+		dataDir:          dataDir,
+		certResolverName: certResolverName,
 	}
 }
 
 func (s *PluginService) getTraefikApp(config map[string]any) (internal.App, error) {
 	var traefikConfig internal.TraefikConfig
+	s.logger.I("raw config: %+v", config)
 	if config != nil {
 		mapstructure.Decode(config, &traefikConfig)
 	}
@@ -39,7 +45,6 @@ func (s *PluginService) getTraefikApp(config map[string]any) (internal.App, erro
 
 	command := []string{"traefik"}
 	if traefikConfig.EnableHttps {
-		s.logger.W("TLS/HTTPS is not implemented yet")
 		if traefikConfig.CertEmail == "" {
 			return EmptyApp, &server.Error{
 				Code:    server.EINVALID,
@@ -47,10 +52,23 @@ func (s *PluginService) getTraefikApp(config map[string]any) (internal.App, erro
 				Op:      "sqlite.PluginService.traefikApp",
 			}
 		}
-	} else {
-		command = append(command, "--api.insecure=true")
+		// Configuration example: https://doc.traefik.io/traefik/https/acme/#configuration-examples
+		command = append(
+			command,
+			"--entrypoints.web.address=:80",
+			"--entrypoints.websecure.address=:443",
+			fmt.Sprintf("--certificatesresolvers.%s.acme.email=%s", s.certResolverName, traefikConfig.CertEmail),
+			fmt.Sprintf("--certificatesresolvers.%s.acme.storage=%s/acme.json", s.certResolverName, s.dataDir),
+			fmt.Sprintf("--certificatesresolvers.%s.acme.httpchallenge.entrypoint=web", s.certResolverName),
+		)
 	}
-	command = append(command, "--providers.docker", "--providers.docker.swarmmode")
+	command = append(command, "--api.insecure=true", "--api.insecure=true", "--providers.docker", "--providers.docker.swarmmode")
+
+	ports := []int32{80}
+	if traefikConfig.EnableHttps {
+		ports = append(ports, 443)
+	}
+	ports = append(ports, 8080)
 
 	return internal.App{
 		ID:             "plugin-traefik",
@@ -60,8 +78,8 @@ func (s *PluginService) getTraefikApp(config map[string]any) (internal.App, erro
 		Hidden:         true,
 		Image:          "traefik:2.7",
 		ImageDigest:    "sha256:fdff55caa91ac7ff217ff03b93f3673844b3b88ad993e023ab43f6004021697c",
-		TargetPorts:    []int32{80, 443, 8080},
-		PublishedPorts: []int32{80, 443, 8080},
+		TargetPorts:    ports,
+		PublishedPorts: ports,
 		Volumes: []*internal.BoundVolume{{
 			Source: "/var/run/docker.sock",
 			Target: "/var/run/docker.sock",
@@ -187,7 +205,11 @@ func (s *PluginService) onEnabled(ctx context.Context, tx server.Tx, plugin inte
 		if err != nil {
 			return err
 		}
-		return s.runtime.Start(ctx, created, route, env)
+		allPlugins, err := findPlugins(ctx, tx, server.PluginsFilter{})
+		if err != nil {
+			return err
+		}
+		return s.runtime.Start(ctx, created, route, env, allPlugins)
 	default:
 		s.logger.V("No onEnabled hook for %v", plugin.Name)
 	}
