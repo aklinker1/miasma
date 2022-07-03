@@ -32,7 +32,6 @@ var dockerEnvKeyRegex = regexp.MustCompile("^[0-9A-Z_]+$")
 var (
 	miasmaIdLabel           = "miasma-id"
 	miasmaFlagLabel         = "miasma"
-	miasmaServiceNamePrefix = "miasma-"
 	miasmaNetworkNamePrefix = "miasma-"
 	defaultNetwork          = "default"
 )
@@ -172,7 +171,7 @@ func (s *RuntimeService) Start(ctx context.Context, app internal.App, route *int
 // Returns the existing service for the app or nil if it doesn't exist
 func (s *RuntimeService) getExistingService(ctx context.Context, app internal.App, includeStatus bool) (*swarm.Service, error) {
 	running, err := s.client.ServiceList(ctx, types.ServiceListOptions{
-		Filters: filters.NewArgs(filters.KeyValuePair{Key: "name", Value: s.getServiceName(app)}),
+		Filters: filters.NewArgs(filters.KeyValuePair{Key: "name", Value: app.Name}),
 		Status:  includeStatus,
 	})
 	if err != nil {
@@ -188,17 +187,13 @@ func (s *RuntimeService) getExistingService(ctx context.Context, app internal.Ap
 	return nil, nil
 }
 
-func (s *RuntimeService) getServiceName(app internal.App) string {
-	return miasmaServiceNamePrefix + app.Name
-}
-
 func (s *RuntimeService) getNetworkName(base string) string {
 	return miasmaNetworkNamePrefix + base
 }
 
 // Convert an app into a docker service
 func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App, route *internal.Route, readonlyEnv map[string]string) (swarm.ServiceSpec, error) {
-	name := s.getServiceName(app)
+	name := app.Name
 
 	env := map[string]string{}
 	if readonlyEnv != nil {
@@ -544,18 +539,20 @@ func (s *RuntimeService) ListServices(ctx context.Context, filter server.ListSer
 	}
 	sort.SliceStable(tasks, compareTask)
 
-	containers := lo.Filter(tasks, func(task swarm.Task, _ int) bool {
-		return task.Status.State == swarm.TaskStateRunning
+	serviceIDs := lo.Map(tasks, func(task swarm.Task, _ int) string {
+		return task.ServiceID
 	})
+	serviceIDSet := lo.Uniq(serviceIDs)
 
 	finalTasks := []internal.RunningContainer{}
-	for _, container := range containers {
-		service, _, err := s.client.ServiceInspectWithRaw(ctx, container.ServiceID, types.ServiceInspectOptions{})
+	for _, serviceID := range serviceIDSet {
+		service, _, err := s.client.ServiceInspectWithRaw(ctx, serviceID, types.ServiceInspectOptions{})
 		if err != nil {
 			return nil, err
 		}
 		finalTasks = append(finalTasks, internal.RunningContainer{
-			Name: strings.Replace(service.Spec.Name, miasmaServiceNamePrefix, "", 1),
+			AppID: service.Spec.Labels[miasmaIdLabel],
+			Name:  service.Spec.Name,
 		})
 	}
 	return finalTasks, nil

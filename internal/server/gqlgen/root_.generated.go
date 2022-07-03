@@ -110,7 +110,7 @@ type ComplexityRoot struct {
 		IP            func(childComplexity int) int
 		Labels        func(childComplexity int) int
 		Os            func(childComplexity int) int
-		Services      func(childComplexity int) int
+		Services      func(childComplexity int, showHidden *bool) int
 		Status        func(childComplexity int) int
 		StatusMessage func(childComplexity int) int
 	}
@@ -136,10 +136,6 @@ type ComplexityRoot struct {
 		Path        func(childComplexity int) int
 		TraefikRule func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
-	}
-
-	RunningContainer struct {
-		Name func(childComplexity int) int
 	}
 }
 
@@ -578,7 +574,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Node.Services(childComplexity), true
+		args, err := ec.field_Node_services_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Node.Services(childComplexity, args["showHidden"].(*bool)), true
 
 	case "Node.status":
 		if e.complexity.Node.Status == nil {
@@ -706,13 +707,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Route.UpdatedAt(childComplexity), true
-
-	case "RunningContainer.name":
-		if e.complexity.RunningContainer.Name == nil {
-			break
-		}
-
-		return e.complexity.RunningContainer.Name(childComplexity), true
 
 	}
 	return 0, false
@@ -940,10 +934,6 @@ enum PluginName {
   TRAEFIK
 }
 
-type RunningContainer {
-  name: String!
-}
-
 type Node {
   id: String!
   os: String!
@@ -953,7 +943,7 @@ type Node {
   status: String!
   statusMessage: String
   labels: Map!
-  services: [RunningContainer!]!
+  services(showHidden: Boolean): [App!]!
 }
 `, BuiltIn: false},
 	{Name: "api/mutations.graphqls", Input: `type Mutation {

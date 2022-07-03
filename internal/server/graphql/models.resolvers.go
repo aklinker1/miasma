@@ -90,11 +90,29 @@ func (r *healthResolver) Cluster(ctx context.Context, obj *internal.Health) (*in
 	return safeReturn(swarm, nil, err)
 }
 
-func (r *nodeResolver) Services(ctx context.Context, obj *internal.Node) ([]*internal.RunningContainer, error) {
+func (r *nodeResolver) Services(ctx context.Context, obj *internal.Node, showHidden *bool) ([]*internal.App, error) {
 	services, err := r.Runtime.ListServices(ctx, server.ListServicesFilter{
 		NodeID: &obj.ID,
 	})
-	return safeReturn(lo.ToSlicePtr(services), nil, err)
+	if err != nil {
+		return nil, err
+	}
+	apps := []*internal.App{}
+	for _, service := range services {
+		fmt.Println(service)
+		app, err := r.Apps.FindApp(ctx, server.AppsFilter{
+			ID:            &service.AppID,
+			IncludeHidden: showHidden,
+		})
+		if server.ErrorCode(err) == server.ENOTFOUND {
+			// noop
+		} else if err != nil {
+			return nil, err
+		} else {
+			apps = append(apps, &app)
+		}
+	}
+	return apps, nil
 }
 
 // App returns gqlgen.AppResolver implementation.

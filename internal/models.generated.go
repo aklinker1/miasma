@@ -121,7 +121,7 @@ type Node struct {
 	Status        string                 `json:"status"`
 	StatusMessage *string                `json:"statusMessage"`
 	Labels        map[string]interface{} `json:"labels"`
-	Services      []*RunningContainer    `json:"services"`
+	Services      []*App                 `json:"services"`
 }
 
 type Plugin struct {
@@ -143,10 +143,6 @@ type RouteInput struct {
 	Host        *string `json:"host"`
 	Path        *string `json:"path"`
 	TraefikRule *string `json:"traefikRule"`
-}
-
-type RunningContainer struct {
-	Name string `json:"name"`
 }
 
 type PluginName string
