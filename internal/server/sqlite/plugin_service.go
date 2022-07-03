@@ -56,7 +56,7 @@ func (s *PluginService) getTraefikApp(config internal.TraefikConfig) (internal.A
 			fmt.Sprintf("--certificatesresolvers.%s.acme.httpchallenge.entrypoint=web", s.certResolverName),
 		)
 	}
-	command = append(command, "--api.insecure=true", "--api.insecure=true", "--providers.docker", "--providers.docker.swarmmode")
+	command = append(command, "--api.insecure=true", "--providers.docker", "--providers.docker.swarmmode")
 
 	ports := []int32{80}
 	if config.EnableHttps {
