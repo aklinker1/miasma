@@ -1,13 +1,18 @@
 """
-The info about the docker swarm if the host running miasma is apart of one.
+Contains useful information about the cluster.
 """
 type ClusterInfo {
+  "The Docker swarm ID"
   id: String!
+  "The command to run on other machines to join the cluster"
   joinCommand: String!
+  "When the cluster was initialized"
   createdAt: Time!
+  "When the cluster was last updated"
   updatedAt: Time!
 }
 
+"Server health and version information"
 type Health {
   "Miasma server's current version."
   version: String!
@@ -17,6 +22,7 @@ type Health {
   cluster: ClusterInfo
 }
 
+"Docker volume configuration"
 type BoundVolume {
   "The path inside the container that the data is served from."
   target: String!
@@ -24,13 +30,16 @@ type BoundVolume {
   source: String!
 }
 
+"Managed application"
 type App {
   id: ID!
   createdAt: Time!
   updatedAt: Time!
+  "The app name. Different from the docker service name, which is the name but lower case and all spaces replaced with dashes"
   name: String!
   "Whether or not the application is managed by the system. You cannot edit or delete system apps."
   system: Boolean!
+  "A string used to group the app"
   group: String
   "The image and tag the application runs."
   image: String!
@@ -52,7 +61,7 @@ type App {
   availableAt(clusterIpAddress: String!): [String!]!
   "The environment variables configured for this app."
   env: Map
-  "Whether or not the application is running, stopped, or starting up."
+  "Whether or not the application is running, or stopped."
   status: String!
   "The number of instances running vs what should be running."
   instances: AppInstances!
@@ -89,14 +98,17 @@ type App {
   service that accesses the other needs the other network added.
   """
   networks: [String!]
+  "Custom docker command. This is an array of arguments starting with the binary that is being executed"
   command: [String!]
 }
 
+"Input type for [BoundVolume](#boundvolume)."
 input BoundVolumeInput {
   target: String!
   source: String!
 }
 
+"Input type for [App](#app)."
 input AppInput {
   name: String!
   image: String!
@@ -110,6 +122,7 @@ input AppInput {
   command: [String!]
 }
 
+"[Changeset](#Changeset) input type for [App](#app)."
 input AppChanges {
   name: String
   image: String
@@ -123,45 +136,73 @@ input AppChanges {
   command: [String!]
 }
 
+"Plugins are apps with deeper integrations with Miasma."
 type Plugin {
   name: PluginName!
   "Whether or not the plugin has been enabled."
   enabled: Boolean!
+  "Plugin's configuration."
   config: Map!
 }
 
+"Rules around where an app can be accessed from."
 type Route {
   appId: ID!
   createdAt: Time!
   updatedAt: Time!
+  "The URL's hostname, ex: 'example.com' or 'google.com'."
   host: String
+  "A custom path at the end of the URL: ex: '/search' or '/console'"
   path: String
+  """
+  A custom Traefik rule instead of just a host and path, ex: '(Host(domain1.com) || Host(domain2.com)'
+
+  See [Traefik's docs](https://doc.traefik.io/traefik/routing/routers/#rule) for usage and complex examples.
+  """
   traefikRule: String
 }
 
+"Input type for [Route](#route)."
 input RouteInput {
   host: String
   path: String
   traefikRule: String
 }
 
+"Contains information about how many instances of the app are running vs supposed to be running"
 type AppInstances {
   running: Int!
   total: Int!
 }
 
+"Unique identifier for plugins"
 enum PluginName {
+  "The name of the [Traefik](https://doc.traefik.io/traefik/) ingress router plugin"
   TRAEFIK
 }
 
+"Details about a machine in the cluster."
 type Node {
+  "The docker node's ID."
   id: String!
+  "The OS the node is running"
   os: String!
+  "The CPU architecture of the node. Services are automatically placed on nodes based on their image's supported architectures and the nodes' architectures."
   architecture: String!
+  "The machines hostname, as returned by the `hostname` command."
   hostname: String!
+  "The IP address the node joined the cluster as."
   ip: String!
+
+  "`unknown`, `down`, `ready`, or `disconnected`. See Docker's [API docs](https://docs.docker.com/engine/api/v1.41/#operation/NodeInspect)."
   status: String!
+  "The node's status message, usually present when when the status is not `ready`."
   statusMessage: String
+  "The node's labels, mostly used to place apps on specific nodes."
   labels: Map!
-  services(showHidden: Boolean): [App!]!
+  "List of apps running on the machine"
+  services(
+    "Same as `listApps`'s argument. When `true`, hidden apps will be returned"
+    showHidden: Boolean = false
+  ): [App!]!
 }

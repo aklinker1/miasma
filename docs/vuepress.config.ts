@@ -1,6 +1,10 @@
 import { defaultTheme, defineUserConfig, Page, Plugin } from "vuepress";
 import { searchPlugin } from "@vuepress/plugin-search";
 import { execSync } from "child_process";
+import { renderSchema } from "graphql-markdown";
+import { buildSchema, graphql, getIntrospectionQuery } from "graphql";
+import fs from "fs/promises";
+import path from "path";
 
 function generateCodePlugin(): Plugin {
   async function executeTemplate(
@@ -16,7 +20,43 @@ function generateCodePlugin(): Plugin {
 
   async function generateGraphqlSchema(): Promise<string> {
     console.log("Generating GraphQL schema docs...");
-    return ":::danger\nTODO\n:::";
+
+    // Merge schemas together
+    const schemaDir = path.resolve(__dirname, "..", "api");
+    const files = (await fs.readdir(schemaDir)).map((f) =>
+      path.resolve(schemaDir, f)
+    );
+    const schemaStr = (
+      await Promise.all(files.map((f) => fs.readFile(f, "utf-8")))
+    ).join("\n");
+
+    // Introspect
+    const schema = buildSchema(schemaStr);
+    const introspection = await graphql({
+      schema,
+      source: getIntrospectionQuery(),
+    });
+
+    // Render to markdown
+    const content: string[] = [];
+    const printer = (line: string) => {
+      content.push(line);
+    };
+    renderSchema(introspection.data, {
+      title: "Schema",
+      headingLevel: 2,
+      skipTableOfContents: true,
+      printer,
+    });
+
+    // Additional processing
+    return (
+      content
+        .join("\n")
+        // Remove extra blank lines inside tables
+        .replace(/<td>\n\n/gm, "<td>\n")
+        .replace(/\n\n<\/td>/gm, "\n</td>")
+    );
   }
 
   async function generateCliHelp(): Promise<string> {
