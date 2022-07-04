@@ -15,11 +15,12 @@ import (
 )
 
 func (r *appResolver) Route(ctx context.Context, obj *internal.App) (*internal.Route, error) {
-	return r.getAppRoute(ctx, obj)
+	route, _, err := r.getAppRoute(ctx, obj)
+	return route, err
 }
 
 func (r *appResolver) SimpleRoute(ctx context.Context, obj *internal.App) (*string, error) {
-	route, err := r.getAppRoute(ctx, obj)
+	route, traefik, err := r.getAppRoute(ctx, obj)
 	if err != nil {
 		return nil, err
 	}
@@ -27,10 +28,11 @@ func (r *appResolver) SimpleRoute(ctx context.Context, obj *internal.App) (*stri
 		return nil, nil
 	}
 
+	scheme := lo.Ternary(traefik.ConfigForTraefik().EnableHttps, "https", "http")
 	if route.Host != nil && route.Path != nil {
-		return lo.ToPtr(fmt.Sprintf("http://%s/%s", *route.Host, *route.Path)), nil
+		return lo.ToPtr(fmt.Sprintf("%s://%s/%s", scheme, *route.Host, *route.Path)), nil
 	} else if route.Host != nil {
-		return lo.ToPtr(fmt.Sprintf("http://%s", *route.Host)), nil
+		return lo.ToPtr(fmt.Sprintf("%s://%s", scheme, *route.Host)), nil
 	}
 	return nil, nil
 }

@@ -2,10 +2,10 @@ package sqlite
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
-	"github.com/mitchellh/mapstructure"
 	"github.com/samber/lo"
 )
 
@@ -15,42 +15,67 @@ var (
 )
 
 type PluginService struct {
-	db      server.DB
-	logger  server.Logger
-	apps    server.AppService
-	runtime server.RuntimeService
+	db               server.DB
+	logger           server.Logger
+	apps             server.AppService
+	runtime          server.RuntimeService
+	dataDir          string
+	certResolverName string
 }
 
-func NewPluginService(db server.DB, apps server.AppService, runtime server.RuntimeService, logger server.Logger) server.PluginService {
+func NewPluginService(db server.DB, apps server.AppService, runtime server.RuntimeService, logger server.Logger, certResolverName string) server.PluginService {
 	return &PluginService{
-		db:      db,
-		logger:  logger,
-		apps:    apps,
-		runtime: runtime,
+		db:               db,
+		logger:           logger,
+		apps:             apps,
+		runtime:          runtime,
+		certResolverName: certResolverName,
 	}
 }
 
-func (s *PluginService) getTraefikApp(config map[string]any) (internal.App, error) {
-	var traefikConfig internal.TraefikConfig
-	if config != nil {
-		mapstructure.Decode(config, &traefikConfig)
-	}
-	s.logger.V("Traefik config: %+v -> %+v", config, traefikConfig)
+func (s *PluginService) getTraefikApp(config internal.TraefikConfig) (internal.App, error) {
+	s.logger.V("Traefik app config: %+v", config)
 
 	command := []string{"traefik"}
-	if traefikConfig.EnableHttps {
-		s.logger.W("TLS/HTTPS is not implemented yet")
-		if traefikConfig.CertEmail == "" {
+	if config.EnableHttps {
+		if config.CertsEmail == "" {
 			return EmptyApp, &server.Error{
 				Code:    server.EINVALID,
-				Message: "Certificate email is missing, did you provide \"certEmail\" in the config?",
+				Message: "Certificate email is missing, did you provide \"certsEmail\" in the config?",
 				Op:      "sqlite.PluginService.traefikApp",
 			}
 		}
-	} else {
-		command = append(command, "--api.insecure=true")
+		command = append(
+			command,
+			"--entrypoints.web.address=:80",
+			"--entrypoints.websecure.address=:443",
+			// Use LetsEncrypt to manage certs: https://doc.traefik.io/traefik/https/acme/#configuration-examples
+			fmt.Sprintf("--certificatesresolvers.%s.acme.email=%s", s.certResolverName, config.CertsEmail),
+			fmt.Sprintf("--certificatesresolvers.%s.acme.storage=/letsencrypt/acme.json", s.certResolverName),
+			fmt.Sprintf("--certificatesresolvers.%s.acme.httpchallenge.entrypoint=web", s.certResolverName),
+			// Redirect HTTP -> HTTPS: https://doc.traefik.io/traefik/routing/entrypoints/#redirection
+			"--entrypoints.web.http.redirections.entrypoint.to=websecure",
+			"--entrypoints.web.http.redirections.entrypoint.scheme=https",
+		)
 	}
-	command = append(command, "--providers.docker", "--providers.docker.swarmmode")
+	command = append(command, "--api.insecure=true", "--providers.docker", "--providers.docker.swarmmode")
+
+	ports := []int32{80}
+	if config.EnableHttps {
+		ports = append(ports, 443)
+	}
+	ports = append(ports, 8080)
+
+	volumes := []*internal.BoundVolume{{
+		Source: "/var/run/docker.sock",
+		Target: "/var/run/docker.sock",
+	}}
+	if config.EnableHttps {
+		volumes = append(volumes, &internal.BoundVolume{
+			Source: config.CertsDir,
+			Target: "/letsencrypt",
+		})
+	}
 
 	return internal.App{
 		ID:             "plugin-traefik",
@@ -60,13 +85,11 @@ func (s *PluginService) getTraefikApp(config map[string]any) (internal.App, erro
 		Hidden:         true,
 		Image:          "traefik:2.7",
 		ImageDigest:    "sha256:fdff55caa91ac7ff217ff03b93f3673844b3b88ad993e023ab43f6004021697c",
-		TargetPorts:    []int32{80, 443, 8080},
-		PublishedPorts: []int32{80, 443, 8080},
-		Volumes: []*internal.BoundVolume{{
-			Source: "/var/run/docker.sock",
-			Target: "/var/run/docker.sock",
-		}},
-		Command: command,
+		TargetPorts:    ports,
+		PublishedPorts: ports,
+		Placement:      []string{"node.role == manager"},
+		Volumes:        volumes,
+		Command:        command,
 	}, nil
 }
 
@@ -167,7 +190,7 @@ func (s *PluginService) onEnabled(ctx context.Context, tx server.Tx, plugin inte
 	s.logger.D("On plugin enabled: %v", plugin.Name)
 	switch plugin.Name {
 	case internal.PluginNameTraefik:
-		app, err := s.getTraefikApp(plugin.Config)
+		app, err := s.getTraefikApp(plugin.ConfigForTraefik())
 		if err != nil {
 			return err
 		}
@@ -202,7 +225,7 @@ func (s *PluginService) onDisabled(ctx context.Context, tx server.Tx, plugin int
 	s.logger.D("On plugin disabled: %v", plugin)
 	switch plugin.Name {
 	case internal.PluginNameTraefik:
-		app, err := s.getTraefikApp(plugin.Config)
+		app, err := s.getTraefikApp(plugin.ConfigForTraefik())
 		if err != nil {
 			return err
 		}
