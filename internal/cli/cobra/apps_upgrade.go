@@ -11,7 +11,7 @@ import (
 var appsUpgradeCmd = &cobra.Command{
 	Use:   "apps:upgrade",
 	Short: "Pull the latest version of the application's image and restart the app",
-	Long:  "Pull the latest version of the application's image and restart the app. If a new image is passed, the app is updated to use that image instead of the current one",
+	Long:  "Pull the latest version of the application's image and restart the app. To change the image to a different tag or different image altogether, use apps:edit instead",
 	Run: func(cmd *cobra.Command, args []string) {
 		appName, deferable := flags.GetAppFlag(cmd)
 		defer deferable()
