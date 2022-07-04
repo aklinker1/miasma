@@ -16,28 +16,28 @@ func safeReturn[T any](value T, fallback T, err error) (T, error) {
 	}
 }
 
-func (r *appResolver) getAppRoute(ctx context.Context, obj *internal.App) (*internal.Route, error) {
+func (r *appResolver) getAppRoute(ctx context.Context, obj *internal.App) (*internal.Route, internal.Plugin, error) {
 	traefik, err := r.Plugins.FindPlugin(ctx, server.PluginsFilter{
 		Name: lo.ToPtr(internal.PluginNameTraefik),
 	})
 	if err != nil {
-		return nil, err
+		return nil, traefik, err
 	}
 	if !traefik.Enabled {
-		return nil, nil
+		return nil, traefik, nil
 	}
 	if obj.Route != nil {
-		return obj.Route, nil
+		return obj.Route, traefik, nil
 	}
 
 	route, err := r.Routes.FindRoute(ctx, server.RoutesFilter{
 		AppID: &obj.ID,
 	})
 	if server.ErrorCode(err) == server.ENOTFOUND {
-		return nil, nil
+		return nil, traefik, nil
 	} else if err != nil {
-		return nil, err
+		return nil, traefik, err
 	} else {
-		return &route, nil
+		return &route, traefik, nil
 	}
 }
