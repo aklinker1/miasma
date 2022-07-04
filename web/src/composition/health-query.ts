@@ -1,5 +1,6 @@
 import { gql } from "graphql-tag";
 import { useQuery } from "@vue/apollo-composable";
+import type { OptionsParameter } from "@vue/apollo-composable/dist/useQuery";
 
 export interface Health {
   version: string;
@@ -12,7 +13,9 @@ export interface Health {
   };
 }
 
-export function useHealthQuery() {
+export function useHealthQuery(
+  options?: OptionsParameter<{ health: Health }, {}>
+) {
   return useQuery<{ health: Health }, {}>(
     gql`
       query getHealth {
@@ -28,6 +31,7 @@ export function useHealthQuery() {
         }
       }
     `,
-    {}
+    {},
+    options ?? {}
   );
 }
