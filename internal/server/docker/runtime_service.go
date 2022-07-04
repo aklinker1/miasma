@@ -172,30 +172,35 @@ func (s *RuntimeService) Start(ctx context.Context, app internal.App, route *int
 
 // Returns the existing service for the app or nil if it doesn't exist
 func (s *RuntimeService) getExistingService(ctx context.Context, app internal.App, includeStatus bool) (*swarm.Service, error) {
-	running, err := s.client.ServiceList(ctx, types.ServiceListOptions{
-		Filters: filters.NewArgs(filters.KeyValuePair{Key: "name", Value: app.Name}),
-		Status:  includeStatus,
+	services, err := s.client.ServiceList(ctx, types.ServiceListOptions{
+		Filters: filters.NewArgs(filters.KeyValuePair{
+			Key:   "label",
+			Value: fmt.Sprintf("%s=%s", miasmaIdLabel, app.ID),
+		}),
+		Status: includeStatus,
 	})
 	if err != nil {
 		return nil, err
 	}
-	s.logger.V("All running services: %v", running)
 
-	for _, service := range running {
-		if service.Spec.Annotations.Labels[miasmaIdLabel] == app.ID {
-			return &service, nil
-		}
+	if len(services) > 0 {
+		return &services[0], nil
 	}
 	return nil, nil
 }
 
-func (s *RuntimeService) getNetworkName(base string) string {
-	return miasmaNetworkNamePrefix + base
+// getServiceName returns a valid DNS target name based on the app name
+func (s *RuntimeService) getServiceName(appName string) string {
+	return strings.ReplaceAll(strings.ToLower(appName), " ", "-")
+}
+
+func (s *RuntimeService) getNetworkName(appName string) string {
+	return miasmaNetworkNamePrefix + appName
 }
 
 // Convert an app into a docker service
 func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App, route *internal.Route, readonlyEnv map[string]string, plugins []internal.Plugin) (swarm.ServiceSpec, error) {
-	name := app.Name
+	hostname := s.getServiceName(app.Name)
 
 	env := map[string]string{}
 	if readonlyEnv != nil {
@@ -233,9 +238,9 @@ func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App, r
 	if ok && traefikPlugin.Enabled && route != nil {
 		labels["traefik.enable"] = "true"
 		labels["traefik.docker.network"] = s.getNetworkName(defaultNetwork)
-		labels["traefik.http.services."+name+".loadbalancer.server.port"] = fmt.Sprint(ports[0].TargetPort)
+		labels["traefik.http.services."+hostname+".loadbalancer.server.port"] = fmt.Sprint(ports[0].TargetPort)
 
-		ruleLabel := "traefik.http.routers." + name + ".rule"
+		ruleLabel := "traefik.http.routers." + hostname + ".rule"
 		if route.TraefikRule != nil {
 			labels[ruleLabel] = *route.TraefikRule
 		} else if route.Host != nil && route.Path != nil {
@@ -247,9 +252,9 @@ func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App, r
 		// HTTPS
 		traefikConfig := traefikPlugin.ConfigForTraefik()
 		if traefikConfig.EnableHttps {
-			tlsLabel := fmt.Sprintf("traefik.http.routers.%s.tls", name)
+			tlsLabel := fmt.Sprintf("traefik.http.routers.%s.tls", hostname)
 			labels[tlsLabel] = "true"
-			tlsResolverLabel := fmt.Sprintf("traefik.http.routers.%s.tls.certresolver", name)
+			tlsResolverLabel := fmt.Sprintf("traefik.http.routers.%s.tls.certresolver", hostname)
 			labels[tlsResolverLabel] = s.certResolverName
 		}
 	}
@@ -290,7 +295,7 @@ func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App, r
 
 	return swarm.ServiceSpec{
 		Annotations: swarm.Annotations{
-			Name:   name,
+			Name:   hostname,
 			Labels: labels,
 		},
 		TaskTemplate: swarm.TaskSpec{
