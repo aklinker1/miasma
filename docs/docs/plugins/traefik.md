@@ -14,6 +14,10 @@ Done!
 
 You can view Traefik's dashboard at `http://<server-ip>:8080` in a browser.
 
+:::tip
+The Traefik plugin is configured run on the Manager Node (placement of `node.role == manager`).
+:::
+
 ## Example Usage
 
 Let's say you want to host 4 apps on the `home.io` domain in the following locations:
@@ -75,10 +79,14 @@ If you're using Miasma with public IP addresses that can be accessed from the in
 The Traefik plugin can be configured to use HTTPS. Behind the scenes, Traefik is managing and auto-renewing certificates via [LetsEncrypt](https://letsencrypt.org/).
 
 ```bash:no-line-numbers
+# Make the directory where you're certs will be stored
+mkdir /path/to/certs
+
+# Enable the plugin with required config
 miasma plugins:enable TRAEFIK --plugin-config '{
     "enableHttps": true,
     "certEmail": "<your-email>",
-    "dataDir": "/path/to/certs"
+    "certsDir": "/path/to/certs"
 }'
 ```
 
@@ -89,8 +97,8 @@ If you've already enabled the plugin, disable it first and re-enable it with the
 All three fields are required to enable HTTPS.
 
 - `enableHttps` - Self explanitory. Set to `true` to enable HTTPS
-- `certEmail` - The email you'd like to use for the LetsEncrypt certificates
-- `dataDir` - The path on your manager node to where you want to store certificates. It must be absolute  
+- `certEmail` (required when `enableHttps=true`) - The email you'd like to use for the LetsEncrypt certificates
+- `certsDir` (required when `enableHttps=true`) - The path on your manager node to where you want to store certificates. It must exist and be an absolute path
 
 You don't have to specify any domains. Certs are generated automatically for all domains configured on running apps.
 
