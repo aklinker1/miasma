@@ -233,7 +233,7 @@ func (s *RuntimeService) getServiceSpec(ctx context.Context, app internal.App, r
 	if ok && traefikPlugin.Enabled && route != nil {
 		labels["traefik.enable"] = "true"
 		labels["traefik.docker.network"] = s.getNetworkName(defaultNetwork)
-		labels["traefik.http.services."+name+"-service.loadbalancer.server.port"] = fmt.Sprint(ports[0].TargetPort)
+		labels["traefik.http.services."+name+".loadbalancer.server.port"] = fmt.Sprint(ports[0].TargetPort)
 
 		ruleLabel := "traefik.http.routers." + name + ".rule"
 		if route.TraefikRule != nil {
