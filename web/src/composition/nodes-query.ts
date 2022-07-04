@@ -1,5 +1,6 @@
 import { gql } from "graphql-tag";
 import { useQuery } from "@vue/apollo-composable";
+import { appFragment } from "../utils/apollo-client";
 
 interface NodeService {
   id: string;
@@ -36,7 +37,10 @@ export function useNodesQuery() {
           }
         }
       }
+
+      ${appFragment}
     `,
+    {},
     { pollInterval: 5e3 }
   );
 }
