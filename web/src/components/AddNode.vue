@@ -64,7 +64,7 @@ const code = computed(() => {
 
           <template v-else>
             <p>
-              To add a node, SSH into the machine and run the following command:
+              To add a node, SSH into the machine and run the below commands.
             </p>
 
             <div>
