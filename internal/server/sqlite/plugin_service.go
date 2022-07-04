@@ -53,6 +53,9 @@ func (s *PluginService) getTraefikApp(config internal.TraefikConfig) (internal.A
 			fmt.Sprintf("--certificatesresolvers.%s.acme.email=%s", s.certResolverName, config.CertEmail),
 			fmt.Sprintf("--certificatesresolvers.%s.acme.storage=/letsencrypt/acme.json", s.certResolverName),
 			fmt.Sprintf("--certificatesresolvers.%s.acme.httpchallenge.entrypoint=web", s.certResolverName),
+			// Redirect HTTP -> HTTPS: https://doc.traefik.io/traefik/routing/entrypoints/#redirection
+			"--entrypoints.web.http.redirections.entrypoint.to=websecure",
+			"--entrypoints.web.http.redirections.entrypoint.scheme=https",
 		)
 	}
 	command = append(command, "--api.insecure=true", "--providers.docker", "--providers.docker.swarmmode")
