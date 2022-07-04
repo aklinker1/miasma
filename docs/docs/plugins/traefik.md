@@ -80,13 +80,13 @@ The Traefik plugin can be configured to use HTTPS. Behind the scenes, Traefik is
 
 ```bash:no-line-numbers
 # Make the directory where you're certs will be stored
-mkdir /path/to/certs
+mkdir /root/letsencrypt
 
 # Enable the plugin with required config
 miasma plugins:enable TRAEFIK --plugin-config '{
     "enableHttps": true,
-    "certEmail": "<your-email>",
-    "certsDir": "/path/to/certs"
+    "certsEmail": "<your-email>",
+    "certsDir": "/root/letsencrypt"
 }'
 ```
 
@@ -97,7 +97,7 @@ If you've already enabled the plugin, disable it first and re-enable it with the
 All three fields are required to enable HTTPS.
 
 - `enableHttps` - Self explanitory. Set to `true` to enable HTTPS
-- `certEmail` (required when `enableHttps=true`) - The email you'd like to use for the LetsEncrypt certificates
+- `certsEmail` (required when `enableHttps=true`) - The email you'd like to use for the LetsEncrypt certificates
 - `certsDir` (required when `enableHttps=true`) - The path on your manager node to where you want to store certificates. It must exist and be an absolute path
 
 You don't have to specify any domains. Certs are generated automatically for all domains configured on running apps.

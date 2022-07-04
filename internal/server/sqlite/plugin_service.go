@@ -38,10 +38,10 @@ func (s *PluginService) getTraefikApp(config internal.TraefikConfig) (internal.A
 
 	command := []string{"traefik"}
 	if config.EnableHttps {
-		if config.CertEmail == "" {
+		if config.CertsEmail == "" {
 			return EmptyApp, &server.Error{
 				Code:    server.EINVALID,
-				Message: "Certificate email is missing, did you provide \"certEmail\" in the config?",
+				Message: "Certificate email is missing, did you provide \"certsEmail\" in the config?",
 				Op:      "sqlite.PluginService.traefikApp",
 			}
 		}
@@ -50,7 +50,7 @@ func (s *PluginService) getTraefikApp(config internal.TraefikConfig) (internal.A
 			"--entrypoints.web.address=:80",
 			"--entrypoints.websecure.address=:443",
 			// Use LetsEncrypt to manage certs: https://doc.traefik.io/traefik/https/acme/#configuration-examples
-			fmt.Sprintf("--certificatesresolvers.%s.acme.email=%s", s.certResolverName, config.CertEmail),
+			fmt.Sprintf("--certificatesresolvers.%s.acme.email=%s", s.certResolverName, config.CertsEmail),
 			fmt.Sprintf("--certificatesresolvers.%s.acme.storage=/letsencrypt/acme.json", s.certResolverName),
 			fmt.Sprintf("--certificatesresolvers.%s.acme.httpchallenge.entrypoint=web", s.certResolverName),
 			// Redirect HTTP -> HTTPS: https://doc.traefik.io/traefik/routing/entrypoints/#redirection

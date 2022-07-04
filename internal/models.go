@@ -11,7 +11,7 @@ type RunningContainer struct {
 
 type TraefikConfig struct {
 	EnableHttps bool   `mapstructure:"enableHttps"`
-	CertEmail   string `mapstructure:"certEmail"`
+	CertsEmail  string `mapstructure:"certsEmail"`
 	CertsDir    string `mapstructure:"certsDir"`
 }
 
