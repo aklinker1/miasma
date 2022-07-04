@@ -149,6 +149,16 @@ This runs the Miasma Server in development mode on port `3000`, excluding the we
 
 The app is written with [Go](https://go.dev) and [GQLGen](https://gqlgen.com/).
 
+#### Changing the GraphQL Schema
+
+To make changes to the schema, edit any of the schema files in the `api/` directory, and run:
+
+```bash:no-line-numbers
+make gen
+```
+
+This will regenerate all the GQLGen files and leave implement queries/mutations as `panic("not implemented")`.
+
 ### Web UI
 
 ```bash:no-line-numbers

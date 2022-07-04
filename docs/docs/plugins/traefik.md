@@ -1,18 +1,19 @@
 ---
-title: Traefik Routing
+title: Traefik Ingress Router
 ---
 
-## Enabling
+# Traefik Plugin
 
 [Traefik](https://traefik.io) (pronounced "traffic") is a modern ingress router used to define hostname and path routing. To get started, add the plugin via the CLI:
 
 ```bash:no-line-numbers{1}
 $ miasma plugins:enable TRAEFIK
+
 Enabling TRAEFIK...
 Done!
 ```
 
-You can view Traefik's dashboard at `http://<server-ip>:8080` in a browser.
+You can view Traefik's dashboard at `http://<server-ip>:8080/dashboard/` in a browser.
 
 :::tip
 The Traefik plugin is configured run on the Manager Node (placement of `node.role == manager`).
@@ -31,45 +32,33 @@ Let's say you want to host 4 apps on the `home.io` domain in the following locat
 
 As you can see, we're going to be able to map to the apex domain, subdomains, and even paths.
 
-### Configuring Domain Names
+### DNS Records
 
-You'll need to setup at least one domain name to use the traefik plugin. For this example, it's just `home.io`, but you can add as many domains as you'd like.
-
-If you're hosting Miasma in the cloud, you might already have a domain name. If not, or if you're hosting it inside your local network, you'll need to setup DNS settings to point devices toward your cluster when making requests to the domain name.
-
-- When hosted in the cloud, you'll need to update your DNS settings for your domain
-- When hosted in a local network, you can use any domain name you'd like, and configure the custom DNS record on a device (via the OS's DNS settings) or at the network level (by configuring your router)
-
-Just point your domain names to the IP address of the cluster, and you're good to go. The traefik plugin runs on port 80, so you don't need to specify a port.
-
-Here are the custom DNS mappings you need to setup for this example:
+You'll need to setup some A records to get started.
 
 - `api1.home.io` &rarr; `192.168.1.0`
 - `home.io` &rarr; `192.168.1.0`
 - `web2.home.io` &rarr; `192.168.1.0`
 
+:::tip
+For local networks, some routers include the ability to map hostnames to local IP address.
+:::
+
 ### Setting Up the Routes
 
 From here on, it's easy to setup the routes for our 4 apps using the Misama CLI.
 
-```bash:no-line-numbers{1,4,7,10}
-$ miasma traefik:set -a web-1 --host home.io
-Done!
-
-$ miasma traefik:set -a api-1 --host api1.home.io
-Done!
-
-$ miasma traefik:set -a web-2 --host web2.home.io
-Done!
-
-$ miasma traefik:set -a api-2 --host web2.home.io --path /api
-Done!
+```bash:no-line-numbers
+miasma traefik:set -a web-1 --host home.io
+miasma traefik:set -a api-1 --host api1.home.io
+miasma traefik:set -a web-2 --host web2.home.io
+miasma traefik:set -a api-2 --host web2.home.io --path /api
 ```
 
-And the routes are setup! Give it a minute, and watch the HTTP Routers on the Traefik dashboard (<http://swarm-ip:8080/dashboard/#/http/routers>) to see when they've been registered.
+And the routes are setup! Give it a minute, and watch the HTTP Routers on the Traefik dashboard (`http://<server-ip>:8080/dashboard/#/http/routers`) to see when they've been registered.
 
 :::tip
-After adding or updating routes, Traefik will automatically discover them. This process can take up to 2 minutes, so don't restart the app wondering why the route is not working immediately.
+After adding or updating routes, Traefik will automatically discover them. This process can take up to 2 minutes, so don't restart the apps wondering why their routes aren't working.
 :::
 
 ## HTTPS & TLS Support
