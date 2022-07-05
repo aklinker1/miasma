@@ -19,37 +19,41 @@ const internalGroup = useInternalValue<"group">("group", props, emit);
 </script>
 
 <template>
-  <div class="space-y-2 px-2">
-    <div class="form-control flex-1">
-      <label class="label">
-        <span class="label-text">App Name</span>
+  <div class="space-y-4">
+    <div class="form-control">
+      <label class="input-group">
+        <span>Name</span>
+        <input
+          class="input input-lg input-bordered w-full"
+          :class="{ 'input-error': !internalName.trim() }"
+          v-model="internalName"
+          placeholder="Enter a name..."
+        />
       </label>
-      <input
-        class="input input-lg input-bordered"
-        v-model="internalName"
-        placeholder="Enter a name..."
-      />
     </div>
 
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">Image</span>
-      </label>
-      <input
-        class="input input-bordered w-full"
-        v-model="internalImage"
-        placeholder="Enter an image..."
-      />
-    </div>
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">Group</span>
-      </label>
-      <input
-        class="input input-bordered w-full"
-        v-model="internalGroup"
-        placeholder="Enter a group..."
-      />
+    <div class="flex gap-4">
+      <div class="form-control flex-grow">
+        <label class="input-group">
+          <span>Image</span>
+          <input
+            class="input input-bordered w-full"
+            :class="{ 'input-error': !internalImage.trim() }"
+            v-model="internalImage"
+            placeholder="Enter an image..."
+          />
+        </label>
+      </div>
+      <div class="form-control flex-grow">
+        <label class="input-group">
+          <span>Group</span>
+          <input
+            class="input input-bordered w-full"
+            v-model="internalGroup"
+            placeholder="..."
+          />
+        </label>
+      </div>
     </div>
   </div>
 </template>

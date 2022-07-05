@@ -45,7 +45,12 @@ function saveChanges() {
 </script>
 
 <template>
-  <form @submit.prevent="saveChanges" @reset.prevent="discardChanges">
+  <form
+    @submit.prevent="saveChanges"
+    @reset.prevent="discardChanges"
+    class="space-y-6"
+  >
+    <h1 class="text-xl">App Details</h1>
     <!-- Header -->
     <app-metadata-input
       v-model:name="name"
