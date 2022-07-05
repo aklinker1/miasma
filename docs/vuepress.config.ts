@@ -1,4 +1,10 @@
-import { defaultTheme, defineUserConfig, Page, Plugin } from "vuepress";
+import {
+  defaultTheme,
+  defineUserConfig,
+  HooksExposed,
+  Page,
+  Plugin,
+} from "vuepress";
 import { searchPlugin } from "@vuepress/plugin-search";
 import { execSync } from "child_process";
 import { renderSchema } from "graphql-markdown";
@@ -6,15 +12,17 @@ import { buildSchema, graphql, getIntrospectionQuery } from "graphql";
 import fs from "fs/promises";
 import path from "path";
 
+type App = Parameters<HooksExposed["extendsPage"]>[1];
+
 function generateCodePlugin(): Plugin {
   async function executeTemplate(
     page: Page,
+    app: App,
     variables: Record<string, string>
   ) {
-    for (const [key, value] of Object.entries(variables)) {
-      const templateKey = `{{ ${key} }}`;
-      while (page.contentRendered.includes(templateKey))
-        page.contentRendered = page.contentRendered.replace(templateKey, value);
+    for (const [key, mdValue] of Object.entries(variables)) {
+      page.content = page.content.replace(`{{ ${key} }}`, mdValue);
+      page.contentRendered = app.markdown.render(page.content);
     }
   }
 
@@ -72,12 +80,12 @@ function generateCodePlugin(): Plugin {
 
     async extendsPage(page, app) {
       if (page.path === "/reference/cli.html") {
-        const help = app.markdown.render(await generateCliHelp());
-        await executeTemplate(page, { help });
+        const help = await generateCliHelp();
+        await executeTemplate(page, app, { help });
       }
       if (page.path === "/reference/graphql.html") {
-        const schema = app.markdown.render(await generateGraphqlSchema());
-        await executeTemplate(page, { schema });
+        const schema = await generateGraphqlSchema();
+        await executeTemplate(page, app, { schema });
       }
     },
   };
