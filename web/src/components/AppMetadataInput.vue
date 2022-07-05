@@ -19,7 +19,7 @@ const internalGroup = useInternalValue<"group">("group", props, emit);
 </script>
 
 <template>
-  <div class="space-y-2 p-2">
+  <div class="space-y-2 px-2">
     <div class="form-control flex-1">
       <label class="label">
         <span class="label-text">App Name</span>
