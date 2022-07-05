@@ -12,7 +12,13 @@ const { app } = useAppDetailsQuery(appId);
       <li>Apps</li>
     </ul>
     <ul v-else>
-      <li><router-link to="/apps">Apps</router-link></li>
+      <li>
+        <router-link
+          to="/apps"
+          class="link link-hover opacity-50 hover:opacity-100 active:opacity-100"
+          >Apps</router-link
+        >
+      </li>
       <li class="space-x-2">
         <app-icon :name="app.name" />
         <span>{{ app.name }}</span>
