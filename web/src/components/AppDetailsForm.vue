@@ -48,21 +48,33 @@ function saveChanges() {
   <form
     @submit.prevent="saveChanges"
     @reset.prevent="discardChanges"
-    class="space-y-6"
+    class="space-y-4"
   >
-    <h1 class="text-xl">App Details</h1>
-    <!-- Header -->
+    <!-- Details -->
+    <h2 class="text-xl">App Details</h2>
     <app-metadata-input
       v-model:name="name"
       v-model:image="image"
       v-model:group="group"
       :app="app"
     />
+    <div class="divider" />
 
-    <!-- TODO: Environment Variables -->
-    <!-- TODO: Ports -->
-    <!-- TODO: Volumes -->
-    <!-- TODO: Placement -->
+    <h2 class="text-xl">Networking</h2>
+    <p>TODO - Ports & Routing</p>
+    <div class="divider" />
+
+    <h2 class="text-xl">Environment Variables</h2>
+    <p>TODO</p>
+    <div class="divider" />
+
+    <h2 class="text-xl">Volumes</h2>
+    <p>TODO</p>
+    <div class="divider" />
+
+    <h2 class="text-xl">Placement</h2>
+    <p>TODO</p>
+    <!-- TODO -->
 
     <!-- Save bar -->
     <save-changes-alert

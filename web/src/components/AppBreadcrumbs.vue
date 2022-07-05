@@ -7,7 +7,7 @@ const { app } = useAppDetailsQuery(appId);
 </script>
 
 <template>
-  <div class="text-2xl breadcrumbs mb-8 grow">
+  <div class="text-2xl breadcrumbs grow">
     <ul v-if="!app">
       <li>Apps</li>
     </ul>
