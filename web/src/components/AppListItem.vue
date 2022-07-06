@@ -63,7 +63,7 @@ const { mutate: startApp, loading: startingApp } = useStartAppMutation();
             </label>
             <ul
               tabindex="0"
-              class="dropdown-content menu p-2 shadow bg-base-200 rounded-box w-52"
+              class="dropdown-content menu p-2 shadow bg-base-200 rounded-box min-w-[13rem]"
             >
               <li v-for="link of app.availableAt">
                 <a
