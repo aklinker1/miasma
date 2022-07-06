@@ -5,12 +5,12 @@ const { result } = useNodesQuery();
 </script>
 
 <template>
-  <div class="grid grid-flow-row">
+  <div class="flex gap-8 flex-wrap items-center justify-center">
     <node-grid-item
       v-for="node of result?.nodes"
       :key="node.id"
       :node="node"
-      class="max-w-[20rem]"
+      class="w-[20rem] shrink-0"
     />
   </div>
 </template>

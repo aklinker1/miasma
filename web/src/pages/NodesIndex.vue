@@ -7,5 +7,5 @@
     <add-node />
   </div>
 
-  <node-grid />
+  <node-grid class="p-8" />
 </template>
