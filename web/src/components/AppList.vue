@@ -27,11 +27,7 @@ const groups = computed(() => {
 
 <template>
   <div v-if="result && result.apps" class="space-y-8">
-    <div
-      class="overflow-x-auto w-full shadow-2xl"
-      v-for="[group, apps] of groups"
-      :key="group"
-    >
+    <div class="w-full shadow-2xl" v-for="[group, apps] of groups" :key="group">
       <table class="table w-full">
         <thead>
           <tr>
