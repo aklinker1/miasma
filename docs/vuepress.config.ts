@@ -122,7 +122,11 @@ export default defineUserConfig({
         children: [
           {
             text: "Miasma",
-            children: ["/reference/cli.md", "/reference/graphql.md"],
+            children: [
+              "/reference/server-config.md",
+              "/reference/cli.md",
+              "/reference/graphql.md",
+            ],
           },
         ],
       },
@@ -143,7 +147,11 @@ export default defineUserConfig({
         "/faq.md",
         "/contributing.md",
       ],
-      "/reference/": ["/reference/cli.md", "/reference/graphql.md"],
+      "/reference/": [
+        "/reference/server-config.md",
+        "/reference/cli.md",
+        "/reference/graphql.md",
+      ],
     },
   }),
 });
