@@ -36,6 +36,7 @@ const labels = computed(() => {
           {{ app.name }}
         </router-link>
       </li>
+      <li v-if="node.services.length === 0" class="text-center p-4">Empty</li>
     </ul>
   </div>
 </template>
