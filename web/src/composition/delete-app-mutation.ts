@@ -1,13 +1,13 @@
 import { gql } from "graphql-tag";
-import { useMutation } from "@vue/apollo-composable";
 import { appFragment } from "../utils/apollo-client";
+import { useMutation } from "@vue/apollo-composable";
 import { App } from "./list-apps-query";
 
-export function useStopAppMutation() {
+export function useDeleteAppMutation() {
   return useMutation<{ app: App }, { id: string }>(
     gql`
-      mutation stopApp($id: ID!) {
-        app: stopApp(id: $id) {
+      mutation deleteApp($id: ID!) {
+        app: deleteApp(id: $id) {
           ...AppListApp
         }
       }
