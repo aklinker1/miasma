@@ -49,6 +49,12 @@ type App {
   tag stays the same but the digest changes.
   """
   imageDigest: String!
+  """
+  Whether or not the app should automatically upgrade when a newer version of it's image is available. Defaults to `true` when creating an app
+
+  App upgrades are automatically checked according the the `AUTO_UPDATE_CRON` expression.
+  """
+  autoUpgrade: Boolean!
   "Whether or not the app is returned during regular requests."
   hidden: Boolean!
   "If the app has a route and the traefik plugin is enabled, this is it's config."
@@ -112,6 +118,7 @@ input BoundVolumeInput {
 input AppInput {
   name: String!
   image: String!
+  autoUpgrade: Boolean
   group: String
   hidden: Boolean
   targetPorts: [Int!]

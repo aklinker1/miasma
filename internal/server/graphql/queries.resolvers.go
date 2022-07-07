@@ -44,7 +44,7 @@ func (r *queryResolver) ListPlugins(ctx context.Context) ([]*internal.Plugin, er
 	return safeReturn(lo.ToSlicePtr(plugins), nil, err)
 }
 
-func (r *queryResolver) GetPlugin(ctx context.Context, pluginName string) (*internal.Plugin, error) {
+func (r *queryResolver) GetPlugin(ctx context.Context, pluginName internal.PluginName) (*internal.Plugin, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

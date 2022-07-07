@@ -9,20 +9,27 @@ import (
 	"time"
 )
 
+// Managed application
 type App struct {
 	ID        string    `json:"id"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
-	Name      string    `json:"name"`
+	// The app name. Different from the docker service name, which is the name but lower case and all spaces replaced with dashes
+	Name string `json:"name"`
 	// Whether or not the application is managed by the system. You cannot edit or delete system apps.
-	System bool    `json:"system"`
-	Group  *string `json:"group"`
+	System bool `json:"system"`
+	// A string used to group the app
+	Group *string `json:"group"`
 	// The image and tag the application runs.
 	Image string `json:"image"`
 	// The currently running image digest (hash). Used internally when running
 	// applications instead of the tag because the when a new image is pushed, the
 	// tag stays the same but the digest changes.
 	ImageDigest string `json:"imageDigest"`
+	// Whether or not the app should automatically upgrade when a newer version of it's image is available. Defaults to `true` when creating an app
+	//
+	// App upgrades are automatically checked according the the `AUTO_UPDATE_CRON` expression.
+	AutoUpgrade bool `json:"autoUpgrade"`
 	// Whether or not the app is returned during regular requests.
 	Hidden bool `json:"hidden"`
 	// If the app has a route and the traefik plugin is enabled, this is it's config.
@@ -33,7 +40,7 @@ type App struct {
 	AvailableAt []string `json:"availableAt"`
 	// The environment variables configured for this app.
 	Env map[string]interface{} `json:"env"`
-	// Whether or not the application is running, stopped, or starting up.
+	// Whether or not the application is running, or stopped.
 	Status string `json:"status"`
 	// The number of instances running vs what should be running.
 	Instances *AppInstances `json:"instances"`
@@ -62,12 +69,15 @@ type App struct {
 	// name and docker's internal DNS. Services don't have to be two way; only the
 	// service that accesses the other needs the other network added.
 	Networks []string `json:"networks"`
-	Command  []string `json:"command"`
+	// Custom docker command. This is an array of arguments starting with the binary that is being executed
+	Command []string `json:"command"`
 }
 
+// Input type for [App](#app).
 type AppInput struct {
 	Name           string              `json:"name"`
 	Image          string              `json:"image"`
+	AutoUpgrade    *bool               `json:"autoUpgrade"`
 	Group          *string             `json:"group"`
 	Hidden         *bool               `json:"hidden"`
 	TargetPorts    []int32             `json:"targetPorts"`
@@ -78,11 +88,13 @@ type AppInput struct {
 	Command        []string            `json:"command"`
 }
 
+// Contains information about how many instances of the app are running vs supposed to be running
 type AppInstances struct {
 	Running int32 `json:"running"`
 	Total   int32 `json:"total"`
 }
 
+// Docker volume configuration
 type BoundVolume struct {
 	// The path inside the container that the data is served from.
 	Target string `json:"target"`
@@ -90,19 +102,25 @@ type BoundVolume struct {
 	Source string `json:"source"`
 }
 
+// Input type for [BoundVolume](#boundvolume).
 type BoundVolumeInput struct {
 	Target string `json:"target"`
 	Source string `json:"source"`
 }
 
-// The info about the docker swarm if the host running miasma is apart of one.
+// Contains useful information about the cluster.
 type ClusterInfo struct {
-	ID          string    `json:"id"`
-	JoinCommand string    `json:"joinCommand"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	// The Docker swarm ID
+	ID string `json:"id"`
+	// The command to run on other machines to join the cluster
+	JoinCommand string `json:"joinCommand"`
+	// When the cluster was initialized
+	CreatedAt time.Time `json:"createdAt"`
+	// When the cluster was last updated
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
+// Server health and version information
 type Health struct {
 	// Miasma server's current version.
 	Version string `json:"version"`
@@ -112,43 +130,64 @@ type Health struct {
 	Cluster *ClusterInfo `json:"cluster"`
 }
 
+// Details about a machine in the cluster.
 type Node struct {
-	ID            string                 `json:"id"`
-	Os            string                 `json:"os"`
-	Architecture  string                 `json:"architecture"`
-	Hostname      string                 `json:"hostname"`
-	IP            string                 `json:"ip"`
-	Status        string                 `json:"status"`
-	StatusMessage *string                `json:"statusMessage"`
-	Labels        map[string]interface{} `json:"labels"`
-	Services      []*App                 `json:"services"`
+	// The docker node's ID.
+	ID string `json:"id"`
+	// The OS the node is running
+	Os string `json:"os"`
+	// The CPU architecture of the node. Services are automatically placed on nodes based on their image's supported architectures and the nodes' architectures.
+	Architecture string `json:"architecture"`
+	// The machines hostname, as returned by the `hostname` command.
+	Hostname string `json:"hostname"`
+	// The IP address the node joined the cluster as.
+	IP string `json:"ip"`
+	// `unknown`, `down`, `ready`, or `disconnected`. See Docker's [API docs](https://docs.docker.com/engine/api/v1.41/#operation/NodeInspect).
+	Status string `json:"status"`
+	// The node's status message, usually present when when the status is not `ready`.
+	StatusMessage *string `json:"statusMessage"`
+	// The node's labels, mostly used to place apps on specific nodes.
+	Labels map[string]interface{} `json:"labels"`
+	// List of apps running on the machine
+	Services []*App `json:"services"`
 }
 
+// Plugins are apps with deeper integrations with Miasma.
 type Plugin struct {
 	Name PluginName `json:"name"`
 	// Whether or not the plugin has been enabled.
-	Enabled bool                   `json:"enabled"`
-	Config  map[string]interface{} `json:"config"`
+	Enabled bool `json:"enabled"`
+	// Plugin's configuration.
+	Config map[string]interface{} `json:"config"`
 }
 
+// Rules around where an app can be accessed from.
 type Route struct {
-	AppID       string    `json:"appId"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
-	Host        *string   `json:"host"`
-	Path        *string   `json:"path"`
-	TraefikRule *string   `json:"traefikRule"`
+	AppID     string    `json:"appId"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	// The URL's hostname, ex: 'example.com' or 'google.com'.
+	Host *string `json:"host"`
+	// A custom path at the end of the URL: ex: '/search' or '/console'
+	Path *string `json:"path"`
+	// A custom Traefik rule instead of just a host and path, ex: '(Host(domain1.com) || Host(domain2.com)'
+	//
+	// See [Traefik's docs](https://doc.traefik.io/traefik/routing/routers/#rule) for usage and complex examples.
+	TraefikRule *string `json:"traefikRule"`
 }
 
+// Input type for [Route](#route).
 type RouteInput struct {
 	Host        *string `json:"host"`
 	Path        *string `json:"path"`
 	TraefikRule *string `json:"traefikRule"`
 }
 
+// Unique identifier for plugins
 type PluginName string
 
 const (
+	// The name of the [Traefik](https://doc.traefik.io/traefik/) ingress router plugin
 	PluginNameTraefik PluginName = "TRAEFIK"
 )
 

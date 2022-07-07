@@ -21,7 +21,7 @@ type QueryResolver interface {
 	ListApps(ctx context.Context, page *int32, size *int32, showHidden *bool) ([]*internal.App, error)
 	GetApp(ctx context.Context, id string) (*internal.App, error)
 	ListPlugins(ctx context.Context) ([]*internal.Plugin, error)
-	GetPlugin(ctx context.Context, pluginName string) (*internal.Plugin, error)
+	GetPlugin(ctx context.Context, pluginName internal.PluginName) (*internal.Plugin, error)
 	Nodes(ctx context.Context) ([]*internal.Node, error)
 }
 
@@ -62,10 +62,10 @@ func (ec *executionContext) field_Query_getApp_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_Query_getPlugin_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
+	var arg0 internal.PluginName
 	if tmp, ok := rawArgs["pluginName"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pluginName"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		arg0, err = ec.unmarshalNPluginName2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐPluginName(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -219,6 +219,8 @@ func (ec *executionContext) fieldContext_Query_listApps(ctx context.Context, fie
 				return ec.fieldContext_App_image(ctx, field)
 			case "imageDigest":
 				return ec.fieldContext_App_imageDigest(ctx, field)
+			case "autoUpgrade":
+				return ec.fieldContext_App_autoUpgrade(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
 			case "route":
@@ -318,6 +320,8 @@ func (ec *executionContext) fieldContext_Query_getApp(ctx context.Context, field
 				return ec.fieldContext_App_image(ctx, field)
 			case "imageDigest":
 				return ec.fieldContext_App_imageDigest(ctx, field)
+			case "autoUpgrade":
+				return ec.fieldContext_App_autoUpgrade(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
 			case "route":
@@ -428,7 +432,7 @@ func (ec *executionContext) _Query_getPlugin(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetPlugin(rctx, fc.Args["pluginName"].(string))
+		return ec.resolvers.Query().GetPlugin(rctx, fc.Args["pluginName"].(internal.PluginName))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

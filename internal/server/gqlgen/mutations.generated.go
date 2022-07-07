@@ -313,6 +313,8 @@ func (ec *executionContext) fieldContext_Mutation_createApp(ctx context.Context,
 				return ec.fieldContext_App_image(ctx, field)
 			case "imageDigest":
 				return ec.fieldContext_App_imageDigest(ctx, field)
+			case "autoUpgrade":
+				return ec.fieldContext_App_autoUpgrade(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
 			case "route":
@@ -412,6 +414,8 @@ func (ec *executionContext) fieldContext_Mutation_editApp(ctx context.Context, f
 				return ec.fieldContext_App_image(ctx, field)
 			case "imageDigest":
 				return ec.fieldContext_App_imageDigest(ctx, field)
+			case "autoUpgrade":
+				return ec.fieldContext_App_autoUpgrade(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
 			case "route":
@@ -511,6 +515,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteApp(ctx context.Context,
 				return ec.fieldContext_App_image(ctx, field)
 			case "imageDigest":
 				return ec.fieldContext_App_imageDigest(ctx, field)
+			case "autoUpgrade":
+				return ec.fieldContext_App_autoUpgrade(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
 			case "route":
@@ -610,6 +616,8 @@ func (ec *executionContext) fieldContext_Mutation_startApp(ctx context.Context, 
 				return ec.fieldContext_App_image(ctx, field)
 			case "imageDigest":
 				return ec.fieldContext_App_imageDigest(ctx, field)
+			case "autoUpgrade":
+				return ec.fieldContext_App_autoUpgrade(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
 			case "route":
@@ -709,6 +717,8 @@ func (ec *executionContext) fieldContext_Mutation_stopApp(ctx context.Context, f
 				return ec.fieldContext_App_image(ctx, field)
 			case "imageDigest":
 				return ec.fieldContext_App_imageDigest(ctx, field)
+			case "autoUpgrade":
+				return ec.fieldContext_App_autoUpgrade(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
 			case "route":
@@ -808,6 +818,8 @@ func (ec *executionContext) fieldContext_Mutation_restartApp(ctx context.Context
 				return ec.fieldContext_App_image(ctx, field)
 			case "imageDigest":
 				return ec.fieldContext_App_imageDigest(ctx, field)
+			case "autoUpgrade":
+				return ec.fieldContext_App_autoUpgrade(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
 			case "route":
@@ -907,6 +919,8 @@ func (ec *executionContext) fieldContext_Mutation_upgradeApp(ctx context.Context
 				return ec.fieldContext_App_image(ctx, field)
 			case "imageDigest":
 				return ec.fieldContext_App_imageDigest(ctx, field)
+			case "autoUpgrade":
+				return ec.fieldContext_App_autoUpgrade(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
 			case "route":

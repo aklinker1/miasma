@@ -42,6 +42,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	App struct {
+		AutoUpgrade    func(childComplexity int) int
 		AvailableAt    func(childComplexity int, clusterIPAddress string) int
 		Command        func(childComplexity int) int
 		CreatedAt      func(childComplexity int) int
@@ -123,7 +124,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		GetApp      func(childComplexity int, id string) int
-		GetPlugin   func(childComplexity int, pluginName string) int
+		GetPlugin   func(childComplexity int, pluginName internal.PluginName) int
 		Health      func(childComplexity int) int
 		ListApps    func(childComplexity int, page *int32, size *int32, showHidden *bool) int
 		ListPlugins func(childComplexity int) int
@@ -154,6 +155,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "App.autoUpgrade":
+		if e.complexity.App.AutoUpgrade == nil {
+			break
+		}
+
+		return e.complexity.App.AutoUpgrade(childComplexity), true
 
 	case "App.availableAt":
 		if e.complexity.App.AvailableAt == nil {
@@ -639,7 +647,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetPlugin(childComplexity, args["pluginName"].(string)), true
+		return e.complexity.Query.GetPlugin(childComplexity, args["pluginName"].(internal.PluginName)), true
 
 	case "Query.health":
 		if e.complexity.Query.Health == nil {
@@ -788,15 +796,20 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 
 var sources = []*ast.Source{
 	{Name: "api/models.graphqls", Input: `"""
-The info about the docker swarm if the host running miasma is apart of one.
+Contains useful information about the cluster.
 """
 type ClusterInfo {
+  "The Docker swarm ID"
   id: String!
+  "The command to run on other machines to join the cluster"
   joinCommand: String!
+  "When the cluster was initialized"
   createdAt: Time!
+  "When the cluster was last updated"
   updatedAt: Time!
 }
 
+"Server health and version information"
 type Health {
   "Miasma server's current version."
   version: String!
@@ -806,6 +819,7 @@ type Health {
   cluster: ClusterInfo
 }
 
+"Docker volume configuration"
 type BoundVolume {
   "The path inside the container that the data is served from."
   target: String!
@@ -813,13 +827,16 @@ type BoundVolume {
   source: String!
 }
 
+"Managed application"
 type App {
   id: ID!
   createdAt: Time!
   updatedAt: Time!
+  "The app name. Different from the docker service name, which is the name but lower case and all spaces replaced with dashes"
   name: String!
   "Whether or not the application is managed by the system. You cannot edit or delete system apps."
   system: Boolean!
+  "A string used to group the app"
   group: String
   "The image and tag the application runs."
   image: String!
@@ -829,6 +846,12 @@ type App {
   tag stays the same but the digest changes.
   """
   imageDigest: String!
+  """
+  Whether or not the app should automatically upgrade when a newer version of it's image is available. Defaults to ` + "`" + `true` + "`" + ` when creating an app
+
+  App upgrades are automatically checked according the the ` + "`" + `AUTO_UPDATE_CRON` + "`" + ` expression.
+  """
+  autoUpgrade: Boolean!
   "Whether or not the app is returned during regular requests."
   hidden: Boolean!
   "If the app has a route and the traefik plugin is enabled, this is it's config."
@@ -841,7 +864,7 @@ type App {
   availableAt(clusterIpAddress: String!): [String!]!
   "The environment variables configured for this app."
   env: Map
-  "Whether or not the application is running, stopped, or starting up."
+  "Whether or not the application is running, or stopped."
   status: String!
   "The number of instances running vs what should be running."
   instances: AppInstances!
@@ -878,17 +901,21 @@ type App {
   service that accesses the other needs the other network added.
   """
   networks: [String!]
+  "Custom docker command. This is an array of arguments starting with the binary that is being executed"
   command: [String!]
 }
 
+"Input type for [BoundVolume](#boundvolume)."
 input BoundVolumeInput {
   target: String!
   source: String!
 }
 
+"Input type for [App](#app)."
 input AppInput {
   name: String!
   image: String!
+  autoUpgrade: Boolean
   group: String
   hidden: Boolean
   targetPorts: [Int!]
@@ -899,6 +926,7 @@ input AppInput {
   command: [String!]
 }
 
+"[Changeset](#Changeset) input type for [App](#app)."
 input AppChanges {
   name: String
   image: String
@@ -912,92 +940,153 @@ input AppChanges {
   command: [String!]
 }
 
+"Plugins are apps with deeper integrations with Miasma."
 type Plugin {
   name: PluginName!
   "Whether or not the plugin has been enabled."
   enabled: Boolean!
-  config: Map
+  "Plugin's configuration."
+  config: Map!
 }
 
+"Rules around where an app can be accessed from."
 type Route {
   appId: ID!
   createdAt: Time!
   updatedAt: Time!
+  "The URL's hostname, ex: 'example.com' or 'google.com'."
   host: String
+  "A custom path at the end of the URL: ex: '/search' or '/console'"
   path: String
+  """
+  A custom Traefik rule instead of just a host and path, ex: '(Host(domain1.com) || Host(domain2.com)'
+
+  See [Traefik's docs](https://doc.traefik.io/traefik/routing/routers/#rule) for usage and complex examples.
+  """
   traefikRule: String
 }
 
+"Input type for [Route](#route)."
 input RouteInput {
   host: String
   path: String
   traefikRule: String
 }
 
+"Contains information about how many instances of the app are running vs supposed to be running"
 type AppInstances {
   running: Int!
   total: Int!
 }
 
+"Unique identifier for plugins"
 enum PluginName {
+  "The name of the [Traefik](https://doc.traefik.io/traefik/) ingress router plugin"
   TRAEFIK
 }
 
+"Details about a machine in the cluster."
 type Node {
+  "The docker node's ID."
   id: String!
+  "The OS the node is running"
   os: String!
+  "The CPU architecture of the node. Services are automatically placed on nodes based on their image's supported architectures and the nodes' architectures."
   architecture: String!
+  "The machines hostname, as returned by the ` + "`" + `hostname` + "`" + ` command."
   hostname: String!
+  "The IP address the node joined the cluster as."
   ip: String!
+
+  "` + "`" + `unknown` + "`" + `, ` + "`" + `down` + "`" + `, ` + "`" + `ready` + "`" + `, or ` + "`" + `disconnected` + "`" + `. See Docker's [API docs](https://docs.docker.com/engine/api/v1.41/#operation/NodeInspect)."
   status: String!
+  "The node's status message, usually present when when the status is not ` + "`" + `ready` + "`" + `."
   statusMessage: String
+  "The node's labels, mostly used to place apps on specific nodes."
   labels: Map!
-  services(showHidden: Boolean): [App!]!
+  "List of apps running on the machine"
+  services(
+    "Same as ` + "`" + `listApps` + "`" + `'s argument. When ` + "`" + `true` + "`" + `, hidden apps will be returned"
+    showHidden: Boolean = false
+  ): [App!]!
 }
 `, BuiltIn: false},
 	{Name: "api/mutations.graphqls", Input: `type Mutation {
-  "Create and start a new app"
+  "Create and start a new app."
   createApp(input: AppInput!): App!
-  "Edit app metadata unrelated to how the container(s) that are run"
+  "Edit app configuration."
   editApp(id: ID!, changes: AppChanges!): App!
-  "Stop and delete an app"
+  "Stop and delete an app."
   deleteApp(id: ID!): App!
-  "Start a stopped app"
+  "Start a stopped app."
   startApp(id: ID!): App!
-  "Stop a running app"
+  "Stop a running app."
   stopApp(id: ID!): App!
-  "Stop and restart an app"
+  "Stop and restart an app."
   restartApp(id: ID!): App!
-  "Pull the latest version of the app's image and then restart"
+  "Pull the latest version of the app's image and then restart."
   upgradeApp(id: ID!): App!
 
-  "Enable one of Miasma's plugins"
-  enablePlugin(name: PluginName!, config: Map): Plugin!
-  "Disable one of Miasma's plugins"
-  disablePlugin(name: PluginName!): Plugin!
+  "Enable one of Miasma's plugins."
+  enablePlugin(
+    "The name of the plugin to enable."
+    name: PluginName!
+    "Any plugin specific configuration."
+    config: Map
+  ): Plugin!
+  "Disable one of Miasma's plugins."
+  disablePlugin("The name of the plugin to disable." name: PluginName!): Plugin!
 
-  "Only available when the 'router' plugin is enabled"
-  setAppEnv(appId: ID!, newEnv: Map): Map
+  "Set an app's environnement variables"
+  setAppEnv(
+    appId: ID!
+    "A map of variable names to their values. Docker only supports UPPER_SNAKE_CASE variable names"
+    newEnv: Map
+  ): Map
 
-  "Only available when the 'router' plugin is enabled"
+  """
+  Set's an app's route.
+
+  Only available when the 'router' plugin is enabled
+  """
   setAppRoute(appId: ID!, route: RouteInput): Route
-  "Only available when the 'router' plugin is enabled"
+  """
+  Removes an app's route.
+
+  Only available when the 'router' plugin is enabled
+  """
   removeAppRoute(appId: ID!): Route
 }
 `, BuiltIn: false},
 	{Name: "api/queries.graphqls", Input: `type Query {
+  "Get the server's health and version information"
   health: Health
 
-  listApps(page: Int = 1, size: Int = 10, showHidden: Boolean): [App!]!
+  "List the running apps"
+  listApps(
+    "The page to start at for pagination, the first page is 1."
+    page: Int = 1
+    "Number of apps to return per page."
+    size: Int = 10
+    "Whether or not to includes apps that are marked as hidden."
+    showHidden: Boolean = false
+  ): [App!]!
+  "Grab an app by it's ID"
   getApp(id: ID!): App!
 
+  "List all the available plugins for Miasma"
   listPlugins: [Plugin!]!
-  getPlugin(pluginName: String!): Plugin!
+  "Grab a plugin by it's name"
+  getPlugin(pluginName: PluginName!): Plugin!
 
+  "List the nodes that are apart of the cluster"
   nodes: [Node!]!
 }
 `, BuiltIn: false},
-	{Name: "api/scalars.graphqls", Input: `scalar Map
+	{Name: "api/scalars.graphqls", Input: `"A JSON map of key-value pairs. Values can be any type."
+scalar Map
+
+"ISO 8601 date time string."
 scalar Time
 `, BuiltIn: false},
 }

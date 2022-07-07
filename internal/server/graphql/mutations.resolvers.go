@@ -37,6 +37,7 @@ func (r *mutationResolver) CreateApp(ctx context.Context, input internal.AppInpu
 		Name:           input.Name,
 		Group:          input.Group,
 		Image:          input.Image,
+		AutoUpgrade:    utils.ValueOr(input.AutoUpgrade, true),
 		Hidden:         utils.ValueOr(input.Hidden, false),
 		TargetPorts:    input.TargetPorts,
 		PublishedPorts: input.PublishedPorts,
