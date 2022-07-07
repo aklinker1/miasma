@@ -425,6 +425,50 @@ func (ec *executionContext) fieldContext_App_imageDigest(ctx context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _App_autoUpgrade(ctx context.Context, field graphql.CollectedField, obj *internal.App) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_App_autoUpgrade(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AutoUpgrade, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_App_autoUpgrade(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "App",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _App_hidden(ctx context.Context, field graphql.CollectedField, obj *internal.App) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_App_hidden(ctx, field)
 	if err != nil {
@@ -1902,6 +1946,8 @@ func (ec *executionContext) fieldContext_Node_services(ctx context.Context, fiel
 				return ec.fieldContext_App_image(ctx, field)
 			case "imageDigest":
 				return ec.fieldContext_App_imageDigest(ctx, field)
+			case "autoUpgrade":
+				return ec.fieldContext_App_autoUpgrade(ctx, field)
 			case "hidden":
 				return ec.fieldContext_App_hidden(ctx, field)
 			case "route":
@@ -2055,11 +2101,14 @@ func (ec *executionContext) _Plugin_config(ctx context.Context, field graphql.Co
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
 	res := resTmp.(map[string]interface{})
 	fc.Result = res
-	return ec.marshalOMap2map(ctx, field.Selections, res)
+	return ec.marshalNMap2map(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Plugin_config(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2359,6 +2408,14 @@ func (ec *executionContext) unmarshalInputAppInput(ctx context.Context, obj inte
 			if err != nil {
 				return it, err
 			}
+		case "autoUpgrade":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("autoUpgrade"))
+			it.AutoUpgrade, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "group":
 			var err error
 
@@ -2566,6 +2623,13 @@ func (ec *executionContext) _App(ctx context.Context, sel ast.SelectionSet, obj 
 		case "imageDigest":
 
 			out.Values[i] = ec._App_imageDigest(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "autoUpgrade":
+
+			out.Values[i] = ec._App_autoUpgrade(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
@@ -3029,6 +3093,9 @@ func (ec *executionContext) _Plugin(ctx context.Context, sel ast.SelectionSet, o
 
 			out.Values[i] = ec._Plugin_config(ctx, field, obj)
 
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

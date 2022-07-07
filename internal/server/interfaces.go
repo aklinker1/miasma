@@ -54,6 +54,7 @@ type AppsFilter struct {
 	Name          *string
 	NameContains  *string
 	IncludeHidden *bool
+	AutoUpgrade   *bool
 	Sort          *Sort
 	Pagination    *Pagination
 }

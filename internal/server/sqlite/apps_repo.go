@@ -23,6 +23,7 @@ func findApps(ctx context.Context, tx server.Tx, filter server.AppsFilter) ([]in
 		"system":          &scanned.System,
 		"image":           &scanned.Image,
 		"image_digest":    &scanned.ImageDigest,
+		"auto_upgrade":    &scanned.AutoUpgrade,
 		"hidden":          &scanned.Hidden,
 		"target_ports":    sqlitetypes.Int32Array(&scanned.TargetPorts),
 		"published_ports": sqlitetypes.Int32Array(&scanned.PublishedPorts),
@@ -42,6 +43,9 @@ func findApps(ctx context.Context, tx server.Tx, filter server.AppsFilter) ([]in
 	}
 	if !utils.ValueOr(filter.IncludeHidden, false) {
 		query.Where("(hidden = ? OR hidden IS NULL)", 0)
+	}
+	if filter.AutoUpgrade != nil {
+		query.Where("(auto_upgrade = ?)", *filter.AutoUpgrade)
 	}
 	if filter.Pagination != nil {
 		query.Paginate(*filter.Pagination)
@@ -102,6 +106,7 @@ func createApp(ctx context.Context, tx server.Tx, app internal.App) (internal.Ap
 		"system":          app.System,
 		"image":           app.Image,
 		"image_digest":    app.ImageDigest,
+		"auto_upgrade":    app.AutoUpgrade,
 		"hidden":          app.Hidden,
 		"target_ports":    sqlitetypes.Int32Array(app.TargetPorts),
 		"published_ports": sqlitetypes.Int32Array(app.PublishedPorts),
@@ -124,6 +129,7 @@ func updateApp(ctx context.Context, tx server.Tx, app internal.App) (internal.Ap
 		"system":          app.System,
 		"image":           app.Image,
 		"image_digest":    app.ImageDigest,
+		"auto_upgrade":    app.AutoUpgrade,
 		"hidden":          app.Hidden,
 		"target_ports":    sqlitetypes.Int32Array(app.TargetPorts),
 		"published_ports": sqlitetypes.Int32Array(app.PublishedPorts),
