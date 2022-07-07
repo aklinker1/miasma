@@ -50,3 +50,15 @@ func (*Logger) W(format string, a ...any) {
 func (*Logger) E(format string, a ...any) {
 	Printfln(cReset+cBold+cRed+"[error  ] "+format+cReset, a...)
 }
+
+// Error implements cron.Logger
+func (l *Logger) Error(err error, msg string, keysAndValues ...interface{}) {
+	args := []any{err}
+	args = append(args, keysAndValues...)
+	l.E("[cron] Error: %+v, Message: "+msg, args...)
+}
+
+// Info implements cron.Logger
+func (l *Logger) Info(msg string, keysAndValues ...interface{}) {
+	l.I("[cron] "+msg, keysAndValues...)
+}

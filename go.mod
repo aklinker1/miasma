@@ -13,6 +13,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.12
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/samber/lo v1.21.0
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/viper v1.12.0

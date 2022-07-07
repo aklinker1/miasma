@@ -3,6 +3,10 @@ package main
 import (
 	"os"
 
+	"github.com/robfig/cron/v3"
+	"github.com/samber/lo"
+
+	cron2 "github.com/aklinker1/miasma/internal/server/cron"
 	"github.com/aklinker1/miasma/internal/server/docker"
 	"github.com/aklinker1/miasma/internal/server/fmt"
 	"github.com/aklinker1/miasma/internal/server/graphql"
@@ -19,14 +23,22 @@ var (
 
 // Environment Variables
 var (
-	ACCESS_TOKEN = os.Getenv("ACCESS_TOKEN")
+	ACCESS_TOKEN      = os.Getenv("ACCESS_TOKEN")
+	AUTO_UPGRADE_CRON = os.Getenv("AUTO_UPGRADE_CRON")
 )
 
 // Other constants
 var (
-	databasePath     = "/data/miasma/apps.db"
-	certResolverName = "miasmaresolver"
+	databasePath           = "/data/miasma/apps.db"
+	certResolverName       = "miasmaresolver"
+	defaultAutoUpgradeCron = "@daily"
 )
+
+type scheduledJob struct {
+	name       string
+	expression string
+	job        func()
+}
 
 func main() {
 	logger := &fmt.Logger{}
@@ -56,8 +68,36 @@ func main() {
 		Version:    VERSION,
 		Logger:     logger,
 	}
-
 	server := graphql.NewServer(logger, db, resolver, ACCESS_TOKEN)
 
+	pollingUpdater := cron2.PollingUpgrader{
+		Logger:  logger,
+		Apps:    apps,
+		Runtime: runtime,
+		Routes:  routes,
+		Plugins: plugins,
+		Env:     env,
+	}
+	jobs := []scheduledJob{
+		{
+			name:       "Auto Upgrade",
+			expression: lo.Ternary(AUTO_UPGRADE_CRON == "", defaultAutoUpgradeCron, AUTO_UPGRADE_CRON),
+			job:        pollingUpdater.Cron,
+		},
+	}
+
+	go scheduleJobs(jobs, logger)
 	server.ServeGraphql()
+}
+
+func scheduleJobs(jobs []scheduledJob, logger *fmt.Logger) {
+	c := cron.New(cron.WithChain(
+		cron.Recover(logger),
+	))
+	logger.I("Scheduled Jobs:")
+	lo.ForEach(jobs, func(job scheduledJob, _ int) {
+		c.AddFunc(job.expression, job.job)
+		logger.I(" - %s (%s)", job.name, job.expression)
+	})
+	c.Start()
 }
