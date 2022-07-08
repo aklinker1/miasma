@@ -1,11 +1,5 @@
 name: Publish Server
-on:
-  workflow_dispatch:
-    inputs:
-      newVersion:
-        type: string
-        description: The version to bump to (no 'v' prefix)
-        required: true
+on: [workflow_dispatch]
 
 jobs:
   validate:
@@ -15,7 +9,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [validate]
     outputs:
-      empty: ${{ steps.filtered-changelog.outputs.empty }}
+      skipped: ${{ steps.filtered-changelog.outputs.skipped }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -28,58 +22,48 @@ jobs:
           node-version: 16
 
       - id: changelog
-        name: Conventional Changelog Action
-        uses: TriPSs/conventional-changelog-action@v3
+        name: Generate Changelog
+        uses: ./.github/actions/generate-changelog
         with:
-          github-token: ${{ secrets.github_token }}
-          git-message: "chore(release): Miasma server {version}"
-          output-file: "false"
-          git-push: "false"
-          version-file: "./meta.json"
-          version-path: "serverVersion"
-          skip-version-file: "true"
-          skip-commit: "true"
-
-      - id: filtered-changelog
-        uses: ./.github/actions/filter-changelog
-        with:
-          changelog: ${{ steps.changelog.outputs.clean_changelog }}
+          message: Download via [Docker Hub](https://hub.docker.com/r/aklinker1/miasma)
+          module: Server
           scopes: api, ui
 
       - name: Bump Version
-        if: ${{ steps.filtered-changelog.outputs.empty == 'false' }}
+        if: ${{ steps.changelog.outputs.skipped == 'false' }}
         run: |
           node -p -e "
             const meta = JSON.parse(\`$(cat meta.json)\`);
-            meta.serverVersion = '${{ github.event.inputs.newVersion }}';
+            meta.serverVersion = '${{ steps.changelog.outputs.nextVersion }}';
             JSON.stringify(meta, null, 2);
           " > meta.json
           echo "Updated meta.json:"
           cat ./meta.json
           git add ./meta.json
-          git commit -m "chore(release): server-v${{ github.event.inputs.newVersion }}"
+          git commit -m "chore(release): server-v${{ steps.changelog.outputs.nextVersion }}"
           git push
 
       - name: Create Tag
+        if: ${{ steps.changelog.outputs.skipped == 'false' }}
         run: |
-          git tag "server-v${{ github.event.inputs.newVersion }}"
+          git tag "server-v${{ steps.changelog.outputs.nextVersion }}"
           git push --tags
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
-        if: ${{ steps.filtered-changelog.outputs.empty == 'false' }}
+        if: ${{ steps.changelog.outputs.skipped == 'false' }}
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
         with:
-          tag_name: server-v${{ github.event.inputs.newVersion }}
-          release_name: Server v${{ github.event.inputs.newVersion }}
-          body: ${{ steps.filtered-changelog.outputs.changelog }}
+          tag_name: server-v${{ steps.changelog.outputs.nextVersion }}
+          release_name: Server v${{ steps.changelog.outputs.nextVersion }}
+          body: ${{ steps.changelog.outputs.changelog }}
 
   publish:
     uses: ./.github/workflows/upload-server-to-docker-hub.yml
     needs: [release]
-    if: ${{ needs.release.outputs.empty == 'false' }}
+    if: ${{ needs.release.outputs.skipped == 'false' }}
     with:
-      ref: server-v${{ github.event.inputs.newVersion }}
-      publishTags: --tag aklinker1/miasma:nightly --tag aklinker1/miasma:latest --tag aklinker1/miasma:${{ github.event.inputs.newVersion }}
+      ref: server-v${{ steps.changelog.outputs.nextVersion }}
+      publishTags: --tag aklinker1/miasma:nightly --tag aklinker1/miasma:latest --tag aklinker1/miasma:${{ steps.changelog.outputs.nextVersion }}
     secrets: inherit
