@@ -2,13 +2,13 @@ name: Publish Server
 on: [workflow_dispatch]
 
 jobs:
-  # validate:
-  #   uses: ./.github/workflows/validate.yml
+  validate:
+    uses: ./.github/workflows/validate.yml
 
   release:
     name: Release
     runs-on: ubuntu-22.04
-    # needs: [validate]
+    needs: [validate]
     outputs:
       skipped: ${{ steps.changelog.outputs.skipped }}
       nextVersion: ${{ steps.changelog.outputs.nextVersion }}
