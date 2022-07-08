@@ -38,10 +38,10 @@ For example, `linux/arm64` is published, so if you want to install the server on
    :::details What are all those parameters for?
    - **`-d`**
    - **`--restart unless-stopped`** - Always restart the container (on reboot, crash, etc) until you explicitly call `docker container stop <id>`
-   - **`-v /var/run/docker.sock:/var/run/docker.sock`** - Bind a special volume that lets Miasma talk to the docker daemon running on the host machine so it can do things like start/stop apps 
+   - **`-v /var/run/docker.sock:/var/run/docker.sock`** - Bind a special volume that lets Miasma talk to the docker daemon running on the host machine so it can do things like start/stop apps
    - **`-v $HOME/.miasma:/data/miasma`** - Bind a volume so Miasma can persist it's configuration and remember what apps have been setup if the container is stopped and restarted
    - [`aklinker1/miasma`](https://hub.docker.com/r/aklinker1/miasma) - The name of the docker image to run. To use a different version of the image, include a `:tag` suffix
-   :::
+     :::
 
 And you're server is setup!
 
@@ -61,8 +61,8 @@ Open up the GraphQL playground, `http://<machine-ip>:3000/playground`, and run t
 }
 ```
 
-
 If everything is setup correctly, you should see a response like this:
+
 ```json:no-line-numbers
 {
   "data": {
@@ -77,26 +77,98 @@ If everything is setup correctly, you should see a response like this:
   }
 }
 ```
+
 :::
 
 ### Add More Nodes (Optional)
 
 1. SSH into the machine to add
-  ```bash:no-line-numbers
-  ssh user@<machine-ip>
-  ```
+
+```bash:no-line-numbers
+ssh user@<machine-ip>
+```
+
 2. Install Docker (same as before)
-  ```bash:no-line-numbers
-  curl -fsSL https://get.docker.com -o get-docker.sh
-  sh get-docker.sh
-  ```
+
+```bash:no-line-numbers
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
+```
+
 3. Join the swarm using the join command output during `docker swarm init`
-  ```bash:no-line-numbers
-  docker swarm join --token <some-token> <swarm-ip>:2377
-  ```
+
+```bash:no-line-numbers
+docker swarm join --token <some-token> <swarm-ip>:2377
+```
 
 ## Install the CLI
 
-:::warning TODO
-Right now you have to build the CLI from source. See [contributing docs](/contributing) to get started, then run `make cli BINARY=miasma` to build `miasma` instead of `miasma-dev`
-:::
+<script setup>
+  import { ref, computed, watch } from 'vue';
+
+  const cliVersion = __CLI_VERSION__;
+  const arches = {
+    linux: [
+      { display: 'amd64/x86_64', value: 'x86_64' },
+      { display: 'arm64/aarch64', value: 'aarch64' },
+      { display: 'armv6', value: 'armv6' },
+      { display: 'armv7', value: 'armv7' },
+      { display: 'ppc64le', value: 'ppc64le' },
+      { display: 's390x', value: 's390x' },
+    ],
+    windows: [
+      { display: "amd64/x86_64", value: "x86_64.exe" },
+    ],
+    darwin: [
+      { display: "amd64/x86_64", value: "x86_64" },
+      { display: "arm64/aarch64", value: "aarch64" },
+    ],
+  }
+  const binaries = {
+    linux: "/usr/local/bin/miasma",
+    windows: "C:\\\"Program Files\"\\miasma\\miasma.exe",
+    darwin: "/usr/local/bin/miasma",
+  }
+  
+  const os = ref("linux");
+  const arch = ref("amd64");
+  const archOptions = computed(() => arches[os.value])
+  const binary = computed(() => binaries[os.value])
+
+  watch(os, (newOs) => {
+    arch.value = arches[newOs][0].value
+  }, { immediate: true })
+</script>
+
+The CLI is a standalone binary, so just download the [latest version from GitHub](https://github.com/aklinker1/miasma/releases?q=cli), verify it's checksum, and add it to your path.
+
+<div>
+  <label>
+    <span><strong>OS:{{' '}}</strong></span>
+    <select placeholder="OS" v-model="os">
+      <option value="linux">Linux</option>
+      <option value="darwin">Mac</option>
+      <option value="windows">Windows</option>
+    </select>
+  </label>
+  &emsp;
+  <label>
+    <span><strong>Arch:{{' '}}</strong></span>
+    <select placeholder="Architecture" v-model="arch">
+      <option v-for="o of archOptions" :key="o.value" :value="o.value">{{o.display}}</option>
+    </select>
+  </label>
+</div>
+
+<div class="language-bash ext-sh"><pre class="language-bash"><code><span class="token comment"># Download</span>
+<span class="token function">curl</span> -L -O https://github.com/aklinker1/miasma/releases/download/cli-v{{cliVersion}}/miasma-cli-{{os}}-{{arch}}
+<span class="token function">curl</span> -L -O https://github.com/aklinker1/miasma/releases/download/cli-v{{cliVersion}}/miasma-cli-{{os}}-{{arch}}.sha256
+<span></span>
+<span class="token comment"># Verify</span>
+<span>sha256sum --check miasma-cli-{{os}}-{{arch}}.sha256</span>
+<span></span>
+<span class="token comment"># Add to Path</span>
+<span class="token function">mv</span> miasma-cli-{{os}}-{{arch}} {{binary}}
+</code></pre></div>
+
+To upgrade to a newer version of the CLI, just run the same commands again using the newer version's tag.
