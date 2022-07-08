@@ -121,8 +121,9 @@ jobs:
 
       - name: Output Checksum
         run: sha256sum --binary "$FILE" > "$FILE".sha256
+        working-directory: bin
         env:
-          FILE: bin/miasma-cli-${{ matrix.filename }}
+          FILE: miasma-cli-${{ matrix.filename }}
 
       - name: Upload Binary
         uses: actions/upload-release-asset@v1
