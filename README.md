@@ -1,5 +1,5 @@
 <h1 align="center">Miasma</h1>
-<p align="center"><i>A Heroku-like, docker based PaaS with cluster and ARM support</i><p>
+<p align="center"><i>A Heroku-like, docker based, open source PaaS with cluster and ARM support</i><p>
 
 ![Miasma Web UI](./.github/assets/ui.png)
 
@@ -20,10 +20,10 @@
 
 #### Huh? What does that even mean?
 
-- Deploy apps from a CLI similar to Heroku (UI coming soon)
-- Apps are ran in Docker Swarm as docker containers
-- You can add as many nodes/devices as you want to form a cluster
-- The `aklinker1/miasma` docker image is published with ARM support
+- Deploy and manage apps from a CLI or UI (work in progress), similar to Heroku
+- Apps are based off Docker images and ran in Docker Swarm
+- You can add as many nodes as you want to form a cluster
+- The [`aklinker1/miasma`](https://hub.docker.com/r/aklinker1/miasma) docker image is published with ARM support
 
 #### What makes Miasma unique?
 
