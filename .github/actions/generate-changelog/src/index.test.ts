@@ -80,7 +80,7 @@ test("Example Server Changelog", async () => {
         hash: "6789",
       }),
     ],
-    ["cli-v0.5.0", "server-v1.1.0"]
+    ["cli-v0.5.0", "server-v1.0.0", "server-v1.1.0"]
   );
 
   await generateChangelog();

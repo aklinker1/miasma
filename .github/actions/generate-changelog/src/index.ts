@@ -16,12 +16,16 @@ export async function generateChangelog() {
   const git = simpleGit();
 
   const { module, scopes, message } = getInputs();
+  console.log({ module, scopes, message });
 
   const prevTag = await getPrevTag(git, module);
+  console.log(`Previous tag: ${prevTag}`);
   let commits: LogResult;
   if (!prevTag) {
+    console.log(`Getting all commits`);
     commits = await git.log();
   } else {
+    console.log(`Getting commits since previous tag`);
     commits = await git.log({ from: prevTag, to: "HEAD" });
   }
   const relevantCommits = commits.all.filter(filterRelevantCommits(scopes));
@@ -38,10 +42,13 @@ export async function generateChangelog() {
     if (
       commit.message.startsWith("feat") &&
       commit.body.includes("BREAKING CHANGE")
-    )
+    ) {
       changelog.breakingChanges.push(commit);
-    else if (commit.message.startsWith("feat")) changelog.features.push(commit);
-    else changelog.fixes.push(commit);
+    } else if (commit.message.startsWith("feat")) {
+      changelog.features.push(commit);
+    } else {
+      changelog.fixes.push(commit);
+    }
   }
 
   setOutputs(changelog);
@@ -98,9 +105,17 @@ function setOutputs(changelog: Changelog) {
       ...changelog.fixes.reverse().map(formatCommit)
     );
   }
-  setOutput("changelog", lines.join("\n").trim());
+
+  const changelogText = lines.join("\n").trim();
+  const nextVersion = getNextVersion(changelog);
+
+  console.log("Changelog:");
+  console.log(changelogText);
+  console.log("Next version:");
+  console.log(nextVersion);
+  setOutput("changelog", changelogText);
   setOutput("skipped", false);
-  setOutput("nextVersion", getNextTag(changelog));
+  setOutput("nextVersion", nextVersion);
 }
 
 function filterRelevantCommits(scopes: string[]) {
@@ -118,17 +133,23 @@ async function getPrevTag(
   git: SimpleGit,
   module: string
 ): Promise<string | undefined> {
-  const tags = await git.tags();
-  return tags.all.find((tag) => tag.startsWith(`${getTagPrefix(module)}-v`));
+  const tags = (await git.tags()).all.reverse();
+  console.log("Tags:", tags);
+  return tags.find((tag) => tag.startsWith(`${getTagPrefix(module)}-v`));
 }
 
-function getNextTag(changelog: Changelog): string {
-  if (!changelog.prevTag) return "1.0.0";
+function getNextVersion(changelog: Changelog): string {
+  if (!changelog.prevTag) {
+    console.log("No previous tag, using 1.0.0");
+    return "1.0.0";
+  }
 
   let [major, minor, patch] = changelog.prevTag
     .replace(`${getTagPrefix(changelog.module)}-v`, "")
     .split(".")
     .map(Number);
+  console.log(`Previous version: ${major}.${minor}.${patch}`);
+
   if (changelog.breakingChanges.length > 0) {
     major++;
   } else if (changelog.features.length > 0) {

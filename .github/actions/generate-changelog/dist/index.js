@@ -7180,12 +7180,16 @@ function generateChangelog() {
     return __awaiter(this, void 0, void 0, function* () {
         const git = (0, simple_git_1.simpleGit)();
         const { module, scopes, message } = getInputs();
+        console.log({ module, scopes, message });
         const prevTag = yield getPrevTag(git, module);
+        console.log(`Previous tag: ${prevTag}`);
         let commits;
         if (!prevTag) {
+            console.log(`Getting all commits`);
             commits = yield git.log();
         }
         else {
+            console.log(`Getting commits since previous tag`);
             commits = yield git.log({ from: prevTag, to: "HEAD" });
         }
         const relevantCommits = commits.all.filter(filterRelevantCommits(scopes));
@@ -7199,12 +7203,15 @@ function generateChangelog() {
         };
         for (const commit of relevantCommits) {
             if (commit.message.startsWith("feat") &&
-                commit.body.includes("BREAKING CHANGE"))
+                commit.body.includes("BREAKING CHANGE")) {
                 changelog.breakingChanges.push(commit);
-            else if (commit.message.startsWith("feat"))
+            }
+            else if (commit.message.startsWith("feat")) {
                 changelog.features.push(commit);
-            else
+            }
+            else {
                 changelog.fixes.push(commit);
+            }
         }
         setOutputs(changelog);
     });
@@ -7242,9 +7249,15 @@ function setOutputs(changelog) {
     if (changelog.fixes.length > 0) {
         lines.push("", "### Fixes", "", ...changelog.fixes.reverse().map(formatCommit));
     }
-    (0, core_1.setOutput)("changelog", lines.join("\n").trim());
+    const changelogText = lines.join("\n").trim();
+    const nextVersion = getNextVersion(changelog);
+    console.log("Changelog:");
+    console.log(changelogText);
+    console.log("Next version:");
+    console.log(nextVersion);
+    (0, core_1.setOutput)("changelog", changelogText);
     (0, core_1.setOutput)("skipped", false);
-    (0, core_1.setOutput)("nextVersion", `${getTagPrefix(changelog.module)}-v${getNextTag(changelog)}`);
+    (0, core_1.setOutput)("nextVersion", nextVersion);
 }
 function filterRelevantCommits(scopes) {
     const regex = new RegExp(`^(feat!?|fix)\\((${scopes.join("|")})\\)`, "m");
@@ -7257,17 +7270,21 @@ function getTagPrefix(module) {
 }
 function getPrevTag(git, module) {
     return __awaiter(this, void 0, void 0, function* () {
-        const tags = yield git.tags();
-        return tags.all.find((tag) => tag.startsWith(`${getTagPrefix(module)}-v`));
+        const tags = (yield git.tags()).all.reverse();
+        console.log("Tags:", tags);
+        return tags.find((tag) => tag.startsWith(`${getTagPrefix(module)}-v`));
     });
 }
-function getNextTag(changelog) {
-    if (!changelog.prevTag)
+function getNextVersion(changelog) {
+    if (!changelog.prevTag) {
+        console.log("No previous tag, using 1.0.0");
         return "1.0.0";
+    }
     let [major, minor, patch] = changelog.prevTag
         .replace(`${getTagPrefix(changelog.module)}-v`, "")
         .split(".")
         .map(Number);
+    console.log(`Previous version: ${major}.${minor}.${patch}`);
     if (changelog.breakingChanges.length > 0) {
         major++;
     }
