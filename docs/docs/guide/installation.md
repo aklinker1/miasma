@@ -168,7 +168,8 @@ The CLI is a standalone binary, so just download the [latest version from GitHub
 <span>sha256sum --check miasma-cli-{{os}}-{{arch}}.sha256</span>
 <span></span>
 <span class="token comment"># Add to Path</span>
-<span class="token function">mv</span> miasma-cli-{{os}}-{{arch}} {{binary}}
+<span class="token function">sudo mv</span> miasma-cli-{{os}}-{{arch}} {{binary}}
+<template v-if="os !== 'windows'"><span class="token function">sudo chmod</span> +x {{binary}}</template>
 </code></pre></div>
 
 To upgrade to a newer version of the CLI, just run the same commands again using the newer version's tag.
