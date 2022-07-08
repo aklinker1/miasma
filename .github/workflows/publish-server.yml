@@ -9,7 +9,8 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [validate]
     outputs:
-      skipped: ${{ steps.filtered-changelog.outputs.skipped }}
+      skipped: ${{ steps.changelog.outputs.skipped }}
+      nextVersion: ${{ steps.changelog.outputs.nextVersion }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -64,6 +65,6 @@ jobs:
     needs: [release]
     if: ${{ needs.release.outputs.skipped == 'false' }}
     with:
-      ref: server-v${{ steps.changelog.outputs.nextVersion }}
-      publishTags: --tag aklinker1/miasma:nightly --tag aklinker1/miasma:latest --tag aklinker1/miasma:${{ steps.changelog.outputs.nextVersion }}
+      ref: server-v${{ needs.release.outputs.nextVersion }}
+      publishTags: --tag aklinker1/miasma:nightly --tag aklinker1/miasma:latest --tag aklinker1/miasma:${{ needs.release.outputs.nextVersion }}
     secrets: inherit
