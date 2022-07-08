@@ -1,0 +1,145 @@
+name: Publish CLI
+on: [workflow_dispatch]
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    uses: ./.github/workflows/validate.yml
+
+  release:
+    name: Release
+    runs-on: ubuntu-22.04
+    needs: [validate]
+    outputs:
+      skipped: ${{ steps.changelog.outputs.skipped }}
+      nextVersion: ${{ steps.changelog.outputs.nextVersion }}
+      releaseUrl: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - id: changelog
+        name: Generate Changelog
+        uses: ./.github/actions/generate-changelog
+        with:
+          module: CLI
+          scopes: cli
+
+      - name: Bump Version
+        if: ${{ steps.changelog.outputs.skipped == 'false' }}
+        run: |
+          node -p -e "
+            const meta = JSON.parse(\`$(cat meta.json)\`);
+            meta.cliVersion = '${{ steps.changelog.outputs.nextVersion }}';
+            JSON.stringify(meta, null, 2);
+          " > meta.json
+          echo "Updated meta.json:"
+          cat ./meta.json
+          git config --global user.email "changelog.action@github.com"
+          git config --global user.name "Changelog Action"
+          git add ./meta.json
+          git commit -m "chore(release): cli-v${{ steps.changelog.outputs.nextVersion }}"
+          git push
+
+      - name: Create Tag
+        if: ${{ steps.changelog.outputs.skipped == 'false' }}
+        run: |
+          git tag "cli-v${{ steps.changelog.outputs.nextVersion }}"
+          git push --tags
+
+      - id: create_release
+        name: Create GitHub Release
+        uses: actions/create-release@v1
+        if: ${{ steps.changelog.outputs.skipped == 'false' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        with:
+          tag_name: cli-v${{ steps.changelog.outputs.nextVersion }}
+          release_name: CLI v${{ steps.changelog.outputs.nextVersion }}
+          body: ${{ steps.changelog.outputs.changelog }}
+
+  publish:
+    name: Publish
+    needs: [release]
+    if: ${{ needs.release.outputs.skipped == 'false' }}
+    strategy:
+      matrix:
+        include:
+          # Based off of: https://github.com/docker/compose/releases, and `go tool dist list`
+          - filename: darwin-aarch64
+            goos: darwin
+            goarch: arm64
+          - filename: darwin-x86_64
+            goos: darwin
+            goarch: amd64
+          - filename: linux-aarch64
+            goos: linux
+            goarch: arm64
+          - filename: linux-armv6
+            goos: linux
+            goarch: arm
+            goarm: "6"
+          - filename: linux-armv7
+            goos: linux
+            goarch: arm
+            goarm: "7"
+          - filename: linux-ppc64le
+            goos: linux
+            goarch: ppc64le
+          - filename: linux-s390x
+            goos: linux
+            goarch: s390x
+          - filename: linux-x86_64
+            goos: linux
+            goarch: amd64
+          - filename: windows-x86_64.exe
+            goos: windows
+            goarch: amd64
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          ref: cli-v${{ needs.release.outputs.nextVersion }}
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.18
+
+      - name: Build Binary
+        run: make build-cli
+        env:
+          CLI_OUTPUT: bin/miasma-cli-${{ matrix.filename }}
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          GOARM: ${{ matrix.goarm }}
+
+      - name: Output Checksum
+        run: sha256sum --binary "$FILE" > "$FILE".sha256
+        env:
+          FILE: bin/miasma-cli-${{ matrix.filename }}
+
+      - name: Upload Binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.releaseUrl }}
+          asset_path: ./bin/miasma-cli-${{ matrix.filename }}
+          asset_name: miasma-cli-${{ matrix.filename }}
+          asset_content_type: application/octet-stream
+
+      - name: Upload Checksum
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.releaseUrl }}
+          asset_path: ./bin/miasma-cli-${{ matrix.filename }}.sha256
+          asset_name: miasma-cli-${{ matrix.filename }}.sha256
+          asset_content_type: text/plain

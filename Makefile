@@ -8,6 +8,7 @@ DATA_DIR=$(shell pwd)/data/database
 
 PUBLISH_TAGS ?= --tag aklinker1/miasma:nightly
 BINARY ?= miasma-dev
+CLI_OUTPUT ?= bin/cli
 
 # Build the production docker image
 build:
@@ -62,12 +63,15 @@ ui:
 	@cd web && pnpm dev
 
 # Compile the CLI and install it to $GOPATH
-cli:
+build-cli:
 	@go build \
 		-ldflags "-X ${BUILD_VAR_PATH}.VERSION=${CLI_VERSION} -X ${BUILD_VAR_PATH}.BUILD=${BUILD} -X ${BUILD_VAR_PATH}.BUILD_HASH=${BUILD_HASH} -X ${BUILD_VAR_PATH}.BUILD_DATE=${BUILD_DATE}" \
-		-o bin/cli \
+		-o "${CLI_OUTPUT}" \
 		cmd/cli/main.go
-	@cp bin/cli "${GOPATH}/bin/${BINARY}"
+
+# Compile the CLI and install it to $GOPATH
+cli: build-cli
+	@cp "${CLI_OUTPUT}" "${GOPATH}/bin/${BINARY}"
 
 # Run just the docs website in dev mode
 doc:
