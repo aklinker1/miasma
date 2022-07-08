@@ -1,0 +1,22 @@
+name: Generate Changelog
+description: Generate changelog for a module based on its previous tag and included scopes
+inputs:
+  module:
+    description: The name of the component/module being published. It's tag will be it's name, but in lower-camel-case characters.
+    required: true
+  message:
+    description: Text shown at the top of the changelog before the breaking changes, features, and fixes.
+    required: true
+  scopes:
+    description: Comma separated list of scopes to filter the changelog down to
+    required: true
+outputs:
+  changelog:
+    description: The filtered changelog
+  skipped:
+    description: Will be set to true when the generated changelog includes no fixes or features
+  nextVersion:
+    description: The suggested next version based on the changes
+runs:
+  using: node16
+  main: dist/index.js
