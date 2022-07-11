@@ -20,7 +20,10 @@ const labels = computed(() => {
         {{ node.hostname }}
       </p>
       <p class="text-sm uppercase">
-        {{ node.ip }}&ensp;&bull;&ensp;{{ node.os }} {{ node.architecture }}
+        {{ node.ip }}&ensp;<span class="opacity-30">&bull;</span>&ensp;{{
+          node.os
+        }}
+        {{ node.architecture }}
       </p>
       <p class="space-x-2">
         <span v-for="label of labels" :key="label" class="badge font-medium">
@@ -29,14 +32,19 @@ const labels = computed(() => {
       </p>
     </div>
 
-    <ul class="menu rounded-box p-2">
+    <div
+      v-if="node.services.length === 0"
+      class="h-full p-2 min-h-12 flex box-content"
+    >
+      <p class="text-center opacity-50 m-auto">0 apps</p>
+    </div>
+    <ul v-else class="menu rounded-box p-2">
       <li v-for="app of node.services" :key="app.id">
         <router-link :to="`/apps/${app.id}`">
           <app-icon class="w-6 h-6" :name="app.name" />
           {{ app.name }}
         </router-link>
       </li>
-      <li v-if="node.services.length === 0" class="text-center p-4">Empty</li>
     </ul>
   </div>
 </template>
