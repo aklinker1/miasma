@@ -5,7 +5,7 @@ const { result, loading, error } = useNodesQuery();
 </script>
 
 <template>
-  <div class="flex gap-8 flex-wrap justify-center">
+  <div class="node-grid">
     <!-- Loading -->
     <div v-if="loading && result == null" class="loading m-8" />
 
@@ -18,8 +18,15 @@ const { result, loading, error } = useNodesQuery();
         v-for="node of result?.nodes"
         :key="node.id"
         :node="node"
-        class="w-[20rem] shrink-0"
       />
     </template>
   </div>
 </template>
+
+<style scoped>
+.node-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: 2rem;
+}
+</style>
