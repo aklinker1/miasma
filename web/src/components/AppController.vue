@@ -84,9 +84,11 @@ const isUpdating = computed(
         :key="link"
         class="text-ellipsis overflow-hidden"
       >
-        <a class="link hover:link-primary w-full" :href="link" target="_blank"
-          ><i-mdi-open-in-new class="shrink-0" />
-          {{ link.replace(/https?:\/\//, "") }}</a
+        <a
+          class="link hover:link-primary w-full"
+          :href="link"
+          target="_blank"
+          >{{ link.replace(/https?:\/\//, "") }}</a
         >
       </li>
       <div class="divider-horizontal" />
