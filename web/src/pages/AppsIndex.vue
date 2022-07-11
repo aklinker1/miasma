@@ -1,5 +1,5 @@
 <template>
-  <div class="flex">
+  <div class="flex gap-8">
     <app-breadcrumbs />
 
     <create-app />
