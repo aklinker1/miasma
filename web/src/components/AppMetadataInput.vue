@@ -49,7 +49,7 @@ const internalGroup = useInternalValue<"group">("group", props, emit);
         <input
           class="input input-bordered focus:input-primary w-full"
           v-model="internalGroup"
-          placeholder="..."
+          placeholder=""
         />
       </label>
     </div>
