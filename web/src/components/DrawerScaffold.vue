@@ -29,7 +29,7 @@ defineProps<{
         </div>
       </div>
 
-      <div class="w-full max-w-screen-lg mx-auto p-8">
+      <div class="w-full max-w-screen-lg mx-auto p-8 space-y-8">
         <slot name="content" />
       </div>
     </div>
