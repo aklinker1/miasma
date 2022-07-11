@@ -23,7 +23,7 @@ defineProps<{
         </div>
         <div class="flex-none">
           <button
-            class="btn btn-sm btn-primary text-primary-content"
+            class="btn btn-primary text-primary-content"
             :class="{
               'opacity-0': isSaving,
             }"
@@ -34,7 +34,7 @@ defineProps<{
           </button>
           <button
             type="submit"
-            class="btn btn-sm"
+            class="btn btn"
             :class="{ loading: isSaving }"
             :disabled="isSaving"
           >
