@@ -20,10 +20,10 @@ const internalGroup = useInternalValue<"group">("group", props, emit);
 
 <template>
   <div class="form-control">
-    <label class="input-group">
-      <span>Name</span>
+    <label class="input-group group">
+      <span class="group-focus-within:text-primary">Name</span>
       <input
-        class="input input-lg input-bordered w-full"
+        class="input input-lg input-bordered focus:input-primary w-full"
         :class="{ 'input-error': !internalName.trim() }"
         v-model="internalName"
         placeholder="Enter a name..."
@@ -33,10 +33,10 @@ const internalGroup = useInternalValue<"group">("group", props, emit);
 
   <div class="flex gap-4">
     <div class="form-control flex-grow">
-      <label class="input-group">
-        <span>Image</span>
+      <label class="input-group group">
+        <span class="group-focus-within:text-primary">Image</span>
         <input
-          class="input input-bordered w-full"
+          class="input input-bordered focus:input-primary w-full"
           :class="{ 'input-error': !internalImage.trim() }"
           v-model="internalImage"
           placeholder="Enter an image..."
@@ -44,10 +44,10 @@ const internalGroup = useInternalValue<"group">("group", props, emit);
       </label>
     </div>
     <div class="form-control flex-grow">
-      <label class="input-group">
-        <span>Group</span>
+      <label class="input-group group">
+        <span class="group-focus-within:text-primary">Group</span>
         <input
-          class="input input-bordered w-full"
+          class="input input-bordered focus:input-primary w-full"
           v-model="internalGroup"
           placeholder="..."
         />
