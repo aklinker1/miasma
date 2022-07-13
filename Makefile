@@ -37,6 +37,7 @@ preview: build
 
 # Run the GraphQL API in dev mode
 run:
+	@touch .env
 	@docker build . -f Dockerfile.dev \
 		-t aklinker1/miasma:local \
 		--build-arg VERSION="${SERVER_VERSION}" \
