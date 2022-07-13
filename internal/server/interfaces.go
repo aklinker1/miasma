@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/aklinker1/miasma/internal"
 )
@@ -106,6 +107,11 @@ type ListServicesFilter struct {
 	NodeID *string
 }
 
+type GetAppLogsArgs struct {
+	App   internal.App
+	After time.Time
+}
+
 // RuntimeService defines how the server runs the apps
 type RuntimeService interface {
 	// Start the app
@@ -125,6 +131,7 @@ type RuntimeService interface {
 	RestartRunningApps(ctx context.Context, params []StartAppParams) error
 	ListNodes(ctx context.Context) ([]internal.Node, error)
 	ListServices(ctx context.Context, filter ListServicesFilter) ([]internal.RunningContainer, error)
+	GetAppLogs(ctx context.Context, args GetAppLogsArgs) ([]internal.Log, error)
 }
 
 type RoutesFilter struct {

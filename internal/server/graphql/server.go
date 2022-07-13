@@ -82,10 +82,9 @@ func (s *graphqlServer) ServeGraphql() error {
 
 func (s *graphqlServer) createGraphqlHandler() *handler.Server {
 	// Define the server
-	es := gqlgen.NewExecutableSchema(gqlgen.Config{
+	srv := handler.NewDefaultServer(gqlgen.NewExecutableSchema(gqlgen.Config{
 		Resolvers: s.resolver,
-	})
-	srv := handler.NewDefaultServer(es)
+	}))
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.POST{})
 

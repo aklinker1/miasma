@@ -6,6 +6,7 @@ package graphql
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
@@ -37,6 +38,18 @@ func (r *queryResolver) GetApp(ctx context.Context, id string) (*internal.App, e
 		ID: &id,
 	})
 	return safeReturn(&app, nil, err)
+}
+
+func (r *queryResolver) GetAppLogs(ctx context.Context, id string, after time.Time) ([]*internal.Log, error) {
+	app, err := r.Apps.FindApp(ctx, server.AppsFilter{ID: &id})
+	if err != nil {
+		return nil, err
+	}
+	logs, err := r.Runtime.GetAppLogs(ctx, server.GetAppLogsArgs{
+		App:   app,
+		After: after,
+	})
+	return safeReturn(lo.ToSlicePtr(logs), nil, err)
 }
 
 func (r *queryResolver) ListPlugins(ctx context.Context) ([]*internal.Plugin, error) {

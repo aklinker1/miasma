@@ -576,3 +576,39 @@ func (s *RuntimeService) ListServices(ctx context.Context, filter server.ListSer
 	}
 	return finalTasks, nil
 }
+
+func (s *RuntimeService) GetAppLogs(ctx context.Context, args server.GetAppLogsArgs) ([]internal.Log, error) {
+	s.logger.D("Getting for logs from %s after %v", args.App.Name, args.After)
+	service, err := s.getExistingService(ctx, args.App, false)
+	if err != nil {
+		return nil, err
+	}
+	stream, err := s.client.ServiceLogs(ctx, service.ID, types.ContainerLogsOptions{
+		Since:      fmt.Sprint(args.After.Unix()),
+		ShowStdout: true,
+		ShowStderr: true,
+	})
+	if err != nil {
+		return nil, err
+	}
+	defer stream.Close()
+
+	logs := []internal.Log{}
+	reader := bufio.NewReader(stream)
+	for {
+		line, err := reader.ReadString('\n')
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		line = strings.TrimSuffix(line, "\n")
+		line = strings.ReplaceAll(line, "\u0000", "")
+		line = strings.ReplaceAll(line, "\u0001", "")
+		logs = append(logs, internal.Log{
+			Message: line,
+		})
+	}
+	return logs, nil
+}

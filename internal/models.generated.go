@@ -130,6 +130,10 @@ type Health struct {
 	Cluster *ClusterInfo `json:"cluster"`
 }
 
+type Log struct {
+	Message string `json:"message"`
+}
+
 // Details about a machine in the cluster.
 type Node struct {
 	// The docker node's ID.

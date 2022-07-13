@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
@@ -89,6 +90,10 @@ type ComplexityRoot struct {
 		Version       func(childComplexity int) int
 	}
 
+	Log struct {
+		Message func(childComplexity int) int
+	}
+
 	Mutation struct {
 		CreateApp      func(childComplexity int, input internal.AppInput) int
 		DeleteApp      func(childComplexity int, id string) int
@@ -124,6 +129,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		GetApp      func(childComplexity int, id string) int
+		GetAppLogs  func(childComplexity int, id string, after time.Time) int
 		GetPlugin   func(childComplexity int, pluginName internal.PluginName) int
 		Health      func(childComplexity int) int
 		ListApps    func(childComplexity int, page *int32, size *int32, showHidden *bool) int
@@ -392,6 +398,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Health.Version(childComplexity), true
 
+	case "Log.message":
+		if e.complexity.Log.Message == nil {
+			break
+		}
+
+		return e.complexity.Log.Message(childComplexity), true
+
 	case "Mutation.createApp":
 		if e.complexity.Mutation.CreateApp == nil {
 			break
@@ -636,6 +649,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetApp(childComplexity, args["id"].(string)), true
+
+	case "Query.getAppLogs":
+		if e.complexity.Query.GetAppLogs == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getAppLogs_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetAppLogs(childComplexity, args["id"].(string), args["after"].(time.Time)), true
 
 	case "Query.getPlugin":
 		if e.complexity.Query.GetPlugin == nil {
@@ -1010,6 +1035,11 @@ type Node {
     showHidden: Boolean = false
   ): [App!]!
 }
+
+type Log {
+  # timestamp: Time!
+  message: String!
+}
 `, BuiltIn: false},
 	{Name: "api/mutations.graphqls", Input: `type Mutation {
   "Create and start a new app."
@@ -1073,6 +1103,9 @@ type Node {
   ): [App!]!
   "Grab an app by it's ID"
   getApp(id: ID!): App!
+
+  "List an app's logs after a specific time"
+  getAppLogs(id: ID!, after: Time!): [Log!]!
 
   "List all the available plugins for Miasma"
   listPlugins: [Plugin!]!

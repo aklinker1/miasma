@@ -14,6 +14,9 @@ type Query {
   "Grab an app by it's ID"
   getApp(id: ID!): App!
 
+  "List an app's logs after a specific time"
+  getAppLogs(id: ID!, after: Time!): [Log!]!
+
   "List all the available plugins for Miasma"
   listPlugins: [Plugin!]!
   "Grab a plugin by it's name"
