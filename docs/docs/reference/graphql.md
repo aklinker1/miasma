@@ -4,7 +4,7 @@ title: GraphQL API
 
 # GraphQL API
 
-The Miasma server ships with a GraphQL API for accessing and editing apps. Once you're server has been started, you can access it at:
+The Miasma server ships with a GraphQL API for accessing and editing apps. Once your server has been started, you can access it at:
 
 `http://<server-ip>:3000/graphql`
 
