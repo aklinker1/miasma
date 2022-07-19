@@ -83,4 +83,4 @@ The app is up and running with a single CLI command!
 - See more complex, common [example apps](/guide/examples)
 - Learn about [plugins](/plugins)
 - Checkout the [CLI reference](/reference/cli) for advanced usage
-- Setup a server that [requires authorization](/authorization)
+- Enable [authorization](/authorization)
