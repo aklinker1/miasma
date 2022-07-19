@@ -157,7 +157,7 @@ To make changes to the schema, edit any of the schema files in the `api/` direct
 make gen
 ```
 
-This will regenerate all the GQLGen files and leave implement queries/mutations as `panic("not implemented")`.
+This will regenerate all the GQLGen files and leave queries/mutations as `panic("not implemented")`.
 
 ### Web UI
 
