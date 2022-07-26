@@ -31,6 +31,9 @@ func (s *runtimeTaskRepo) GetAll(ctx context.Context, filter server.RuntimeTasks
 	if filter.NodeID != nil {
 		filterArgs = append(filterArgs, filters.KeyValuePair{Key: "node", Value: *filter.NodeID})
 	}
+	if filter.State != nil {
+		filterArgs = append(filterArgs, filters.KeyValuePair{Key: "desired-state", Value: string(*filter.State)})
+	}
 	tasks, err := s.client.TaskList(ctx, types.TaskListOptions{
 		Filters: filters.NewArgs(filterArgs...),
 	})

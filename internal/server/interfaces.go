@@ -107,6 +107,7 @@ type RuntimeImageRepo interface {
 
 type RuntimeTasksFilter struct {
 	NodeID *string
+	State  *DesiredTaskState
 }
 type RuntimeTaskRepo interface {
 	GetAll(ctx context.Context, filter RuntimeTasksFilter) ([]internal.RunningContainer, error)
