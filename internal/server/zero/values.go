@@ -13,6 +13,8 @@ var (
 	SwarmService       = swarm.Service{}
 	SwarmNode          = swarm.Node{}
 	SwarmTask          = swarm.Task{}
+	SwarmServiceSpec   = swarm.ServiceSpec{}
 	AppInstances       = internal.AppInstances{}
 	RuntimeServiceSpec = server.RuntimeServiceSpec{}
+	RuntimeService     = server.RuntimeService{}
 )

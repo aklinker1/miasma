@@ -83,15 +83,16 @@ type RuntimeRepo interface {
 }
 
 type RuntimeServicesFilter struct {
-	AppID  *string
-	NodeID *string
+	ID            *string
+	AppID         *string
+	IncludeStatus bool
 }
 type RuntimeServiceRepo interface {
 	GetAll(ctx context.Context, filter RuntimeServicesFilter) ([]RuntimeService, error)
 	GetOne(ctx context.Context, filter RuntimeServicesFilter) (RuntimeService, error)
-	Create(ctx context.Context, service RuntimeServiceSpec) (RuntimeService, error)
+	Create(ctx context.Context, service RuntimeServiceSpec) error
 	Update(ctx context.Context, serviceID string, newService RuntimeServiceSpec) (RuntimeService, error)
-	Delete(ctx context.Context, service RuntimeService) (RuntimeService, error)
+	Remove(ctx context.Context, service RuntimeService) (RuntimeService, error)
 }
 
 type RuntimeNodesFilter struct {
@@ -105,7 +106,8 @@ type RuntimeImageRepo interface {
 }
 
 type RuntimeTasksFilter struct {
+	NodeID *string
 }
 type RuntimeTaskRepo interface {
-	GetAll(ctx context.Context, filter RuntimeTasksFilter) ([]swarm.Node, error)
+	GetAll(ctx context.Context, filter RuntimeTasksFilter) ([]internal.RunningContainer, error)
 }

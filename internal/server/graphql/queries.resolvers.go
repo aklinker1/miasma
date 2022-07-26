@@ -21,7 +21,7 @@ func (r *queryResolver) Health(ctx context.Context) (*internal.Health, error) {
 }
 
 func (r *queryResolver) ListApps(ctx context.Context, page *int, size *int, showHidden *bool) ([]*internal.App, error) {
-	apps, err := inTx(ctx, r.DB.ReadonlyTx, nil, func(tx server.Tx) ([]internal.App, error) {
+	apps, err := utils.InTx(ctx, r.DB.ReadonlyTx, nil, func(tx server.Tx) ([]internal.App, error) {
 		return r.AppRepo.GetAll(ctx, tx, server.AppsFilter{
 			IncludeHidden: showHidden,
 			Pagination: &server.Pagination{
@@ -30,37 +30,37 @@ func (r *queryResolver) ListApps(ctx context.Context, page *int, size *int, show
 			},
 		})
 	})
-	return safeReturn(lo.ToSlicePtr(apps), nil, err)
+	return utils.SafeReturn(lo.ToSlicePtr(apps), nil, err)
 }
 
 func (r *queryResolver) GetApp(ctx context.Context, id string) (*internal.App, error) {
-	app, err := inTx(ctx, r.DB.ReadonlyTx, zero.App, func(tx server.Tx) (internal.App, error) {
+	app, err := utils.InTx(ctx, r.DB.ReadonlyTx, zero.App, func(tx server.Tx) (internal.App, error) {
 		return r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
 			ID: &id,
 		})
 	})
-	return safeReturn(&app, nil, err)
+	return utils.SafeReturn(&app, nil, err)
 }
 
 func (r *queryResolver) ListPlugins(ctx context.Context) ([]*internal.Plugin, error) {
-	plugins, err := inTx(ctx, r.DB.ReadonlyTx, nil, func(tx server.Tx) ([]internal.Plugin, error) {
+	plugins, err := utils.InTx(ctx, r.DB.ReadonlyTx, nil, func(tx server.Tx) ([]internal.Plugin, error) {
 		return r.PluginRepo.GetAll(ctx, tx, server.PluginsFilter{})
 	})
-	return safeReturn(lo.ToSlicePtr(plugins), nil, err)
+	return utils.SafeReturn(lo.ToSlicePtr(plugins), nil, err)
 }
 
 func (r *queryResolver) GetPlugin(ctx context.Context, name internal.PluginName) (*internal.Plugin, error) {
-	plugin, err := inTx(ctx, r.DB.ReadonlyTx, zero.Plugin, func(tx server.Tx) (internal.Plugin, error) {
+	plugin, err := utils.InTx(ctx, r.DB.ReadonlyTx, zero.Plugin, func(tx server.Tx) (internal.Plugin, error) {
 		return r.PluginRepo.GetOne(ctx, tx, server.PluginsFilter{
 			Name: &name,
 		})
 	})
-	return safeReturn(&plugin, nil, err)
+	return utils.SafeReturn(&plugin, nil, err)
 }
 
 func (r *queryResolver) Nodes(ctx context.Context) ([]*internal.Node, error) {
 	nodes, err := r.RuntimeNodeRepo.GetAll(ctx, server.RuntimeNodesFilter{})
-	return safeReturn(lo.ToSlicePtr(nodes), nil, err)
+	return utils.SafeReturn(lo.ToSlicePtr(nodes), nil, err)
 }
 
 // Query returns gqlgen.QueryResolver implementation.

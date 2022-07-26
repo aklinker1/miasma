@@ -16,12 +16,12 @@ import (
 )
 
 func (r *appResolver) Route(ctx context.Context, obj *internal.App) (*internal.Route, error) {
-	route, err := r.getAppRoute(ctx, obj)
+	route, err := r.AppService.GetAppRoute(ctx, obj)
 	return route, err
 }
 
 func (r *appResolver) SimpleRoute(ctx context.Context, obj *internal.App) (*string, error) {
-	route, err := r.getAppRoute(ctx, obj)
+	route, err := r.AppService.GetAppRoute(ctx, obj)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func (r *appResolver) SimpleRoute(ctx context.Context, obj *internal.App) (*stri
 		return nil, nil
 	}
 
-	traefik, err := inTx(ctx, r.DB.ReadonlyTx, zero.Plugin, func(tx server.Tx) (internal.Plugin, error) {
+	traefik, err := utils.InTx(ctx, r.DB.ReadonlyTx, zero.Plugin, func(tx server.Tx) (internal.Plugin, error) {
 		return r.PluginRepo.GetTraefik(ctx, tx)
 	})
 	if err != nil {
@@ -69,14 +69,14 @@ func (r *appResolver) AvailableAt(ctx context.Context, obj *internal.App, cluste
 }
 
 func (r *appResolver) Env(ctx context.Context, obj *internal.App) (map[string]interface{}, error) {
-	env, err := inTx(ctx, r.DB.ReadonlyTx, nil, func(tx server.Tx) (internal.EnvMap, error) {
+	env, err := utils.InTx(ctx, r.DB.ReadonlyTx, nil, func(tx server.Tx) (internal.EnvMap, error) {
 		return r.EnvRepo.Get(ctx, tx, server.EnvFilter{AppID: &obj.ID})
 	})
-	return safeReturn(utils.ToAnyMap(env), nil, err)
+	return utils.SafeReturn(utils.ToAnyMap(env), nil, err)
 }
 
 func (r *appResolver) Status(ctx context.Context, obj *internal.App) (internal.RuntimeStatus, error) {
-	return r.getAppStatus(ctx, *obj)
+	return r.AppService.GetAppStatus(ctx, *obj)
 }
 
 func (r *appResolver) Instances(ctx context.Context, obj *internal.App) (*internal.AppInstances, error) {
@@ -113,14 +113,14 @@ func (r *healthResolver) Cluster(ctx context.Context, obj *internal.Health) (*in
 }
 
 func (r *nodeResolver) Services(ctx context.Context, obj *internal.Node, showHidden *bool) ([]*internal.App, error) {
-	services, err := r.RuntimeServiceRepo.GetAll(ctx, server.RuntimeServicesFilter{
+	services, err := r.RuntimeTaskRepo.GetAll(ctx, server.RuntimeTasksFilter{
 		NodeID: &obj.ID,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	return inTx(ctx, r.DB.ReadonlyTx, nil, func(tx server.Tx) ([]*internal.App, error) {
+	return utils.InTx(ctx, r.DB.ReadonlyTx, nil, func(tx server.Tx) ([]*internal.App, error) {
 		apps := []*internal.App{}
 		for _, service := range services {
 			fmt.Println(service)

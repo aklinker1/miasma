@@ -6,10 +6,12 @@ import (
 	"github.com/robfig/cron/v3"
 	"github.com/samber/lo"
 
+	"github.com/aklinker1/miasma/internal/server"
 	cron2 "github.com/aklinker1/miasma/internal/server/cron"
 	"github.com/aklinker1/miasma/internal/server/docker"
 	"github.com/aklinker1/miasma/internal/server/fmt"
 	"github.com/aklinker1/miasma/internal/server/graphql"
+	"github.com/aklinker1/miasma/internal/server/services"
 	"github.com/aklinker1/miasma/internal/server/sqlite"
 )
 
@@ -43,40 +45,85 @@ type scheduledJob struct {
 func main() {
 	logger := &fmt.Logger{}
 
-	db := sqlite.NewDB(databasePath, logger)
+	db := sqlite.NewDB(databasePath, logger.Scoped("db"))
 	err := db.Open()
 	if err != nil {
 		logger.E("Failed to open database: %v", err)
 		os.Exit(1)
 	}
 
-	runtime, err := docker.NewRuntimeService(logger, certResolverName)
-	apps := sqlite.NewAppService(db, runtime, logger)
-	env := sqlite.NewEnvService(db, runtime, logger)
-	routes := sqlite.NewRouteService(db, logger)
-	plugins := sqlite.NewPluginService(db, apps, runtime, logger, certResolverName)
+	dockerClient, err := docker.NewDefaultClient()
 	if err != nil {
 		logger.E("Failed to initialize docker runtime: %v", err)
 		os.Exit(1)
 	}
-	resolver := &graphql.Resolver{
-		Apps:       apps,
-		Routes:     routes,
-		EnvService: env,
-		Plugins:    plugins,
-		Runtime:    runtime,
-		Version:    VERSION,
-		Logger:     logger,
+
+	panic(server.NewNotImplementedError("Implement repos"))
+	var appRepo server.AppRepo
+	var envRepo server.EnvRepo
+	var routeRepo server.RouteRepo
+	var pluginRepo server.PluginRepo
+	var runtimeRepo server.RuntimeRepo
+	var runtimeServiceRepo server.RuntimeServiceRepo
+	var runtimeImageRepo server.RuntimeImageRepo
+	var runtimeNodeRepo server.RuntimeNodeRepo
+	var runtimeTaskRepo server.RuntimeTaskRepo
+
+	appService := &services.AppService{
+		DB:                 db,
+		Logger:             logger.Scoped("app-service"),
+		AppRepo:            appRepo,
+		RouteRepo:          routeRepo,
+		EnvRepo:            envRepo,
+		PluginRepo:         pluginRepo,
+		RuntimeServiceRepo: runtimeServiceRepo,
 	}
-	server := graphql.NewServer(logger, db, resolver, ACCESS_TOKEN)
+	runtimeService := &services.RuntimeService{
+		DB:                 db,
+		Logger:             logger.Scoped("runtime-service"),
+		AppRepo:            appRepo,
+		RouteRepo:          routeRepo,
+		EnvRepo:            envRepo,
+		PluginRepo:         pluginRepo,
+		RuntimeServiceRepo: runtimeServiceRepo,
+		AppService:         appService,
+	}
+	pluginService := &services.PluginService{
+		DB:               db,
+		Logger:           logger.Scoped("plugin-service"),
+		PluginRepo:       pluginRepo,
+		CertResolverName: certResolverName,
+		RuntimeService:   runtimeService,
+	}
+
+	resolver := &graphql.Resolver{
+		Version: VERSION,
+		DB:      db,
+		Logger:  logger.Scoped("resolver"),
+
+		AppRepo:            appRepo,
+		RouteRepo:          routeRepo,
+		EnvRepo:            envRepo,
+		PluginRepo:         pluginRepo,
+		RuntimeServiceRepo: runtimeServiceRepo,
+		RuntimeRepo:        runtimeRepo,
+		RuntimeNodeRepo:    runtimeNodeRepo,
+		RuntimeTaskRepo:    runtimeTaskRepo,
+		RuntimeImageRepo:   runtimeImageRepo,
+
+		AppService:     appService,
+		PluginService:  pluginService,
+		RuntimeService: runtimeService,
+	}
+	server := graphql.NewServer(logger.Scoped("gql-server"), db, resolver, ACCESS_TOKEN)
 
 	pollingUpdater := cron2.PollingUpgrader{
-		Logger:  logger,
-		Apps:    apps,
-		Runtime: runtime,
-		Routes:  routes,
-		Plugins: plugins,
-		Env:     env,
+		DB:               db,
+		Logger:           logger.Scoped("polling-upgrader"),
+		AppRepo:          appRepo,
+		RuntimeImageRepo: runtimeImageRepo,
+		PluginRepo:       pluginRepo,
+		RuntimeService:   runtimeService,
 	}
 	jobs := []scheduledJob{
 		{
@@ -92,7 +139,7 @@ func main() {
 
 func scheduleJobs(jobs []scheduledJob, logger *fmt.Logger) {
 	c := cron.New(cron.WithChain(
-		cron.Recover(logger),
+		cron.Recover(logger.Scoped("cron")),
 	))
 	logger.I("Scheduled Jobs:")
 	lo.ForEach(jobs, func(job scheduledJob, _ int) {

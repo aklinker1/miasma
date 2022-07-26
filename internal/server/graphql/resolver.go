@@ -1,11 +1,17 @@
 package graphql
 
-import "github.com/aklinker1/miasma/internal/server"
+import (
+	"github.com/aklinker1/miasma/internal/server"
+	"github.com/aklinker1/miasma/internal/server/services"
+)
 
 //go:generate go run github.com/99designs/gqlgen generate
 
 type Resolver struct {
-	DB                 server.DB
+	Version string
+	DB      server.DB
+	Logger  server.Logger
+
 	AppRepo            server.AppRepo
 	PluginRepo         server.PluginRepo
 	EnvRepo            server.EnvRepo
@@ -15,7 +21,8 @@ type Resolver struct {
 	RuntimeNodeRepo    server.RuntimeNodeRepo
 	RuntimeTaskRepo    server.RuntimeTaskRepo
 	RuntimeImageRepo   server.RuntimeImageRepo
-	Logger             server.Logger
-	Version            string
-	CertResolverName   string
+
+	AppService     *services.AppService
+	PluginService  *services.PluginService
+	RuntimeService *services.RuntimeService
 }

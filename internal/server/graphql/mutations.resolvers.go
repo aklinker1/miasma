@@ -10,6 +10,7 @@ import (
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
 	"github.com/aklinker1/miasma/internal/server/gqlgen"
+	"github.com/aklinker1/miasma/internal/server/services"
 	"github.com/aklinker1/miasma/internal/server/zero"
 	"github.com/aklinker1/miasma/internal/utils"
 	"github.com/samber/lo"
@@ -49,7 +50,7 @@ func (r *mutationResolver) CreateApp(ctx context.Context, input internal.AppInpu
 	}
 	newApp.ImageDigest = newDigest
 
-	created, err := inTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
+	created, err := utils.InTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
 		// Save the app
 		created, err := r.AppRepo.Create(ctx, tx, newApp)
 		if err != nil {
@@ -57,16 +58,16 @@ func (r *mutationResolver) CreateApp(ctx context.Context, input internal.AppInpu
 		}
 
 		// Start the app
-		err = r.startApp(ctx, tx, partialRuntimeServiceSpec{
-			app: created,
+		err = r.RuntimeService.StartApp(ctx, tx, services.PartialRuntimeServiceSpec{
+			App: created,
 		})
 		return created, err
 	})
-	return safeReturn(&created, nil, err)
+	return utils.SafeReturn(&created, nil, err)
 }
 
 func (r *mutationResolver) EditApp(ctx context.Context, id string, changes map[string]interface{}) (*internal.App, error) {
-	updated, err := inTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
+	updated, err := utils.InTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
 		// Apply changes
 		newApp, err := r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
 			ID: &id,
@@ -95,15 +96,15 @@ func (r *mutationResolver) EditApp(ctx context.Context, id string, changes map[s
 		}
 
 		// Restart the app
-		return updated, r.restartAppIfRunning(ctx, tx, partialRuntimeServiceSpec{
-			app: updated,
+		return updated, r.RuntimeService.RestartAppIfRunning(ctx, tx, services.PartialRuntimeServiceSpec{
+			App: updated,
 		})
 	})
-	return safeReturn(&updated, nil, err)
+	return utils.SafeReturn(&updated, nil, err)
 }
 
 func (r *mutationResolver) DeleteApp(ctx context.Context, id string) (*internal.App, error) {
-	deleted, err := inTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
+	deleted, err := utils.InTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
 		app, err := r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
 			ID: &id,
 		})
@@ -114,60 +115,60 @@ func (r *mutationResolver) DeleteApp(ctx context.Context, id string) (*internal.
 		if err != nil {
 			return zero.App, err
 		}
-		return deleted, r.stopApp(ctx, tx, partialRuntimeServiceSpec{
-			app: deleted,
+		return deleted, r.RuntimeService.StopApp(ctx, tx, services.PartialRuntimeServiceSpec{
+			App: deleted,
 		})
 	})
-	return safeReturn(&deleted, nil, err)
+	return utils.SafeReturn(&deleted, nil, err)
 }
 
 func (r *mutationResolver) StartApp(ctx context.Context, id string) (*internal.App, error) {
-	app, err := inTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
+	app, err := utils.InTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
 		app, err := r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
 			ID: &id,
 		})
 		if err != nil {
 			return zero.App, err
 		}
-		return app, r.startApp(ctx, tx, partialRuntimeServiceSpec{
-			app: app,
+		return app, r.RuntimeService.StartApp(ctx, tx, services.PartialRuntimeServiceSpec{
+			App: app,
 		})
 	})
-	return safeReturn(&app, nil, err)
+	return utils.SafeReturn(&app, nil, err)
 }
 
 func (r *mutationResolver) StopApp(ctx context.Context, id string) (*internal.App, error) {
-	app, err := inTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
+	app, err := utils.InTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
 		app, err := r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
 			ID: &id,
 		})
 		if err != nil {
 			return zero.App, err
 		}
-		return app, r.stopApp(ctx, tx, partialRuntimeServiceSpec{
-			app: app,
+		return app, r.RuntimeService.StopApp(ctx, tx, services.PartialRuntimeServiceSpec{
+			App: app,
 		})
 	})
-	return safeReturn(&app, nil, err)
+	return utils.SafeReturn(&app, nil, err)
 }
 
 func (r *mutationResolver) RestartApp(ctx context.Context, id string) (*internal.App, error) {
-	app, err := inTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
+	app, err := utils.InTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
 		app, err := r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
 			ID: &id,
 		})
 		if err != nil {
 			return zero.App, err
 		}
-		return app, r.restartApp(ctx, tx, partialRuntimeServiceSpec{
-			app: app,
+		return app, r.RuntimeService.RestartApp(ctx, tx, services.PartialRuntimeServiceSpec{
+			App: app,
 		})
 	})
-	return safeReturn(&app, nil, err)
+	return utils.SafeReturn(&app, nil, err)
 }
 
 func (r *mutationResolver) UpgradeApp(ctx context.Context, id string) (*internal.App, error) {
-	upgraded, err := inTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
+	upgraded, err := utils.InTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
 		// Grab the old digest
 		app, err := r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
 			ID: &id,
@@ -194,28 +195,28 @@ func (r *mutationResolver) UpgradeApp(ctx context.Context, id string) (*internal
 		}
 
 		// Restart the app
-		return upgraded, r.restartAppIfRunning(ctx, tx, partialRuntimeServiceSpec{
-			app: upgraded,
+		return upgraded, r.RuntimeService.RestartAppIfRunning(ctx, tx, services.PartialRuntimeServiceSpec{
+			App: upgraded,
 		})
 	})
-	return safeReturn(&upgraded, nil, err)
+	return utils.SafeReturn(&upgraded, nil, err)
 }
 
 func (r *mutationResolver) EnablePlugin(ctx context.Context, name internal.PluginName, config map[string]interface{}) (*internal.Plugin, error) {
-	enabled, err := r.togglePlugin(ctx, true, name, config)
-	return safeReturn(&enabled, nil, err)
+	enabled, err := r.PluginService.TogglePlugin(ctx, true, name, config)
+	return utils.SafeReturn(&enabled, nil, err)
 }
 
 func (r *mutationResolver) DisablePlugin(ctx context.Context, name internal.PluginName) (*internal.Plugin, error) {
-	disabled, err := r.togglePlugin(ctx, false, name, map[string]any{})
-	return safeReturn(&disabled, nil, err)
+	disabled, err := r.PluginService.TogglePlugin(ctx, false, name, map[string]any{})
+	return utils.SafeReturn(&disabled, nil, err)
 }
 
 func (r *mutationResolver) SetAppEnv(ctx context.Context, appID string, newEnv map[string]interface{}) (map[string]interface{}, error) {
-	created, err := inTx(ctx, r.DB.ReadWriteTx, nil, func(tx server.Tx) (internal.EnvMap, error) {
+	created, err := utils.InTx(ctx, r.DB.ReadWriteTx, nil, func(tx server.Tx) (internal.EnvMap, error) {
 		return r.EnvRepo.Set(ctx, tx, appID, utils.ToEnvMap(newEnv))
 	})
-	return safeReturn(utils.ToAnyMap(created), nil, err)
+	return utils.SafeReturn(utils.ToAnyMap(created), nil, err)
 }
 
 func (r *mutationResolver) SetAppRoute(ctx context.Context, appID string, route *internal.RouteInput) (*internal.Route, error) {
@@ -224,7 +225,7 @@ func (r *mutationResolver) SetAppRoute(ctx context.Context, appID string, route 
 		return nil, err
 	}
 
-	updated, err := inTx(ctx, r.DB.ReadWriteTx, zero.Route, func(tx server.Tx) (internal.Route, error) {
+	updated, err := utils.InTx(ctx, r.DB.ReadWriteTx, zero.Route, func(tx server.Tx) (internal.Route, error) {
 		existing, err := r.RouteRepo.GetOne(ctx, tx, server.RoutesFilter{
 			AppID: &appID,
 		})
@@ -258,11 +259,11 @@ func (r *mutationResolver) SetAppRoute(ctx context.Context, appID string, route 
 		return r.RouteRepo.Update(ctx, tx, existing)
 	})
 
-	return safeReturn(&updated, nil, err)
+	return utils.SafeReturn(&updated, nil, err)
 }
 
 func (r *mutationResolver) RemoveAppRoute(ctx context.Context, appID string) (*internal.Route, error) {
-	return inTx(ctx, r.DB.ReadWriteTx, nil, func(tx server.Tx) (*internal.Route, error) {
+	return utils.InTx(ctx, r.DB.ReadWriteTx, nil, func(tx server.Tx) (*internal.Route, error) {
 		route, err := r.RouteRepo.GetOne(ctx, tx, server.RoutesFilter{
 			AppID: &appID,
 		})
@@ -272,7 +273,7 @@ func (r *mutationResolver) RemoveAppRoute(ctx context.Context, appID string) (*i
 			return &zero.Route, err
 		}
 		deleted, err := r.RouteRepo.Delete(ctx, tx, route)
-		return safeReturn(&deleted, nil, err)
+		return utils.SafeReturn(&deleted, nil, err)
 	})
 }
 

@@ -1,33 +1,36 @@
-package graphql
+package services
 
 import (
 	"context"
-	"strings"
 
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
 	"github.com/aklinker1/miasma/internal/server/zero"
 )
 
-func isSwarmNotInitializedError(err error) bool {
-	if err == nil {
-		return false
-	}
-	return strings.Contains(err.Error(), "This node is not a swarm manager")
+type RuntimeService struct {
+	DB                 server.DB
+	Logger             server.Logger
+	AppRepo            server.AppRepo
+	RouteRepo          server.RouteRepo
+	EnvRepo            server.EnvRepo
+	PluginRepo         server.PluginRepo
+	RuntimeServiceRepo server.RuntimeServiceRepo
+	AppService         *AppService
 }
 
 // Struct containing all the required data to "start" and app. Only include the data you already know
-type partialRuntimeServiceSpec struct {
-	app        internal.App
-	hasPlugins bool
-	plugins    []internal.Plugin
-	hasEnv     bool
-	env        internal.EnvMap
-	hasRoute   bool
-	route      *internal.Route
+type PartialRuntimeServiceSpec struct {
+	App        internal.App
+	HasPlugins bool
+	Plugins    []internal.Plugin
+	HasEnv     bool
+	Env        internal.EnvMap
+	HasRoute   bool
+	Route      *internal.Route
 }
 
-func (r *Resolver) startApp(ctx context.Context, tx server.Tx, partialInput partialRuntimeServiceSpec) error {
+func (r *RuntimeService) StartApp(ctx context.Context, tx server.Tx, partialInput PartialRuntimeServiceSpec) error {
 	spec, err := r.getRuntimeServiceSpec(ctx, tx, partialInput)
 	if err != nil {
 		return err
@@ -36,9 +39,9 @@ func (r *Resolver) startApp(ctx context.Context, tx server.Tx, partialInput part
 	return err
 }
 
-func (r *Resolver) stopApp(ctx context.Context, tx server.Tx, partialInput partialRuntimeServiceSpec) error {
+func (r *RuntimeService) StopApp(ctx context.Context, tx server.Tx, partialInput PartialRuntimeServiceSpec) error {
 	existing, err := r.RuntimeServiceRepo.GetOne(ctx, server.RuntimeServicesFilter{
-		AppID: &partialInput.app.ID,
+		AppID: &partialInput.App.ID,
 	})
 	if server.ErrorCode(err) == server.ENOTFOUND {
 		r.Logger.W("Stopping service that is already stopped")
@@ -51,10 +54,10 @@ func (r *Resolver) stopApp(ctx context.Context, tx server.Tx, partialInput parti
 	return err
 }
 
-func (r *Resolver) restartApp(ctx context.Context, tx server.Tx, partialInput partialRuntimeServiceSpec) error {
+func (r *RuntimeService) RestartApp(ctx context.Context, tx server.Tx, partialInput PartialRuntimeServiceSpec) error {
 	// Stop
 	existing, err := r.RuntimeServiceRepo.GetOne(ctx, server.RuntimeServicesFilter{
-		AppID: &partialInput.app.ID,
+		AppID: &partialInput.App.ID,
 	})
 	if server.ErrorCode(err) == server.ENOTFOUND {
 		r.Logger.W("Restarting service that is already stopped")
@@ -76,29 +79,29 @@ func (r *Resolver) restartApp(ctx context.Context, tx server.Tx, partialInput pa
 	return err
 }
 
-func (r *Resolver) restartAppIfRunning(ctx context.Context, tx server.Tx, partialInput partialRuntimeServiceSpec) error {
-	status, err := r.getAppStatus(ctx, partialInput.app)
+func (r *RuntimeService) RestartAppIfRunning(ctx context.Context, tx server.Tx, partialInput PartialRuntimeServiceSpec) error {
+	status, err := r.AppService.GetAppStatus(ctx, partialInput.App)
 	if err != nil {
 		return err
 	}
 	if status == internal.RuntimeStatusRunning {
-		return r.restartApp(ctx, tx, partialInput)
+		return r.RestartApp(ctx, tx, partialInput)
 	}
 	return nil
 }
 
-func (r *Resolver) getRuntimeServiceSpec(
+func (r *RuntimeService) getRuntimeServiceSpec(
 	ctx context.Context,
 	tx server.Tx,
-	partial partialRuntimeServiceSpec,
+	partial PartialRuntimeServiceSpec,
 ) (server.RuntimeServiceSpec, error) {
 	data := server.RuntimeServiceSpec{
-		App: partial.app,
+		App: partial.App,
 	}
 
 	// Env
-	if partial.hasEnv {
-		data.Env = partial.env
+	if partial.HasEnv {
+		data.Env = partial.Env
 	} else {
 		env, err := r.EnvRepo.Get(ctx, tx, server.EnvFilter{
 			AppID: &data.App.ID,
@@ -110,8 +113,8 @@ func (r *Resolver) getRuntimeServiceSpec(
 	}
 
 	// Route
-	if partial.hasRoute {
-		data.Route = partial.route
+	if partial.HasRoute {
+		data.Route = partial.Route
 	} else {
 		route, err := r.RouteRepo.GetOne(ctx, tx, server.RoutesFilter{
 			AppID: &data.App.ID,
@@ -126,8 +129,8 @@ func (r *Resolver) getRuntimeServiceSpec(
 	}
 
 	// Plugins
-	if partial.hasPlugins {
-		data.Plugins = partial.plugins
+	if partial.HasPlugins {
+		data.Plugins = partial.Plugins
 	} else {
 		plugins, err := r.PluginRepo.GetAll(ctx, tx, server.PluginsFilter{})
 		if err != nil {
@@ -139,7 +142,7 @@ func (r *Resolver) getRuntimeServiceSpec(
 	return data, nil
 }
 
-func (r *Resolver) restartAllAppsIfRunning(ctx context.Context, tx server.Tx) error {
+func (r *RuntimeService) RestartAllAppsIfRunning(ctx context.Context, tx server.Tx) error {
 	apps, err := r.AppRepo.GetAll(ctx, tx, server.AppsFilter{})
 	if err != nil {
 		return err
@@ -151,10 +154,10 @@ func (r *Resolver) restartAllAppsIfRunning(ctx context.Context, tx server.Tx) er
 	}
 
 	for _, app := range apps {
-		err = r.restartAppIfRunning(ctx, tx, partialRuntimeServiceSpec{
-			app:        app,
-			hasPlugins: true,
-			plugins:    plugins,
+		err = r.RestartAppIfRunning(ctx, tx, PartialRuntimeServiceSpec{
+			App:        app,
+			HasPlugins: true,
+			Plugins:    plugins,
 		})
 		if err != nil {
 			return err

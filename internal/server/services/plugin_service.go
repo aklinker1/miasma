@@ -1,4 +1,4 @@
-package graphql
+package services
 
 import (
 	"context"
@@ -7,16 +7,25 @@ import (
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
 	"github.com/aklinker1/miasma/internal/server/zero"
+	"github.com/aklinker1/miasma/internal/utils"
 	"github.com/samber/lo"
 )
+
+type PluginService struct {
+	DB               server.DB
+	Logger           server.Logger
+	PluginRepo       server.PluginRepo
+	CertResolverName string
+	RuntimeService   *RuntimeService
+}
 
 var (
 	pluginAppGroup = lo.ToPtr("System")
 )
 
-func (r *Resolver) togglePlugin(ctx context.Context, enabled bool, name internal.PluginName, config map[string]any) (internal.Plugin, error) {
-	return inTx(ctx, r.DB.ReadWriteTx, zero.Plugin, func(tx server.Tx) (internal.Plugin, error) {
-		plugin, err := r.PluginRepo.GetOne(ctx, tx, server.PluginsFilter{
+func (s *PluginService) TogglePlugin(ctx context.Context, enabled bool, name internal.PluginName, config map[string]any) (internal.Plugin, error) {
+	return utils.InTx(ctx, s.DB.ReadWriteTx, zero.Plugin, func(tx server.Tx) (internal.Plugin, error) {
+		plugin, err := s.PluginRepo.GetOne(ctx, tx, server.PluginsFilter{
 			Name: &name,
 		})
 		if err != nil {
@@ -25,79 +34,79 @@ func (r *Resolver) togglePlugin(ctx context.Context, enabled bool, name internal
 
 		// Stop if no change
 		if plugin.Enabled == enabled {
-			r.Logger.W("Plugin already %s", lo.Ternary(enabled, "enabled", "disabled"))
+			s.Logger.W("Plugin already %s", lo.Ternary(enabled, "enabled", "disabled"))
 			return plugin, nil
 		}
 
 		// Update the plugin
 		plugin.Enabled = enabled
 		plugin.Config = config
-		updated, err := r.PluginRepo.Update(ctx, tx, plugin)
+		updated, err := s.PluginRepo.Update(ctx, tx, plugin)
 		if err != nil {
 			return zero.Plugin, err
 		}
 
 		// Execute the enabled/disabled hooks for each plugin
 		if enabled {
-			err = r.onPluginEnabled(ctx, tx, updated)
+			err = s.onPluginEnabled(ctx, tx, updated)
 		} else {
-			err = r.onPluginDisabled(ctx, tx, updated)
+			err = s.onPluginDisabled(ctx, tx, updated)
 		}
 		return updated, err
 	})
 }
 
-func (r *Resolver) onPluginEnabled(ctx context.Context, tx server.Tx, plugin internal.Plugin) error {
+func (s *PluginService) onPluginEnabled(ctx context.Context, tx server.Tx, plugin internal.Plugin) error {
 	switch plugin.Name {
 	case internal.PluginNameTraefik:
-		return r.onTraefikEnabled(ctx, tx, plugin)
+		return s.onTraefikEnabled(ctx, tx, plugin)
 	}
 	return nil
 }
 
-func (r *Resolver) onTraefikEnabled(ctx context.Context, tx server.Tx, plugin internal.Plugin) error {
+func (s *PluginService) onTraefikEnabled(ctx context.Context, tx server.Tx, plugin internal.Plugin) error {
 	// Start Traefik
-	app, err := r.createTraefikApp(plugin.ConfigForTraefik())
+	app, err := s.createTraefikApp(plugin.ConfigForTraefik())
 	if err != nil {
 		return err
 	}
-	err = r.startApp(ctx, tx, partialRuntimeServiceSpec{
-		app: app,
+	err = s.RuntimeService.StartApp(ctx, tx, PartialRuntimeServiceSpec{
+		App: app,
 	})
 	if err != nil {
 		return err
 	}
 
 	// Restart all other apps
-	return r.restartAllAppsIfRunning(ctx, tx)
+	return s.RuntimeService.RestartAllAppsIfRunning(ctx, tx)
 }
 
-func (r *Resolver) onPluginDisabled(ctx context.Context, tx server.Tx, plugin internal.Plugin) error {
+func (s *PluginService) onPluginDisabled(ctx context.Context, tx server.Tx, plugin internal.Plugin) error {
 	switch plugin.Name {
 	case internal.PluginNameTraefik:
-		return r.onTraefikDisabled(ctx, tx, plugin)
+		return s.onTraefikDisabled(ctx, tx, plugin)
 	}
 	return nil
 }
 
-func (r *Resolver) onTraefikDisabled(ctx context.Context, tx server.Tx, plugin internal.Plugin) error {
+func (s *PluginService) onTraefikDisabled(ctx context.Context, tx server.Tx, plugin internal.Plugin) error {
 	// Stop Traefik
-	app, err := r.createTraefikApp(plugin.ConfigForTraefik())
+	app, err := s.createTraefikApp(plugin.ConfigForTraefik())
 	if err != nil {
 		return err
 	}
-	err = r.stopApp(ctx, tx, partialRuntimeServiceSpec{
-		app: app,
+	err = s.RuntimeService.StopApp(ctx, tx, PartialRuntimeServiceSpec{
+		App: app,
 	})
 	if err != nil {
 		return err
 	}
 
 	// Restart all other apps
-	return r.restartAllAppsIfRunning(ctx, tx)
+	return s.RuntimeService.RestartAllAppsIfRunning(ctx, tx)
 }
 
-func (r *Resolver) createTraefikApp(config internal.TraefikConfig) (internal.App, error) {
+func (s *PluginService) createTraefikApp(config internal.TraefikConfig) (internal.App, error) {
 	command := []string{"traefik"}
 	if config.EnableHttps {
 		if config.CertsEmail == "" {
@@ -112,9 +121,9 @@ func (r *Resolver) createTraefikApp(config internal.TraefikConfig) (internal.App
 			"--entrypoints.web.address=:80",
 			"--entrypoints.websecure.address=:443",
 			// Use LetsEncrypt to manage certs: https://doc.traefik.io/traefik/https/acme/#configuration-examples
-			fmt.Sprintf("--certificatesresolvers.%s.acme.email=%s", r.CertResolverName, config.CertsEmail),
-			fmt.Sprintf("--certificatesresolvers.%s.acme.storage=/letsencrypt/acme.json", r.CertResolverName),
-			fmt.Sprintf("--certificatesresolvers.%s.acme.httpchallenge.entrypoint=web", r.CertResolverName),
+			fmt.Sprintf("--certificatesresolvers.%s.acme.email=%s", s.CertResolverName, config.CertsEmail),
+			fmt.Sprintf("--certificatesresolvers.%s.acme.storage=/letsencrypt/acme.json", s.CertResolverName),
+			fmt.Sprintf("--certificatesresolvers.%s.acme.httpchallenge.entrypoint=web", s.CertResolverName),
 			// Redirect HTTP -> HTTPS: https://doc.traefik.io/traefik/routing/entrypoints/#redirection
 			"--entrypoints.web.http.redirections.entrypoint.to=websecure",
 			"--entrypoints.web.http.redirections.entrypoint.scheme=https",
