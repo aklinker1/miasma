@@ -18,10 +18,10 @@ import (
 
 type QueryResolver interface {
 	Health(ctx context.Context) (*internal.Health, error)
-	ListApps(ctx context.Context, page *int32, size *int32, showHidden *bool) ([]*internal.App, error)
+	ListApps(ctx context.Context, page *int, size *int, showHidden *bool) ([]*internal.App, error)
 	GetApp(ctx context.Context, id string) (*internal.App, error)
 	ListPlugins(ctx context.Context) ([]*internal.Plugin, error)
-	GetPlugin(ctx context.Context, pluginName internal.PluginName) (*internal.Plugin, error)
+	GetPlugin(ctx context.Context, name internal.PluginName) (*internal.Plugin, error)
 	Nodes(ctx context.Context) ([]*internal.Node, error)
 }
 
@@ -63,33 +63,33 @@ func (ec *executionContext) field_Query_getPlugin_args(ctx context.Context, rawA
 	var err error
 	args := map[string]interface{}{}
 	var arg0 internal.PluginName
-	if tmp, ok := rawArgs["pluginName"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pluginName"))
+	if tmp, ok := rawArgs["name"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 		arg0, err = ec.unmarshalNPluginName2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐPluginName(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["pluginName"] = arg0
+	args["name"] = arg0
 	return args, nil
 }
 
 func (ec *executionContext) field_Query_listApps_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *int32
+	var arg0 *int
 	if tmp, ok := rawArgs["page"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("page"))
-		arg0, err = ec.unmarshalOInt2ᚖint32(ctx, tmp)
+		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["page"] = arg0
-	var arg1 *int32
+	var arg1 *int
 	if tmp, ok := rawArgs["size"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("size"))
-		arg1, err = ec.unmarshalOInt2ᚖint32(ctx, tmp)
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -178,7 +178,7 @@ func (ec *executionContext) _Query_listApps(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ListApps(rctx, fc.Args["page"].(*int32), fc.Args["size"].(*int32), fc.Args["showHidden"].(*bool))
+		return ec.resolvers.Query().ListApps(rctx, fc.Args["page"].(*int), fc.Args["size"].(*int), fc.Args["showHidden"].(*bool))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -432,7 +432,7 @@ func (ec *executionContext) _Query_getPlugin(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetPlugin(rctx, fc.Args["pluginName"].(internal.PluginName))
+		return ec.resolvers.Query().GetPlugin(rctx, fc.Args["name"].(internal.PluginName))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

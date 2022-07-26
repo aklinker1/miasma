@@ -31,8 +31,6 @@ skip_mod_tidy: true
 models:
   ID:
     model: github.com/99designs/gqlgen/graphql.ID
-  Int:
-    model: github.com/99designs/gqlgen/graphql.Int32
   EnvMap:
     model: github.com/aklinker1/miasma/internal.EnvMap
   Health:

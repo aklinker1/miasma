@@ -41,12 +41,12 @@ type App struct {
 	// The environment variables configured for this app.
 	Env map[string]interface{} `json:"env"`
 	// Whether or not the application is running, or stopped.
-	Status string `json:"status"`
+	Status RuntimeStatus `json:"status"`
 	// The number of instances running vs what should be running.
 	Instances *AppInstances `json:"instances"`
 	// The ports that the app is listening to inside the container. If no target
 	// ports are specified, then the container should respect the `PORT` env var.
-	TargetPorts []int32 `json:"targetPorts"`
+	TargetPorts []int `json:"targetPorts"`
 	// The ports that you access the app through in the swarm. This field can, and
 	// should be left empty. Miasma automatically manages assigning published ports
 	// between 3001-4999. If you need to specify a port, make sure it's outside that
@@ -58,7 +58,7 @@ type App struct {
 	// removed it to clear a port for another app/plugin, make sure to restart the
 	// app and a new, random port will be allocated for the app, freeing the old
 	// port.
-	PublishedPorts []int32 `json:"publishedPorts"`
+	PublishedPorts []int `json:"publishedPorts"`
 	// The placement constraints specifying which nodes the app will be ran on. Any
 	// valid value for the [`--constraint` flag](https://docs.docker.com/engine/swarm/services/#placement-constraints)
 	// is valid item in this list.
@@ -80,8 +80,8 @@ type AppInput struct {
 	AutoUpgrade    *bool               `json:"autoUpgrade"`
 	Group          *string             `json:"group"`
 	Hidden         *bool               `json:"hidden"`
-	TargetPorts    []int32             `json:"targetPorts"`
-	PublishedPorts []int32             `json:"publishedPorts"`
+	TargetPorts    []int               `json:"targetPorts"`
+	PublishedPorts []int               `json:"publishedPorts"`
 	Placement      []string            `json:"placement"`
 	Volumes        []*BoundVolumeInput `json:"volumes"`
 	Networks       []string            `json:"networks"`
@@ -90,8 +90,8 @@ type AppInput struct {
 
 // Contains information about how many instances of the app are running vs supposed to be running
 type AppInstances struct {
-	Running int32 `json:"running"`
-	Total   int32 `json:"total"`
+	Running int `json:"running"`
+	Total   int `json:"total"`
 }
 
 // Docker volume configuration
@@ -221,5 +221,46 @@ func (e *PluginName) UnmarshalGQL(v interface{}) error {
 }
 
 func (e PluginName) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type RuntimeStatus string
+
+const (
+	RuntimeStatusRunning RuntimeStatus = "RUNNING"
+	RuntimeStatusStopped RuntimeStatus = "STOPPED"
+)
+
+var AllRuntimeStatus = []RuntimeStatus{
+	RuntimeStatusRunning,
+	RuntimeStatusStopped,
+}
+
+func (e RuntimeStatus) IsValid() bool {
+	switch e {
+	case RuntimeStatusRunning, RuntimeStatusStopped:
+		return true
+	}
+	return false
+}
+
+func (e RuntimeStatus) String() string {
+	return string(e)
+}
+
+func (e *RuntimeStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = RuntimeStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid RuntimeStatus", str)
+	}
+	return nil
+}
+
+func (e RuntimeStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

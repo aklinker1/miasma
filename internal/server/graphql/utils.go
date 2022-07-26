@@ -3,11 +3,10 @@ package graphql
 import (
 	"context"
 
-	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
-	"github.com/samber/lo"
 )
 
+// Returns fallback and the err if it exists, otherwise it returns the value and nil
 func safeReturn[T any](value T, fallback T, err error) (T, error) {
 	if err != nil {
 		return fallback, err
@@ -16,28 +15,19 @@ func safeReturn[T any](value T, fallback T, err error) (T, error) {
 	}
 }
 
-func (r *appResolver) getAppRoute(ctx context.Context, obj *internal.App) (*internal.Route, internal.Plugin, error) {
-	traefik, err := r.Plugins.FindPlugin(ctx, server.PluginsFilter{
-		Name: lo.ToPtr(internal.PluginNameTraefik),
-	})
+// Runs a function block inside a transaction. If the function returns no error, the result is
+// committed, otherwise the transaction is rolled back
+func inTx[T interface{}](ctx context.Context, beginTx func(context.Context) (server.Tx, error), defaultValue T, fn func(server.Tx) (T, error)) (T, error) {
+	tx, err := beginTx(ctx)
 	if err != nil {
-		return nil, traefik, err
+		return defaultValue, err
 	}
-	if !traefik.Enabled {
-		return nil, traefik, nil
-	}
-	if obj.Route != nil {
-		return obj.Route, traefik, nil
-	}
+	defer tx.Rollback()
 
-	route, err := r.Routes.FindRoute(ctx, server.RoutesFilter{
-		AppID: &obj.ID,
-	})
-	if server.ErrorCode(err) == server.ENOTFOUND {
-		return nil, traefik, nil
-	} else if err != nil {
-		return nil, traefik, err
-	} else {
-		return &route, traefik, nil
+	v, err := fn(tx)
+	if err != nil {
+		return defaultValue, err
 	}
+	tx.Commit()
+	return v, nil
 }

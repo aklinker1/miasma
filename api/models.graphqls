@@ -30,6 +30,11 @@ type BoundVolume {
   source: String!
 }
 
+enum RuntimeStatus {
+  RUNNING
+  STOPPED
+}
+
 "Managed application"
 type App {
   id: ID!
@@ -68,7 +73,7 @@ type App {
   "The environment variables configured for this app."
   env: Map
   "Whether or not the application is running, or stopped."
-  status: String!
+  status: RuntimeStatus!
   "The number of instances running vs what should be running."
   instances: AppInstances!
   """

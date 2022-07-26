@@ -23,7 +23,7 @@ type AppResolver interface {
 	SimpleRoute(ctx context.Context, obj *internal.App) (*string, error)
 	AvailableAt(ctx context.Context, obj *internal.App, clusterIPAddress string) ([]string, error)
 	Env(ctx context.Context, obj *internal.App) (map[string]interface{}, error)
-	Status(ctx context.Context, obj *internal.App) (string, error)
+	Status(ctx context.Context, obj *internal.App) (internal.RuntimeStatus, error)
 	Instances(ctx context.Context, obj *internal.App) (*internal.AppInstances, error)
 }
 type HealthResolver interface {
@@ -731,9 +731,9 @@ func (ec *executionContext) _App_status(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(internal.RuntimeStatus)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNRuntimeStatus2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐRuntimeStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_App_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -743,7 +743,7 @@ func (ec *executionContext) fieldContext_App_status(ctx context.Context, field g
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type RuntimeStatus does not have child fields")
 		},
 	}
 	return fc, nil
@@ -822,9 +822,9 @@ func (ec *executionContext) _App_targetPorts(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]int32)
+	res := resTmp.([]int)
 	fc.Result = res
-	return ec.marshalOInt2ᚕint32ᚄ(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚕintᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_App_targetPorts(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -863,9 +863,9 @@ func (ec *executionContext) _App_publishedPorts(ctx context.Context, field graph
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]int32)
+	res := resTmp.([]int)
 	fc.Result = res
-	return ec.marshalOInt2ᚕint32ᚄ(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚕintᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_App_publishedPorts(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1077,9 +1077,9 @@ func (ec *executionContext) _AppInstances_running(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int32)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNInt2int32(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AppInstances_running(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1121,9 +1121,9 @@ func (ec *executionContext) _AppInstances_total(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int32)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNInt2int32(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AppInstances_total(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2436,7 +2436,7 @@ func (ec *executionContext) unmarshalInputAppInput(ctx context.Context, obj inte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("targetPorts"))
-			it.TargetPorts, err = ec.unmarshalOInt2ᚕint32ᚄ(ctx, v)
+			it.TargetPorts, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2444,7 +2444,7 @@ func (ec *executionContext) unmarshalInputAppInput(ctx context.Context, obj inte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("publishedPorts"))
-			it.PublishedPorts, err = ec.unmarshalOInt2ᚕint32ᚄ(ctx, v)
+			it.PublishedPorts, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3380,6 +3380,16 @@ func (ec *executionContext) unmarshalNPluginName2githubᚗcomᚋaklinker1ᚋmias
 }
 
 func (ec *executionContext) marshalNPluginName2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐPluginName(ctx context.Context, sel ast.SelectionSet, v internal.PluginName) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalNRuntimeStatus2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐRuntimeStatus(ctx context.Context, v interface{}) (internal.RuntimeStatus, error) {
+	var res internal.RuntimeStatus
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNRuntimeStatus2githubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐRuntimeStatus(ctx context.Context, sel ast.SelectionSet, v internal.RuntimeStatus) graphql.Marshaler {
 	return v
 }
 

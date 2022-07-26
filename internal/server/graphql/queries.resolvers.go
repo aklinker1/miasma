@@ -5,11 +5,11 @@ package graphql
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
 	"github.com/aklinker1/miasma/internal/server/gqlgen"
+	"github.com/aklinker1/miasma/internal/server/zero"
 	"github.com/aklinker1/miasma/internal/utils"
 	"github.com/samber/lo"
 )
@@ -20,36 +20,46 @@ func (r *queryResolver) Health(ctx context.Context) (*internal.Health, error) {
 	}, nil
 }
 
-func (r *queryResolver) ListApps(ctx context.Context, page *int32, size *int32, showHidden *bool) ([]*internal.App, error) {
-	filter := server.AppsFilter{
-		IncludeHidden: showHidden,
-		Pagination: &server.Pagination{
-			Page: utils.ValueOr(page, 1),
-			Size: utils.ValueOr(size, 10),
-		},
-	}
-	apps, err := r.Apps.FindApps(ctx, filter)
+func (r *queryResolver) ListApps(ctx context.Context, page *int, size *int, showHidden *bool) ([]*internal.App, error) {
+	apps, err := inTx(ctx, r.DB.ReadonlyTx, nil, func(tx server.Tx) ([]internal.App, error) {
+		return r.AppRepo.GetAll(ctx, tx, server.AppsFilter{
+			IncludeHidden: showHidden,
+			Pagination: &server.Pagination{
+				Page: utils.ValueOr(page, 1),
+				Size: utils.ValueOr(size, 10),
+			},
+		})
+	})
 	return safeReturn(lo.ToSlicePtr(apps), nil, err)
 }
 
 func (r *queryResolver) GetApp(ctx context.Context, id string) (*internal.App, error) {
-	app, err := r.Apps.FindApp(ctx, server.AppsFilter{
-		ID: &id,
+	app, err := inTx(ctx, r.DB.ReadonlyTx, zero.App, func(tx server.Tx) (internal.App, error) {
+		return r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
+			ID: &id,
+		})
 	})
 	return safeReturn(&app, nil, err)
 }
 
 func (r *queryResolver) ListPlugins(ctx context.Context) ([]*internal.Plugin, error) {
-	plugins, err := r.Plugins.FindPlugins(ctx, server.PluginsFilter{})
+	plugins, err := inTx(ctx, r.DB.ReadonlyTx, nil, func(tx server.Tx) ([]internal.Plugin, error) {
+		return r.PluginRepo.GetAll(ctx, tx, server.PluginsFilter{})
+	})
 	return safeReturn(lo.ToSlicePtr(plugins), nil, err)
 }
 
-func (r *queryResolver) GetPlugin(ctx context.Context, pluginName internal.PluginName) (*internal.Plugin, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *queryResolver) GetPlugin(ctx context.Context, name internal.PluginName) (*internal.Plugin, error) {
+	plugin, err := inTx(ctx, r.DB.ReadonlyTx, zero.Plugin, func(tx server.Tx) (internal.Plugin, error) {
+		return r.PluginRepo.GetOne(ctx, tx, server.PluginsFilter{
+			Name: &name,
+		})
+	})
+	return safeReturn(&plugin, nil, err)
 }
 
 func (r *queryResolver) Nodes(ctx context.Context) ([]*internal.Node, error) {
-	nodes, err := r.Runtime.ListNodes(ctx)
+	nodes, err := r.RuntimeNodeRepo.GetAll(ctx, server.RuntimeNodesFilter{})
 	return safeReturn(lo.ToSlicePtr(nodes), nil, err)
 }
 

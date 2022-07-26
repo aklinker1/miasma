@@ -29,26 +29,33 @@ func Errorf(format string, a ...any) error {
 }
 
 type Logger struct {
+	prefix string
 }
 
-func (*Logger) V(format string, a ...any) {
-	Printfln(cReset+cDim+"[verbose] "+format+cReset, a...)
+func (l *Logger) V(format string, a ...any) {
+	Printfln(cReset+cDim+"[verbose] "+l.prefix+format+cReset, a...)
 }
 
-func (*Logger) D(format string, a ...any) {
-	Printfln(cReset+"[debug  ] "+format, a...)
+func (l *Logger) D(format string, a ...any) {
+	Printfln(cReset+"[debug  ] "+l.prefix+format, a...)
 }
 
-func (*Logger) I(format string, a ...any) {
-	Printfln(cReset+cBlue+"[info   ] "+format+cReset, a...)
+func (l *Logger) I(format string, a ...any) {
+	Printfln(cReset+cBlue+"[info   ] "+l.prefix+format+cReset, a...)
 }
 
-func (*Logger) W(format string, a ...any) {
-	Printfln(cReset+cBold+cYellow+"[warn   ] "+format+cReset, a...)
+func (l *Logger) W(format string, a ...any) {
+	Printfln(cReset+cBold+cYellow+"[warn   ] "+l.prefix+format+cReset, a...)
 }
 
-func (*Logger) E(format string, a ...any) {
-	Printfln(cReset+cBold+cRed+"[error  ] "+format+cReset, a...)
+func (l *Logger) E(format string, a ...any) {
+	Printfln(cReset+cBold+cRed+"[error  ] "+l.prefix+format+cReset, a...)
+}
+
+func (l *Logger) Scoped(scope string) *Logger {
+	return &Logger{
+		prefix: l.prefix + scope,
+	}
 }
 
 // Error implements cron.Logger
