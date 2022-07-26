@@ -3,8 +3,10 @@ import { gql } from "graphql-tag";
 import { useQuery } from "@vue/apollo-composable";
 import { Ref } from "vue";
 
+export type RuntimeStatus = "RUNNING" | "STOPPED";
+
 export interface AppStatus {
-  status: string;
+  status: RuntimeStatus;
   instances?: {
     total: number;
     running: number;

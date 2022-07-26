@@ -2,12 +2,13 @@ import { gql } from "graphql-tag";
 import { useQuery } from "@vue/apollo-composable";
 import { Ref } from "vue";
 import { appFragment } from "../utils/apollo-client";
+import { RuntimeStatus } from "./app-status-query";
 
 export interface App {
   id: string;
   name: string;
   group?: string;
-  status: string;
+  status: RuntimeStatus;
   simpleRoute?: string;
   instances?: {
     running: number;

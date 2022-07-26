@@ -38,7 +38,4 @@ export default defineConfig(({ mode }) => ({
       dts: "src/@types/components.d.ts",
     }),
   ],
-  server: {
-    port: 8080,
-  },
 }));
