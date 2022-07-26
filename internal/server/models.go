@@ -45,3 +45,11 @@ type RuntimeServiceSpec struct {
 	Env     internal.EnvMap
 	Route   *internal.Route
 }
+
+type DesiredTaskState string
+
+var (
+	DesiredTaskStateRunning  DesiredTaskState = "running"
+	DesiredTaskStateShutdown DesiredTaskState = "shutdown"
+	DesiredTaskStateAccepted DesiredTaskState = "accepted"
+)

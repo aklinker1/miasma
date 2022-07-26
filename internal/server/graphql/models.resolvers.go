@@ -121,6 +121,7 @@ func (r *healthResolver) Cluster(ctx context.Context, obj *internal.Health) (*in
 func (r *nodeResolver) Services(ctx context.Context, obj *internal.Node, showHidden *bool) ([]*internal.App, error) {
 	services, err := r.RuntimeTaskRepo.GetAll(ctx, server.RuntimeTasksFilter{
 		NodeID: &obj.ID,
+		State:  &server.DesiredTaskStateRunning,
 	})
 	if err != nil {
 		return nil, err
@@ -129,6 +130,7 @@ func (r *nodeResolver) Services(ctx context.Context, obj *internal.Node, showHid
 	return utils.InTx(ctx, r.DB.ReadonlyTx, nil, func(tx server.Tx) ([]*internal.App, error) {
 		apps := []*internal.App{}
 		for _, service := range services {
+			// TODO: get all by service app ids
 			app, err := r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
 				ID:            &service.AppID,
 				IncludeHidden: showHidden,
