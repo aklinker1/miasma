@@ -59,7 +59,7 @@ type PluginRepo interface {
 }
 
 type EnvFilter struct {
-	AppID *string
+	AppID string
 }
 type EnvRepo interface {
 	Get(ctx context.Context, tx Tx, filter EnvFilter) (internal.EnvMap, error)

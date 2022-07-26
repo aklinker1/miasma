@@ -35,7 +35,7 @@ func (r *RuntimeService) StartApp(ctx context.Context, tx server.Tx, partialInpu
 	if err != nil {
 		return err
 	}
-	_, err = r.RuntimeServiceRepo.Create(ctx, spec)
+	err = r.RuntimeServiceRepo.Create(ctx, spec)
 	return err
 }
 
@@ -50,7 +50,7 @@ func (r *RuntimeService) StopApp(ctx context.Context, tx server.Tx, partialInput
 	if err != nil {
 		return err
 	}
-	_, err = r.RuntimeServiceRepo.Delete(ctx, existing)
+	_, err = r.RuntimeServiceRepo.Remove(ctx, existing)
 	return err
 }
 
@@ -64,7 +64,7 @@ func (r *RuntimeService) RestartApp(ctx context.Context, tx server.Tx, partialIn
 	} else if err != nil {
 		return err
 	} else {
-		_, err = r.RuntimeServiceRepo.Delete(ctx, existing)
+		_, err = r.RuntimeServiceRepo.Remove(ctx, existing)
 		if err != nil {
 			return err
 		}
@@ -75,7 +75,7 @@ func (r *RuntimeService) RestartApp(ctx context.Context, tx server.Tx, partialIn
 	if err != nil {
 		return err
 	}
-	_, err = r.RuntimeServiceRepo.Create(ctx, spec)
+	err = r.RuntimeServiceRepo.Create(ctx, spec)
 	return err
 }
 
@@ -103,9 +103,7 @@ func (r *RuntimeService) getRuntimeServiceSpec(
 	if partial.HasEnv {
 		data.Env = partial.Env
 	} else {
-		env, err := r.EnvRepo.Get(ctx, tx, server.EnvFilter{
-			AppID: &data.App.ID,
-		})
+		env, err := r.EnvRepo.Get(ctx, tx, server.EnvFilter{AppID: data.App.ID})
 		if err != nil {
 			return zero.RuntimeServiceSpec, err
 		}

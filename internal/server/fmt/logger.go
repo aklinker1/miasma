@@ -54,7 +54,7 @@ func (l *Logger) E(format string, a ...any) {
 
 func (l *Logger) Scoped(scope string) *Logger {
 	return &Logger{
-		prefix: l.prefix + scope,
+		prefix: fmt.Sprintf("%s[%s] ", l.prefix, scope),
 	}
 }
 

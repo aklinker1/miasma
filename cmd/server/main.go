@@ -6,7 +6,6 @@ import (
 	"github.com/robfig/cron/v3"
 	"github.com/samber/lo"
 
-	"github.com/aklinker1/miasma/internal/server"
 	cron2 "github.com/aklinker1/miasma/internal/server/cron"
 	"github.com/aklinker1/miasma/internal/server/docker"
 	"github.com/aklinker1/miasma/internal/server/fmt"
@@ -43,31 +42,57 @@ type scheduledJob struct {
 }
 
 func main() {
+	// Dependencies
 	logger := &fmt.Logger{}
-
 	db := sqlite.NewDB(databasePath, logger.Scoped("db"))
 	err := db.Open()
 	if err != nil {
 		logger.E("Failed to open database: %v", err)
 		os.Exit(1)
 	}
-
 	dockerClient, err := docker.NewDefaultClient()
 	if err != nil {
 		logger.E("Failed to initialize docker runtime: %v", err)
 		os.Exit(1)
 	}
 
-	panic(server.NewNotImplementedError("Implement repos"))
-	var appRepo server.AppRepo
-	var envRepo server.EnvRepo
-	var routeRepo server.RouteRepo
-	var pluginRepo server.PluginRepo
-	var runtimeRepo server.RuntimeRepo
-	var runtimeServiceRepo server.RuntimeServiceRepo
-	var runtimeImageRepo server.RuntimeImageRepo
-	var runtimeNodeRepo server.RuntimeNodeRepo
-	var runtimeTaskRepo server.RuntimeTaskRepo
+	// Persistance Layer
+
+	appRepo := &sqlite.AppRepo{
+		Logger: logger.Scoped("app-repo"),
+	}
+	envRepo := &sqlite.EnvRepo{
+		Logger: logger.Scoped("env-repo"),
+	}
+	routeRepo := &sqlite.RouteRepo{
+		Logger: logger.Scoped("route-repo"),
+	}
+	pluginRepo := &sqlite.PluginRepo{
+		Logger: logger.Scoped("plugin-repo"),
+	}
+	runtimeRepo := docker.NewRuntimeRepo(
+		logger.Scoped("runtime-repo"),
+		dockerClient,
+	)
+	runtimeServiceRepo := docker.NewRuntimeServiceRepo(
+		logger.Scoped("runtime-service-repo"),
+		dockerClient,
+		certResolverName,
+	)
+	runtimeImageRepo := docker.NewRuntimeImageRepo(
+		logger.Scoped("runtime-image-repo"),
+		dockerClient,
+	)
+	runtimeNodeRepo := docker.NewRuntimeNodeRepo(
+		logger.Scoped("runtime-node-repo"),
+		dockerClient,
+	)
+	runtimeTaskRepo := docker.NewRuntimeTaskRepo(
+		logger.Scoped("runtime-task-repo"),
+		dockerClient,
+	)
+
+	// Service Layer
 
 	appService := &services.AppService{
 		DB:                 db,
@@ -91,9 +116,11 @@ func main() {
 	pluginService := &services.PluginService{
 		DB:               db,
 		Logger:           logger.Scoped("plugin-service"),
+		AppRepo:          appRepo,
 		PluginRepo:       pluginRepo,
 		CertResolverName: certResolverName,
 		RuntimeService:   runtimeService,
+		AppService:       appService,
 	}
 
 	resolver := &graphql.Resolver{
@@ -115,7 +142,8 @@ func main() {
 		PluginService:  pluginService,
 		RuntimeService: runtimeService,
 	}
-	server := graphql.NewServer(logger.Scoped("gql-server"), db, resolver, ACCESS_TOKEN)
+
+	// Jobs
 
 	pollingUpdater := cron2.PollingUpgrader{
 		DB:               db,
@@ -133,13 +161,17 @@ func main() {
 		},
 	}
 
-	go scheduleJobs(jobs, logger)
+	go scheduleJobs(jobs, logger.Scoped("cron"))
+
+	// Controllers
+
+	server := graphql.NewServer(logger.Scoped("gql-server"), db, resolver, ACCESS_TOKEN)
 	server.ServeGraphql()
 }
 
 func scheduleJobs(jobs []scheduledJob, logger *fmt.Logger) {
 	c := cron.New(cron.WithChain(
-		cron.Recover(logger.Scoped("cron")),
+		cron.Recover(logger),
 	))
 	logger.I("Scheduled Jobs:")
 	lo.ForEach(jobs, func(job scheduledJob, _ int) {

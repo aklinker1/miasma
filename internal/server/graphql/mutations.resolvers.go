@@ -68,13 +68,22 @@ func (r *mutationResolver) CreateApp(ctx context.Context, input internal.AppInpu
 
 func (r *mutationResolver) EditApp(ctx context.Context, id string, changes map[string]interface{}) (*internal.App, error) {
 	updated, err := utils.InTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
-		// Apply changes
 		newApp, err := r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
 			ID: &id,
 		})
 		if err != nil {
 			return zero.App, err
 		}
+
+		// Prevent updating system apps
+		if newApp.System {
+			return zero.App, &server.Error{
+				Code:    server.EINVALID,
+				Message: "Cannot edit Miasma's system apps",
+			}
+		}
+
+		// Apply changes
 		err = gqlgen.ApplyChanges(changes, &newApp)
 		if err != nil {
 			return zero.App, err

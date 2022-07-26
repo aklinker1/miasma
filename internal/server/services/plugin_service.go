@@ -14,8 +14,10 @@ import (
 type PluginService struct {
 	DB               server.DB
 	Logger           server.Logger
+	AppRepo          server.AppRepo
 	PluginRepo       server.PluginRepo
 	CertResolverName string
+	AppService       *AppService
 	RuntimeService   *RuntimeService
 }
 
@@ -65,13 +67,19 @@ func (s *PluginService) onPluginEnabled(ctx context.Context, tx server.Tx, plugi
 }
 
 func (s *PluginService) onTraefikEnabled(ctx context.Context, tx server.Tx, plugin internal.Plugin) error {
-	// Start Traefik
-	app, err := s.createTraefikApp(plugin.ConfigForTraefik())
+	// Create Traefik App
+	app, err := s.defineTraefikApp(plugin.ConfigForTraefik())
 	if err != nil {
 		return err
 	}
+	created, err := s.AppRepo.Create(ctx, tx, app)
+	if err != nil {
+		return err
+	}
+
+	// Start app
 	err = s.RuntimeService.StartApp(ctx, tx, PartialRuntimeServiceSpec{
-		App: app,
+		App: created,
 	})
 	if err != nil {
 		return err
@@ -90,8 +98,8 @@ func (s *PluginService) onPluginDisabled(ctx context.Context, tx server.Tx, plug
 }
 
 func (s *PluginService) onTraefikDisabled(ctx context.Context, tx server.Tx, plugin internal.Plugin) error {
-	// Stop Traefik
-	app, err := s.createTraefikApp(plugin.ConfigForTraefik())
+	// Stop Traefik App
+	app, err := s.defineTraefikApp(plugin.ConfigForTraefik())
 	if err != nil {
 		return err
 	}
@@ -102,11 +110,17 @@ func (s *PluginService) onTraefikDisabled(ctx context.Context, tx server.Tx, plu
 		return err
 	}
 
+	// Delete app
+	_, err = s.AppService.DeleteAppCascade(ctx, tx, app)
+	if err != nil {
+		return err
+	}
+
 	// Restart all other apps
 	return s.RuntimeService.RestartAllAppsIfRunning(ctx, tx)
 }
 
-func (s *PluginService) createTraefikApp(config internal.TraefikConfig) (internal.App, error) {
+func (s *PluginService) defineTraefikApp(config internal.TraefikConfig) (internal.App, error) {
 	command := []string{"traefik"}
 	if config.EnableHttps {
 		if config.CertsEmail == "" {

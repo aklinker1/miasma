@@ -70,7 +70,7 @@ func (r *appResolver) AvailableAt(ctx context.Context, obj *internal.App, cluste
 
 func (r *appResolver) Env(ctx context.Context, obj *internal.App) (map[string]interface{}, error) {
 	env, err := utils.InTx(ctx, r.DB.ReadonlyTx, nil, func(tx server.Tx) (internal.EnvMap, error) {
-		return r.EnvRepo.Get(ctx, tx, server.EnvFilter{AppID: &obj.ID})
+		return r.EnvRepo.Get(ctx, tx, server.EnvFilter{AppID: obj.ID})
 	})
 	return utils.SafeReturn(utils.ToAnyMap(env), nil, err)
 }

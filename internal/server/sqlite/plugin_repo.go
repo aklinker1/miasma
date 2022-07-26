@@ -7,12 +7,17 @@ import (
 	"github.com/aklinker1/miasma/internal/server"
 	"github.com/aklinker1/miasma/internal/server/sqlite/sqlb"
 	"github.com/aklinker1/miasma/internal/server/sqlite/sqlitetypes"
+	"github.com/aklinker1/miasma/internal/server/zero"
 	"github.com/samber/lo"
 )
 
-func findPlugins(ctx context.Context, tx server.Tx, filter server.PluginsFilter) ([]internal.Plugin, error) {
+type PluginRepo struct {
+	Logger server.Logger
+}
+
+func (r *PluginRepo) GetAll(ctx context.Context, tx server.Tx, filter server.PluginsFilter) ([]internal.Plugin, error) {
 	var scanned internal.Plugin
-	query := sqlb.Select("plugins", map[string]any{
+	query := sqlb.Select(r.Logger, "plugins", map[string]any{
 		"name":    sqlitetypes.PluginName(&scanned.Name),
 		"enabled": &scanned.Enabled,
 		"config":  sqlitetypes.JSON(&scanned.Config),
@@ -44,27 +49,33 @@ func findPlugins(ctx context.Context, tx server.Tx, filter server.PluginsFilter)
 	return result, rows.Err()
 }
 
-func findPlugin(ctx context.Context, tx server.Tx, filter server.PluginsFilter) (internal.Plugin, error) {
-	plugins, err := findPlugins(ctx, tx, filter)
+func (r *PluginRepo) GetOne(ctx context.Context, tx server.Tx, filter server.PluginsFilter) (internal.Plugin, error) {
+	plugins, err := r.GetAll(ctx, tx, filter)
 	if err != nil {
-		return EmptyPlugin, err
+		return zero.Plugin, err
 	}
 	if len(plugins) == 0 {
-		return EmptyPlugin, &server.Error{
+		return zero.Plugin, &server.Error{
 			Code:    server.ENOTFOUND,
 			Message: "Plugin not found",
-			Op:      "findPlugin",
+			Op:      "sqlite.PluginRepo.GetOne",
 		}
 	}
 	return plugins[0], nil
 }
 
-func updatePlugin(ctx context.Context, tx server.Tx, plugin internal.Plugin) (internal.Plugin, error) {
+func (r *PluginRepo) GetTraefik(ctx context.Context, tx server.Tx) (internal.Plugin, error) {
+	return r.GetOne(ctx, tx, server.PluginsFilter{
+		Name: lo.ToPtr(internal.PluginNameTraefik),
+	})
+}
+
+func (r *PluginRepo) Update(ctx context.Context, tx server.Tx, plugin internal.Plugin) (internal.Plugin, error) {
 	data := map[string]any{
 		"enabled": plugin.Enabled,
 		"config":  sqlitetypes.JSON(plugin.Config),
 	}
-	sql, args := sqlb.Update("plugins", "name", sqlitetypes.PluginName(plugin.Name), data).ToSQL()
+	sql, args := sqlb.Update(r.Logger, "plugins", "name", sqlitetypes.PluginName(plugin.Name), data).ToSQL()
 	_, err := tx.ExecContext(ctx, sql, args...)
 	return plugin, err
 }

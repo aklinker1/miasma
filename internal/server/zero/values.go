@@ -10,6 +10,7 @@ var (
 	App                = internal.App{}
 	Plugin             = internal.Plugin{}
 	Route              = internal.Route{}
+	EnvMap             = internal.EnvMap{}
 	SwarmService       = swarm.Service{}
 	SwarmNode          = swarm.Node{}
 	SwarmTask          = swarm.Task{}
