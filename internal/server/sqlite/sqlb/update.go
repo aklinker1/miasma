@@ -44,6 +44,6 @@ func (b *updateBuilder) ToSQL() (sql string, args []any) {
 		strings.Join(setters, ", "),
 		b.idField,
 	)
-	b.logger.V("SQL Update: %s %v", sql, args)
+	b.logger.V("%s %v", sql, args)
 	return sql, args
 }

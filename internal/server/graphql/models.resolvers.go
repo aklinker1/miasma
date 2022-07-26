@@ -88,6 +88,12 @@ func (r *appResolver) Instances(ctx context.Context, obj *internal.App) (*intern
 	} else if err != nil {
 		return nil, err
 	}
+	if service.ServiceStatus == nil {
+		return &internal.AppInstances{
+			Running: 0,
+			Total:   0,
+		}, nil
+	}
 	return &internal.AppInstances{
 		Running: int(service.ServiceStatus.RunningTasks),
 		Total:   int(service.ServiceStatus.DesiredTasks),
@@ -123,7 +129,6 @@ func (r *nodeResolver) Services(ctx context.Context, obj *internal.Node, showHid
 	return utils.InTx(ctx, r.DB.ReadonlyTx, nil, func(tx server.Tx) ([]*internal.App, error) {
 		apps := []*internal.App{}
 		for _, service := range services {
-			fmt.Println(service)
 			app, err := r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
 				ID:            &service.AppID,
 				IncludeHidden: showHidden,

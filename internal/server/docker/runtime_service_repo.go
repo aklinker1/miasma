@@ -76,7 +76,7 @@ func (s *runtimeServiceRepo) GetAll(ctx context.Context, filter server.RuntimeSe
 	if filter.AppID != nil {
 		search = append(search, filters.KeyValuePair{
 			Key:   "label",
-			Value: fmt.Sprintf("%s=%s", miasmaIdLabel, filter.AppID),
+			Value: fmt.Sprintf("%s=%s", miasmaIdLabel, *filter.AppID),
 		})
 	}
 	services, err := s.client.ServiceList(ctx, types.ServiceListOptions{

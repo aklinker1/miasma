@@ -40,6 +40,6 @@ func (b *insertBuilder) ToSQL() (sql string, args []any) {
 	columns := strings.Join(b.columns, ", ")
 	values := strings.Join(b.values, ", ")
 	sql = fmt.Sprintf(`INSERT INTO %s (%s) VALUES (%s)`, b.table, columns, values)
-	b.logger.V("SQL Insert: %s %v", sql, args)
+	b.logger.V("%s %v", sql, args)
 	return sql, args
 }
