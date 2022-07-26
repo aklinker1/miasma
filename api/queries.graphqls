@@ -17,7 +17,7 @@ type Query {
   "List all the available plugins for Miasma"
   listPlugins: [Plugin!]!
   "Grab a plugin by it's name"
-  getPlugin(pluginName: PluginName!): Plugin!
+  getPlugin(name: PluginName!): Plugin!
 
   "List the nodes that are apart of the cluster"
   nodes: [Node!]!

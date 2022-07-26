@@ -64,11 +64,11 @@ func editApp(appName string, newApp *flags.EditApp) {
 	typedChanges := app
 
 	// Merge lists
-	existingTargetPortMap := map[int32]int{}
+	existingTargetPortMap := map[int]int{}
 	for index, port := range typedChanges.TargetPorts {
 		existingTargetPortMap[port] = index
 	}
-	existingPublishedPortMap := map[int32]int{}
+	existingPublishedPortMap := map[int]int{}
 	for index, port := range typedChanges.PublishedPorts {
 		existingPublishedPortMap[port] = index
 	}

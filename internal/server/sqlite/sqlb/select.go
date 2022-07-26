@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/aklinker1/miasma/internal/server"
-	fmt2 "github.com/aklinker1/miasma/internal/server/fmt"
 	"github.com/samber/lo"
 )
 
@@ -23,7 +22,7 @@ type selectBuilder struct {
 	logger            server.Logger
 }
 
-func Select(table string, columns map[string]any) *selectBuilder {
+func Select(logger server.Logger, table string, columns map[string]any) *selectBuilder {
 	selectColumns := []string{}
 	scanDest := []any{}
 	for name, target := range columns {
@@ -34,7 +33,7 @@ func Select(table string, columns map[string]any) *selectBuilder {
 		table:    table,
 		columns:  selectColumns,
 		scanDest: scanDest,
-		logger:   &fmt2.Logger{},
+		logger:   logger,
 	}
 }
 
@@ -87,7 +86,7 @@ func (b *selectBuilder) ToSQL() (sql string, args []any) {
 		args = append(args, b.pagination.Limit(), b.pagination.Offset())
 	}
 	sql = fmt.Sprintf(`SELECT %s FROM %s%s%s%s`, columns, b.table, where, order, limitOffset)
-	b.logger.V("SQL Query: %s %v", sql, args)
+	b.logger.V("%s %v", sql, args)
 	return sql, args
 }
 

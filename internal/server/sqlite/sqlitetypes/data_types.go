@@ -47,22 +47,22 @@ func (array stringArray) Value() (driver.Value, error) {
 	return json.Marshal(array)
 }
 
-// blob -> []int32
+// blob -> []int
 
-type int32Array []int32
+type intArray []int
 
-func Int32Array(a any) any {
+func IntArray(a any) any {
 	switch a := a.(type) {
-	case []int32:
-		return (*int32Array)(&a)
-	case *[]int32:
-		return (*int32Array)(a)
+	case []int:
+		return (*intArray)(&a)
+	case *[]int:
+		return (*intArray)(a)
 	}
 	return nil
 }
 
 // Scan implements the sql.Scanner interface.
-func (a *int32Array) Scan(src interface{}) error {
+func (a *intArray) Scan(src interface{}) error {
 	switch src := src.(type) {
 	case []byte:
 		return json.Unmarshal(src, a)
@@ -75,13 +75,13 @@ func (a *int32Array) Scan(src interface{}) error {
 
 	return &server.Error{
 		Code:    server.EINTERNAL,
-		Message: fmt.Sprintf("Failed to scan %+v (%T) into a []int32", src, src),
-		Op:      "int32Array.Scan",
+		Message: fmt.Sprintf("Failed to scan %+v (%T) into a []int", src, src),
+		Op:      "intArray.Scan",
 	}
 }
 
 // Value implements the driver.Valuer interface.
-func (array int32Array) Value() (driver.Value, error) {
+func (array intArray) Value() (driver.Value, error) {
 	return json.Marshal(array)
 }
 

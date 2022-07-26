@@ -16,11 +16,11 @@ func UseEditAppFlags(cmd *cobra.Command) {
 	cmd.Flags().Bool("hidden", false, "Make the app hidden")
 	cmd.Flags().Bool("visible", false, "Remove the hidden flag from the app")
 
-	cmd.Flags().Int32Slice("add-target-ports", []int32{}, "Add to the list of ports that the app is listening to inside the container")
-	cmd.Flags().Int32Slice("rm-target-ports", []int32{}, "Remove from the list of ports that the app is listening to inside the container")
+	cmd.Flags().IntSlice("add-target-ports", []int{}, "Add to the list of ports that the app is listening to inside the container")
+	cmd.Flags().IntSlice("rm-target-ports", []int{}, "Remove from the list of ports that the app is listening to inside the container")
 
-	cmd.Flags().Int32Slice("add-published-ports", []int32{}, "Add to the list of ports the app can be accessed through")
-	cmd.Flags().Int32Slice("rm-published-ports", []int32{}, "Remove from the list of ports the app can be accessed through")
+	cmd.Flags().IntSlice("add-published-ports", []int{}, "Add to the list of ports the app can be accessed through")
+	cmd.Flags().IntSlice("rm-published-ports", []int{}, "Remove from the list of ports the app can be accessed through")
 
 	cmd.Flags().StringSlice("add-placement-constraint", []string{}, "Add to the list of constraints specifying which nodes can run the app")
 	cmd.Flags().StringSlice("rm-placement-constraint", []string{}, "Remove from the list of constraints specifying which nodes can run the app")
@@ -34,10 +34,10 @@ type EditApp struct {
 	Visible                bool
 	Name                   *string
 	Group                  *string
-	AddTargetPorts         []int32
-	RMTargetPorts          []int32
-	AddPublishedPorts      []int32
-	RMPublishedPorts       []int32
+	AddTargetPorts         []int
+	RMTargetPorts          []int
+	AddPublishedPorts      []int
+	RMPublishedPorts       []int
 	AddPlacementConstraint []string
 	RMPlacementConstraint  []string
 	AddVolume              []string
@@ -82,24 +82,24 @@ func GetEditAppFlags(cmd *cobra.Command) *EditApp {
 	}
 
 	// Target Ports
-	addTargetPorts, err := cmd.Flags().GetInt32Slice("add-target-ports")
+	addTargetPorts, err := cmd.Flags().GetIntSlice("add-target-ports")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	rmTargetPorts, err := cmd.Flags().GetInt32Slice("rm-target-ports")
+	rmTargetPorts, err := cmd.Flags().GetIntSlice("rm-target-ports")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
 	// Published Ports
-	addPublishedPorts, err := cmd.Flags().GetInt32Slice("add-published-ports")
+	addPublishedPorts, err := cmd.Flags().GetIntSlice("add-published-ports")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	rmPublishedPorts, err := cmd.Flags().GetInt32Slice("rm-published-ports")
+	rmPublishedPorts, err := cmd.Flags().GetIntSlice("rm-published-ports")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

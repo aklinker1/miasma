@@ -10,6 +10,7 @@ import (
 	"github.com/aklinker1/miasma/internal/server/docker"
 	"github.com/aklinker1/miasma/internal/server/fmt"
 	"github.com/aklinker1/miasma/internal/server/graphql"
+	"github.com/aklinker1/miasma/internal/server/services"
 	"github.com/aklinker1/miasma/internal/server/sqlite"
 )
 
@@ -41,42 +42,116 @@ type scheduledJob struct {
 }
 
 func main() {
+	// Dependencies
 	logger := &fmt.Logger{}
-
-	db := sqlite.NewDB(databasePath, logger)
+	db := sqlite.NewDB(databasePath, logger.Scoped("db"))
 	err := db.Open()
 	if err != nil {
 		logger.E("Failed to open database: %v", err)
 		os.Exit(1)
 	}
-
-	runtime, err := docker.NewRuntimeService(logger, certResolverName)
-	apps := sqlite.NewAppService(db, runtime, logger)
-	env := sqlite.NewEnvService(db, runtime, logger)
-	routes := sqlite.NewRouteService(db, logger)
-	plugins := sqlite.NewPluginService(db, apps, runtime, logger, certResolverName)
+	dockerClient, err := docker.NewDefaultClient()
 	if err != nil {
 		logger.E("Failed to initialize docker runtime: %v", err)
 		os.Exit(1)
 	}
-	resolver := &graphql.Resolver{
-		Apps:       apps,
-		Routes:     routes,
-		EnvService: env,
-		Plugins:    plugins,
-		Runtime:    runtime,
-		Version:    VERSION,
-		Logger:     logger,
+
+	// Persistance Layer
+
+	appRepo := &sqlite.AppRepo{
+		Logger: logger.Scoped("app-repo"),
 	}
-	server := graphql.NewServer(logger, db, resolver, ACCESS_TOKEN)
+	envRepo := &sqlite.EnvRepo{
+		Logger: logger.Scoped("env-repo"),
+	}
+	routeRepo := &sqlite.RouteRepo{
+		Logger: logger.Scoped("route-repo"),
+	}
+	pluginRepo := &sqlite.PluginRepo{
+		Logger: logger.Scoped("plugin-repo"),
+	}
+	runtimeRepo := docker.NewRuntimeRepo(
+		logger.Scoped("runtime-repo"),
+		dockerClient,
+	)
+	runtimeServiceRepo := docker.NewRuntimeServiceRepo(
+		logger.Scoped("runtime-service-repo"),
+		dockerClient,
+		certResolverName,
+	)
+	runtimeImageRepo := docker.NewRuntimeImageRepo(
+		logger.Scoped("runtime-image-repo"),
+		dockerClient,
+	)
+	runtimeNodeRepo := docker.NewRuntimeNodeRepo(
+		logger.Scoped("runtime-node-repo"),
+		dockerClient,
+	)
+	runtimeTaskRepo := docker.NewRuntimeTaskRepo(
+		logger.Scoped("runtime-task-repo"),
+		dockerClient,
+	)
+
+	// Service Layer
+
+	appService := &services.AppService{
+		DB:                 db,
+		Logger:             logger.Scoped("app-service"),
+		AppRepo:            appRepo,
+		RouteRepo:          routeRepo,
+		EnvRepo:            envRepo,
+		PluginRepo:         pluginRepo,
+		RuntimeServiceRepo: runtimeServiceRepo,
+	}
+	runtimeService := &services.RuntimeService{
+		DB:                 db,
+		Logger:             logger.Scoped("runtime-service"),
+		AppRepo:            appRepo,
+		RouteRepo:          routeRepo,
+		EnvRepo:            envRepo,
+		PluginRepo:         pluginRepo,
+		RuntimeServiceRepo: runtimeServiceRepo,
+		AppService:         appService,
+	}
+	pluginService := &services.PluginService{
+		DB:               db,
+		Logger:           logger.Scoped("plugin-service"),
+		AppRepo:          appRepo,
+		PluginRepo:       pluginRepo,
+		CertResolverName: certResolverName,
+		RuntimeService:   runtimeService,
+		AppService:       appService,
+	}
+
+	resolver := &graphql.Resolver{
+		Version: VERSION,
+		DB:      db,
+		Logger:  logger.Scoped("resolver"),
+
+		AppRepo:            appRepo,
+		RouteRepo:          routeRepo,
+		EnvRepo:            envRepo,
+		PluginRepo:         pluginRepo,
+		RuntimeServiceRepo: runtimeServiceRepo,
+		RuntimeRepo:        runtimeRepo,
+		RuntimeNodeRepo:    runtimeNodeRepo,
+		RuntimeTaskRepo:    runtimeTaskRepo,
+		RuntimeImageRepo:   runtimeImageRepo,
+
+		AppService:     appService,
+		PluginService:  pluginService,
+		RuntimeService: runtimeService,
+	}
+
+	// Jobs
 
 	pollingUpdater := cron2.PollingUpgrader{
-		Logger:  logger,
-		Apps:    apps,
-		Runtime: runtime,
-		Routes:  routes,
-		Plugins: plugins,
-		Env:     env,
+		DB:               db,
+		Logger:           logger.Scoped("polling-upgrader"),
+		AppRepo:          appRepo,
+		RuntimeImageRepo: runtimeImageRepo,
+		PluginRepo:       pluginRepo,
+		RuntimeService:   runtimeService,
 	}
 	jobs := []scheduledJob{
 		{
@@ -86,7 +161,11 @@ func main() {
 		},
 	}
 
-	go scheduleJobs(jobs, logger)
+	go scheduleJobs(jobs, logger.Scoped("cron"))
+
+	// Controllers
+
+	server := graphql.NewServer(logger.Scoped("gql-server"), db, resolver, ACCESS_TOKEN)
 	server.ServeGraphql()
 }
 

@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/aklinker1/miasma/internal/server"
-	fmt2 "github.com/aklinker1/miasma/internal/server/fmt"
 )
 
 type insertBuilder struct {
@@ -16,7 +15,7 @@ type insertBuilder struct {
 	logger  server.Logger
 }
 
-func Insert(table string, record map[string]any) *insertBuilder {
+func Insert(logger server.Logger, table string, record map[string]any) *insertBuilder {
 	columns := []string{}
 	values := []string{}
 	args := []any{}
@@ -32,7 +31,7 @@ func Insert(table string, record map[string]any) *insertBuilder {
 		columns: columns,
 		args:    args,
 		values:  values,
-		logger:  &fmt2.Logger{},
+		logger:  logger,
 	}
 }
 
@@ -41,6 +40,6 @@ func (b *insertBuilder) ToSQL() (sql string, args []any) {
 	columns := strings.Join(b.columns, ", ")
 	values := strings.Join(b.values, ", ")
 	sql = fmt.Sprintf(`INSERT INTO %s (%s) VALUES (%s)`, b.table, columns, values)
-	b.logger.V("SQL Insert: %s %v", sql, args)
+	b.logger.V("%s %v", sql, args)
 	return sql, args
 }

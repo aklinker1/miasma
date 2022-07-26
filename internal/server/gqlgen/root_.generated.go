@@ -124,9 +124,9 @@ type ComplexityRoot struct {
 
 	Query struct {
 		GetApp      func(childComplexity int, id string) int
-		GetPlugin   func(childComplexity int, pluginName internal.PluginName) int
+		GetPlugin   func(childComplexity int, name internal.PluginName) int
 		Health      func(childComplexity int) int
-		ListApps    func(childComplexity int, page *int32, size *int32, showHidden *bool) int
+		ListApps    func(childComplexity int, page *int, size *int, showHidden *bool) int
 		ListPlugins func(childComplexity int) int
 		Nodes       func(childComplexity int) int
 	}
@@ -647,7 +647,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetPlugin(childComplexity, args["pluginName"].(internal.PluginName)), true
+		return e.complexity.Query.GetPlugin(childComplexity, args["name"].(internal.PluginName)), true
 
 	case "Query.health":
 		if e.complexity.Query.Health == nil {
@@ -666,7 +666,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.ListApps(childComplexity, args["page"].(*int32), args["size"].(*int32), args["showHidden"].(*bool)), true
+		return e.complexity.Query.ListApps(childComplexity, args["page"].(*int), args["size"].(*int), args["showHidden"].(*bool)), true
 
 	case "Query.listPlugins":
 		if e.complexity.Query.ListPlugins == nil {
@@ -827,6 +827,11 @@ type BoundVolume {
   source: String!
 }
 
+enum RuntimeStatus {
+  RUNNING
+  STOPPED
+}
+
 "Managed application"
 type App {
   id: ID!
@@ -865,7 +870,7 @@ type App {
   "The environment variables configured for this app."
   env: Map
   "Whether or not the application is running, or stopped."
-  status: String!
+  status: RuntimeStatus!
   "The number of instances running vs what should be running."
   instances: AppInstances!
   """
@@ -1077,7 +1082,7 @@ type Node {
   "List all the available plugins for Miasma"
   listPlugins: [Plugin!]!
   "Grab a plugin by it's name"
-  getPlugin(pluginName: PluginName!): Plugin!
+  getPlugin(name: PluginName!): Plugin!
 
   "List the nodes that are apart of the cluster"
   nodes: [Node!]!

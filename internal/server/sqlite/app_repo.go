@@ -8,13 +8,18 @@ import (
 	"github.com/aklinker1/miasma/internal/server"
 	"github.com/aklinker1/miasma/internal/server/sqlite/sqlb"
 	"github.com/aklinker1/miasma/internal/server/sqlite/sqlitetypes"
+	"github.com/aklinker1/miasma/internal/server/zero"
 	"github.com/aklinker1/miasma/internal/utils"
 	"github.com/gofrs/uuid"
 )
 
-func findApps(ctx context.Context, tx server.Tx, filter server.AppsFilter) ([]internal.App, error) {
+type AppRepo struct {
+	Logger server.Logger
+}
+
+func (r *AppRepo) GetAll(ctx context.Context, tx server.Tx, filter server.AppsFilter) ([]internal.App, error) {
 	var scanned internal.App
-	query := sqlb.Select("apps", map[string]any{
+	query := sqlb.Select(r.Logger, "apps", map[string]any{
 		"id":              &scanned.ID,
 		"created_at":      &scanned.CreatedAt,
 		"updated_at":      &scanned.UpdatedAt,
@@ -25,8 +30,8 @@ func findApps(ctx context.Context, tx server.Tx, filter server.AppsFilter) ([]in
 		"image_digest":    &scanned.ImageDigest,
 		"auto_upgrade":    &scanned.AutoUpgrade,
 		"hidden":          &scanned.Hidden,
-		"target_ports":    sqlitetypes.Int32Array(&scanned.TargetPorts),
-		"published_ports": sqlitetypes.Int32Array(&scanned.PublishedPorts),
+		"target_ports":    sqlitetypes.IntArray(&scanned.TargetPorts),
+		"published_ports": sqlitetypes.IntArray(&scanned.PublishedPorts),
 		"placement":       sqlitetypes.StringArray(&scanned.Placement),
 		"volumes":         sqlitetypes.BoundVolumeArray(&scanned.Volumes),
 		"command":         sqlitetypes.StringArray(&scanned.Command),
@@ -71,33 +76,33 @@ func findApps(ctx context.Context, tx server.Tx, filter server.AppsFilter) ([]in
 	return result, rows.Err()
 }
 
-func findApp(ctx context.Context, tx server.Tx, filter server.AppsFilter) (internal.App, error) {
-	apps, err := findApps(ctx, tx, filter)
+func (r *AppRepo) GetOne(ctx context.Context, tx server.Tx, filter server.AppsFilter) (internal.App, error) {
+	apps, err := r.GetAll(ctx, tx, filter)
 	if err != nil {
-		return EmptyApp, err
+		return zero.App, err
 	}
 	if len(apps) == 0 {
-		return EmptyApp, &server.Error{
+		return zero.App, &server.Error{
 			Code:    server.ENOTFOUND,
 			Message: "App not found",
-			Op:      "findApp",
+			Op:      "sqlite.AppRepo.GetOne",
 		}
 	}
 	return apps[0], nil
 }
 
-func createApp(ctx context.Context, tx server.Tx, app internal.App) (internal.App, error) {
+func (r *AppRepo) Create(ctx context.Context, tx server.Tx, app internal.App) (internal.App, error) {
 	if app.ID == "" {
 		id, err := uuid.NewV4()
 		if err != nil {
-			return EmptyApp, err
+			return zero.App, err
 		}
 		app.ID = id.String()
 	}
 	app.CreatedAt = time.Now()
 	app.UpdatedAt = time.Now()
 
-	sql, args := sqlb.Insert("apps", map[string]any{
+	sql, args := sqlb.Insert(r.Logger, "apps", map[string]any{
 		"id":              app.ID,
 		"created_at":      app.CreatedAt,
 		"updated_at":      app.UpdatedAt,
@@ -108,8 +113,8 @@ func createApp(ctx context.Context, tx server.Tx, app internal.App) (internal.Ap
 		"image_digest":    app.ImageDigest,
 		"auto_upgrade":    app.AutoUpgrade,
 		"hidden":          app.Hidden,
-		"target_ports":    sqlitetypes.Int32Array(app.TargetPorts),
-		"published_ports": sqlitetypes.Int32Array(app.PublishedPorts),
+		"target_ports":    sqlitetypes.IntArray(app.TargetPorts),
+		"published_ports": sqlitetypes.IntArray(app.PublishedPorts),
 		"placement":       sqlitetypes.StringArray(app.Placement),
 		"volumes":         sqlitetypes.BoundVolumeArray(app.Volumes),
 		"command":         sqlitetypes.StringArray(app.Command),
@@ -119,10 +124,10 @@ func createApp(ctx context.Context, tx server.Tx, app internal.App) (internal.Ap
 	return app, err
 }
 
-func updateApp(ctx context.Context, tx server.Tx, app internal.App) (internal.App, error) {
+func (r *AppRepo) Update(ctx context.Context, tx server.Tx, app internal.App) (internal.App, error) {
 	app.UpdatedAt = time.Now()
 
-	sql, args := sqlb.Update("apps", "id", app.ID, map[string]any{
+	sql, args := sqlb.Update(r.Logger, "apps", "id", app.ID, map[string]any{
 		"updated_at":      app.UpdatedAt,
 		"name":            app.Name,
 		"group":           app.Group,
@@ -131,8 +136,8 @@ func updateApp(ctx context.Context, tx server.Tx, app internal.App) (internal.Ap
 		"image_digest":    app.ImageDigest,
 		"auto_upgrade":    app.AutoUpgrade,
 		"hidden":          app.Hidden,
-		"target_ports":    sqlitetypes.Int32Array(app.TargetPorts),
-		"published_ports": sqlitetypes.Int32Array(app.PublishedPorts),
+		"target_ports":    sqlitetypes.IntArray(app.TargetPorts),
+		"published_ports": sqlitetypes.IntArray(app.PublishedPorts),
 		"placement":       sqlitetypes.StringArray(app.Placement),
 		"volumes":         sqlitetypes.BoundVolumeArray(app.Volumes),
 		"command":         sqlitetypes.StringArray(app.Command),
@@ -142,7 +147,8 @@ func updateApp(ctx context.Context, tx server.Tx, app internal.App) (internal.Ap
 	return app, err
 }
 
-func deleteApp(ctx context.Context, tx server.Tx, app internal.App) error {
+func (r *AppRepo) Delete(ctx context.Context, tx server.Tx, app internal.App) (internal.App, error) {
+	app.UpdatedAt = time.Now()
 	_, err := tx.ExecContext(ctx, "DELETE FROM apps WHERE id = ?", app.ID)
-	return err
+	return app, err
 }

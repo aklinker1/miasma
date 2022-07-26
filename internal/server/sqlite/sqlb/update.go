@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/aklinker1/miasma/internal/server"
-	fmt2 "github.com/aklinker1/miasma/internal/server/fmt"
 )
 
 type updateBuilder struct {
@@ -16,7 +15,7 @@ type updateBuilder struct {
 	logger  server.Logger
 }
 
-func Update(table string, idField string, id any, record map[string]any) *updateBuilder {
+func Update(logger server.Logger, table string, idField string, id any, record map[string]any) *updateBuilder {
 	columns := []string{}
 	args := []any{}
 	for column, value := range record {
@@ -29,7 +28,7 @@ func Update(table string, idField string, id any, record map[string]any) *update
 		columns: columns,
 		args:    args,
 		idField: idField,
-		logger:  &fmt2.Logger{},
+		logger:  logger,
 	}
 }
 
@@ -45,6 +44,6 @@ func (b *updateBuilder) ToSQL() (sql string, args []any) {
 		strings.Join(setters, ", "),
 		b.idField,
 	)
-	b.logger.V("SQL Update: %s %v", sql, args)
+	b.logger.V("%s %v", sql, args)
 	return sql, args
 }

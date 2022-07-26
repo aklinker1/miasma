@@ -1,13 +1,14 @@
 import { Ref } from "vue";
 import { gql } from "graphql-tag";
 import { useQuery } from "@vue/apollo-composable";
+import { RuntimeStatus } from "./app-status-query";
 
 export interface AppDetails {
   id: string;
   name: string;
   image: string;
   group?: string;
-  status: string;
+  status: RuntimeStatus;
   availableAt: string[];
   instances?: {
     running: number;
