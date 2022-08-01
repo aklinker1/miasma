@@ -249,6 +249,10 @@ func (r *mutationResolver) SetAppRoute(ctx context.Context, appID string, route 
 	}
 
 	updated, err := utils.InTx(ctx, r.DB.ReadWriteTx, zero.Route, func(tx server.Tx) (internal.Route, error) {
+		app, err := r.AppRepo.GetOne(ctx, tx, server.AppsFilter{ID: &appID})
+		if err != nil {
+			return zero.Route, err
+		}
 		existing, err := r.RouteRepo.GetOne(ctx, tx, server.RoutesFilter{
 			AppID: &appID,
 		})
@@ -279,7 +283,15 @@ func (r *mutationResolver) SetAppRoute(ctx context.Context, appID string, route 
 		existing.Host = route.Host
 		existing.Path = route.Path
 		existing.TraefikRule = route.TraefikRule
-		return r.RouteRepo.Update(ctx, tx, existing)
+		updated, err := r.RouteRepo.Update(ctx, tx, existing)
+		if err != nil {
+			return zero.Route, err
+		}
+		return updated, r.RuntimeService.RestartAppIfRunning(ctx, tx, services.PartialRuntimeServiceSpec{
+			App:      app,
+			HasRoute: true,
+			Route:    &updated,
+		})
 	})
 
 	return utils.SafeReturn(&updated, nil, err)
