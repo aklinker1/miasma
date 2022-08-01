@@ -223,7 +223,21 @@ func (r *mutationResolver) DisablePlugin(ctx context.Context, name internal.Plug
 
 func (r *mutationResolver) SetAppEnv(ctx context.Context, appID string, newEnv map[string]interface{}) (map[string]interface{}, error) {
 	created, err := utils.InTx(ctx, r.DB.ReadWriteTx, nil, func(tx server.Tx) (internal.EnvMap, error) {
-		return r.EnvRepo.Set(ctx, tx, appID, utils.ToEnvMap(newEnv))
+		app, err := r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
+			ID: &appID,
+		})
+		if err != nil {
+			return nil, err
+		}
+		saved, err := r.EnvRepo.Set(ctx, tx, app.ID, utils.ToEnvMap(newEnv))
+		if err != nil {
+			return nil, err
+		}
+		return saved, r.RuntimeService.RestartAppIfRunning(ctx, tx, services.PartialRuntimeServiceSpec{
+			App:    app,
+			HasEnv: true,
+			Env:    saved,
+		})
 	})
 	return utils.SafeReturn(utils.ToAnyMap(created), nil, err)
 }
