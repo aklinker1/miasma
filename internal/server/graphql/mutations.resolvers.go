@@ -299,6 +299,10 @@ func (r *mutationResolver) SetAppRoute(ctx context.Context, appID string, route 
 
 func (r *mutationResolver) RemoveAppRoute(ctx context.Context, appID string) (*internal.Route, error) {
 	return utils.InTx(ctx, r.DB.ReadWriteTx, nil, func(tx server.Tx) (*internal.Route, error) {
+		app, err := r.AppRepo.GetOne(ctx, tx, server.AppsFilter{ID: &appID})
+		if err != nil {
+			return nil, err
+		}
 		route, err := r.RouteRepo.GetOne(ctx, tx, server.RoutesFilter{
 			AppID: &appID,
 		})
@@ -308,7 +312,18 @@ func (r *mutationResolver) RemoveAppRoute(ctx context.Context, appID string) (*i
 			return &zero.Route, err
 		}
 		deleted, err := r.RouteRepo.Delete(ctx, tx, route)
-		return utils.SafeReturn(&deleted, nil, err)
+		if err != nil {
+			return nil, err
+		}
+		return utils.SafeReturn(
+			&deleted,
+			nil,
+			r.RuntimeService.RestartAppIfRunning(ctx, tx, services.PartialRuntimeServiceSpec{
+				App:      app,
+				HasRoute: true,
+				Route:    nil,
+			}),
+		)
 	})
 }
 
