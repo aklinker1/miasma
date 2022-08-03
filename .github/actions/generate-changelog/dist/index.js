@@ -7287,9 +7287,12 @@ function getNextVersion(changelog) {
     console.log(`Previous version: ${major}.${minor}.${patch}`);
     if (changelog.breakingChanges.length > 0) {
         major++;
+        minor = 0;
+        patch = 0;
     }
     else if (changelog.features.length > 0) {
         minor++;
+        patch = 0;
     }
     else if (changelog.fixes.length > 0) {
         patch++;

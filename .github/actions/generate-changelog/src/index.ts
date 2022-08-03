@@ -152,8 +152,11 @@ function getNextVersion(changelog: Changelog): string {
 
   if (changelog.breakingChanges.length > 0) {
     major++;
+    minor = 0;
+    patch = 0;
   } else if (changelog.features.length > 0) {
     minor++;
+    patch = 0;
   } else if (changelog.fixes.length > 0) {
     patch++;
   }

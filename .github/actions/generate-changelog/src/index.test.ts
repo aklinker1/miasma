@@ -155,3 +155,103 @@ test("Example CLI Changelog", async () => {
   expect(setOutputMock).toBeCalledWith("skipped", false);
   expect(setOutputMock).toBeCalledWith("nextVersion", "1.0.0");
 });
+
+test("Reset patch when minor is bumped", async () => {
+  const module = "CLI";
+  const scopes = "cli";
+  mockInputs(module, scopes);
+  const git = mockGit(
+    [
+      mockCommit({
+        message: "feat(cli): Some CLI change 3",
+        hash: "1234",
+      }),
+      mockCommit({
+        message: "fix(cli): Some CLI change 2",
+        hash: "2345",
+      }),
+      mockCommit({
+        message: "fix(ui): Some UI change",
+        hash: "2345",
+      }),
+      mockCommit({
+        message: "feat(cli): Some CLI change 1",
+        hash: "3456",
+      }),
+    ],
+    ["cli-v1.0.1"]
+  );
+
+  await generateChangelog();
+
+  expect(git.log).toBeCalledTimes(1);
+  expect(git.log).toBeCalledWith({ from: "cli-v1.0.1", to: "HEAD" });
+  expect(setOutputMock).toBeCalledTimes(3);
+  expect(setOutputMock).toBeCalledWith(
+    "changelog",
+    `
+### Features
+
+- **cli:** Some CLI change 1 (3456)
+- **cli:** Some CLI change 3 (1234)
+
+### Fixes
+
+- **cli:** Some CLI change 2 (2345)
+    `.trim()
+  );
+  expect(setOutputMock).toBeCalledWith("skipped", false);
+  expect(setOutputMock).toBeCalledWith("nextVersion", "1.1.0");
+});
+
+test("Reset minor and patch when major is bumped", async () => {
+  const module = "CLI";
+  const scopes = "cli";
+  mockInputs(module, scopes);
+  const git = mockGit(
+    [
+      mockCommit({
+        message: "feat(cli): Some CLI change 3",
+        body: "BREAKING CHANGE: some desc",
+        hash: "1234",
+      }),
+      mockCommit({
+        message: "fix(cli): Some CLI change 2",
+        hash: "2345",
+      }),
+      mockCommit({
+        message: "fix(ui): Some UI change",
+        hash: "2345",
+      }),
+      mockCommit({
+        message: "feat(cli): Some CLI change 1",
+        hash: "3456",
+      }),
+    ],
+    ["cli-v1.1.1"]
+  );
+
+  await generateChangelog();
+
+  expect(git.log).toBeCalledTimes(1);
+  expect(git.log).toBeCalledWith({ from: "cli-v1.1.1", to: "HEAD" });
+  expect(setOutputMock).toBeCalledTimes(3);
+  expect(setOutputMock).toBeCalledWith(
+    "changelog",
+    `
+### BREAKING CHANGES
+
+- **cli:** Some CLI change 3 (1234)
+
+### Features
+
+- **cli:** Some CLI change 1 (3456)
+
+### Fixes
+
+- **cli:** Some CLI change 2 (2345)
+    `.trim()
+  );
+  expect(setOutputMock).toBeCalledWith("skipped", false);
+  expect(setOutputMock).toBeCalledWith("nextVersion", "2.0.0");
+});
