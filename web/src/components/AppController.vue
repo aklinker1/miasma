@@ -75,6 +75,9 @@ const isUpdating = computed(
         {{ status.instances.total }} instances</span
       >
     </li>
+    <li>
+      <app-logs-container :app-id="app.id" />
+    </li>
 
     <!-- URLs -->
     <template v-if="app.availableAt.length > 0">
