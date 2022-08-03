@@ -81,7 +81,8 @@ func (r *appResolver) Status(ctx context.Context, obj *internal.App) (internal.R
 
 func (r *appResolver) Instances(ctx context.Context, obj *internal.App) (*internal.AppInstances, error) {
 	service, err := r.RuntimeServiceRepo.GetOne(ctx, server.RuntimeServicesFilter{
-		AppID: &obj.ID,
+		AppID:         &obj.ID,
+		IncludeStatus: true,
 	})
 	if server.ErrorCode(err) == server.ENOTFOUND {
 		return &internal.AppInstances{}, nil
