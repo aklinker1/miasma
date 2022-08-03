@@ -11,6 +11,7 @@ specifiers:
   '@vue/apollo-composable': 4.0.0-alpha.18
   autoprefixer: ^10.4.7
   daisyui: ^2.17.0
+  date-fns: ^2.29.1
   graphql: ^16.5.0
   graphql-tag: ^2.12.6
   lodash.debounce: ^4.0.8
@@ -34,6 +35,7 @@ dependencies:
   '@tailwindcss/typography': 0.5.4_tailwindcss@3.1.6
   '@vue/apollo-composable': 4.0.0-alpha.18_ga3iooe4t6afr6kongbdyporqi
   daisyui: 2.17.0_ugi4xkrfysqkt4c4y6hkyfj344
+  date-fns: 2.29.1
   graphql: 16.5.0
   graphql-tag: 2.12.6_graphql@16.5.0
   prismjs: 1.28.0
@@ -529,6 +531,11 @@ packages:
       tailwindcss: 3.1.6
     transitivePeerDependencies:
       - ts-node
+    dev: false
+
+  /date-fns/2.29.1:
+    resolution: {integrity: sha512-dlLD5rKaKxpFdnjrs+5azHDFOPEu4ANy/LTh04A1DTzMM7qoajmKCBc8pkKRFT41CNzw+4gQh79X5C+Jq27HAw==}
+    engines: {node: '>=0.11'}
     dev: false
 
   /debug/4.3.4:
