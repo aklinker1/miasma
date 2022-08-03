@@ -218,3 +218,18 @@ type Node {
     showHidden: Boolean = false
   ): [App!]!
 }
+
+"Tasks define the desired state of on app. If you're familiar with docker, this returns the result of `docker service ps`"
+type AppTask {
+  message: String!
+  state: String!
+  desiredState: String!
+  timestamp: Time!
+  appId: String!
+  app: App!
+  nodeId: String!
+  node: Node!
+  name: String!
+  error: String
+  exitCode: Int
+}

@@ -31,6 +31,7 @@ type Config struct {
 
 type ResolverRoot interface {
 	App() AppResolver
+	AppTask() AppTaskResolver
 	Health() HealthResolver
 	Mutation() MutationResolver
 	Node() NodeResolver
@@ -69,6 +70,20 @@ type ComplexityRoot struct {
 	AppInstances struct {
 		Running func(childComplexity int) int
 		Total   func(childComplexity int) int
+	}
+
+	AppTask struct {
+		App          func(childComplexity int) int
+		AppID        func(childComplexity int) int
+		DesiredState func(childComplexity int) int
+		Error        func(childComplexity int) int
+		ExitCode     func(childComplexity int) int
+		Message      func(childComplexity int) int
+		Name         func(childComplexity int) int
+		Node         func(childComplexity int) int
+		NodeID       func(childComplexity int) int
+		State        func(childComplexity int) int
+		Timestamp    func(childComplexity int) int
 	}
 
 	BoundVolume struct {
@@ -124,6 +139,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		GetApp      func(childComplexity int, id string) int
+		GetAppTasks func(childComplexity int, id string) int
 		GetPlugin   func(childComplexity int, name internal.PluginName) int
 		Health      func(childComplexity int) int
 		ListApps    func(childComplexity int, page *int, size *int, showHidden *bool) int
@@ -328,6 +344,83 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AppInstances.Total(childComplexity), true
+
+	case "AppTask.app":
+		if e.complexity.AppTask.App == nil {
+			break
+		}
+
+		return e.complexity.AppTask.App(childComplexity), true
+
+	case "AppTask.appId":
+		if e.complexity.AppTask.AppID == nil {
+			break
+		}
+
+		return e.complexity.AppTask.AppID(childComplexity), true
+
+	case "AppTask.desiredState":
+		if e.complexity.AppTask.DesiredState == nil {
+			break
+		}
+
+		return e.complexity.AppTask.DesiredState(childComplexity), true
+
+	case "AppTask.error":
+		if e.complexity.AppTask.Error == nil {
+			break
+		}
+
+		return e.complexity.AppTask.Error(childComplexity), true
+
+	case "AppTask.exitCode":
+		if e.complexity.AppTask.ExitCode == nil {
+			break
+		}
+
+		return e.complexity.AppTask.ExitCode(childComplexity), true
+
+	case "AppTask.message":
+		if e.complexity.AppTask.Message == nil {
+			break
+		}
+
+		return e.complexity.AppTask.Message(childComplexity), true
+
+	case "AppTask.name":
+		if e.complexity.AppTask.Name == nil {
+			break
+		}
+
+		return e.complexity.AppTask.Name(childComplexity), true
+
+	case "AppTask.node":
+		if e.complexity.AppTask.Node == nil {
+			break
+		}
+
+		return e.complexity.AppTask.Node(childComplexity), true
+
+	case "AppTask.nodeId":
+		if e.complexity.AppTask.NodeID == nil {
+			break
+		}
+
+		return e.complexity.AppTask.NodeID(childComplexity), true
+
+	case "AppTask.state":
+		if e.complexity.AppTask.State == nil {
+			break
+		}
+
+		return e.complexity.AppTask.State(childComplexity), true
+
+	case "AppTask.timestamp":
+		if e.complexity.AppTask.Timestamp == nil {
+			break
+		}
+
+		return e.complexity.AppTask.Timestamp(childComplexity), true
 
 	case "BoundVolume.source":
 		if e.complexity.BoundVolume.Source == nil {
@@ -636,6 +729,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetApp(childComplexity, args["id"].(string)), true
+
+	case "Query.getAppTasks":
+		if e.complexity.Query.GetAppTasks == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getAppTasks_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetAppTasks(childComplexity, args["id"].(string)), true
 
 	case "Query.getPlugin":
 		if e.complexity.Query.GetPlugin == nil {
@@ -1015,6 +1120,21 @@ type Node {
     showHidden: Boolean = false
   ): [App!]!
 }
+
+"Tasks define the desired state of on app. If you're familiar with docker, this returns the result of ` + "`" + `docker service ps` + "`" + `"
+type AppTask {
+  message: String!
+  state: String!
+  desiredState: String!
+  timestamp: Time!
+  appId: String!
+  app: App!
+  nodeId: String!
+  node: Node!
+  name: String!
+  error: String
+  exitCode: Int
+}
 `, BuiltIn: false},
 	{Name: "api/mutations.graphqls", Input: `type Mutation {
   "Create and start a new app."
@@ -1078,6 +1198,9 @@ type Node {
   ): [App!]!
   "Grab an app by it's ID"
   getApp(id: ID!): App!
+
+  "List of tasks for an app, up the 5 most recent"
+  getAppTasks(id: ID!): [AppTask!]!
 
   "List all the available plugins for Miasma"
   listPlugins: [Plugin!]!

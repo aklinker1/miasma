@@ -34,12 +34,29 @@ func (r *queryResolver) ListApps(ctx context.Context, page *int, size *int, show
 }
 
 func (r *queryResolver) GetApp(ctx context.Context, id string) (*internal.App, error) {
+	return r.getApp(ctx, id)
+}
+
+func (r *queryResolver) GetAppTasks(ctx context.Context, id string) ([]*internal.AppTask, error) {
 	app, err := utils.InTx(ctx, r.DB.ReadonlyTx, zero.App, func(tx server.Tx) (internal.App, error) {
 		return r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
 			ID: &id,
 		})
 	})
-	return utils.SafeReturn(&app, nil, err)
+	if err != nil {
+		return nil, err
+	}
+
+	service, err := r.RuntimeServiceRepo.GetOne(ctx, server.RuntimeServicesFilter{AppID: &app.ID})
+	if err != nil {
+		return nil, err
+	}
+
+	tasks, err := r.RuntimeTaskRepo.GetAll(ctx, server.RuntimeTasksFilter{ServiceID: &service.ID})
+	if err != nil {
+		return nil, err
+	}
+	return lo.ToSlicePtr(tasks), nil
 }
 
 func (r *queryResolver) ListPlugins(ctx context.Context) ([]*internal.Plugin, error) {

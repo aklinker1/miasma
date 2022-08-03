@@ -94,6 +94,21 @@ type AppInstances struct {
 	Total   int `json:"total"`
 }
 
+// Tasks define the desired state of on app. If you're familiar with docker, this returns the result of `docker service ps`
+type AppTask struct {
+	Message      string    `json:"message"`
+	State        string    `json:"state"`
+	DesiredState string    `json:"desiredState"`
+	Timestamp    time.Time `json:"timestamp"`
+	AppID        string    `json:"appId"`
+	App          *App      `json:"app"`
+	NodeID       string    `json:"nodeId"`
+	Node         *Node     `json:"node"`
+	Name         string    `json:"name"`
+	Error        *string   `json:"error"`
+	ExitCode     *int      `json:"exitCode"`
+}
+
 // Docker volume configuration
 type BoundVolume struct {
 	// The path inside the container that the data is served from.

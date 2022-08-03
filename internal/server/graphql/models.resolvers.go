@@ -100,6 +100,14 @@ func (r *appResolver) Instances(ctx context.Context, obj *internal.App) (*intern
 	}, nil
 }
 
+func (r *appTaskResolver) App(ctx context.Context, obj *internal.AppTask) (*internal.App, error) {
+	return r.getApp(ctx, obj.AppID)
+}
+
+func (r *appTaskResolver) Node(ctx context.Context, obj *internal.AppTask) (*internal.Node, error) {
+	return r.getNode(ctx, obj.NodeID)
+}
+
 func (r *healthResolver) DockerVersion(ctx context.Context, obj *internal.Health) (string, error) {
 	info, err := r.RuntimeRepo.Info(ctx)
 	return info.ServerVersion, err
@@ -150,6 +158,9 @@ func (r *nodeResolver) Services(ctx context.Context, obj *internal.Node, showHid
 // App returns gqlgen.AppResolver implementation.
 func (r *Resolver) App() gqlgen.AppResolver { return &appResolver{r} }
 
+// AppTask returns gqlgen.AppTaskResolver implementation.
+func (r *Resolver) AppTask() gqlgen.AppTaskResolver { return &appTaskResolver{r} }
+
 // Health returns gqlgen.HealthResolver implementation.
 func (r *Resolver) Health() gqlgen.HealthResolver { return &healthResolver{r} }
 
@@ -157,5 +168,6 @@ func (r *Resolver) Health() gqlgen.HealthResolver { return &healthResolver{r} }
 func (r *Resolver) Node() gqlgen.NodeResolver { return &nodeResolver{r} }
 
 type appResolver struct{ *Resolver }
+type appTaskResolver struct{ *Resolver }
 type healthResolver struct{ *Resolver }
 type nodeResolver struct{ *Resolver }

@@ -96,9 +96,11 @@ type RuntimeServiceRepo interface {
 }
 
 type RuntimeNodesFilter struct {
+	ID *string
 }
 type RuntimeNodeRepo interface {
 	GetAll(ctx context.Context, filter RuntimeNodesFilter) ([]internal.Node, error)
+	GetOne(ctx context.Context, filter RuntimeNodesFilter) (internal.Node, error)
 }
 
 type RuntimeImageRepo interface {
@@ -106,9 +108,10 @@ type RuntimeImageRepo interface {
 }
 
 type RuntimeTasksFilter struct {
-	NodeID *string
-	State  *DesiredTaskState
+	NodeID    *string
+	ServiceID *string
+	State     *DesiredTaskState
 }
 type RuntimeTaskRepo interface {
-	GetAll(ctx context.Context, filter RuntimeTasksFilter) ([]internal.RunningContainer, error)
+	GetAll(ctx context.Context, filter RuntimeTasksFilter) ([]internal.AppTask, error)
 }
