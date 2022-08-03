@@ -12,7 +12,7 @@ func ApplyChanges(changes map[string]interface{}, to interface{}) error {
 		ErrorUnused: true,
 		TagName:     "json",
 		Result:      to,
-		ZeroFields:  false,
+		ZeroFields:  true,
 		// This is needed to get mapstructure to call the gqlgen unmarshaler func for custom scalars (eg Date)
 		DecodeHook: func(a reflect.Type, b reflect.Type, v interface{}) (interface{}, error) {
 			if reflect.PtrTo(b).Implements(reflect.TypeOf((*graphql.Unmarshaler)(nil)).Elem()) {
