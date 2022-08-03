@@ -2,9 +2,11 @@ package docker
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
+	"github.com/aklinker1/miasma/internal/server/zero"
 	"github.com/aklinker1/miasma/internal/utils"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/swarm"
@@ -47,4 +49,19 @@ func (s *runtimeNodeRepo) GetAll(ctx context.Context, filter server.RuntimeNodes
 			Labels:        utils.ToAnyMap(n.Spec.Labels),
 		}
 	}), nil
+}
+
+// GetOne implements server.RuntimeNodeRepo
+func (s *runtimeNodeRepo) GetOne(ctx context.Context, filter server.RuntimeNodesFilter) (internal.Node, error) {
+	nodes, err := s.GetAll(ctx, filter)
+	if err != nil {
+		return zero.Node, err
+	}
+	if len(nodes) == 0 {
+		return zero.Node, &server.Error{
+			Code:    server.ENOTFOUND,
+			Message: fmt.Sprintf("Node not found for %+v", filter),
+		}
+	}
+	return nodes[0], nil
 }

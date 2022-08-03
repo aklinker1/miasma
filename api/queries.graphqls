@@ -14,6 +14,9 @@ type Query {
   "Grab an app by it's ID"
   getApp(id: ID!): App!
 
+  "List of tasks for an app, up the 5 most recent"
+  getAppTasks(id: ID!): [AppTask!]!
+
   "List all the available plugins for Miasma"
   listPlugins: [Plugin!]!
   "Grab a plugin by it's name"

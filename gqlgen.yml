@@ -63,3 +63,9 @@ models:
         resolver: true
       apps:
         resolver: true
+  AppTask:
+    fields:
+      app:
+        resolver: true
+      node:
+        resolver: true

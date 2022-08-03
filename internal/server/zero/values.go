@@ -8,6 +8,7 @@ import (
 
 var (
 	App                = internal.App{}
+	Node               = internal.Node{}
 	Plugin             = internal.Plugin{}
 	Route              = internal.Route{}
 	EnvMap             = internal.EnvMap{}
