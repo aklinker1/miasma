@@ -9,22 +9,39 @@ import (
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
 	"github.com/aklinker1/miasma/internal/server/gqlgen"
+	"github.com/aklinker1/miasma/internal/utils"
 )
 
 // AppLog is the resolver for the appLog field.
 func (r *subscriptionResolver) AppLog(ctx context.Context, id string) (<-chan []*internal.Log, error) {
-	r.Logger.I("Resolver started")
-	_, err := r.RuntimeServiceRepo.GetOne(ctx, server.RuntimeServicesFilter{AppID: &id})
+	service, err := r.RuntimeServiceRepo.GetOne(ctx, server.RuntimeServicesFilter{AppID: &id})
 	if err != nil {
-		return nil, err
-	}
-	// stream, err := r.LogRepo.GetLogStream(streamCtx, service.ID)
-	if err != nil {
-		// done()
 		return nil, err
 	}
 
-	sub := r.LogSubscriptions.CreateSubscription()
+	sub := r.LogSubscriptions.CreateSubscription(func(jobCtx context.Context, done *utils.MutexValue[bool]) {
+		stream, err := r.LogRepo.GetLogStream(jobCtx, service.ID)
+		if err != nil {
+
+			return
+		}
+		defer stream.Close()
+
+		for !done.Value() {
+			r.Logger.D("Waiting for log...")
+			log, noMoreLogs, err := stream.NextLog()
+			if noMoreLogs {
+				r.Logger.I("No more logs")
+				break
+			} else if err != nil {
+				r.Logger.E("Failed to read line: %v", err)
+				break
+			}
+			r.Logger.V("[%v] %s", log.Timestamp, log.Message)
+			r.LogSubscriptions.Broadcast([]*internal.Log{&log})
+		}
+
+	})
 
 	go func() {
 		<-ctx.Done()
@@ -53,7 +70,6 @@ func (r *subscriptionResolver) AppLog(ctx context.Context, id string) (<-chan []
 
 	sub.Channel <- []*internal.Log{}
 
-	r.Logger.I("Resolver done")
 	// done()
 	return sub.Channel, nil
 }

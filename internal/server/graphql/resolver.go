@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"context"
+	"sync"
 
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
@@ -33,6 +34,7 @@ type Resolver struct {
 	RuntimeService *services.RuntimeService
 
 	LogSubscriptions *utils.SubscriptionManager[[]*internal.Log]
+	LogStreams       sync.Map
 }
 
 func (r *Resolver) getApp(ctx context.Context, id string) (*internal.App, error) {

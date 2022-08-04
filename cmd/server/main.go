@@ -149,7 +149,7 @@ func main() {
 		PluginService:  pluginService,
 		RuntimeService: runtimeService,
 
-		LogSubscriptions: utils.NewSubscriptionManager[[]*internal.Log](),
+		LogSubscriptions: utils.NewSubscriptionManager[[]*internal.Log](logger.Scoped("log-subscriptions")),
 	}
 
 	// Jobs
