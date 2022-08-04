@@ -9,6 +9,7 @@ import (
 var (
 	App                = internal.App{}
 	Node               = internal.Node{}
+	Log                = internal.Log{}
 	Plugin             = internal.Plugin{}
 	Route              = internal.Route{}
 	EnvMap             = internal.EnvMap{}

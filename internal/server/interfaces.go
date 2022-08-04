@@ -115,3 +115,12 @@ type RuntimeTasksFilter struct {
 type RuntimeTaskRepo interface {
 	GetAll(ctx context.Context, filter RuntimeTasksFilter) ([]internal.AppTask, error)
 }
+
+type LogStream interface {
+	Close()
+	NextLog() (log internal.Log, done bool, err error)
+}
+
+type LogRepo interface {
+	GetLogStream(ctx context.Context, serviceID string) (LogStream, error)
+}

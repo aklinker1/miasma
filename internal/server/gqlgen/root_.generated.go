@@ -36,6 +36,7 @@ type ResolverRoot interface {
 	Mutation() MutationResolver
 	Node() NodeResolver
 	Query() QueryResolver
+	Subscription() SubscriptionResolver
 }
 
 type DirectiveRoot struct {
@@ -104,6 +105,11 @@ type ComplexityRoot struct {
 		Version       func(childComplexity int) int
 	}
 
+	Log struct {
+		Message   func(childComplexity int) int
+		Timestamp func(childComplexity int) int
+	}
+
 	Mutation struct {
 		CreateApp      func(childComplexity int, input internal.AppInput) int
 		DeleteApp      func(childComplexity int, id string) int
@@ -154,6 +160,10 @@ type ComplexityRoot struct {
 		Path        func(childComplexity int) int
 		TraefikRule func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
+	}
+
+	Subscription struct {
+		AppLog func(childComplexity int, id string) int
 	}
 }
 
@@ -484,6 +494,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Health.Version(childComplexity), true
+
+	case "Log.message":
+		if e.complexity.Log.Message == nil {
+			break
+		}
+
+		return e.complexity.Log.Message(childComplexity), true
+
+	case "Log.timestamp":
+		if e.complexity.Log.Timestamp == nil {
+			break
+		}
+
+		return e.complexity.Log.Timestamp(childComplexity), true
 
 	case "Mutation.createApp":
 		if e.complexity.Mutation.CreateApp == nil {
@@ -829,6 +853,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Route.UpdatedAt(childComplexity), true
 
+	case "Subscription.appLog":
+		if e.complexity.Subscription.AppLog == nil {
+			break
+		}
+
+		args, err := ec.field_Subscription_appLog_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Subscription.AppLog(childComplexity, args["id"].(string)), true
+
 	}
 	return 0, false
 }
@@ -874,6 +910,23 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 				Data: buf.Bytes(),
 			}
 		}
+	case ast.Subscription:
+		next := ec._Subscription(ctx, rc.Operation.SelectionSet)
+
+		var buf bytes.Buffer
+		return func(ctx context.Context) *graphql.Response {
+			buf.Reset()
+			data := next(ctx)
+
+			if data == nil {
+				return nil
+			}
+			data.MarshalGQL(&buf)
+
+			return &graphql.Response{
+				Data: buf.Bytes(),
+			}
+		}
 
 	default:
 		return graphql.OneShot(graphql.ErrorResponse(ctx, "unsupported GraphQL operation"))
@@ -900,7 +953,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "api/models.graphqls", Input: `"""
+	{Name: "../../../api/models.graphqls", Input: `"""
 Contains useful information about the cluster.
 """
 type ClusterInfo {
@@ -1135,8 +1188,13 @@ type AppTask {
   error: String
   exitCode: Int
 }
+
+type Log {
+  message: String!
+  timestamp: Time!
+}
 `, BuiltIn: false},
-	{Name: "api/mutations.graphqls", Input: `type Mutation {
+	{Name: "../../../api/mutations.graphqls", Input: `type Mutation {
   "Create and start a new app."
   createApp(input: AppInput!): App!
   "Edit app configuration."
@@ -1183,7 +1241,7 @@ type AppTask {
   removeAppRoute(appId: ID!): Route
 }
 `, BuiltIn: false},
-	{Name: "api/queries.graphqls", Input: `type Query {
+	{Name: "../../../api/queries.graphqls", Input: `type Query {
   "Get the server's health and version information"
   health: Health
 
@@ -1211,11 +1269,15 @@ type AppTask {
   nodes: [Node!]!
 }
 `, BuiltIn: false},
-	{Name: "api/scalars.graphqls", Input: `"A JSON map of key-value pairs. Values can be any type."
+	{Name: "../../../api/scalars.graphqls", Input: `"A JSON map of key-value pairs. Values can be any type."
 scalar Map
 
 "ISO 8601 date time string."
 scalar Time
+`, BuiltIn: false},
+	{Name: "../../../api/subscription.graphqls", Input: `type Subscription {
+  appLog(id: ID!): [Log!]!
+}
 `, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)

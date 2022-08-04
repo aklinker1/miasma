@@ -26,10 +26,13 @@ type Resolver struct {
 	RuntimeNodeRepo    server.RuntimeNodeRepo
 	RuntimeTaskRepo    server.RuntimeTaskRepo
 	RuntimeImageRepo   server.RuntimeImageRepo
+	LogRepo            server.LogRepo
 
 	AppService     *services.AppService
 	PluginService  *services.PluginService
 	RuntimeService *services.RuntimeService
+
+	LogSubscriptions *utils.SubscriptionManager[[]*internal.Log]
 }
 
 func (r *Resolver) getApp(ctx context.Context, id string) (*internal.App, error) {
