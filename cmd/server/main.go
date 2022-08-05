@@ -6,14 +6,12 @@ import (
 	"github.com/robfig/cron/v3"
 	"github.com/samber/lo"
 
-	"github.com/aklinker1/miasma/internal"
 	cron2 "github.com/aklinker1/miasma/internal/server/cron"
 	"github.com/aklinker1/miasma/internal/server/docker"
 	"github.com/aklinker1/miasma/internal/server/fmt"
 	"github.com/aklinker1/miasma/internal/server/graphql"
 	"github.com/aklinker1/miasma/internal/server/services"
 	"github.com/aklinker1/miasma/internal/server/sqlite"
-	"github.com/aklinker1/miasma/internal/utils"
 )
 
 // Compile time variables
@@ -148,8 +146,6 @@ func main() {
 		AppService:     appService,
 		PluginService:  pluginService,
 		RuntimeService: runtimeService,
-
-		LogSubscriptions: utils.NewSubscriptionManager[[]*internal.Log](logger.Scoped("log-subscriptions")),
 	}
 
 	// Jobs

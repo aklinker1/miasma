@@ -32,9 +32,6 @@ type Resolver struct {
 	AppService     *services.AppService
 	PluginService  *services.PluginService
 	RuntimeService *services.RuntimeService
-
-	LogSubscriptions *utils.SubscriptionManager[[]*internal.Log]
-	LogStreams       sync.Map
 }
 
 func (r *Resolver) getApp(ctx context.Context, id string) (*internal.App, error) {
