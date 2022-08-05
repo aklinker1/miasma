@@ -56,7 +56,6 @@ function saveChanges() {
       v-model:name="name"
       v-model:image="image"
       v-model:group="group"
-      :app="app"
     />
     <div class="divider" />
 
