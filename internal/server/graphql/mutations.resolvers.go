@@ -16,6 +16,7 @@ import (
 	"github.com/samber/lo"
 )
 
+// CreateApp is the resolver for the createApp field.
 func (r *mutationResolver) CreateApp(ctx context.Context, input internal.AppInput) (*internal.App, error) {
 	err := validateAppInput(input)
 	if err != nil {
@@ -66,6 +67,7 @@ func (r *mutationResolver) CreateApp(ctx context.Context, input internal.AppInpu
 	return utils.SafeReturn(&created, nil, err)
 }
 
+// EditApp is the resolver for the editApp field.
 func (r *mutationResolver) EditApp(ctx context.Context, id string, changes map[string]interface{}) (*internal.App, error) {
 	updated, err := utils.InTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
 		newApp, err := r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
@@ -112,6 +114,7 @@ func (r *mutationResolver) EditApp(ctx context.Context, id string, changes map[s
 	return utils.SafeReturn(&updated, nil, err)
 }
 
+// DeleteApp is the resolver for the deleteApp field.
 func (r *mutationResolver) DeleteApp(ctx context.Context, id string) (*internal.App, error) {
 	deleted, err := utils.InTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
 		app, err := r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
@@ -131,6 +134,7 @@ func (r *mutationResolver) DeleteApp(ctx context.Context, id string) (*internal.
 	return utils.SafeReturn(&deleted, nil, err)
 }
 
+// StartApp is the resolver for the startApp field.
 func (r *mutationResolver) StartApp(ctx context.Context, id string) (*internal.App, error) {
 	app, err := utils.InTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
 		app, err := r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
@@ -146,6 +150,7 @@ func (r *mutationResolver) StartApp(ctx context.Context, id string) (*internal.A
 	return utils.SafeReturn(&app, nil, err)
 }
 
+// StopApp is the resolver for the stopApp field.
 func (r *mutationResolver) StopApp(ctx context.Context, id string) (*internal.App, error) {
 	app, err := utils.InTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
 		app, err := r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
@@ -161,6 +166,7 @@ func (r *mutationResolver) StopApp(ctx context.Context, id string) (*internal.Ap
 	return utils.SafeReturn(&app, nil, err)
 }
 
+// RestartApp is the resolver for the restartApp field.
 func (r *mutationResolver) RestartApp(ctx context.Context, id string) (*internal.App, error) {
 	app, err := utils.InTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
 		app, err := r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
@@ -176,6 +182,7 @@ func (r *mutationResolver) RestartApp(ctx context.Context, id string) (*internal
 	return utils.SafeReturn(&app, nil, err)
 }
 
+// UpgradeApp is the resolver for the upgradeApp field.
 func (r *mutationResolver) UpgradeApp(ctx context.Context, id string) (*internal.App, error) {
 	upgraded, err := utils.InTx(ctx, r.DB.ReadWriteTx, zero.App, func(tx server.Tx) (internal.App, error) {
 		// Grab the old digest
@@ -211,16 +218,19 @@ func (r *mutationResolver) UpgradeApp(ctx context.Context, id string) (*internal
 	return utils.SafeReturn(&upgraded, nil, err)
 }
 
+// EnablePlugin is the resolver for the enablePlugin field.
 func (r *mutationResolver) EnablePlugin(ctx context.Context, name internal.PluginName, config map[string]interface{}) (*internal.Plugin, error) {
 	enabled, err := r.PluginService.TogglePlugin(ctx, true, name, config)
 	return utils.SafeReturn(&enabled, nil, err)
 }
 
+// DisablePlugin is the resolver for the disablePlugin field.
 func (r *mutationResolver) DisablePlugin(ctx context.Context, name internal.PluginName) (*internal.Plugin, error) {
 	disabled, err := r.PluginService.TogglePlugin(ctx, false, name, map[string]any{})
 	return utils.SafeReturn(&disabled, nil, err)
 }
 
+// SetAppEnv is the resolver for the setAppEnv field.
 func (r *mutationResolver) SetAppEnv(ctx context.Context, appID string, newEnv map[string]interface{}) (map[string]interface{}, error) {
 	created, err := utils.InTx(ctx, r.DB.ReadWriteTx, nil, func(tx server.Tx) (internal.EnvMap, error) {
 		app, err := r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
@@ -242,6 +252,7 @@ func (r *mutationResolver) SetAppEnv(ctx context.Context, appID string, newEnv m
 	return utils.SafeReturn(utils.ToAnyMap(created), nil, err)
 }
 
+// SetAppRoute is the resolver for the setAppRoute field.
 func (r *mutationResolver) SetAppRoute(ctx context.Context, appID string, route *internal.RouteInput) (*internal.Route, error) {
 	err := validateRouteInput(route)
 	if err != nil {
@@ -297,6 +308,7 @@ func (r *mutationResolver) SetAppRoute(ctx context.Context, appID string, route 
 	return utils.SafeReturn(&updated, nil, err)
 }
 
+// RemoveAppRoute is the resolver for the removeAppRoute field.
 func (r *mutationResolver) RemoveAppRoute(ctx context.Context, appID string) (*internal.Route, error) {
 	return utils.InTx(ctx, r.DB.ReadWriteTx, nil, func(tx server.Tx) (*internal.Route, error) {
 		app, err := r.AppRepo.GetOne(ctx, tx, server.AppsFilter{ID: &appID})

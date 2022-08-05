@@ -233,3 +233,8 @@ type AppTask {
   error: String
   exitCode: Int
 }
+
+type Log {
+  message: String!
+  timestamp: Time!
+}

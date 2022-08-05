@@ -14,12 +14,14 @@ import (
 	"github.com/samber/lo"
 )
 
+// Health is the resolver for the health field.
 func (r *queryResolver) Health(ctx context.Context) (*internal.Health, error) {
 	return &internal.Health{
 		Version: r.Version,
 	}, nil
 }
 
+// ListApps is the resolver for the listApps field.
 func (r *queryResolver) ListApps(ctx context.Context, page *int, size *int, showHidden *bool) ([]*internal.App, error) {
 	apps, err := utils.InTx(ctx, r.DB.ReadonlyTx, nil, func(tx server.Tx) ([]internal.App, error) {
 		return r.AppRepo.GetAll(ctx, tx, server.AppsFilter{
@@ -33,10 +35,12 @@ func (r *queryResolver) ListApps(ctx context.Context, page *int, size *int, show
 	return utils.SafeReturn(lo.ToSlicePtr(apps), nil, err)
 }
 
+// GetApp is the resolver for the getApp field.
 func (r *queryResolver) GetApp(ctx context.Context, id string) (*internal.App, error) {
 	return r.getApp(ctx, id)
 }
 
+// GetAppTasks is the resolver for the getAppTasks field.
 func (r *queryResolver) GetAppTasks(ctx context.Context, id string) ([]*internal.AppTask, error) {
 	app, err := utils.InTx(ctx, r.DB.ReadonlyTx, zero.App, func(tx server.Tx) (internal.App, error) {
 		return r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
@@ -59,6 +63,7 @@ func (r *queryResolver) GetAppTasks(ctx context.Context, id string) ([]*internal
 	return lo.ToSlicePtr(tasks), nil
 }
 
+// ListPlugins is the resolver for the listPlugins field.
 func (r *queryResolver) ListPlugins(ctx context.Context) ([]*internal.Plugin, error) {
 	plugins, err := utils.InTx(ctx, r.DB.ReadonlyTx, nil, func(tx server.Tx) ([]internal.Plugin, error) {
 		return r.PluginRepo.GetAll(ctx, tx, server.PluginsFilter{})
@@ -66,6 +71,7 @@ func (r *queryResolver) ListPlugins(ctx context.Context) ([]*internal.Plugin, er
 	return utils.SafeReturn(lo.ToSlicePtr(plugins), nil, err)
 }
 
+// GetPlugin is the resolver for the getPlugin field.
 func (r *queryResolver) GetPlugin(ctx context.Context, name internal.PluginName) (*internal.Plugin, error) {
 	plugin, err := utils.InTx(ctx, r.DB.ReadonlyTx, zero.Plugin, func(tx server.Tx) (internal.Plugin, error) {
 		return r.PluginRepo.GetOne(ctx, tx, server.PluginsFilter{
@@ -75,6 +81,7 @@ func (r *queryResolver) GetPlugin(ctx context.Context, name internal.PluginName)
 	return utils.SafeReturn(&plugin, nil, err)
 }
 
+// Nodes is the resolver for the nodes field.
 func (r *queryResolver) Nodes(ctx context.Context) ([]*internal.Node, error) {
 	nodes, err := r.RuntimeNodeRepo.GetAll(ctx, server.RuntimeNodesFilter{})
 	return utils.SafeReturn(lo.ToSlicePtr(nodes), nil, err)

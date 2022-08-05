@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/aklinker1/miasma/internal"
 	"github.com/docker/docker/api/types"
@@ -114,4 +115,24 @@ type RuntimeTasksFilter struct {
 }
 type RuntimeTaskRepo interface {
 	GetAll(ctx context.Context, filter RuntimeTasksFilter) ([]internal.AppTask, error)
+}
+
+type LogStream interface {
+	Close()
+	NextLog() (log internal.Log, done bool, err error)
+}
+type LogsFilter struct {
+	ServiceID string
+	// Whether or not to keep listening for logs after returning the latests logs
+	Follow *bool
+	// Either an integer or the string "all" (default), this dictates the initial amount of logs to
+	// return
+	Tail          *string
+	Before        *time.Time
+	After         *time.Time
+	ExcludeStdout *bool
+	ExcludeStderr *bool
+}
+type LogRepo interface {
+	GetLogStream(ctx context.Context, filter LogsFilter) (LogStream, error)
 }

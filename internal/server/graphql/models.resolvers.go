@@ -15,11 +15,13 @@ import (
 	"github.com/samber/lo"
 )
 
+// Route is the resolver for the route field.
 func (r *appResolver) Route(ctx context.Context, obj *internal.App) (*internal.Route, error) {
 	route, err := r.AppService.GetAppRoute(ctx, obj)
 	return route, err
 }
 
+// SimpleRoute is the resolver for the simpleRoute field.
 func (r *appResolver) SimpleRoute(ctx context.Context, obj *internal.App) (*string, error) {
 	route, err := r.AppService.GetAppRoute(ctx, obj)
 	if err != nil {
@@ -45,6 +47,7 @@ func (r *appResolver) SimpleRoute(ctx context.Context, obj *internal.App) (*stri
 	return nil, nil
 }
 
+// AvailableAt is the resolver for the availableAt field.
 func (r *appResolver) AvailableAt(ctx context.Context, obj *internal.App, clusterIPAddress string) ([]string, error) {
 	routes := []string{}
 	simpleRoute, err := r.SimpleRoute(ctx, obj)
@@ -68,6 +71,7 @@ func (r *appResolver) AvailableAt(ctx context.Context, obj *internal.App, cluste
 	return routes, nil
 }
 
+// Env is the resolver for the env field.
 func (r *appResolver) Env(ctx context.Context, obj *internal.App) (map[string]interface{}, error) {
 	env, err := utils.InTx(ctx, r.DB.ReadonlyTx, nil, func(tx server.Tx) (internal.EnvMap, error) {
 		return r.EnvRepo.Get(ctx, tx, server.EnvFilter{AppID: obj.ID})
@@ -75,10 +79,12 @@ func (r *appResolver) Env(ctx context.Context, obj *internal.App) (map[string]in
 	return utils.SafeReturn(utils.ToAnyMap(env), nil, err)
 }
 
+// Status is the resolver for the status field.
 func (r *appResolver) Status(ctx context.Context, obj *internal.App) (internal.RuntimeStatus, error) {
 	return r.AppService.GetAppStatus(ctx, *obj)
 }
 
+// Instances is the resolver for the instances field.
 func (r *appResolver) Instances(ctx context.Context, obj *internal.App) (*internal.AppInstances, error) {
 	service, err := r.RuntimeServiceRepo.GetOne(ctx, server.RuntimeServicesFilter{
 		AppID:         &obj.ID,
@@ -101,19 +107,23 @@ func (r *appResolver) Instances(ctx context.Context, obj *internal.App) (*intern
 	}, nil
 }
 
+// App is the resolver for the app field.
 func (r *appTaskResolver) App(ctx context.Context, obj *internal.AppTask) (*internal.App, error) {
 	return r.getApp(ctx, obj.AppID)
 }
 
+// Node is the resolver for the node field.
 func (r *appTaskResolver) Node(ctx context.Context, obj *internal.AppTask) (*internal.Node, error) {
 	return r.getNode(ctx, obj.NodeID)
 }
 
+// DockerVersion is the resolver for the dockerVersion field.
 func (r *healthResolver) DockerVersion(ctx context.Context, obj *internal.Health) (string, error) {
 	info, err := r.RuntimeRepo.Info(ctx)
 	return info.ServerVersion, err
 }
 
+// Cluster is the resolver for the cluster field.
 func (r *healthResolver) Cluster(ctx context.Context, obj *internal.Health) (*internal.ClusterInfo, error) {
 	cluster, err := r.RuntimeRepo.ClusterInfo(ctx)
 	if cluster == nil {
@@ -127,6 +137,7 @@ func (r *healthResolver) Cluster(ctx context.Context, obj *internal.Health) (*in
 	}, nil
 }
 
+// Services is the resolver for the services field.
 func (r *nodeResolver) Services(ctx context.Context, obj *internal.Node, showHidden *bool) ([]*internal.App, error) {
 	services, err := r.RuntimeTaskRepo.GetAll(ctx, server.RuntimeTasksFilter{
 		NodeID: &obj.ID,

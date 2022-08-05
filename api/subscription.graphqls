@@ -1,0 +1,11 @@
+type Subscription {
+  "Returns the latest log one at a time."
+  appLogs(
+    "The ID of the app you want to listen for logs from."
+    id: ID!
+    excludeStdout: Boolean = false
+    excludeStderr: Boolean = false
+    "The subscription will load this number of logs from the past initially before listening for future logs."
+    initialCount: Int = 50
+  ): Log!
+}

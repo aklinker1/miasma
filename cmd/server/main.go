@@ -91,6 +91,10 @@ func main() {
 		logger.Scoped("runtime-task-repo"),
 		dockerClient,
 	)
+	logRepo := docker.NewLogRepo(
+		logger.Scoped("logs"),
+		dockerClient,
+	)
 
 	// Service Layer
 
@@ -137,6 +141,7 @@ func main() {
 		RuntimeNodeRepo:    runtimeNodeRepo,
 		RuntimeTaskRepo:    runtimeTaskRepo,
 		RuntimeImageRepo:   runtimeImageRepo,
+		LogRepo:            logRepo,
 
 		AppService:     appService,
 		PluginService:  pluginService,
