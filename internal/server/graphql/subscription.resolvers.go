@@ -12,8 +12,8 @@ import (
 	"github.com/aklinker1/miasma/internal/server/gqlgen"
 )
 
-// AppLog is the resolver for the appLog field.
-func (r *subscriptionResolver) AppLog(ctx context.Context, id string) (<-chan *internal.Log, error) {
+// AppLogs is the resolver for the appLogs field.
+func (r *subscriptionResolver) AppLogs(ctx context.Context, id string) (<-chan *internal.Log, error) {
 	service, err := r.RuntimeServiceRepo.GetOne(ctx, server.RuntimeServicesFilter{
 		AppID: &id,
 	})

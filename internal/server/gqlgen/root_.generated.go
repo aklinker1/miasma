@@ -163,7 +163,7 @@ type ComplexityRoot struct {
 	}
 
 	Subscription struct {
-		AppLog func(childComplexity int, id string) int
+		AppLogs func(childComplexity int, id string) int
 	}
 }
 
@@ -853,17 +853,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Route.UpdatedAt(childComplexity), true
 
-	case "Subscription.appLog":
-		if e.complexity.Subscription.AppLog == nil {
+	case "Subscription.appLogs":
+		if e.complexity.Subscription.AppLogs == nil {
 			break
 		}
 
-		args, err := ec.field_Subscription_appLog_args(context.TODO(), rawArgs)
+		args, err := ec.field_Subscription_appLogs_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Subscription.AppLog(childComplexity, args["id"].(string)), true
+		return e.complexity.Subscription.AppLogs(childComplexity, args["id"].(string)), true
 
 	}
 	return 0, false
@@ -1276,7 +1276,7 @@ scalar Map
 scalar Time
 `, BuiltIn: false},
 	{Name: "../../../api/subscription.graphqls", Input: `type Subscription {
-  appLog(id: ID!): Log!
+  appLogs(id: ID!): Log!
 }
 `, BuiltIn: false},
 }
