@@ -33,5 +33,5 @@ func (r *logRepo) GetLogStream(ctx context.Context, serviceID string) (server.Lo
 	if err != nil {
 		return nil, err
 	}
-	return io.NewReadCloserLogStream(rd), nil
+	return io.NewLogStream(rd), nil
 }

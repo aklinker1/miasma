@@ -71,5 +71,14 @@ func (r *Resolver) runSubscriptionJob(ctx context.Context, job func(done func() 
 		r.Logger.V("Web-socket closed")
 	}()
 
-	go job(done)
+	go func() {
+		defer func() {
+			e := recover()
+			if e != nil {
+				r.Logger.E("Recovered: %v", e)
+			}
+		}()
+
+		job(done)
+	}()
 }

@@ -5,8 +5,7 @@ package graphql
 
 import (
 	"context"
-	"fmt"
-	"time"
+	"errors"
 
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
@@ -15,43 +14,27 @@ import (
 
 // AppLog is the resolver for the appLog field.
 func (r *subscriptionResolver) AppLog(ctx context.Context, id string) (<-chan *internal.Log, error) {
-	// logs := make(chan *internal.Log, 1)
-	// runSubscriptionJob(ctx, func(done func() bool) {
-	// 	for i := 1; !done(); i++ {
-	// 		message := fmt.Sprintf("Log %d", i)
-	// 		fmt.Println("Sending", message)
-	// 		logs <- &internal.Log{
-	// 			Message:   message,
-	// 			Timestamp: time.Now(),
-	// 		}
-	// 		time.Sleep(1 * time.Second)
-	// 	}
-	// })
-	// return logs, nil
-
-	_, err := r.RuntimeServiceRepo.GetOne(ctx, server.RuntimeServicesFilter{
+	service, err := r.RuntimeServiceRepo.GetOne(ctx, server.RuntimeServicesFilter{
 		AppID: &id,
 	})
 	if err != nil {
 		return nil, err
 	}
-
-	// stream, err := r.LogRepo.GetLogStream(ctx, service.ID)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// defer stream.Close()
+	stream, err := r.LogRepo.GetLogStream(ctx, service.ID)
+	if err != nil {
+		return nil, err
+	}
 
 	logs := make(chan *internal.Log, 1)
 	r.runSubscriptionJob(ctx, func(done func() bool) {
-		for i := 1; !done(); i++ {
-			message := fmt.Sprintf("Log %d", i)
-			r.Logger.V("Sending %s", message)
-			logs <- &internal.Log{
-				Message:   message,
-				Timestamp: time.Now(),
+		defer stream.Close()
+		for !done() {
+			log, _, err := stream.NextLog()
+			if err == nil {
+				logs <- &log
+			} else if !errors.Is(err, context.Canceled) {
+				r.Logger.E("%v", err)
 			}
-			time.Sleep(1 * time.Second)
 		}
 	})
 	return logs, nil
