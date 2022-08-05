@@ -16,6 +16,7 @@
     "graphql": "^16.5.0",
     "graphql-tag": "^2.12.6",
     "prismjs": "^1.28.0",
+    "subscriptions-transport-ws": "^0.11.0",
     "unplugin-icons": "^0.14.7",
     "unplugin-vue-components": "^0.19.9",
     "vue": "^3.2.25",

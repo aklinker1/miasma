@@ -2,8 +2,11 @@ import {
   ApolloClient,
   createHttpLink,
   gql,
+  split,
   InMemoryCache,
 } from "@apollo/client/core";
+import { WebSocketLink } from "@apollo/client/link/ws";
+import { getMainDefinition } from "@apollo/client/utilities";
 import { router } from "../router";
 
 export const appFragment = gql`
@@ -54,11 +57,34 @@ const httpLink = createHttpLink({
   },
 });
 
+const wsLink = new WebSocketLink({
+  uri: import.meta.env.DEV
+    ? "ws://localhost:3000/graphql"
+    : `ws://${location.host}/graphql`,
+  options: {
+    reconnect: true,
+
+    connectionParams: {
+      authToken: "",
+    },
+  },
+});
+
 // Cache implementation
 const cache = new InMemoryCache();
 
 // Create the apollo client
 export const apolloClient = new ApolloClient({
-  link: httpLink,
+  link: split(
+    ({ query }) => {
+      const definition = getMainDefinition(query);
+      return (
+        definition.kind === "OperationDefinition" &&
+        definition.operation === "subscription"
+      );
+    },
+    wsLink,
+    httpLink
+  ),
   cache,
 });
