@@ -27,7 +27,7 @@ func (r *logRepo) GetLogStream(ctx context.Context, serviceID string) (server.Lo
 		ShowStdout: true,
 		ShowStderr: true,
 		Timestamps: true,
-		Follow:     false,
+		Follow:     true,
 		Tail:       "50",
 	})
 	if err != nil {

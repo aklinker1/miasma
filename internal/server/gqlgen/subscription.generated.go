@@ -16,7 +16,7 @@ import (
 // region    ************************** generated!.gotpl **************************
 
 type SubscriptionResolver interface {
-	AppLog(ctx context.Context, id string) (<-chan []*internal.Log, error)
+	AppLog(ctx context.Context, id string) (<-chan *internal.Log, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -74,7 +74,7 @@ func (ec *executionContext) _Subscription_appLog(ctx context.Context, field grap
 	}
 	return func(ctx context.Context) graphql.Marshaler {
 		select {
-		case res, ok := <-resTmp.(<-chan []*internal.Log):
+		case res, ok := <-resTmp.(<-chan *internal.Log):
 			if !ok {
 				return nil
 			}
@@ -82,7 +82,7 @@ func (ec *executionContext) _Subscription_appLog(ctx context.Context, field grap
 				w.Write([]byte{'{'})
 				graphql.MarshalString(field.Alias).MarshalGQL(w)
 				w.Write([]byte{':'})
-				ec.marshalNLog2ᚕᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐLogᚄ(ctx, field.Selections, res).MarshalGQL(w)
+				ec.marshalNLog2ᚖgithubᚗcomᚋaklinker1ᚋmiasmaᚋinternalᚐLog(ctx, field.Selections, res).MarshalGQL(w)
 				w.Write([]byte{'}'})
 			})
 		case <-ctx.Done():

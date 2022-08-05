@@ -15,7 +15,7 @@ type SubscriptionManager[T any] struct {
 	subscriptions       []*Subscription[T]
 	logger              server.Logger
 	activeSubscriptions int
-	stopJob             func()
+	// stopJob             func()
 }
 
 func NewSubscriptionManager[T any](logger server.Logger) *SubscriptionManager[T] {
@@ -24,11 +24,11 @@ func NewSubscriptionManager[T any](logger server.Logger) *SubscriptionManager[T]
 		subscriptions:       []*Subscription[T]{},
 		logger:              logger,
 		activeSubscriptions: 0,
-		stopJob:             func() {},
+		// stopJob:             func() {},
 	}
 }
 
-func (m *SubscriptionManager[T]) CreateSubscription(job func(jobCtx context.Context, done *MutexValue[bool])) *Subscription[T] {
+func (m *SubscriptionManager[T]) CreateSubscription(ctx context.Context, job func(jobCtx context.Context, done *MutexValue[bool])) *Subscription[T] {
 	sub := &Subscription[T]{
 		id:      rand.Int63(),
 		Channel: make(chan T, 1),
@@ -37,19 +37,19 @@ func (m *SubscriptionManager[T]) CreateSubscription(job func(jobCtx context.Cont
 
 	m.mu.Lock()
 	if m.activeSubscriptions == 0 {
-		jobCtx, stopJob := context.WithCancel(context.Background())
-		m.stopJob = stopJob
+		// jobCtx, stopJob := context.WithCancel(context.Background())
+		// m.stopJob = stopJob
 		go func() {
 			done := NewMutexValue(false)
 			go func() {
-				<-jobCtx.Done()
+				<-ctx.Done()
 				m.logger.V("Job canceled")
 				done.Set(true)
 			}()
 			defer func() {
 				m.logger.V("Job finished")
 			}()
-			job(jobCtx, done)
+			job(ctx, done)
 		}()
 	}
 	m.activeSubscriptions++
@@ -63,9 +63,9 @@ func (m *SubscriptionManager[T]) CancelSubscription(sub *Subscription[T]) {
 
 	m.mu.Lock()
 	m.activeSubscriptions--
-	if m.activeSubscriptions == 0 {
-		m.stopJob()
-	}
+	// if m.activeSubscriptions == 0 {
+	// 	m.stopJob()
+	// }
 	m.subscriptions = lo.Filter(m.subscriptions, func(s *Subscription[T], _ int) bool {
 		return s != sub
 	})
@@ -76,9 +76,9 @@ func (m *SubscriptionManager[T]) CancelSubscription(sub *Subscription[T]) {
 func (m *SubscriptionManager[T]) Broadcast(t T) {
 	m.mu.Lock()
 	m.logger.V("Broadcasting %v to %d subscriptions", t, len(m.subscriptions))
-	// for _, s := range m.subscriptions {
-	// 	s.Channel <- t
-	// }
+	for _, s := range m.subscriptions {
+		s.Channel <- t
+	}
 	m.mu.Unlock()
 }
 

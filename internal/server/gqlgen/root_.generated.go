@@ -1276,7 +1276,7 @@ scalar Map
 scalar Time
 `, BuiltIn: false},
 	{Name: "../../../api/subscription.graphqls", Input: `type Subscription {
-  appLog(id: ID!): [Log!]!
+  appLog(id: ID!): Log!
 }
 `, BuiltIn: false},
 }

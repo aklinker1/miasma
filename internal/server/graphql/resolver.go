@@ -52,3 +52,24 @@ func (r *Resolver) getNode(ctx context.Context, id string) (*internal.Node, erro
 	})
 	return utils.SafeReturn(&node, nil, err)
 }
+
+func (r *Resolver) runSubscriptionJob(ctx context.Context, job func(done func() bool)) {
+	finished := false
+	mu := sync.Mutex{}
+	done := func() bool {
+		mu.Lock()
+		v := finished
+		mu.Unlock()
+		return v
+	}
+
+	go func() {
+		<-ctx.Done()
+		mu.Lock()
+		finished = true
+		mu.Unlock()
+		r.Logger.V("Web-socket closed")
+	}()
+
+	go job(done)
+}
