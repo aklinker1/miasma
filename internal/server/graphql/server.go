@@ -9,9 +9,11 @@ import (
 	"runtime/debug"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
+	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/aklinker1/miasma/internal/server"
@@ -20,6 +22,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
+	"github.com/gorilla/websocket"
 )
 
 const (
@@ -85,9 +88,26 @@ func (s *graphqlServer) createGraphqlHandler() *handler.Server {
 	es := gqlgen.NewExecutableSchema(gqlgen.Config{
 		Resolvers: s.resolver,
 	})
-	srv := handler.NewDefaultServer(es)
+	srv := handler.New(es)
+	srv.AddTransport(transport.Websocket{
+		KeepAlivePingInterval: 10 * time.Second,
+		Upgrader: websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool {
+				return true
+			},
+		},
+	})
 	srv.AddTransport(transport.Options{})
+	srv.AddTransport(transport.GET{})
 	srv.AddTransport(transport.POST{})
+	srv.AddTransport(transport.MultipartForm{})
+
+	srv.SetQueryCache(lru.New(1000))
+
+	srv.Use(extension.Introspection{})
+	srv.Use(extension.AutomaticPersistedQuery{
+		Cache: lru.New(100),
+	})
 
 	// Enable introspection
 	srv.Use(extension.Introspection{})
