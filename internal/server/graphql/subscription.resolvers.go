@@ -6,21 +6,33 @@ package graphql
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/aklinker1/miasma/internal"
 	"github.com/aklinker1/miasma/internal/server"
 	"github.com/aklinker1/miasma/internal/server/gqlgen"
+	"github.com/samber/lo"
 )
 
 // AppLogs is the resolver for the appLogs field.
-func (r *subscriptionResolver) AppLogs(ctx context.Context, id string) (<-chan *internal.Log, error) {
+func (r *subscriptionResolver) AppLogs(ctx context.Context, id string, excludeStdout *bool, excludeStderr *bool, initialCount *int) (<-chan *internal.Log, error) {
 	service, err := r.RuntimeServiceRepo.GetOne(ctx, server.RuntimeServicesFilter{
 		AppID: &id,
 	})
 	if err != nil {
 		return nil, err
 	}
-	stream, err := r.LogRepo.GetLogStream(ctx, service.ID)
+	tail := lo.ToPtr("50")
+	if initialCount != nil {
+		*tail = fmt.Sprint(*initialCount)
+	}
+	stream, err := r.LogRepo.GetLogStream(ctx, server.LogsFilter{
+		ServiceID:     service.ID,
+		Follow:        lo.ToPtr(true),
+		Tail:          tail,
+		ExcludeStdout: excludeStdout,
+		ExcludeStderr: excludeStderr,
+	})
 	if err != nil {
 		return nil, err
 	}

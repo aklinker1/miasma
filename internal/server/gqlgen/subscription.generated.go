@@ -16,7 +16,7 @@ import (
 // region    ************************** generated!.gotpl **************************
 
 type SubscriptionResolver interface {
-	AppLogs(ctx context.Context, id string) (<-chan *internal.Log, error)
+	AppLogs(ctx context.Context, id string, excludeStdout *bool, excludeStderr *bool, initialCount *int) (<-chan *internal.Log, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -35,6 +35,33 @@ func (ec *executionContext) field_Subscription_appLogs_args(ctx context.Context,
 		}
 	}
 	args["id"] = arg0
+	var arg1 *bool
+	if tmp, ok := rawArgs["excludeStdout"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("excludeStdout"))
+		arg1, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["excludeStdout"] = arg1
+	var arg2 *bool
+	if tmp, ok := rawArgs["excludeStderr"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("excludeStderr"))
+		arg2, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["excludeStderr"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["initialCount"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("initialCount"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["initialCount"] = arg3
 	return args, nil
 }
 
@@ -60,7 +87,7 @@ func (ec *executionContext) _Subscription_appLogs(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Subscription().AppLogs(rctx, fc.Args["id"].(string))
+		return ec.resolvers.Subscription().AppLogs(rctx, fc.Args["id"].(string), fc.Args["excludeStdout"].(*bool), fc.Args["excludeStderr"].(*bool), fc.Args["initialCount"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

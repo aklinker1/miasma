@@ -163,7 +163,7 @@ type ComplexityRoot struct {
 	}
 
 	Subscription struct {
-		AppLogs func(childComplexity int, id string) int
+		AppLogs func(childComplexity int, id string, excludeStdout *bool, excludeStderr *bool, initialCount *int) int
 	}
 }
 
@@ -863,7 +863,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Subscription.AppLogs(childComplexity, args["id"].(string)), true
+		return e.complexity.Subscription.AppLogs(childComplexity, args["id"].(string), args["excludeStdout"].(*bool), args["excludeStderr"].(*bool), args["initialCount"].(*int)), true
 
 	}
 	return 0, false
@@ -1276,7 +1276,15 @@ scalar Map
 scalar Time
 `, BuiltIn: false},
 	{Name: "../../../api/subscription.graphqls", Input: `type Subscription {
-  appLogs(id: ID!): Log!
+  "Returns the latest log one at a time."
+  appLogs(
+    "The ID of the app you want to listen for logs from."
+    id: ID!
+    excludeStdout: Boolean = false
+    excludeStderr: Boolean = false
+    "The subscription will load this number of logs from the past initially before listening for future logs."
+    initialCount: Int = 50
+  ): Log!
 }
 `, BuiltIn: false},
 }
