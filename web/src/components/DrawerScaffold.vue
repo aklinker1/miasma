@@ -17,11 +17,11 @@ defineProps<{
             </label>
           </div>
           <div class="px-2 mx-2 font-bold text-xl">
-            <router-link to="/" class="link link-hover">{{
-              navTitle
-            }}</router-link>
+            <router-link to="/" class="link link-hover" :title="navTitle">
+              <i-my-nav-branding class="w-32 aspect-[706/108]" />
+            </router-link>
           </div>
-          <div class="flex-none hidden sm:block">
+          <div class="flex-none hidden sm:block ml-4">
             <ul class="menu menu-horizontal rounded-box p-2 space-x-2">
               <slot name="nav-items" />
             </ul>
@@ -29,8 +29,48 @@ defineProps<{
         </div>
       </div>
 
-      <div class="w-full max-w-screen-lg mx-auto p-8 space-y-8">
+      <div
+        class="w-full max-w-screen-lg mx-auto p-8 space-y-8 min-h-[80vh] shrink-0"
+      >
         <slot name="content" />
+      </div>
+
+      <div class="bg-neutral-focus w-full p-8">
+        <footer class="footer max-w-screen-md mx-auto">
+          <div>
+            <span class="footer-title">Links</span>
+            <a href="/playground" target="_blank" class="link link-hover"
+              >GraphQL Playground</a
+            >
+            <a
+              href="https://aklinker1.github.io/miasma"
+              target="_blank"
+              class="link link-hover"
+              >Documentation</a
+            >
+            <a
+              href="https://github.com/aklinker1/miasma"
+              target="_blank"
+              class="link link-hover"
+              >GitHub</a
+            >
+          </div>
+          <div>
+            <span class="footer-title">Help</span>
+            <a
+              href="https://github.com/aklinker1/miasma/discussions/new?category=q-a"
+              target="_blank"
+              class="link link-hover"
+              >Have a question?</a
+            >
+            <a
+              href="https://github.com/aklinker1/miasma/issues/new"
+              target="_blank"
+              class="link link-hover"
+              >Report a Bug</a
+            >
+          </div>
+        </footer>
       </div>
     </div>
     <div class="drawer-side">
