@@ -1,6 +1,6 @@
 :root {
-    --c-brand: #8B5CF6;
-    --c-brand-light: #A78BFA;
+    --c-brand: #a855f7;
+    --c-brand-light: #c084fc;
     --c-tip: #10B981;
     --c-warning: #F59E0B;
     --c-warning-bg: var(--c-tip-bg);
@@ -13,8 +13,8 @@
 }
 
 html.dark {
-    --c-brand: #A78BFA;
-    --c-brand-light: #C4B5FD;
+    --c-brand: #D8B4FE;
+    --c-brand-light: #e9d5ff;
     --c-tip: #34D399;
     --c-warning: #FBBF24;
     --c-warning-bg: var(--c-tip-bg);

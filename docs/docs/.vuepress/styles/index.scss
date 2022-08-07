@@ -2,3 +2,12 @@ a > code {
     color: var(--c-text-accent);
     font-weight: 700 !important;
 }
+
+.logo {
+    transform: scale(65%, 65%);
+    transform-origin: 0% 50%;
+}
+
+.site-name {
+    opacity: 0;
+}

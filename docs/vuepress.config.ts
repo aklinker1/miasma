@@ -110,7 +110,9 @@ export default defineUserConfig({
       },
     }),
   ],
+  head: [["link", { rel: "icon", href: "/favicon.svg" }]],
   theme: defaultTheme({
+    logo: "/nav-branding.svg",
     docsRepo: "https://github.com/aklinker1/miasma",
     docsDir: "docs/docs",
     editLink: true,
