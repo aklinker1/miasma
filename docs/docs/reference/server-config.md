@@ -32,4 +32,4 @@ By default, all apps automatically upgrade on this schedule. To prevent an app f
 
 **Default: `3000`**
 
-The port the miasma server runs on. It can be any valid port, but it is recommended to stay away from 3001-4000, where apps are published.
+The port the Miasma server runs on. It can be any valid port, but it is recommended to stay away from 3001-4000, where apps are published.

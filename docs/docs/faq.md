@@ -24,4 +24,4 @@ Plus there was inconsistency in more than just routing, `.env` file formatting, 
 
 Portainer gives you access to every thing Docker can do on a UI, but I wanted to simplify things, most apps don't need all that configuration.
 
-Having miasma manage ports and routing for me is huge, it's so easy to mistype a traefik label and be stuck for hours.
+Having Miasma manage ports and routing for me is huge, it's so easy to mistype a traefik label and be stuck for hours.
