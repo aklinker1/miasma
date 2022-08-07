@@ -25,13 +25,13 @@ Miasma is a self-hosted, docker based, Heroku-like PaaS with cluster and ARM sup
 - [***Cluster***](https://en.wikipedia.org/wiki/Computer_cluster): Scale the platform horizontally by using multiple computers/devices to run your apps
 - ***ARM support***: In addition to the standard CPU architectures, Miasma is [published with ARM support](https://hub.docker.com/r/aklinker1/miasma/tags)
 
-> Checkout the [full feature list](https://aklinker1.github.io/miasma/#features)!
+> Checkout the [full feature list](https://miasma.aklinker1.io/#features)!
 
 #### 🚪 Why is it the "cloud for your closet"?
 
 I originally wrote Miasma as a simple way to deploy apps to some Raspberry Pis in my closet on my local network!
 
-Since then, features have been added to make it an *almost* production ready service. I'm hosting <https://aklinker1.io> (an echo server) using Miasma on Digital Ocean, and will be using it for some personal services in the future!
+Since then, features have been added to make it an *almost* production ready service. I'm hosting [aklinker1.io](https://aklinker1.io) (an echo server) using Miasma on Digital Ocean, and will be using it for some personal services in the future!
 
 #### ✨ What makes Miasma unique?
 
@@ -40,7 +40,7 @@ Since then, features have been added to make it an *almost* production ready ser
 
 ### 📘 Docs
 
-Head over to the docs to learn more or get started: <https://aklinker1.github.io/miasma>
+Head over to the docs to learn more or get started: <https://miasma.aklinker1.io>
 
 ### 👋 Contributing
 
@@ -48,4 +48,4 @@ Head over to the docs to learn more or get started: <https://aklinker1.github.io
   <img src="https://contrib.rocks/image?repo=aklinker1/miasma" />
 </a>
 
-Check out the [contributing docs](https://aklinker1.github.io/miasma/docs/contributing) to get your local development environment setup.
+Check out the [contributing docs](https://miasma.aklinker1.io/docs/contributing) to get your local development environment setup.
