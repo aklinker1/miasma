@@ -43,8 +43,6 @@ jobs:
       - name: Build VuePress site
         run: pnpm build
         working-directory: docs
-        env:
-          VUE_PRESS_BASE: /miasma/
 
       - name: Deploy to GitHub Pages
         uses: crazy-max/ghaction-github-pages@v3
