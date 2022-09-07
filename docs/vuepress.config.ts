@@ -150,6 +150,7 @@ export default defineUserConfig({
           text: "Plugins",
           children: ["/plugins/index.md", "/plugins/traefik.md"],
         },
+        "/guide/troubleshooting.md",
         "/faq.md",
         "/contributing.md",
       ],
