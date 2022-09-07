@@ -145,6 +145,7 @@ export default defineUserConfig({
         "/guide/app-communication.md",
         "/guide/examples.md",
         "/authorization.md",
+        "/guide/private-registries.md",
         {
           text: "Plugins",
           children: ["/plugins/index.md", "/plugins/traefik.md"],
