@@ -2,8 +2,8 @@
   "name": "docs",
   "private": true,
   "scripts": {
-    "dev": "cross-env DEV=true vuepress dev docs",
-    "build": "vuepress build docs"
+    "dev": "cross-env DEV=true vuepress dev .",
+    "build": "vuepress build ."
   },
   "devDependencies": {
     "@vuepress/client": "2.0.0-beta.48",
