@@ -54,6 +54,34 @@ func (r *RuntimeService) StopApp(ctx context.Context, tx server.Tx, partialInput
 	return err
 }
 
+func (r *RuntimeService) UpdateApp(ctx context.Context, tx server.Tx, partialInput PartialRuntimeServiceSpec) error {
+	existing, err := r.RuntimeServiceRepo.GetOne(ctx, server.RuntimeServicesFilter{
+		AppID: &partialInput.App.ID,
+	})
+	if err != nil {
+		return err
+	}
+
+	newSpec, err := r.getRuntimeServiceSpec(ctx, tx, partialInput)
+	if err != nil {
+		return err
+	}
+
+	_, err = r.RuntimeServiceRepo.Update(ctx, existing.ID, newSpec)
+	return err
+}
+
+func (r *RuntimeService) UpdateAppIfRunning(ctx context.Context, tx server.Tx, partialInput PartialRuntimeServiceSpec) error {
+	status, err := r.AppService.GetAppStatus(ctx, partialInput.App)
+	if err != nil {
+		return err
+	}
+	if status == internal.RuntimeStatusRunning {
+		return r.UpdateApp(ctx, tx, partialInput)
+	}
+	return nil
+}
+
 func (r *RuntimeService) RestartApp(ctx context.Context, tx server.Tx, partialInput PartialRuntimeServiceSpec) error {
 	// Stop
 	existing, err := r.RuntimeServiceRepo.GetOne(ctx, server.RuntimeServicesFilter{

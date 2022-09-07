@@ -363,5 +363,22 @@ func (s *runtimeServiceRepo) findOpenPorts(ctx context.Context, count int) ([]in
 }
 
 func (s *runtimeServiceRepo) Update(ctx context.Context, serviceID string, newService server.RuntimeServiceSpec) (server.RuntimeService, error) {
-	return zero.RuntimeService, server.NewNotImplementedError("docker.runtimeServiceRepo.Update")
+	s.logger.D("Updating service %s", serviceID)
+	newDockerSpec, err := s.getDockerSpec(ctx, newService)
+	if err != nil {
+		return zero.RuntimeService, err
+	}
+	existing, err := s.GetOne(ctx, server.RuntimeServicesFilter{
+		ID: &serviceID,
+	})
+	if err != nil {
+		return zero.RuntimeService, err
+	}
+	_, err = s.client.ServiceUpdate(ctx, serviceID, existing.Version, newDockerSpec, types.ServiceUpdateOptions{})
+	if err != nil {
+		return zero.RuntimeService, err
+	}
+	return s.GetOne(ctx, server.RuntimeServicesFilter{
+		ID: &serviceID,
+	})
 }
