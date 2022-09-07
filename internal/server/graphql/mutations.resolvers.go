@@ -107,7 +107,7 @@ func (r *mutationResolver) EditApp(ctx context.Context, id string, changes map[s
 		}
 
 		// Restart the app
-		return updated, r.RuntimeService.RestartAppIfRunning(ctx, tx, services.PartialRuntimeServiceSpec{
+		return updated, r.RuntimeService.UpdateAppIfRunning(ctx, tx, services.PartialRuntimeServiceSpec{
 			App: updated,
 		})
 	})
@@ -211,7 +211,7 @@ func (r *mutationResolver) UpgradeApp(ctx context.Context, id string) (*internal
 		}
 
 		// Restart the app
-		return upgraded, r.RuntimeService.RestartAppIfRunning(ctx, tx, services.PartialRuntimeServiceSpec{
+		return upgraded, r.RuntimeService.UpdateAppIfRunning(ctx, tx, services.PartialRuntimeServiceSpec{
 			App: upgraded,
 		})
 	})
