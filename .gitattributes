@@ -1,5 +1,5 @@
 *.generated.go linguist-generated=true
-/docs/docs/cli/Usage.md linguist-generated=true
-/docs/docs/server/Swagger.md linguist-generated=true
+/docs/cli/Usage.md linguist-generated=true
+/docs/server/Swagger.md linguist-generated=true
 pnpm-lock.yaml linguist-generated=true
 */dist/* linguist-generated=true

@@ -114,7 +114,7 @@ export default defineUserConfig({
   theme: defaultTheme({
     logo: "/nav-branding.svg",
     docsRepo: "https://github.com/aklinker1/miasma",
-    docsDir: "docs/docs",
+    docsDir: "docs",
     editLink: true,
     repo: "https://github.com/aklinker1/miasma",
     navbar: [

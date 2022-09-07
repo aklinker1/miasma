@@ -228,7 +228,7 @@ This will build and run the production docker image. This is slower than running
 make docs
 ```
 
-This will bundle the VuePress docs website to `docs/docs/.vuepress/dist`.
+This will bundle the VuePress docs website to `docs/.vuepress/dist`.
 
 ### CLI
 
