@@ -43,7 +43,7 @@ miasma apps:edit -a postgres --rm-target-ports 80
 
 ## Expose Multiple Ports
 
-If your image uses multiple ports, and you want to be able to access both of them, you can just add multiple published ports. Behind the scenes, multiple target ports will be randomly generated for the container, and provided to the app via the `PORT_1` (same as `PORT`), `PORT_2`, `PORT_3`, etc environment variables.
+If your image uses multiple ports, and you want to be able to access both of them, you can just add multiple target or published ports. Behind the scenes, multiple target ports will be randomly generated for the container, and provided to the app via the `PORT_1` (same as `PORT`), `PORT_2`, `PORT_3`, etc environment variables.
 
 ```bash:no-line-numbers
 miasma apps:edit -a example --add-published-ports 8081 --add-published-ports 8082
@@ -52,7 +52,7 @@ miasma apps:edit -a example --add-published-ports 8081 --add-published-ports 808
 To use hard coded target ports, you can also set those:
 
 ```bash:no-line-numbers
-miasma apps:edit -a example --add-published-ports 8081 --add-published-ports 8082
+miasma apps:edit -a example --add-target-ports 8081 --add-target-ports 8082
 ```
 
 :::warning Order Matters
