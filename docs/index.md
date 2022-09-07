@@ -16,9 +16,9 @@ It has two components: a **lightweight server**, and a **CLI tool**. The server 
 - Custom hostname and path routing
 - Multiple architecture support (`arm/v7`, `arm64`, `amd64`)
 - Cluster/multiple device support
-- Automatically managed HTTPS certificates 
+- Automatically managed HTTPS certificates
 
-## Future Work
+### Future Work
 
 - Web dashboard (in progress)
 - Horizontal scaling
