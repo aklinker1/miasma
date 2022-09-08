@@ -46,7 +46,7 @@ func (r *AppRepo) GetAll(ctx context.Context, tx server.Tx, filter server.AppsFi
 	if filter.NameContains != nil {
 		query.Where("name ILIKE ?", "%"+*filter.NameContains+"%")
 	}
-	if !utils.ValueOr(filter.IncludeHidden, false) {
+	if utils.ValueOr(filter.ExcludeHidden, false) {
 		query.Where("(hidden = ? OR hidden IS NULL)", 0)
 	}
 	if filter.AutoUpgrade != nil {

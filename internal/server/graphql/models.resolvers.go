@@ -149,11 +149,12 @@ func (r *nodeResolver) Services(ctx context.Context, obj *internal.Node, showHid
 
 	return utils.InTx(ctx, r.DB.ReadonlyTx, nil, func(tx server.Tx) ([]*internal.App, error) {
 		apps := []*internal.App{}
+		hideHidden := !utils.ValueOr(showHidden, false)
 		for _, service := range services {
 			// TODO: get all by service app ids
 			app, err := r.AppRepo.GetOne(ctx, tx, server.AppsFilter{
 				ID:            &service.AppID,
-				IncludeHidden: showHidden,
+				ExcludeHidden: &hideHidden,
 			})
 			if server.ErrorCode(err) == server.ENOTFOUND {
 				// noop

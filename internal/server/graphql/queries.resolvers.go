@@ -24,8 +24,9 @@ func (r *queryResolver) Health(ctx context.Context) (*internal.Health, error) {
 // ListApps is the resolver for the listApps field.
 func (r *queryResolver) ListApps(ctx context.Context, page *int, size *int, showHidden *bool) ([]*internal.App, error) {
 	apps, err := utils.InTx(ctx, r.DB.ReadonlyTx, nil, func(tx server.Tx) ([]internal.App, error) {
+		hideHidden := !utils.ValueOr(showHidden, false)
 		return r.AppRepo.GetAll(ctx, tx, server.AppsFilter{
-			IncludeHidden: showHidden,
+			ExcludeHidden: &hideHidden,
 			Pagination: &server.Pagination{
 				Page: utils.ValueOr(page, 1),
 				Size: utils.ValueOr(size, 10),

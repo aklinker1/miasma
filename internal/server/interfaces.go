@@ -34,7 +34,7 @@ type AppsFilter struct {
 	ID            *string
 	Name          *string
 	NameContains  *string
-	IncludeHidden *bool
+	ExcludeHidden *bool
 	AutoUpgrade   *bool
 	Sort          *Sort
 	Pagination    *Pagination
