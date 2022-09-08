@@ -2,6 +2,7 @@ name: Publish Server (Nightly Cron)
 on:
   schedule:
     - cron: "0 0 * * *" # Nightly at midnight
+  workflow_dispatch:
 
 jobs:
   check-date:
