@@ -110,7 +110,18 @@ export default defineUserConfig({
       },
     }),
   ],
-  head: [["link", { rel: "icon", href: "/favicon.svg" }]],
+  head: [
+    ["link", { rel: "icon", href: "/favicon.svg" }],
+    [
+      "script",
+      {
+        async: true,
+        defer: true,
+        "data-website-id": "b29bfbde-9a3d-4550-92af-03f64684c08a",
+        src: "https://stats.aklinker1.io/umami.js",
+      },
+    ],
+  ],
   theme: defaultTheme({
     logo: "/nav-branding.svg",
     docsRepo: "https://github.com/aklinker1/miasma",
