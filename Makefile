@@ -10,6 +10,11 @@ PUBLISH_TAGS ?= --tag aklinker1/miasma:nightly
 BINARY ?= miasma-dev
 CLI_OUTPUT ?= bin/cli
 
+compile:
+	mkdir -p web/dist
+	touch web/dist/index.html
+	go build -o bin/server cmd/server/main.go
+
 # Build the production docker image
 build:
 	@docker build . -f Dockerfile \
@@ -98,5 +103,7 @@ publish:
 # Remove generated files
 clean:
 	@rm -rf "${DATA_DIR}/apps".* ; echo "Cleaned local database..."
-	@rm -rf ./bin ; echo "Cleaned output directory..."
+	@rm -rf ./bin ; echo "Cleaned bin directory..."
+	@rm -rf ./web/dist ; echo "Cleaned web/dist directory..."
+	@rm -rf ./docs/.vuepress/dist ; echo "Cleaned docs/.vuepress/dist directory..."
 	@echo "Done!"
