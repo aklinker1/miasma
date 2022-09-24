@@ -11,7 +11,7 @@ Welcome to the contributor's guide! Here you'll find everything you need to know
 ## Required Tools
 
 - [GNU `make`](https://www.gnu.org/software/make/) to run scripts
-- [Go 1.18](https://go.dev/doc/install) to build the CLI
+- [Go 1.19](https://go.dev/doc/install) to build the CLI
 - [Node 16 LTS](https://nodejs.org/en/) to run the UI in dev mode
 - [Docker](https://docs.docker.com/get-docker/) to build the server and production docker image
 
