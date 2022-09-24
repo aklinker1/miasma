@@ -9,7 +9,7 @@ RUN mkdir /build
 RUN curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm@7
 WORKDIR /build
 
-FROM golang:1.18-alpine as api-builder-base
+FROM golang:1.19-alpine as api-builder-base
 RUN apk add --update git jq build-base
 RUN mkdir /build
 WORKDIR /build
