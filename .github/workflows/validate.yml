@@ -12,7 +12,7 @@ jobs:
       docs: ${{ steps.filter.outputs.docs }}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.1.0
 
       - uses: dorny/paths-filter@v2
         id: filter
@@ -51,7 +51,7 @@ jobs:
     if: ${{ needs.changes.outputs.api == 'true' }}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.1.0
 
       - name: Install Go
         uses: actions/setup-go@v3
@@ -69,7 +69,7 @@ jobs:
     if: ${{ needs.changes.outputs.cli == 'true' }}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.1.0
 
       - name: Install Go
         uses: actions/setup-go@v3
@@ -90,7 +90,7 @@ jobs:
     if: ${{ needs.changes.outputs.web == 'true' }}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.1.0
 
       - name: Setup PNPM
         uses: pnpm/action-setup@v2.2.2
@@ -123,7 +123,7 @@ jobs:
     if: ${{ needs.changes.outputs.docs == 'true' }}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.1.0
 
       - name: Setup PNPM
         uses: pnpm/action-setup@v2.2.2
