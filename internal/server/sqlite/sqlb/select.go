@@ -67,7 +67,7 @@ func (b *selectBuilder) ToSQL() (sql string, args []any) {
 	if !b.includeSoftDelete && lo.Contains(b.columns, "deleted_at") {
 		wheres = append(wheres, "deleted_at IS NULL")
 	}
-	if len(b.where) > 0 {
+	if len(wheres) > 0 {
 		where = fmt.Sprintf(" WHERE %s", strings.Join(wheres, " AND "))
 	}
 
