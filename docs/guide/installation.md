@@ -16,11 +16,7 @@ Before starting, make sure the machine you're installing the server on is one of
 For example, `linux/arm64` is published, so if you want to install the server on a Raspberry Pi, it needs to be running a 64bit OS, like Ubuntu Server 64bit.
 :::
 
-1. [Install Docker](https://docs.docker.com/get-docker/). On linux, I recommend using `get.docker.com`:
-   ```bash:no-line-numbers
-   curl -fsSL https://get.docker.com -o get-docker.sh
-   sh get-docker.sh
-   ```
+1. [Install Docker](https://docs.docker.com/engine/install/).
 1. Initialize the swarm (**this is required** even if you aren't planning on using multiple nodes)
    ```bash:no-line-numbers
    docker swarm init
@@ -88,12 +84,7 @@ If everything is setup correctly, you should see a response like this:
 ssh user@<machine-ip>
 ```
 
-2. Install Docker (same as before)
-
-```bash:no-line-numbers
-curl -fsSL https://get.docker.com -o get-docker.sh
-sh get-docker.sh
-```
+1. [Install Docker](https://docs.docker.com/engine/install/) (same as before).
 
 3. Join the swarm using the join command output during `docker swarm init`
 
