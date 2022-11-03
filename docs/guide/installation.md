@@ -79,18 +79,14 @@ If everything is setup correctly, you should see a response like this:
 ### Add More Nodes (Optional)
 
 1. SSH into the machine to add
-
-```bash:no-line-numbers
-ssh user@<machine-ip>
-```
-
-1. [Install Docker](https://docs.docker.com/engine/install/) (same as before).
-
+   ```bash:no-line-numbers
+   ssh user@<machine-ip>
+   ```
+2. [Install Docker](https://docs.docker.com/engine/install/) (same as before).
 3. Join the swarm using the join command output during `docker swarm init`
-
-```bash:no-line-numbers
-docker swarm join --token <some-token> <swarm-ip>:2377
-```
+   ```bash:no-line-numbers
+   docker swarm join --token <some-token> <swarm-ip>:2377
+   ```
 
 ## Install the CLI
 
