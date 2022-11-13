@@ -1,0 +1,4 @@
+*.gen.*
+.nuxt
+pnpm-lock.yaml
+assets/img

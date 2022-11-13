@@ -1,0 +1,24 @@
+<script lang="ts" setup>
+import { AppDetailsTask } from "../composition/service-tasks-query";
+import formatDistanceToNow from "date-fns/formatDistanceToNow";
+
+const props = defineProps<{
+  task: AppDetailsTask;
+}>();
+
+const time = computed(() =>
+  formatDistanceToNow(Date.parse(props.task.timestamp), {
+    includeSeconds: true,
+  })
+);
+</script>
+
+<template>
+  <li class="border-base-100 border-t-2 p-4">
+    <p class="text-sm">
+      <span class="text-primary font-bold uppercase">{{ task.state }}</span
+      >&ensp;{{ time }} ago
+    </p>
+    <p class="text-lg">{{ task.error || task.message }}</p>
+  </li>
+</template>

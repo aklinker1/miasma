@@ -1,0 +1,18 @@
+<script lang="ts" setup>
+import { useAppTasksQuery } from "../composition/service-tasks-query.js";
+
+const props = defineProps<{
+  serviceId: string;
+}>();
+
+const vars = computed(() => ({
+  serviceId: props.serviceId,
+}));
+const { result } = useAppTasksQuery(vars);
+</script>
+
+<template>
+  <ul>
+    <task-list-item v-for="task of result?.tasks" :task="task" />
+  </ul>
+</template>
