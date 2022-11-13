@@ -72,7 +72,7 @@ defineProps<{
 </template>
 
 <style scoped>
-a.nuxt-link-active {
+a.router-link-active {
   @apply active;
 }
 </style>
