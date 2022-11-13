@@ -1,5 +1,0 @@
-"A JSON map of key-value pairs. Values can be any type."
-scalar Map
-
-"ISO 8601 date time string."
-scalar Time
