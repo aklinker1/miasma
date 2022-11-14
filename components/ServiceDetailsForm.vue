@@ -10,11 +10,21 @@ const props = defineProps<{
 const getPrevName = (): string => props.service.Spec?.Name?.trim() ?? '';
 const getPrevImage = (): string => props.service.Spec!.TaskTemplate!.ContainerSpec!.Image!;
 const getPrevGroup = (): string => props.service.Spec?.Labels?.[MiasmaLabels.Group]?.trim() ?? '';
+const getPrevEnv = (): Docker.ContainerEnv => {
+  const currentEnv = toRaw(props.service).Spec?.TaskTemplate?.ContainerSpec?.Env;
+  return currentEnv ? [...currentEnv] : [];
+};
+const getPrevPortConfigs = (): Docker.EndpointPortConfig[] => {
+  const currentPorts = toRaw(props.service).Spec?.EndpointSpec?.Ports;
+  return currentPorts ? [...currentPorts] : [];
+};
 
 const currentName = computed(() => getPrevName());
 const name = ref(getPrevName());
 const image = ref(getPrevImage());
 const group = ref(getPrevGroup());
+const env = ref(getPrevEnv());
+const ports = ref(getPrevPortConfigs());
 
 function getNewSpec(base: Docker.ServiceSpec = toRaw(props.service).Spec!) {
   const newSpec: Docker.ServiceSpec = clone(base);
@@ -27,6 +37,16 @@ function getNewSpec(base: Docker.ServiceSpec = toRaw(props.service).Spec!) {
   if (newGroup) newSpec.Labels![MiasmaLabels.Group] = newGroup;
   else delete newSpec.Labels![MiasmaLabels.Group];
 
+  if (env.value.length) newSpec.TaskTemplate!.ContainerSpec!.Env = env.value;
+  else delete newSpec.TaskTemplate!.ContainerSpec!.Env;
+
+  if (ports.value.length) {
+    newSpec.EndpointSpec ??= {};
+    newSpec.EndpointSpec.Ports = ports.value;
+  } else if (newSpec?.EndpointSpec?.Ports) {
+    delete newSpec.EndpointSpec.Ports;
+  }
+
   return newSpec;
 }
 
@@ -34,6 +54,7 @@ function discardChanges() {
   name.value = getPrevName();
   image.value = getPrevImage();
   group.value = getPrevGroup();
+  env.value = getPrevEnv();
 
   // If you discard on an error, don't show error next time there is a change
   resetSave.value();
@@ -90,13 +111,13 @@ function saveChanges() {
 
     <!-- Networks -->
     <h2 class="text-xl">Networking</h2>
-    <p>TODO - Ports & Routing</p>
+    <service-ports-form v-model:ports="ports" />
 
     <div class="divider" />
 
     <!-- Config -->
-    <h2 class="text-xl">Environment Variables</h2>
-    <p>TODO</p>
+    <h2 class="text-xl">Environment</h2>
+    <service-environment-variables-form v-model:env="env" />
 
     <div class="divider" />
 

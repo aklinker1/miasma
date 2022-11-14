@@ -6,9 +6,7 @@ export interface AppGroup {
   services: Docker.Service[];
 }
 
-export default function useGroupedApps(
-  services: Ref<Docker.Service[] | undefined>,
-): Ref<AppGroup[]> {
+export default function (services: Ref<Docker.Service[] | undefined>): Ref<AppGroup[]> {
   return computed(() => {
     const groupMap = (services.value ?? []).reduce<Record<string, Docker.Service[]>>(
       (map, service) => {
@@ -20,9 +18,9 @@ export default function useGroupedApps(
       {},
     );
 
-    const groups: AppGroup[] = Object.entries(groupMap).map(([group, groupApps]) => ({
+    const groups: AppGroup[] = Object.entries(groupMap).map(([group, groupServices]) => ({
       name: group.trim() || undefined,
-      services: groupApps,
+      services: groupServices,
     }));
 
     // Return a single empty group so we can show "no services" inside a table

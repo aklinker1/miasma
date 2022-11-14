@@ -25,7 +25,6 @@ export default function () {
   >({
     async mutationFn({ newSpec, prevService }) {
       const res: Docker.PostServiceCreateResponse201 = await copyService(newSpec);
-      console.log({ res });
       await deleteService(prevService).catch(console.error);
       return res;
     },

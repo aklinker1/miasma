@@ -13,10 +13,10 @@ export function defineService(overrides: DeepPartial<Docker.ServiceSpec>): Docke
 
   // Append or overwrite required fields
   service.Labels ??= {};
-  service.Labels[MiasmaLabels.Group] = '';
   service.Labels[MiasmaLabels.InstanceCount] = '1';
 
   service.Networks ??= [];
+  // Communicate with other miasma services
   service.Networks.push({ Target: 'miasma-default' });
 
   return service;

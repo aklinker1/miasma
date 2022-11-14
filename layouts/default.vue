@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 const route = useRoute();
 
-const isApps = computed(() => route.path.startsWith('/services'));
+const isServices = computed(() => route.path.startsWith('/services'));
 const isNodes = computed(() => route.path.startsWith('/nodes'));
 const isLogin = computed(() => route.path.startsWith('/login'));
 
@@ -12,7 +12,7 @@ const { error, refetch } = useDockerSwarmInfoQuery();
   <drawer-scaffold nav-title="Miasma">
     <template #nav-items v-if="!isLogin">
       <li>
-        <nuxt-link to="/services" class="gap-2" :class="{ active: isApps }">
+        <nuxt-link to="/services" class="gap-2" :class="{ active: isServices }">
           <div class="i-mdi-cube text-2xl" />
           <span>Services</span>
         </nuxt-link>
@@ -27,7 +27,7 @@ const { error, refetch } = useDockerSwarmInfoQuery();
 
     <template #drawer-items v-if="!isLogin">
       <li>
-        <nuxt-link to="/services" class="gap-2" :class="{ active: isApps }">
+        <nuxt-link to="/services" class="gap-2" :class="{ active: isServices }">
           <div class="i-mdi-cube text-2xl" />
           <span>Services</span>
         </nuxt-link>

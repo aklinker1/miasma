@@ -16,9 +16,12 @@ useHead({
   <div class="space-y-4">
     <error-display title="Failed to load service details" :error="error" :retry="refetch" />
 
-    <template v-if="service">
-      <service-controller :service="service" />
-      <service-details-form :service="service" />
-    </template>
+    <div v-if="service">
+      <service-controller
+        class="w-full md:w-56 md:flex-shrink-0 md:float-left md:mr-12"
+        :service="service"
+      />
+      <service-details-form class="md:flex-grow" :service="service" />
+    </div>
   </div>
 </template>

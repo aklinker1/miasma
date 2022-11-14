@@ -6,7 +6,7 @@ const { data, isLoading, error } = useDockerNodesQuery();
   <div>
     <!-- Loading -->
     <div v-if="isLoading" class="flex py-32 items-center justify-center">
-      <cube-spinner class="m-auto" />
+      <cube-spinner />
     </div>
 
     <!-- Error -->
