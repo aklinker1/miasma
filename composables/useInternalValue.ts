@@ -24,8 +24,8 @@ export default function <K extends string, T extends Record<K, any> = Record<K, 
     // For objects, don't emit if nothing has changed
     if (isEqual(newValue, prevValue)) return;
 
-    if (beforeEmit) emit(`update:${key}`, beforeEmit(newValue));
-    else emit(`update:${key}`, newValue);
+    if (beforeEmit) emit(`update:${key}`, beforeEmit(toRaw(newValue)));
+    else emit(`update:${key}`, toRaw(newValue));
   });
 
   return v;

@@ -2,6 +2,7 @@
 import { MiasmaLabels } from '~~/utils/labels';
 import isEqual from 'lodash.isequal';
 import { clone } from '~~/utils/clone';
+import { detailedDiff } from 'deep-object-diff';
 
 const props = defineProps<{
   service: Docker.Service;
@@ -18,6 +19,10 @@ const getPrevPortConfigs = (): Docker.EndpointPortConfig[] => {
   const currentPorts = toRaw(props.service).Spec?.EndpointSpec?.Ports;
   return currentPorts ? [...currentPorts] : [];
 };
+const getPrevMounts = (): Docker.Mount[] => {
+  const currentMounts = toRaw(props.service).Spec?.TaskTemplate?.ContainerSpec?.Mounts;
+  return currentMounts ? [...currentMounts] : [];
+};
 
 const currentName = computed(() => getPrevName());
 const name = ref(getPrevName());
@@ -25,6 +30,7 @@ const image = ref(getPrevImage());
 const group = ref(getPrevGroup());
 const env = ref(getPrevEnv());
 const ports = ref(getPrevPortConfigs());
+const mounts = ref(getPrevMounts());
 
 function getNewSpec(base: Docker.ServiceSpec = toRaw(props.service).Spec!) {
   const newSpec: Docker.ServiceSpec = clone(base);
@@ -47,6 +53,14 @@ function getNewSpec(base: Docker.ServiceSpec = toRaw(props.service).Spec!) {
     delete newSpec.EndpointSpec.Ports;
   }
 
+  if (mounts.value.length) {
+    newSpec.TaskTemplate ??= {};
+    newSpec.TaskTemplate.ContainerSpec ??= {};
+    newSpec.TaskTemplate.ContainerSpec.Mounts = mounts.value;
+  } else if (newSpec?.TaskTemplate?.ContainerSpec?.Mounts) {
+    delete newSpec.TaskTemplate.ContainerSpec.Mounts;
+  }
+
   return newSpec;
 }
 
@@ -55,6 +69,8 @@ function discardChanges() {
   image.value = getPrevImage();
   group.value = getPrevGroup();
   env.value = getPrevEnv();
+  ports.value = getPrevPortConfigs();
+  mounts.value = getPrevMounts();
 
   // If you discard on an error, don't show error next time there is a change
   resetSave.value();
@@ -62,7 +78,20 @@ function discardChanges() {
 }
 
 const newSpec = computed(() => getNewSpec());
-const hasChanged = computed(() => !isEqual(toRaw(newSpec.value), toRaw(props.service).Spec));
+const hasChanges = computed(() => !isEqual(toRaw(props.service).Spec, toRaw(newSpec.value)));
+
+watch(
+  [newSpec, hasChanges],
+  ([newNewSpec, newHasChanges]) => {
+    if (newHasChanges)
+      console.debug('Changes:', {
+        diff: detailedDiff(toRaw(props.service.Spec!), toRaw(newNewSpec)),
+        new: toRaw(newNewSpec),
+        old: toRaw(props.service.Spec),
+      });
+  },
+  { immediate: true },
+);
 
 const {
   mutate: _updateService,
@@ -122,8 +151,8 @@ function saveChanges() {
     <div class="divider" />
 
     <!-- Volumes -->
-    <h2 class="text-xl">Volumes</h2>
-    <p>TODO</p>
+    <h2 class="text-xl">Mounts</h2>
+    <service-mounts-form v-model:mounts="mounts" />
 
     <div class="divider" />
 
@@ -136,7 +165,7 @@ function saveChanges() {
     <!-- Save bar -->
     <save-changes-alert
       :is-saving="isSaving || isRenaming"
-      :visible="hasChanged"
+      :visible="hasChanges"
       :error="saveError ?? renameError"
       type="submit"
       @discard="discardChanges"

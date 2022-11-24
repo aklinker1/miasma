@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "autoprefixer": "^10.4.13",
+    "deep-object-diff": "^1.1.9",
     "docker-modem": "^3.0.6",
     "lodash.isequal": "^4.5.0",
     "lodash.merge": "^4.6.2",

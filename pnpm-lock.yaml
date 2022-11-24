@@ -5,8 +5,11 @@ specifiers:
   '@nuxtjs/color-mode': ^3.1.8
   '@nuxtjs/tailwindcss': ^6.1.3
   '@types/docker-modem': ^3.0.2
+  '@types/lodash.differencewith': ^4.5.7
+  '@types/lodash.frompairs': ^4.0.7
   '@types/lodash.isequal': ^4.5.6
   '@types/lodash.merge': ^4.6.7
+  '@types/lodash.topairs': ^4.3.7
   '@unocss/nuxt': ^0.46.4
   '@unocss/preset-icons': ^0.46.4
   '@vueuse/core': ^9.5.0
@@ -14,10 +17,14 @@ specifiers:
   autoprefixer: ^10.4.13
   code-block-writer: ^11.0.3
   daisyui: ^2.39.1
+  deep-object-diff: ^1.1.9
   docker-modem: ^3.0.6
   husky: ^8.0.2
+  lodash.differencewith: ^4.5.0
+  lodash.frompairs: ^4.0.1
   lodash.isequal: ^4.5.0
   lodash.merge: ^4.6.2
+  lodash.topairs: ^4.3.0
   nuxt: 3.0.0-rc.13
   openapi-types: ^12.0.2
   postcss: ^8.4.19
@@ -33,9 +40,13 @@ specifiers:
 
 dependencies:
   autoprefixer: 10.4.13_postcss@8.4.19
+  deep-object-diff: 1.1.9
   docker-modem: 3.0.6
+  lodash.differencewith: 4.5.0
+  lodash.frompairs: 4.0.1
   lodash.isequal: 4.5.0
   lodash.merge: 4.6.2
+  lodash.topairs: 4.3.0
   postcss: 8.4.19
   typescript: 4.8.4
   vite: 3.2.3
@@ -48,8 +59,11 @@ devDependencies:
   '@nuxtjs/color-mode': 3.1.8
   '@nuxtjs/tailwindcss': 6.1.3
   '@types/docker-modem': 3.0.2
+  '@types/lodash.differencewith': 4.5.7
+  '@types/lodash.frompairs': 4.0.7
   '@types/lodash.isequal': 4.5.6
   '@types/lodash.merge': 4.6.7
+  '@types/lodash.topairs': 4.3.7
   '@unocss/nuxt': 0.46.4_vite@3.2.3
   '@unocss/preset-icons': 0.46.4
   '@vueuse/core': 9.5.0_vue@3.2.45
@@ -956,6 +970,18 @@ packages:
     resolution: {integrity: sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==}
     dev: true
 
+  /@types/lodash.differencewith/4.5.7:
+    resolution: {integrity: sha512-7eteqr9cLL3mlvmFfWiTV7V4RgIRfiQpT6eRnTaG1WAdnxYJ5XLekj0EcQsHNRZqiffKMx/FZltwG+E3xTMadg==}
+    dependencies:
+      '@types/lodash': 4.14.188
+    dev: true
+
+  /@types/lodash.frompairs/4.0.7:
+    resolution: {integrity: sha512-7UeH2+GF9yop4AqnPwae5/2TE+eY0WRDy0RRQtNGHjzIgdUhilRskMXvXqUcCSazvbkxasjqydXrIE1OB6bPKA==}
+    dependencies:
+      '@types/lodash': 4.14.188
+    dev: true
+
   /@types/lodash.isequal/4.5.6:
     resolution: {integrity: sha512-Ww4UGSe3DmtvLLJm2F16hDwEQSv7U0Rr8SujLUA2wHI2D2dm8kPu6Et+/y303LfjTIwSBKXB/YTUcAKpem/XEg==}
     dependencies:
@@ -964,6 +990,12 @@ packages:
 
   /@types/lodash.merge/4.6.7:
     resolution: {integrity: sha512-OwxUJ9E50gw3LnAefSHJPHaBLGEKmQBQ7CZe/xflHkyy/wH2zVyEIAKReHvVrrn7zKdF58p16We9kMfh7v0RRQ==}
+    dependencies:
+      '@types/lodash': 4.14.188
+    dev: true
+
+  /@types/lodash.topairs/4.3.7:
+    resolution: {integrity: sha512-g/6Qr4Kw4Tco4SdLtkLpY1Ed2ZsRsstuUsyYFzWTlubISEq7qsGSAdQb50KJcNGa7K7Eixk9Q/9oXzmVq39jbw==}
     dependencies:
       '@types/lodash': 4.14.188
     dev: true
@@ -2366,6 +2398,10 @@ packages:
     resolution: {integrity: sha512-bHtC0iYvWhyaTzvV3CZgPeZQqCOBGyGsVV7v4eevpdkLHfiSrXUdBG+qAuSz4RI70sszvjQ1QSZ98An1yNwpSw==}
     dev: true
 
+  /deep-object-diff/1.1.9:
+    resolution: {integrity: sha512-Rn+RuwkmkDwCi2/oXOFS9Gsr5lJZu/yTGpK7wAaAIE75CC+LCGEZHpY6VQJa/RoJcrmaA/docWJZvYohlNkWPA==}
+    dev: false
+
   /deepmerge/4.2.2:
     resolution: {integrity: sha512-FJ3UgI4gIl+PHZm53knsuSFpE+nESMr7M4v9QcgB7S63Kj/6WqMiFQJpBBYz1Pt+66bZpP3Q7Lye0Oo9MPKEdg==}
     engines: {node: '>=0.10.0'}
@@ -3720,9 +3756,17 @@ packages:
     resolution: {integrity: sha512-dS2j+W26TQ7taQBGN8Lbbq04ssV3emRw4NY58WErlTO29pIqS0HmoT5aJ9+TUQ1N3G+JOZSji4eugsWwGp9yPA==}
     dev: true
 
+  /lodash.differencewith/4.5.0:
+    resolution: {integrity: sha512-/8JFjydAS+4bQuo3CpLMBv7WxGFyk7/etOAsrQUCu0a9QVDemxv0YQ0rFyeZvqlUD314SERfNlgnlqqHmaQ0Cg==}
+    dev: false
+
   /lodash.flatten/4.4.0:
     resolution: {integrity: sha512-C5N2Z3DgnnKr0LOpv/hKCgKdb7ZZwafIrsesve6lmzvZIRZRGaZ/l6Q8+2W7NaT+ZwO3fFlSCzCzrDCFdJfZ4g==}
     dev: true
+
+  /lodash.frompairs/4.0.1:
+    resolution: {integrity: sha512-dvqe2I+cO5MzXCMhUnfYFa9MD+/760yx2aTAN1lqEcEkf896TxgrX373igVdqSJj6tQd0jnSLE1UMuKufqqxFw==}
+    dev: false
 
   /lodash.isarguments/3.1.0:
     resolution: {integrity: sha512-chi4NHZlZqZD18a0imDHnZPrDeBbTtVN7GXMwuGdRH9qotxAjYs3aVLKc7zNOG9eddR5Ksd8rvFEBc9SsggPpg==}
@@ -3760,6 +3804,10 @@ packages:
     dependencies:
       lodash._reinterpolate: 3.0.0
     dev: true
+
+  /lodash.topairs/4.3.0:
+    resolution: {integrity: sha512-qrRMbykBSEGdOgQLJJqVSdPWMD7Q+GJJ5jMRfQYb+LTLsw3tYVIabnCzRqTJb2WTo17PG5gNzXuFaZgYH/9SAQ==}
+    dev: false
 
   /lodash.union/4.6.0:
     resolution: {integrity: sha512-c4pB2CdGrGdjMKYLA+XiRDO7Y0PRQbm/Gzg8qMj+QH+pFVAoTp5sBpO0odL3FjoPCGjK96p6qsP+yQoiLoOBcw==}
