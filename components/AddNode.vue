@@ -25,7 +25,7 @@ const joinCommand = computed(() => {
   const ip =
     nodes.value?.find(node => node.ManagerStatus?.Reachability === 'reachable')?.ManagerStatus
       ?.Addr ?? '<manager-ip>';
-  return `docker swarm join \\\n  --token ${token} \\\n  ${ip}`;
+  return `docker swarm join \\\n    --token ${token} \\\n    ${ip}`;
 });
 </script>
 
@@ -59,7 +59,7 @@ const joinCommand = computed(() => {
       </ul>
 
       <div class="p-4 bg-neutral text-neutral-content text-sm overflow-x-auto rounded-box">
-        <pre>{{ joinCommand }}</pre>
+        <pre>$ {{ joinCommand }}</pre>
       </div>
 
       <div class="modal-action">
