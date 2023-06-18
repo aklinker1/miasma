@@ -6,7 +6,10 @@ useHead({
 
 <template>
   <div class="space-y-4">
-    <node-breadcrumbs />
+    <div class="flex justify-between items-center">
+      <node-breadcrumbs />
+      <add-node />
+    </div>
 
     <!-- Node List -->
     <nuxt-page />
