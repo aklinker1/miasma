@@ -8,7 +8,7 @@ useHead({
   <div class="space-y-4">
     <node-breadcrumbs />
 
-    <!-- Service Lists -->
+    <!-- Node List -->
     <nuxt-page />
   </div>
 </template>

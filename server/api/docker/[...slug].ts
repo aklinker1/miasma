@@ -6,11 +6,11 @@ export default defineEventHandler(async event => {
   const modem = new DockerModem({
     socketPath: '/Users/aklinker1/.colima/default/docker.sock',
   });
-  const query = useQuery(event);
+  const query = getQuery(event);
 
   // Including a ? is required to make query params work, and does not break when there are not
   // query params
-  const path = `/${event.context.params.slug}?`;
+  const path = `/${event.context.params?.slug}?`;
   try {
     const response = await new Promise((resolve, reject) => {
       const options = {
