@@ -1,9 +1,25 @@
-export default function () {
-  return useDockerUpdateServiceMutation((service, spec) => {
-    const desiredTasks = service.ServiceStatus?.DesiredTasks ?? 0;
-    if (desiredTasks === 0) throw Error('Service is already stopped');
+import { useMutation, useQueryClient } from 'vue-query';
+import { MiasmaLabels } from '~~/utils/labels';
 
-    spec.Mode!.Replicated!.Replicas = 0;
-    return spec;
+export default function () {
+  const client = useQueryClient();
+
+  return useMutation<
+    Docker.PostServiceUpdateResponse200 | Docker.PostServiceCreateResponse201,
+    H3Error<
+      | Docker.PostServiceUpdateResponse400
+      | Docker.PostServiceUpdateResponse404
+      | Docker.PostServiceUpdateResponse500
+      | Docker.PostServiceUpdateResponse503
+    >,
+    Docker.Service
+  >({
+    mutationFn: docker.stopService,
+    async onSuccess(_, service) {
+      // All the services queries
+      client.invalidateQueries(QueryKeys.Services);
+      // Service by ID
+      client.invalidateQueries([QueryKeys.Service, service.ID]);
+    },
   });
 }

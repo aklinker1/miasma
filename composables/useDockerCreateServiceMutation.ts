@@ -11,12 +11,5 @@ export default function () {
       | Docker.PostServiceCreateResponse503
     >,
     Docker.ServiceSpec
-  >({
-    mutationFn(spec) {
-      return $fetch('/api/docker/services/create', {
-        method: 'POST',
-        body: spec,
-      });
-    },
-  });
+  >(docker.createService);
 }

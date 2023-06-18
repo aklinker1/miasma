@@ -10,10 +10,6 @@ export default function () {
     >,
     Docker.Service
   >({
-    mutationFn(service) {
-      return $fetch(`/api/docker/services/${service.ID}`, {
-        method: 'DELETE',
-      });
-    },
+    mutationFn: docker.deleteService,
   });
 }
