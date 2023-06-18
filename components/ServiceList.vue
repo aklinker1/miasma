@@ -2,10 +2,15 @@
 const props = defineProps<{
   showHidden?: boolean;
 }>();
-const showHidden = computed(() => props.showHidden);
 
-const includeStatus = ref(true);
-const { data: services, error, refetch, isLoading } = useDockerServicesQuery(includeStatus);
+const {
+  data: services,
+  error,
+  refetch,
+  isLoading,
+} = useDockerServicesQuery({
+  status: true,
+});
 
 const groups = useServiceGroups(services);
 </script>

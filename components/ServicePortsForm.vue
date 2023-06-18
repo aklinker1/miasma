@@ -14,7 +14,10 @@ const {
   key: 'ports',
   props,
   emits,
-  emptyValue: {} as Docker.EndpointPortConfig,
+  emptyValue: {
+    Protocol: 'tcp',
+    PublishMode: 'ingress',
+  } as Docker.EndpointPortConfig,
   isEmpty: item => item.PublishedPort == null && item.TargetPort == null,
 });
 
@@ -33,6 +36,20 @@ function updatePublished(index: number, event: Event) {
     PublishedPort: Number(newPublishedPort),
   });
 }
+function updateProtocol(index: number, event: Event) {
+  const newProtocol = (event.target as HTMLSelectElement).value as 'tcp' | 'udp' | 'sctp';
+  _updateItem(index, {
+    ...list.value[index],
+    Protocol: newProtocol,
+  });
+}
+function updatePublishMode(index: number, event: Event) {
+  const newPublishMode = (event.target as HTMLSelectElement).value as 'ingress' | 'host';
+  _updateItem(index, {
+    ...list.value[index],
+    PublishMode: newPublishMode,
+  });
+}
 </script>
 
 <template>
@@ -40,35 +57,46 @@ function updatePublished(index: number, event: Event) {
     <table class="table w-full table-compact shadow-2xl">
       <thead>
         <tr>
-          <td class="w-8">Protocol</td>
-          <td class="min-w-[12rem]">Target Port</td>
-          <td />
-          <td class="min-w-[12rem]">Published Port</td>
+          <th>Protocol</th>
+          <th>Publish Mode</th>
+          <th>Target Port</th>
+          <th>Published Port</th>
         </tr>
       </thead>
       <!-- Items -->
       <tbody>
         <tr v-for="(config, i) of list" :key="i">
-          <td>
+          <td class="whitespace-nowrap pr-0">
             <select
-              class="select select-sm select-bordered focus:select-primary w-full min-w-[8rem] placeholder:opacity-50"
+              class="select select-sm select-bordered focus:select-primary placeholder:opacity-50 min-w-0"
               :value="config.Protocol ?? 'tcp'"
-              disabled
-              title="Not implemented yet"
+              @input="event => updateProtocol(i, event)"
             >
               <option value="tcp">TCP</option>
+              <option value="udp">UDP</option>
+              <option value="sctp">SCTP</option>
             </select>
           </td>
-          <td>
-            <div class="form-control">
-              <label class="input-group input-group-lg">
+          <td class="whitespace-nowrap pr-0">
+            <select
+              class="select select-sm select-bordered focus:select-primary placeholder:opacity-50 min-w-0"
+              :value="config.PublishMode ?? 'ingress'"
+              @input="event => updatePublishMode(i, event)"
+            >
+              <option value="ingress">Ingress</option>
+              <option value="host">Host</option>
+            </select>
+          </td>
+          <td class="w-[50%] pr-0">
+            <div class="flex w-full gap-2 items-center">
+              <label class="input-group">
                 <span>
                   <div class="i-mdi-docker text-xl" />
                 </span>
                 <input
                   type="number"
                   placeholder="Target"
-                  class="input input-sm input-bordered focus:input-primary w-full placeholder:opacity-50 font-mono"
+                  class="input input-sm input-bordered focus:input-primary placeholder:opacity-50 font-mono flex-1 min-w-0"
                   min="0"
                   max="65535"
                   :value="config.TargetPort"
@@ -76,21 +104,19 @@ function updatePublished(index: number, event: Event) {
                   @input="event => updateTarget(i, event)"
                 />
               </label>
+              <div class="shrink-0 i-mdi-arrow-right text-xl m-1" />
             </div>
           </td>
-          <td class="align-middle w-3">
-            <div class="i-mdi-arrow-right text-xl m-1" />
-          </td>
-          <td>
-            <div class="flex w-full gap-2">
-              <label class="input-group input-group-lg">
+          <td class="w-[50%]">
+            <div class="flex w-full gap-2 items-center">
+              <label class="input-group">
                 <span>
                   <div class="i-ri-server-fill text-xl" />
                 </span>
                 <input
                   type="number"
                   placeholder="Published"
-                  class="input input-sm input-bordered focus:input-primary placeholder:opacity-50 font-mono flex-1"
+                  class="input input-sm input-bordered focus:input-primary placeholder:opacity-50 font-mono flex-1 min-w-0"
                   min="0"
                   max="65535"
                   :value="config.PublishedPort"

@@ -14,10 +14,11 @@ const { mutate: startService, isLoading: isStarting } = useDockerStartServiceMut
 const { mutate: stopService, isLoading: isStopping } = useDockerStopServiceMutation();
 // const { mutate: restartService, isLoading: isRestarting } = useRestartServiceMutation();
 const { mutate: _deleteService, isLoading: isDeleting } = useDockerDeleteServiceMutation();
-// const { mutate: editService, isLoading: isPullingLatest } = useDockerUpdateServiceMutation();
-// function pullLatest() {
-//   editService({ id: props.service.id, changes: { image: props.service.image } });
-// }
+
+const isPullingLatest = ref(false);
+function pullLatest() {
+  console.warn('TODO');
+}
 
 const urls = useServiceUrls(service);
 
@@ -26,8 +27,8 @@ const isUpdating = computed(
     isStarting.value ||
     isStopping.value ||
     // isRestarting.value ||
-    isDeleting.value,
-  // isPullingLatest.value,
+    isDeleting.value ||
+    isPullingLatest.value,
 );
 
 const router = useRouter();
@@ -40,7 +41,7 @@ function deleteService() {
   <ul class="menu bg-base-300 p-2 rounded-box shadow-2xl">
     <!-- Status -->
     <li class="menu-title"><span>Status</span></li>
-    <li v-if="status" class="font-medium">
+    <li v-if="status" class="font-medium pointer-events-none">
       <span
         class="bg-opacity-0 cursor-auto uppercase"
         :class="{
@@ -60,12 +61,10 @@ function deleteService() {
       </span>
     </li>
     <li v-if="desiredTasks" :class="{ 'disabled pointer-events-none': isUpdating || true }">
-      <span>
-        <div class="i-mdi-pencil text-2xl" />
-        <span>{{ service.ServiceStatus?.RunningTasks ?? 0 }}</span>
-        /
-        <span>{{ desiredTasks }} instances</span>
-      </span>
+      <div>
+        <div class="i-mdi-pencil text-2xl"></div>
+        <span>{{ service.ServiceStatus?.RunningTasks ?? 0 }} / {{ desiredTasks }} instances</span>
+      </div>
     </li>
     <!-- <li>
       <service-logs-container :service-id="service.id" />
@@ -106,21 +105,12 @@ function deleteService() {
         <span>Stop Service</span>
       </span>
     </li>
-    <!-- <li
-      :class="{ 'disabled pointer-events-none': isUpdating || status !== 'running' }"
-      @click="restartService(service)"
-    >
-      <span>
-        <div class="i-mdi-restart text-2xl" />
-        <span>Restart Service</span>
-      </span>
-    </li> -->
-    <!-- <li :class="{ 'disabled pointer-events-none': isUpdating || true }" @click="pullLatest">
+    <li :class="{ 'disabled pointer-events-none': isUpdating || true }" @click="pullLatest">
       <span>
         <div class="i-mdi-cloud-download text-2xl" />
         <span>Pull Latest Image</span>
       </span>
-    </li> -->
+    </li>
     <li :class="{ 'disabled pointer-events-none': isUpdating }" @click="deleteService()">
       <span
         class="hover:text-error bg-error bg-opacity-0 hover:bg-opacity-10 active:bg-opacity-100 active:text-error-content"

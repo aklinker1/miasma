@@ -20,6 +20,7 @@ const isShowingNameWarning = computed(() => internalName.value.trim() !== props.
 </script>
 
 <template>
+  <!-- Service Name -->
   <div class="form-control">
     <label class="input-group group">
       <span class="group-focus-within:text-primary">Name</span>
@@ -38,6 +39,7 @@ const isShowingNameWarning = computed(() => internalName.value.trim() !== props.
   </div>
 
   <div class="flex gap-4">
+    <!-- Docker Image -->
     <div class="form-control flex-grow">
       <label class="input-group group">
         <span class="group-focus-within:text-primary">Image</span>
@@ -49,8 +51,10 @@ const isShowingNameWarning = computed(() => internalName.value.trim() !== props.
         />
       </label>
     </div>
+
+    <!-- Group -->
     <div class="form-control flex-grow">
-      <label class="input-group group">
+      <label class="input-group group" title="Group related services together on the dashboard">
         <span class="group-focus-within:text-primary">Group</span>
         <input
           class="input input-bordered focus:input-primary w-full"

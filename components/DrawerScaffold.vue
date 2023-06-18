@@ -10,7 +10,7 @@ defineProps<{
     <div class="drawer-content flex flex-col">
       <!-- Navbar -->
       <div class="w-full navbar bg-base-300 shrink-0">
-        <div class="w-full max-w-screen-lg mx-auto">
+        <div class="w-full max-w-screen-xl mx-auto">
           <div class="flex-none sm:hidden">
             <label for="drawer-toggle" class="btn btn-circle btn-ghost">
               <div class="i-mdi-menu text-2xl" />
@@ -29,7 +29,7 @@ defineProps<{
         </div>
       </div>
 
-      <div class="w-full max-w-screen-lg mx-auto p-8 space-y-8 min-h-[80vh] shrink-0">
+      <div class="w-full max-w-screen-xl mx-auto p-8 space-y-8 min-h-[80vh] shrink-0">
         <slot name="content" />
       </div>
 
@@ -64,7 +64,11 @@ defineProps<{
     </div>
     <div class="drawer-side">
       <label for="drawer-toggle" class="drawer-overlay"></label>
-      <ul class="menu p-4 overflow-y-auto w-80 bg-base-100">
+      <ul class="menu p-4 overflow-y-auto w-80 bg-base-100 h-full">
+        <nuxt-link to="/" class="link link-hover px-4 pt-4 pb-8" :title="navTitle">
+          <img src="~/assets/img/nav-branding.svg" class="w-32 aspect-[706/108]" />
+        </nuxt-link>
+
         <slot name="drawer-items" />
       </ul>
     </div>

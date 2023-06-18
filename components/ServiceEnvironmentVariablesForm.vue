@@ -36,8 +36,8 @@ function updateValue(index: number, event: Event) {
     <table class="table w-full table-compact shadow-2xl">
       <thead>
         <tr>
-          <td class="min-w-[16rem]">Key</td>
-          <td class="w-full">Value</td>
+          <th class="min-w-[16rem]">Key</th>
+          <th class="w-full">Value</th>
         </tr>
       </thead>
       <!-- Items -->

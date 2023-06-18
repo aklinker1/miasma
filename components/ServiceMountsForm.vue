@@ -40,10 +40,10 @@ function updateSource(index: number, event: Event) {
     <table class="table w-full table-compact shadow-2xl">
       <thead>
         <tr>
-          <td class="w-8">Type</td>
-          <td class="min-w-[12rem]">Target Path</td>
-          <td />
-          <td class="min-w-[12rem]">Source Path</td>
+          <th class="w-8">Type</th>
+          <th class="min-w-[12rem]">Target Path</th>
+          <th />
+          <th class="min-w-[12rem]">Source Path</th>
         </tr>
       </thead>
       <!-- Items -->

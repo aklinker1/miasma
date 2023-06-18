@@ -46,9 +46,10 @@ function getNewSpec(base: Docker.ServiceSpec = toRaw(props.service).Spec!) {
   if (env.value.length) newSpec.TaskTemplate!.ContainerSpec!.Env = env.value;
   else delete newSpec.TaskTemplate!.ContainerSpec!.Env;
 
-  if (ports.value.length) {
+  const validPorts = ports.value.filter(port => !!port.PublishedPort && !!port.TargetPort);
+  if (validPorts.length) {
     newSpec.EndpointSpec ??= {};
-    newSpec.EndpointSpec.Ports = ports.value;
+    newSpec.EndpointSpec.Ports = validPorts;
   } else if (newSpec?.EndpointSpec?.Ports) {
     delete newSpec.EndpointSpec.Ports;
   }
@@ -74,20 +75,19 @@ function discardChanges() {
 
   // If you discard on an error, don't show error next time there is a change
   resetSave.value();
-  resetRename.value();
 }
 
 const newSpec = computed(() => getNewSpec());
-const hasChanges = computed(() => !isEqual(toRaw(props.service).Spec, toRaw(newSpec.value)));
+const hasChanges = computed(() => !isEqual(clone(props.service.Spec), clone(newSpec.value)));
 
 watch(
   [newSpec, hasChanges],
   ([newNewSpec, newHasChanges]) => {
     if (newHasChanges)
       console.debug('Changes:', {
-        diff: detailedDiff(toRaw(props.service.Spec!), toRaw(newNewSpec)),
-        new: toRaw(newNewSpec),
-        old: toRaw(props.service.Spec),
+        diff: detailedDiff(toRaw(clone(props.service.Spec!)), toRaw(clone(newNewSpec))),
+        new: clone(newNewSpec),
+        old: clone(props.service.Spec),
       });
   },
   { immediate: true },
@@ -98,37 +98,18 @@ const {
   isLoading: isSaving,
   error: saveError,
   reset: resetSave,
-} = useDockerUpdateServiceMutation((_, prevSpec) => getNewSpec(prevSpec));
-const {
-  mutate: _renameService,
-  isLoading: isRenaming,
-  error: renameError,
-  reset: resetRename,
-} = useDockerRenameServiceMutation();
+} = useDockerUpdateServiceMutation();
 const router = useRouter();
 
 function saveChanges() {
-  if (name.value !== currentName.value) {
-    _renameService(
-      {
-        prevService: toRaw(props.service),
-        newSpec: getNewSpec(),
-      },
-      {
-        onSuccess({ ID }) {
-          router.replace(`/services/${ID}`);
-        },
-      },
-    );
-  } else {
-    _updateService(props.service);
-  }
+  _updateService({ service: props.service, newSpec: getNewSpec() });
 }
 </script>
 
 <template>
   <form @submit.prevent="saveChanges" @reset.prevent="discardChanges" class="space-y-4">
     <!-- Details -->
+    <h1 class="text-2xl">Details</h1>
     <service-metadata-input
       :current-name="currentName"
       v-model:name="name"
@@ -164,9 +145,9 @@ function saveChanges() {
 
     <!-- Save bar -->
     <save-changes-alert
-      :is-saving="isSaving || isRenaming"
+      :is-saving="isSaving"
       :visible="hasChanges"
-      :error="saveError ?? renameError"
+      :error="saveError"
       type="submit"
       @discard="discardChanges"
     />

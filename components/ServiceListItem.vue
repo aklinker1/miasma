@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { routes } from '~/utils/routes';
+
 const props = defineProps<{
   service: Docker.Service;
 }>();
@@ -20,7 +22,7 @@ const urls = useServiceUrls(service);
       <service-icon class="w-6 h-6 ml-2" :name="name" />
     </th>
     <td>
-      <nuxt-link :to="`/services/${service.ID}`">
+      <nuxt-link :to="routes.service(service.ID)">
         <p class="text-lg">
           {{ name }}
         </p>
@@ -43,7 +45,7 @@ const urls = useServiceUrls(service);
         <span>{{ desiredTasks }}</span>
       </p>
     </td>
-    <td class="space-x-3 text-right">
+    <td class="flex justify-end gap-3">
       <open-service-button v-if="status !== 'stopped' && urls?.length" :available-at="urls" />
       <stop-service-button v-if="status !== 'stopped'" :service="service" />
       <start-service-button v-else :service="service" />
