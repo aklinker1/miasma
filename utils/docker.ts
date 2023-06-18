@@ -151,4 +151,25 @@ export const docker = {
 
     return $fetch(url.href);
   },
+
+  async pullImage(image: string): Promise<void> {
+    const url = new DockerURL(`/api/docker/images/create`);
+    const body = {
+      fromImage: image,
+    };
+    await $fetch(url.href, {
+      method: 'POST',
+      body,
+    });
+  },
+
+  async pullLatest(service: Docker.Service): Promise<Docker.PostServiceUpdateResponse200> {
+    const image = service.Spec?.TaskTemplate?.ContainerSpec?.Image;
+    if (image == null) {
+      console.warn('Image missing in service:', service);
+      throw Error('Service does not have an image');
+    }
+    await this.pullImage(image);
+    return await this.updateService(service, service.Spec!);
+  },
 };

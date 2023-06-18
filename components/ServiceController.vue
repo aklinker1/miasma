@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import useDockerPullLatestMutation from '~/composables/useDockerPullLatestMutation';
 import { MiasmaLabels } from '~~/utils/labels';
 
 const props = defineProps<{
@@ -14,11 +15,7 @@ const { mutate: startService, isLoading: isStarting } = useDockerStartServiceMut
 const { mutate: stopService, isLoading: isStopping } = useDockerStopServiceMutation();
 // const { mutate: restartService, isLoading: isRestarting } = useRestartServiceMutation();
 const { mutate: _deleteService, isLoading: isDeleting } = useDockerDeleteServiceMutation();
-
-const isPullingLatest = ref(false);
-function pullLatest() {
-  console.warn('TODO');
-}
+const { mutate: pullLatest, isLoading: isPullingLatest } = useDockerPullLatestMutation();
 
 const urls = useServiceUrls(service);
 
@@ -105,9 +102,10 @@ function deleteService() {
         <span>Stop Service</span>
       </span>
     </li>
-    <li :class="{ 'disabled pointer-events-none': isUpdating || true }" @click="pullLatest">
+    <li :class="{ 'disabled pointer-events-none': isUpdating }" @click="pullLatest(service)">
       <span>
-        <div class="i-mdi-cloud-download text-2xl" />
+        <div v-if="!isPullingLatest" class="i-mdi-cloud-download text-2xl" />
+        <div v-else class="loading loading-spinner" />
         <span>Pull Latest Image</span>
       </span>
     </li>
@@ -115,7 +113,8 @@ function deleteService() {
       <span
         class="hover:text-error bg-error bg-opacity-0 hover:bg-opacity-10 active:bg-opacity-100 active:text-error-content"
       >
-        <div class="i-mdi-trash text-2xl" />
+        <div v-if="!isDeleting" class="i-mdi-trash text-2xl" />
+        <div v-else class="loading loading-spinner" />
         <span>Delete Service</span>
       </span>
     </li>
