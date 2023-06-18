@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 const nodeId = useNodeIdPathParam();
-const { data: service } = useDockerServiceQuery(nodeId);
+const { data: node } = useDockerNodeQuery(nodeId);
 </script>
 
 <template>
@@ -18,8 +18,7 @@ const { data: service } = useDockerServiceQuery(nodeId);
         </nuxt-link>
       </li>
       <li class="space-x-2">
-        <service-icon v-if="service" :name="service.Spec?.Name ?? ''" />
-        <span v-if="service">{{ service.Spec?.Name ?? 'Unknown' }}</span>
+        <span v-if="node">{{ node.Description?.Hostname ?? node.ID ?? 'Unknown' }}</span>
       </li>
     </ul>
   </div>

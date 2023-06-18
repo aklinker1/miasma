@@ -1,3 +1,3 @@
 <template>
-  {{ $route }}
+  <p>Todo</p>
 </template>

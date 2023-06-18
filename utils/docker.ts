@@ -9,7 +9,9 @@ export interface ListServiceOptions {
 }
 
 export interface ListNodeOptions {
-  filters?: unknown;
+  filters?: {
+    id?: string[];
+  };
 }
 
 export interface ListTaskOptions {
@@ -140,6 +142,13 @@ export const docker = {
     }
 
     return $fetch(url.href);
+  },
+
+  async getNode(id: string): Promise<Docker.Node> {
+    const res = await docker.listNodes({
+      filters: { id: [id] },
+    });
+    return res[0];
   },
 
   listTasks(options?: ListTaskOptions): Promise<Docker.GetTaskListResponse200> {

@@ -23,11 +23,7 @@ const { data: tasks, isLoading } = useDockerTasksQuery(taskFilters);
   <div class="flex flex-col rounded-lg shadow-2xl overflow-hidden">
     <div class="py-3 px-4 bg-base-200 space-y-1">
       <!-- Disable link while node details page is not implemented -->
-      <nuxt-link
-        :to="`/nodes/${node.ID}`"
-        aria-disabled="true"
-        class="text-xl link link-primary link-hover block pointer-events-none"
-      >
+      <nuxt-link :to="`/nodes/${node.ID}`" class="text-xl link link-primary link-hover block">
         {{ node.Description?.Hostname }}
       </nuxt-link>
       <p class="text-sm uppercase">
