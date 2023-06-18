@@ -1,110 +1,9 @@
 <script lang="ts" setup>
 import { MiasmaLabels } from '~~/utils/labels';
-import isEqual from 'lodash.isequal';
-import { clone } from '~~/utils/clone';
-import { detailedDiff } from 'deep-object-diff';
 
 const props = defineProps<{
   service: Docker.Service;
 }>();
-
-const getPrevName = (): string => props.service.Spec?.Name?.trim() ?? '';
-const getPrevImage = (): string => props.service.Spec!.TaskTemplate!.ContainerSpec!.Image!;
-const getPrevGroup = (): string => props.service.Spec?.Labels?.[MiasmaLabels.Group]?.trim() ?? '';
-const getPrevEnv = (): Docker.ContainerEnv => {
-  const currentEnv = toRaw(props.service).Spec?.TaskTemplate?.ContainerSpec?.Env;
-  return currentEnv ? [...currentEnv] : [];
-};
-const getPrevPortConfigs = (): Docker.EndpointPortConfig[] => {
-  const currentPorts = toRaw(props.service).Spec?.EndpointSpec?.Ports;
-  return currentPorts ? [...currentPorts] : [];
-};
-const getPrevMounts = (): Docker.Mount[] => {
-  const currentMounts = toRaw(props.service).Spec?.TaskTemplate?.ContainerSpec?.Mounts;
-  return currentMounts ? [...currentMounts] : [];
-};
-const getPrevConstraints = (): string[] => {
-  const currentConstraints = toRaw(props.service).Spec?.TaskTemplate?.Placement?.Constraints;
-  return currentConstraints ? [...currentConstraints] : [];
-};
-
-const currentName = computed(() => getPrevName());
-const name = ref(getPrevName());
-const image = ref(getPrevImage());
-const group = ref(getPrevGroup());
-const env = ref(getPrevEnv());
-const ports = ref(getPrevPortConfigs());
-const mounts = ref(getPrevMounts());
-const constraints = ref(getPrevConstraints());
-
-function getNewSpec(base: Docker.ServiceSpec = toRaw(props.service).Spec!) {
-  const newSpec: Docker.ServiceSpec = clone(base);
-
-  newSpec.Name = name.value.trim();
-
-  newSpec.TaskTemplate!.ContainerSpec!.Image = image.value.trim();
-
-  const newGroup = group.value.trim();
-  if (newGroup) newSpec.Labels![MiasmaLabels.Group] = newGroup;
-  else delete newSpec.Labels![MiasmaLabels.Group];
-
-  if (env.value.length) newSpec.TaskTemplate!.ContainerSpec!.Env = env.value;
-  else delete newSpec.TaskTemplate!.ContainerSpec!.Env;
-
-  if (ports.value.length) {
-    newSpec.EndpointSpec ??= {};
-    newSpec.EndpointSpec.Ports = ports.value;
-  } else if (newSpec?.EndpointSpec?.Ports) {
-    delete newSpec.EndpointSpec.Ports;
-  }
-
-  if (mounts.value.length) {
-    newSpec.TaskTemplate ??= {};
-    newSpec.TaskTemplate.ContainerSpec ??= {};
-    newSpec.TaskTemplate.ContainerSpec.Mounts = mounts.value;
-  } else if (newSpec?.TaskTemplate?.ContainerSpec?.Mounts) {
-    delete newSpec.TaskTemplate.ContainerSpec.Mounts;
-  }
-
-  if (constraints.value.length) {
-    newSpec.TaskTemplate ??= {};
-    newSpec.TaskTemplate.Placement ??= {};
-    newSpec.TaskTemplate.Placement.Constraints = constraints.value;
-  } else if (newSpec?.TaskTemplate?.Placement?.Constraints) {
-    delete newSpec.TaskTemplate.Placement.Constraints;
-  }
-
-  return newSpec;
-}
-
-function discardChanges() {
-  name.value = getPrevName();
-  image.value = getPrevImage();
-  group.value = getPrevGroup();
-  env.value = getPrevEnv();
-  ports.value = getPrevPortConfigs();
-  mounts.value = getPrevMounts();
-  constraints.value = getPrevConstraints();
-
-  // If you discard on an error, don't show error next time there is a change
-  resetSave.value();
-}
-
-const newSpec = computed(() => getNewSpec());
-const hasChanges = computed(() => !isEqual(clone(props.service.Spec), clone(newSpec.value)));
-
-watch(
-  [newSpec, hasChanges],
-  ([newNewSpec, newHasChanges]) => {
-    if (newHasChanges)
-      console.debug('Changes:', {
-        diff: detailedDiff(toRaw(clone(props.service.Spec!)), toRaw(clone(newNewSpec))),
-        new: clone(newNewSpec),
-        old: clone(props.service.Spec),
-      });
-  },
-  { immediate: true },
-);
 
 const {
   mutate: _updateService,
@@ -113,8 +12,73 @@ const {
   reset: resetSave,
 } = useDockerUpdateServiceMutation();
 
+const service = toRef(props, 'service');
+const {
+  latestModel,
+  discardChanges,
+  hasChanges,
+  constraints,
+  env,
+  group,
+  image,
+  mounts,
+  name,
+  ports,
+} = useDeepEditable(
+  computed(() => service.value.Spec ?? {}),
+  {
+    name: model => model?.Name?.trim() ?? '',
+    image: model => model?.TaskTemplate?.ContainerSpec?.Image,
+    group: model => model?.Labels?.[MiasmaLabels.Group]?.trim() ?? '',
+    env: model => model?.TaskTemplate?.ContainerSpec?.Env ?? [],
+    ports: model => model?.EndpointSpec?.Ports ?? [],
+    mounts: model => model?.TaskTemplate?.ContainerSpec?.Mounts ?? [],
+    constraints: model => model?.TaskTemplate?.Placement?.Constraints ?? [],
+  },
+  (base, values): Docker.ServiceSpec => {
+    base.Name = values.name.trim();
+
+    base.TaskTemplate!.ContainerSpec!.Image = values.image.trim();
+
+    const newGroup = values.group.trim();
+    if (newGroup) base.Labels![MiasmaLabels.Group] = newGroup;
+    else delete base.Labels![MiasmaLabels.Group];
+
+    if (values.env.length) base.TaskTemplate!.ContainerSpec!.Env = values.env;
+    else delete base.TaskTemplate!.ContainerSpec!.Env;
+
+    if (values.ports.length) {
+      base.EndpointSpec ??= {};
+      base.EndpointSpec.Ports = values.ports;
+    } else if (base?.EndpointSpec?.Ports) {
+      delete base.EndpointSpec.Ports;
+    }
+
+    if (values.mounts.length) {
+      base.TaskTemplate ??= {};
+      base.TaskTemplate.ContainerSpec ??= {};
+      base.TaskTemplate.ContainerSpec.Mounts = values.mounts;
+    } else if (base?.TaskTemplate?.ContainerSpec?.Mounts) {
+      delete base.TaskTemplate.ContainerSpec.Mounts;
+    }
+
+    if (values.constraints.length) {
+      base.TaskTemplate ??= {};
+      base.TaskTemplate.Placement ??= {};
+      base.TaskTemplate.Placement.Constraints = values.constraints;
+    } else if (base?.TaskTemplate?.Placement?.Constraints) {
+      delete base.TaskTemplate.Placement.Constraints;
+    }
+
+    return base;
+  },
+  resetSave,
+);
+
+const currentName = computed(() => props.service.Spec?.Name ?? '');
+
 function saveChanges() {
-  _updateService({ service: props.service, newSpec: getNewSpec() });
+  _updateService({ service: props.service, newSpec: latestModel.value });
 }
 </script>
 
