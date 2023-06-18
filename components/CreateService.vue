@@ -1,39 +1,45 @@
 <script lang="ts" setup>
-import { useRouter } from "vue-router";
-import {
-  AppInput,
-  useCreateAppMutation,
-} from "../composition/create-service-mutation";
+import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
 const modalBackground = ref<HTMLElement>();
 
-const name = ref("");
-const image = ref("");
+const name = ref('');
+const image = ref('');
+function reset() {
+  name.value = '';
+  image.value = '';
+}
 
 const isSubmitDisabled = computed(
-  () => !name.value.trim() || !image.value.trim() || loading.value
+  () => !name.value.trim() || !image.value.trim() || isLoading.value,
 );
 
 function dismiss() {
   modalBackground.value?.click();
 }
 
-const { loading, error, mutate: createApp } = useCreateAppMutation();
+const { isLoading, error, mutate: createService } = useDockerCreateServiceMutation();
 
 async function createAppWithValues() {
-  const service: AppInput = {
-    name: name.value.trim(),
-    image: image.value.trim(),
-  };
-  const result = await createApp({ service });
-  const newId = result?.data?.service.id;
-  dismiss();
-  if (!newId) {
-    console.warn("Created service did not have an ID");
-  }
-  router.push(`/services/${newId}`);
+  const spec = defineService({
+    Name: name.value.trim(),
+    TaskTemplate: {
+      ContainerSpec: {
+        Image: image.value.trim(),
+      },
+    },
+  });
+  createService(spec, {
+    onSuccess(service) {
+      dismiss();
+      if (!service.ID) {
+        console.warn('Created service did not have an ID');
+      }
+      router.push(routes.service(service.ID));
+    },
+  });
 }
 </script>
 
@@ -43,18 +49,16 @@ async function createAppWithValues() {
     for="create-service-modal"
     class="btn btn-outline hover:btn-primary gap-2 modal-button"
     title="Create Service"
-    >Create
-    <i-mdi-plus class="w-6 h-6" />
+    @click="reset"
+  >
+    <span>Create</span>
+    <div class="i-mdi-plus text-2xl" />
   </label>
 
   <!-- Put this part before </body> tag -->
   <teleport to="body">
     <input type="checkbox" id="create-service-modal" class="modal-toggle" />
-    <label
-      ref="modalBackground"
-      for="create-service-modal"
-      class="modal cursor-pointer"
-    >
+    <label ref="modalBackground" for="create-service-modal" class="modal cursor-pointer">
       <label class="modal-box relative" for="">
         <form @submit.prevent="createAppWithValues" class="flex flex-col gap-4">
           <h3 class="text-lg font-bold">Create New Service</h3>
@@ -62,13 +66,11 @@ async function createAppWithValues() {
           <!-- Service Name -->
           <div class="form-control w-full group">
             <label class="input-group">
-              <span
-                ><service-icon class="group-focus-within:text-primary" :name="name"
-              /></span>
+              <span><service-icon class="group-focus-within:text-primary" :name="name" /></span>
               <input
                 type="text"
                 placeholder="Service Name"
-                class="input input-bordered focus:input-primary w-full"
+                class="input input-bordered focus:input-primary w-full placeholder:opacity-50"
                 v-model="name"
               />
             </label>
@@ -77,13 +79,13 @@ async function createAppWithValues() {
           <!-- Docker Image -->
           <div class="form-control w-full group">
             <label class="input-group">
-              <span
-                ><i-mdi-docker class="group-focus-within:text-primary"
-              /></span>
+              <span class="px-3">
+                <span class="i-mdi-docker text-2xl group-focus-within:text-primary" />
+              </span>
               <input
                 type="text"
                 placeholder="Docker Image"
-                class="input input-bordered focus:input-primary w-full"
+                class="input input-bordered focus:input-primary w-full placeholder:opacity-50"
                 v-model="image"
               />
             </label>
@@ -95,12 +97,8 @@ async function createAppWithValues() {
           </div>
 
           <!-- Submit -->
-          <button
-            type="submit"
-            class="btn btn-primary self-end"
-            :class="{ loading }"
-            :disabled="isSubmitDisabled"
-          >
+          <button type="submit" class="btn btn-primary self-end" :disabled="isSubmitDisabled">
+            <span v-if="isLoading" class="loading loading-spinner" />
             Create
           </button>
         </form>
