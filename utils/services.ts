@@ -16,8 +16,6 @@ export function defineService(overrides: DeepPartial<Docker.ServiceSpec>): Docke
   service.Labels[MiasmaLabels.InstanceCount] = '1';
 
   service.Networks ??= [];
-  // Communicate with other miasma services
-  service.Networks.push({ Target: 'miasma-default' });
 
   return service;
 }
