@@ -23,6 +23,10 @@ const getPrevMounts = (): Docker.Mount[] => {
   const currentMounts = toRaw(props.service).Spec?.TaskTemplate?.ContainerSpec?.Mounts;
   return currentMounts ? [...currentMounts] : [];
 };
+const getPrevConstraints = (): string[] => {
+  const currentConstraints = toRaw(props.service).Spec?.TaskTemplate?.Placement?.Constraints;
+  return currentConstraints ? [...currentConstraints] : [];
+};
 
 const currentName = computed(() => getPrevName());
 const name = ref(getPrevName());
@@ -31,6 +35,7 @@ const group = ref(getPrevGroup());
 const env = ref(getPrevEnv());
 const ports = ref(getPrevPortConfigs());
 const mounts = ref(getPrevMounts());
+const constraints = ref(getPrevConstraints());
 
 function getNewSpec(base: Docker.ServiceSpec = toRaw(props.service).Spec!) {
   const newSpec: Docker.ServiceSpec = clone(base);
@@ -46,10 +51,9 @@ function getNewSpec(base: Docker.ServiceSpec = toRaw(props.service).Spec!) {
   if (env.value.length) newSpec.TaskTemplate!.ContainerSpec!.Env = env.value;
   else delete newSpec.TaskTemplate!.ContainerSpec!.Env;
 
-  const validPorts = ports.value.filter(port => !!port.PublishedPort && !!port.TargetPort);
-  if (validPorts.length) {
+  if (ports.value.length) {
     newSpec.EndpointSpec ??= {};
-    newSpec.EndpointSpec.Ports = validPorts;
+    newSpec.EndpointSpec.Ports = ports.value;
   } else if (newSpec?.EndpointSpec?.Ports) {
     delete newSpec.EndpointSpec.Ports;
   }
@@ -62,6 +66,14 @@ function getNewSpec(base: Docker.ServiceSpec = toRaw(props.service).Spec!) {
     delete newSpec.TaskTemplate.ContainerSpec.Mounts;
   }
 
+  if (constraints.value.length) {
+    newSpec.TaskTemplate ??= {};
+    newSpec.TaskTemplate.Placement ??= {};
+    newSpec.TaskTemplate.Placement.Constraints = constraints.value;
+  } else if (newSpec?.TaskTemplate?.Placement?.Constraints) {
+    delete newSpec.TaskTemplate.Placement.Constraints;
+  }
+
   return newSpec;
 }
 
@@ -72,6 +84,7 @@ function discardChanges() {
   env.value = getPrevEnv();
   ports.value = getPrevPortConfigs();
   mounts.value = getPrevMounts();
+  constraints.value = getPrevConstraints();
 
   // If you discard on an error, don't show error next time there is a change
   resetSave.value();
@@ -99,7 +112,6 @@ const {
   error: saveError,
   reset: resetSave,
 } = useDockerUpdateServiceMutation();
-const router = useRouter();
 
 function saveChanges() {
   _updateService({ service: props.service, newSpec: getNewSpec() });
@@ -139,7 +151,7 @@ function saveChanges() {
 
     <!-- Constraints -->
     <h2 class="text-xl">Constraints</h2>
-    <p>TODO</p>
+    <service-constraints-form v-model:constraints="constraints" />
 
     <!-- TODO -->
 
