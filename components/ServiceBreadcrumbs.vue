@@ -2,7 +2,9 @@
 import { routes } from '~/utils/routes';
 
 const serviceId = useServiceIdPathParam();
-const { data: service } = useDockerServiceQuery(serviceId);
+const { data: service } = useDockerServiceQuery(serviceId, {
+  enabled: computed(() => !!serviceId.value),
+});
 
 const serviceName = computed(() => service.value?.Spec?.Name ?? 'Unknown');
 </script>

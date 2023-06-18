@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 const nodeId = useNodeIdPathParam();
-const { data: node } = useDockerNodeQuery(nodeId);
+const { data: node } = useDockerNodeQuery(nodeId, {
+  enabled: computed(() => !!nodeId.value),
+});
 </script>
 
 <template>
