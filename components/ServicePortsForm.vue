@@ -57,8 +57,8 @@ function updatePublishMode(index: number, event: Event) {
     <table class="table w-full table-compact shadow-2xl">
       <thead>
         <tr>
-          <th>Protocol</th>
-          <th>Publish Mode</th>
+          <!-- <th>Protocol</th> -->
+          <!-- <th>Publish Mode</th> -->
           <th>Target Port</th>
           <th>Published Port</th>
         </tr>
@@ -66,7 +66,7 @@ function updatePublishMode(index: number, event: Event) {
       <!-- Items -->
       <tbody>
         <tr v-for="(config, i) of list" :key="i">
-          <td class="whitespace-nowrap pr-0">
+          <!-- <td class="whitespace-nowrap pr-0">
             <select
               class="select select-sm select-bordered focus:select-primary placeholder:opacity-50 min-w-0"
               :value="config.Protocol ?? 'tcp'"
@@ -76,8 +76,8 @@ function updatePublishMode(index: number, event: Event) {
               <option value="udp">UDP</option>
               <option value="sctp">SCTP</option>
             </select>
-          </td>
-          <td class="whitespace-nowrap pr-0">
+          </td> -->
+          <!-- <td class="whitespace-nowrap pr-0">
             <select
               class="select select-sm select-bordered focus:select-primary placeholder:opacity-50 min-w-0"
               :value="config.PublishMode ?? 'ingress'"
@@ -86,8 +86,8 @@ function updatePublishMode(index: number, event: Event) {
               <option value="ingress">Ingress</option>
               <option value="host">Host</option>
             </select>
-          </td>
-          <td class="w-[50%] pr-0">
+          </td> -->
+          <td class="w-full pr-0">
             <div class="flex w-full gap-2 items-center">
               <label class="input-group">
                 <span>
@@ -107,7 +107,7 @@ function updatePublishMode(index: number, event: Event) {
               <div class="shrink-0 i-mdi-arrow-right text-xl m-1" />
             </div>
           </td>
-          <td class="w-[50%]">
+          <td class="w-full">
             <div class="flex w-full gap-2 items-center">
               <label class="input-group">
                 <span>

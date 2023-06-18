@@ -10,7 +10,7 @@ defineProps<{
     <div class="drawer-content flex flex-col">
       <!-- Navbar -->
       <div class="w-full navbar bg-base-300 shrink-0">
-        <div class="w-full max-w-screen-xl mx-auto">
+        <div class="w-full max-w-screen-lg mx-auto">
           <div class="flex-none sm:hidden">
             <label for="drawer-toggle" class="btn btn-circle btn-ghost">
               <div class="i-mdi-menu text-2xl" />
@@ -29,7 +29,7 @@ defineProps<{
         </div>
       </div>
 
-      <div class="w-full max-w-screen-xl mx-auto p-8 space-y-8 min-h-[80vh] shrink-0">
+      <div class="w-full max-w-screen-lg mx-auto p-8 space-y-8 min-h-[80vh] shrink-0">
         <slot name="content" />
       </div>
 

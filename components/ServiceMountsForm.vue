@@ -40,7 +40,7 @@ function updateSource(index: number, event: Event) {
     <table class="table w-full table-compact shadow-2xl">
       <thead>
         <tr>
-          <th class="w-8">Type</th>
+          <!-- <th class="w-8">Type</th> -->
           <th class="min-w-[12rem]">Target Path</th>
           <th />
           <th class="min-w-[12rem]">Source Path</th>
@@ -49,7 +49,7 @@ function updateSource(index: number, event: Event) {
       <!-- Items -->
       <tbody>
         <tr v-for="(config, i) of list" :key="i">
-          <td>
+          <!-- <td>
             <select
               class="select select-sm select-bordered focus:select-primary w-full min-w-[8rem] placeholder:opacity-50"
               :value="config.Type ?? 'bind'"
@@ -61,7 +61,7 @@ function updateSource(index: number, event: Event) {
               <option value="tmpfs">tmpfs</option>
               <option value="npipe">npipe</option>
             </select>
-          </td>
+          </td> -->
           <td>
             <div class="form-control">
               <label class="input-group input-group-lg">
