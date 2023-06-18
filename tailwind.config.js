@@ -1,5 +1,6 @@
 const colors = require('tailwindcss/colors');
 const defaultTheme = require('tailwindcss/defaultTheme');
+const daisyui = require('daisyui');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -18,14 +19,14 @@ module.exports = {
     themes: [
       {
         light: {
-          ...require('daisyui/src/colors/themes')['[data-theme=light]'],
+          ...require('daisyui/src/theming/themes')['[data-theme=light]'],
           primary: colors.purple[500],
           'primary-focus': colors.purple[600],
         },
       },
       {
         dark: {
-          ...require('daisyui/src/colors/themes')['[data-theme=dark]'],
+          ...require('daisyui/src/theming/themes')['[data-theme=dark]'],
           primary: colors.purple[300],
           'primary-focus': colors.purple[400],
           'primary-content': 'rgb(31, 36, 45)',
