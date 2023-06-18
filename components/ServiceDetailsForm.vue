@@ -75,10 +75,10 @@ const {
   resetSave,
 );
 
-const currentName = computed(() => props.service.Spec?.Name ?? '');
+const currentName = computed(() => service.value.Spec?.Name ?? '');
 
 function saveChanges() {
-  _updateService({ service: props.service, newSpec: latestModel.value });
+  _updateService({ service: service.value, newSpec: latestModel.value });
 }
 </script>
 

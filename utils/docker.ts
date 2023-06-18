@@ -23,9 +23,10 @@ export interface ListTaskOptions {
  */
 class DockerURL extends URL {
   static ORIGIN = 'http://docker';
+  static BASE_URL = `${DockerURL.ORIGIN}/api/docker`;
 
   constructor(path: string) {
-    super(DockerURL.ORIGIN + path);
+    super(DockerURL.BASE_URL + path);
   }
 
   get href() {
@@ -35,12 +36,12 @@ class DockerURL extends URL {
 
 export const docker = {
   getSwarmInfo(): Promise<Docker.GetSwarmInspectResponse200> {
-    const url = new DockerURL(`/api/docker/swarm`);
+    const url = new DockerURL(`/swarm`);
     return $fetch(url.href);
   },
 
   getSystemInfo(): Promise<Docker.GetSystemInfoResponse200> {
-    const url = new DockerURL(`/api/docker/info`);
+    const url = new DockerURL(`/info`);
     return $fetch(url.href);
   },
 
@@ -53,7 +54,7 @@ export const docker = {
   },
 
   async listServices(options?: ListServiceOptions): Promise<Docker.GetServiceListResponse200> {
-    let url = new DockerURL(`/api/docker/services`);
+    let url = new DockerURL(`/services`);
 
     if (options?.filters != null) {
       url.searchParams.set('filters', JSON.stringify(options.filters));
@@ -66,7 +67,7 @@ export const docker = {
   },
 
   createService(spec: Docker.ServiceSpec): Promise<Docker.PostServiceCreateResponse201> {
-    const url = new DockerURL(`/api/docker/services/create`);
+    const url = new DockerURL(`/services/create`);
     return $fetch(url.href, {
       method: 'POST',
       body: spec,
@@ -74,7 +75,7 @@ export const docker = {
   },
 
   async deleteService(service: Pick<Docker.Service, 'ID'>): Promise<void> {
-    const url = new DockerURL(`/api/docker/services/${service.ID}`);
+    const url = new DockerURL(`/services/${service.ID}`);
     await $fetch(url.href, {
       method: 'DELETE',
     });
@@ -84,12 +85,10 @@ export const docker = {
     service: Docker.Service,
     newSpec: Docker.ServiceSpec,
   ): Promise<Docker.PostServiceUpdateResponse200> {
-    const version = service.Version?.Index ?? 0;
+    const url = new DockerURL(`/services/${service.ID}/update`);
+    url.searchParams.set('version', String(service.Version?.Index ?? 0));
 
-    return $fetch(`/api/docker/services/${service.ID}/update?version=${version}`, {
-      method: 'POST',
-      body: newSpec,
-    });
+    return $fetch(url.href, { method: 'POST', body: newSpec });
   },
 
   async renameService(
@@ -135,7 +134,7 @@ export const docker = {
   },
 
   listNodes(options?: ListNodeOptions): Promise<Docker.GetNodeListResponse200> {
-    const url = new DockerURL(`/api/docker/nodes`);
+    const url = new DockerURL(`/nodes`);
 
     if (options?.filters) {
       url.searchParams.set('filters', JSON.stringify(options.filters));
@@ -151,8 +150,15 @@ export const docker = {
     return res[0];
   },
 
+  async updateNode(node: Docker.Node, newSpec: Docker.NodeSpec): Promise<void> {
+    const url = new DockerURL(`/nodes/${node.ID}/update`);
+    url.searchParams.set('version', String(node.Version?.Index ?? 0));
+
+    return $fetch(url.href, { method: 'POST', body: newSpec });
+  },
+
   listTasks(options?: ListTaskOptions): Promise<Docker.GetTaskListResponse200> {
-    const url = new DockerURL(`/api/docker/tasks`);
+    const url = new DockerURL(`/tasks`);
 
     if (options?.filters) {
       url.searchParams.set('filters', JSON.stringify(options.filters));
@@ -162,7 +168,7 @@ export const docker = {
   },
 
   async pullImage(image: string): Promise<void> {
-    const url = new DockerURL(`/api/docker/images/create`);
+    const url = new DockerURL(`/images/create`);
     const body = {
       fromImage: image,
     };
