@@ -7,9 +7,8 @@ on:
 
 jobs:
   checks:
-    name: API Checks
+    name: Run Checks
     runs-on: ubuntu-22.04
-    if: ${{ needs.changes.outputs.api == 'true' }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -27,3 +26,15 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
+
+      - name: Check Formatting
+        run: pnpm format:check
+
+      - name: Type Check
+        run: pnpm compile
+
+      - name: App Builds
+        run: pnpm build
+
+      - name: Docs Build
+        run: pnpm docs:build
