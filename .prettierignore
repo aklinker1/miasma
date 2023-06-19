@@ -1,3 +1,6 @@
 *.gen.*
 .nuxt
 pnpm-lock.yaml
+.output
+dist
+docs/.vitepress/cache

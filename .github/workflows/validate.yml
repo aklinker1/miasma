@@ -1,5 +1,5 @@
 name: Validate
-on: 
+on:
   pull_request:
   workflow_call:
   push:
