@@ -2,10 +2,6 @@
 
 By default, Miasma does not require authentication to access the UI. Authentication is disabled when the `VITE_AUTH` environment variable is not set, or set to an unknown type.
 
-:::info
-Authentication is a work-in-progress, not completed yet.
-:::
-
 Supported authentication methods:
 
 [[toc]]

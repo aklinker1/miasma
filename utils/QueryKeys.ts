@@ -1,4 +1,5 @@
 export enum QueryKeys {
+  Health = 'health',
   Service = 'service',
   Services = 'services',
   Node = 'node',

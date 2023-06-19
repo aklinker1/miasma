@@ -64,7 +64,12 @@ const { error, refetch } = useDockerSwarmInfoQuery();
     </template>
 
     <template #content>
-      <error-display title="Problem with Docker Swarm" :error="error" :retry="refetch" />
+      <error-display
+        v-if="error?.statusCode !== 403"
+        title="Problem with Docker Swarm"
+        :error="error"
+        :retry="refetch"
+      />
 
       <router-view />
     </template>

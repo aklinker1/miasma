@@ -1,6 +1,13 @@
 import DockerModem from 'docker-modem';
 
 export default defineEventHandler(async event => {
+  const app = useExtendedNitroApp();
+  const user = await app.auth.getUser(event);
+  if (user == null) {
+    setResponseStatus(event, 403);
+    return 'Authentication not sent or invalid';
+  }
+
   // GET requests can't read the body, so return undefined
   const body = await readBody(event).catch(() => undefined);
   const modem = new DockerModem({
