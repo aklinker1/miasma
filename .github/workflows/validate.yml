@@ -1,50 +1,12 @@
 name: Validate
-on: [push, workflow_call]
+on: 
+  pull_request:
+  workflow_call:
+  push:
+    branches: [main]
 
 jobs:
-  # Filter jobs example: https://github.com/dorny/paths-filter#examples
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      api: ${{ steps.filter.outputs.api }}
-      cli: ${{ steps.filter.outputs.cli }}
-      web: ${{ steps.filter.outputs.web }}
-      docs: ${{ steps.filter.outputs.docs }}
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
-
-      - uses: dorny/paths-filter@v2
-        id: filter
-        with:
-          filters: |
-            api:
-              - 'Dockerfile*'
-              - 'go.*'
-              - 'gqlgen.yml'
-              - 'Makefile'
-              - 'tools.go'
-              - 'api/**'
-              - 'cmd/server/*'
-              - 'internal/server/**'
-              - 'internal/utils/**'
-              - 'internal/*.go'
-            cli:
-              - 'go.*'
-              - 'Makefile'
-              - 'tools.go'
-              - 'cmd/cli/*'
-              - 'cmd/print-cli-docs/*'
-              - 'internal/cli/**'
-              - 'internal/utils/**'
-              - 'internal/*.go'
-            web:
-              - 'web/**'
-            docs:
-              - 'docs/**'
-              - 'cmd/print-cli-docs/*'
-
-  api-checks:
+  checks:
     name: API Checks
     runs-on: ubuntu-22.04
     needs: changes
@@ -53,94 +15,16 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v3
 
-      - name: Install Go
-        uses: actions/setup-go@v4
-        with:
-          go-version-file: go.mod
-          cache: true
-
-      - name: Compile
-        run: make compile
-
-  cli-checks:
-    name: CLI Checks
-    runs-on: ubuntu-22.04
-    needs: changes
-    if: ${{ needs.changes.outputs.cli == 'true' }}
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
-
-      - name: Install Go
-        uses: actions/setup-go@v4
-        with:
-          go-version-file: go.mod
-          cache: true
-
-      - name: Compile
-        run: make build-cli
-
-      - name: Executable
-        run: ./bin/cli --version
-
-  web-checks:
-    name: Web Checks
-    runs-on: ubuntu-22.04
-    needs: changes
-    if: ${{ needs.changes.outputs.web == 'true' }}
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
-
       - name: Setup PNPM
-        uses: pnpm/action-setup@v2.2.2
+        uses: pnpm/action-setup@v2
         with:
           version: 7
 
-      - name: Setup Node 16
+      - name: Install Node 18
         uses: actions/setup-node@v3
         with:
-          node-version: 16
-          cache: pnpm
-          cache-dependency-path: web/pnpm-lock.yaml
+          node-version: 18
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-        working-directory: web
-
-      - name: Type Check
-        run: pnpm compile
-        working-directory: web
-
-      - name: Build
-        run: pnpm vite build
-        working-directory: web
-
-  doc-checks:
-    name: Documentation Checks
-    runs-on: ubuntu-22.04
-    needs: changes
-    if: ${{ needs.changes.outputs.docs == 'true' }}
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
-
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v2.2.2
-        with:
-          version: 7
-
-      - name: Setup Node 16
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: pnpm
-          cache-dependency-path: web/pnpm-lock.yaml
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-        working-directory: web
-
-      - name: Build
-        run: pnpm build
-        working-directory: web
+        run: pnpm install

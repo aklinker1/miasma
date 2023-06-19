@@ -1,54 +1,40 @@
 name: Publish Docs
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - "docs/**" # Hand written docs
-      - "internal/cli/cobra/**" # Generated CLI docs
-      - "api/**" # Generated GraphQL docs
-  workflow_dispatch:
 
 jobs:
-  docs:
+  publish:
     name: Publish
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
-        with:
-          # fetch all commits to get last updated time or other git log info
-          fetch-depth: 0
+      - name: Checkout Repo
+        uses: actions/checkout@v3
 
       - name: Setup PNPM
-        uses: pnpm/action-setup@v2.2.2
+        uses: pnpm/action-setup@v2
         with:
           version: 7
 
-      - name: Setup Node 16
+      - name: Install Node 18
         uses: actions/setup-node@v3
         with:
-          node-version: 16
-          cache: pnpm
-          cache-dependency-path: docs/pnpm-lock.yaml
-
-      - name: Setup Go 1.19
-        uses: actions/setup-go@v4
-        with:
-          go-version: "1.19"
+          node-version: 18
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-        working-directory: docs
+        run: pnpm install
 
       - name: Build VuePress site
-        run: pnpm build
-        working-directory: docs
+        run: pnpm docs:build
 
       - name: Deploy to GitHub Pages
         uses: crazy-max/ghaction-github-pages@v3
         with:
           target_branch: gh-pages
-          build_dir: docs/.vuepress/dist
+          build_dir: docs/.vitepress/dist
           fqdn: miasma.aklinker1.io
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

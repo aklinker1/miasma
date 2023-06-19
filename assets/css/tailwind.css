@@ -1,0 +1,17 @@
+@import './base.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    .table thead th {
+        background-color: hsl(var(--b3));
+    }
+    .table thead th:first-child {
+        border-top-left-radius: var(--rounded-box, 1rem);
+    }
+    .table thead th:last-child {
+        border-top-right-radius: var(--rounded-box, 1rem);
+    }
+}
