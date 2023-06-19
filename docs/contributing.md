@@ -26,6 +26,9 @@ The CSS framework is [TailwindCSS](https://tailwindcss.com/) + [DaisyUI](https:/
 The UI uses a API proxy (`/api/docker`) for communicating with the docker engine.
 
 ```bash
+# Create a swarm on your development computer
+docker swarm init
+
 # Start Miasma in dev mode
 pnpm dev
 

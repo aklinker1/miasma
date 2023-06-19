@@ -15,20 +15,4 @@
   </a>
 </p>
 
-## Development Setup
-
-```bash
-# Create a swarm locally
-docker swarm init
-# Create an network for miasma to run on
-docker network create --driver overlay miasma-default
-```
-
-# TODO
-
-- [ ] Edit Service Ports
-- [ ] Edit Service Environment
-- [ ] Edit Service Volumes
-- [ ] Edit Service Logs
-- [ ] Edit Service Tasks
-- [ ] Edit Node Labels
+See <https://miasma.aklinker1.io/get-started> to try out Miasma!
