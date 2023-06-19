@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { TaskFilters } from '~~/composables/useDockerTasksQuery';
+import { TaskFilters } from '~/composables/useDockerTasksQuery';
 
 const props = defineProps<{
   node: Docker.Node;

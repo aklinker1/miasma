@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { MiasmaLabels } from '~~/utils/labels';
-
 const props = defineProps<{
   service: Docker.Service;
 }>();

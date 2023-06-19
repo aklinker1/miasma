@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import useDockerPullLatestMutation from '~/composables/useDockerPullLatestMutation';
-import { MiasmaLabels } from '~~/utils/labels';
 
 const props = defineProps<{
   service: Docker.Service;
@@ -13,19 +12,13 @@ const desiredTasks = computed(() => service.value.Spec?.Labels?.[MiasmaLabels.In
 
 const { mutate: startService, isLoading: isStarting } = useDockerStartServiceMutation();
 const { mutate: stopService, isLoading: isStopping } = useDockerStopServiceMutation();
-// const { mutate: restartService, isLoading: isRestarting } = useRestartServiceMutation();
 const { mutate: _deleteService, isLoading: isDeleting } = useDockerDeleteServiceMutation();
 const { mutate: pullLatest, isLoading: isPullingLatest } = useDockerPullLatestMutation();
 
 const urls = useServiceUrls(service);
 
 const isUpdating = computed(
-  () =>
-    isStarting.value ||
-    isStopping.value ||
-    // isRestarting.value ||
-    isDeleting.value ||
-    isPullingLatest.value,
+  () => isStarting.value || isStopping.value || isDeleting.value || isPullingLatest.value,
 );
 
 const router = useRouter();

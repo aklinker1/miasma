@@ -1,5 +1,4 @@
 import { Ref } from 'vue';
-import { MiasmaLabels } from '~~/utils/labels';
 
 export interface AppGroup {
   name?: string;
