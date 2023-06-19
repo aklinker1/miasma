@@ -1,8 +1,11 @@
 import { useQuery } from 'vue-query';
-import { QueryKeys } from '~~/utils/QueryKeys';
 
 export default function () {
-  return useQuery<
+  const docker = useDocker();
+  const auth = useCookie('Authorization');
+  const hasAuth = computed(() => !!auth.value);
+
+  return useDockerQuery<
     Docker.GetSwarmInspectResponse200,
     H3Error<
       | Docker.GetSwarmInspectResponse404
@@ -11,8 +14,9 @@ export default function () {
     >
   >({
     queryKey: [QueryKeys.SwarmInfo],
-    queryFn: () => $fetch('/api/docker/swarm'),
+    queryFn: docker.getSwarmInfo,
     staleTime: 20e3,
     refetchInterval: 20e3,
+    enabled: hasAuth,
   });
 }

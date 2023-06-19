@@ -1,6 +1,8 @@
 import { useMutation } from 'vue-query';
 
 export default function () {
+  const docker = useDocker();
+
   return useMutation<
     void,
     H3Error<

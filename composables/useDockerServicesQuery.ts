@@ -1,10 +1,11 @@
 import { MaybeRef } from 'vue';
 import { useQuery } from 'vue-query';
-import { ListServiceOptions } from '~/utils/docker';
-import { QueryKeys } from '~~/utils/QueryKeys';
+import { ListServiceOptions } from './useDocker';
 
 export default function (options?: MaybeRef<ListServiceOptions>) {
-  return useQuery<
+  const docker = useDocker();
+
+  return useDockerQuery<
     Docker.GetServiceListResponse200,
     H3Error<Docker.GetServiceListResponse500 | Docker.GetServiceListResponse503>
   >({

@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from 'vue-query';
-import { MiasmaLabels } from '~~/utils/labels';
 
 export default function () {
   const client = useQueryClient();
+  const docker = useDocker();
 
   return useMutation<
     Docker.PostServiceUpdateResponse200 | Docker.PostServiceCreateResponse201,

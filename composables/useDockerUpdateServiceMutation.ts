@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from 'vue-query';
-import { QueryKeys } from '~~/utils/QueryKeys';
 import { routes } from '~/utils/routes';
 
 export default function () {
   const client = useQueryClient();
   const router = useRouter();
+  const docker = useDocker();
 
   return useMutation<
     Docker.PostServiceUpdateResponse200 | Docker.PostServiceCreateResponse201,

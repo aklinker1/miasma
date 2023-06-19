@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from 'vue-query';
 
 export default function () {
   const client = useQueryClient();
+  const docker = useDocker();
 
   return useMutation<
     void,
