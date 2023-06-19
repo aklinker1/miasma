@@ -19,7 +19,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: aklinker1/miasma:latest
+          images: aklinker1/miasma
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
