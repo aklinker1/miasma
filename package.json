@@ -7,14 +7,15 @@
     "format:check": "prettier --check .",
     "dev": "nuxt dev",
     "build": "nuxt build",
-    "generate": "nuxt generate",
     "preview": "nuxt preview",
     "gen": "tsx scripts/generate-docker-types.ts",
     "postinstall": "nuxt prepare",
     "prepare": "husky install",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "docker:build": "docker build . -t aklinker1/miasma:local",
+    "docker:run": "env-cmd -- docker run -it --init -p 3000:3000 -v \"${VITE_DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock\" aklinker1/miasma:local"
   },
   "devDependencies": {
     "@iconify/json": "^2.2.79",
@@ -29,6 +30,7 @@
     "@vueuse/nuxt": "^10.2.0",
     "code-block-writer": "^12.0.0",
     "daisyui": "^3.1.1",
+    "env-cmd": "^10.1.0",
     "husky": "^8.0.3",
     "nuxt": "3.5.3",
     "openapi-types": "^12.1.3",

@@ -10,9 +10,8 @@ export default defineEventHandler(async event => {
 
   // GET requests can't read the body, so return undefined
   const body = await readBody(event).catch(() => undefined);
-  const modem = new DockerModem({
-    socketPath: '/Users/aklinker1/.colima/default/docker.sock',
-  });
+  const socketPath = import.meta.env.VITE_DOCKER_SOCKET ?? '/var/run/docker.sock';
+  const modem = new DockerModem({ socketPath });
   const query = getQuery(event);
 
   // Including a ? is required to make query params work, and does not break when there are not
