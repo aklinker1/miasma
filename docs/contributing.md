@@ -4,11 +4,11 @@ title: Contributing
 
 # Contributing
 
-Welcome to the contributor's guide! Here you'll find everything you need to know about contributing to Miasma.
-
 <a href="https://github.com/aklinker1/miasma/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=aklinker1/miasma" />
 </a>
+
+Welcome to the contributor's guide! Here you'll find everything you need to know about contributing to Miasma.
 
 [[toc]]
 

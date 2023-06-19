@@ -4,7 +4,7 @@
 
 ## Prerequisites
 
-Before installing Miasma, you'll need a machine with [`docker` installed](https://docs.docker.com/get-docker/). My device of choice is a _Raspberry Pi 4 with Ubuntu Server_, but Miasma support almost all hardware and operating systems.
+Before installing Miasma, you'll need a machine with [`docker` installed](https://docs.docker.com/get-docker/). My device of choice is a _Raspberry Pi 4 with Ubuntu Server_, but Miasma supports almost all hardware and operating systems.
 
 :::info
 If you choose to [add more nodes](#add-more-nodes), this machine will be the ["manager node"](https://docs.docker.com/engine/swarm/manage-nodes/) of the swarm.
