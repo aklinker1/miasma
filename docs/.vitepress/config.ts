@@ -30,7 +30,10 @@ export default defineConfig({
       },
       {
         text: 'Other',
-        items: [{ text: 'Contributing', link: '/contributing' }],
+        items: [
+          { text: 'Contributing', link: '/contributing' },
+          { text: 'Migrate to V2', link: '/v2-migration' },
+        ],
       },
     ],
 
