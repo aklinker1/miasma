@@ -9,7 +9,6 @@ jobs:
   checks:
     name: API Checks
     runs-on: ubuntu-22.04
-    needs: changes
     if: ${{ needs.changes.outputs.api == 'true' }}
     steps:
       - name: Checkout Repo
