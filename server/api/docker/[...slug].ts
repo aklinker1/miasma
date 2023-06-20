@@ -10,7 +10,7 @@ export default defineEventHandler(async event => {
 
   // GET requests can't read the body, so return undefined
   const body = await readBody(event).catch(() => undefined);
-  const socketPath = import.meta.env.VITE_DOCKER_SOCKET ?? '/var/run/docker.sock';
+  const socketPath = import.meta.env.MIASMA_DOCKER_SOCKET ?? '/var/run/docker.sock';
   const modem = new DockerModem({ socketPath });
   const query = getQuery(event);
 

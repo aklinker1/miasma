@@ -1,6 +1,6 @@
 # Authentication
 
-By default, Miasma does not require authentication to access the UI. Authentication is disabled when the `VITE_AUTH` environment variable is not set, or set to an unknown type.
+By default, Miasma does not require authentication to access the UI. Authentication is disabled when the `MIASMA_AUTH` environment variable is not set, or set to an unknown type.
 
 Supported authentication methods:
 
@@ -10,14 +10,14 @@ Supported authentication methods:
 
 When using token based authentication, you are required to login with a token when accessing Miasma's UI.
 
-Set the `VITE_AUTH=token:<your-token>` when starting the docker image, like so:
+Set the `MIASMA_AUTH=token:<your-token>` when starting the docker image, like so:
 
 ```sh
 $ docker run -d \
     --restart unless-stopped \
     -p 3000:3000 \
     -v /var/run/docker.sock:/var/run/docker.sock \
-    -e VITE_AUTH=token:1234 \
+    -e MIASMA_AUTH=token:1234 \
     aklinker1/miasma
 ```
 
@@ -27,14 +27,14 @@ Here, you'll need to enter `1234` on the UI to access the dashboard.
 
 When using basic authentication, you'll be required to enter a username and password.
 
-Set the `VITE_AUTH=basic:<username1>:<password1>\n<username2>:<password2>\n...` environment variable.
+Set the `MIASMA_AUTH=basic:<username1>:<password1>\n<username2>:<password2>\n...` environment variable.
 
 ```sh
 $ docker run -d \
     --restart unless-stopped \
     -p 3000:3000 \
     -v /var/run/docker.sock:/var/run/docker.sock \
-    -e VITE_AUTH=basic:user1:password1\nuser2:password2 \
+    -e MIASMA_AUTH=basic:user1:password1\nuser2:password2 \
     aklinker1/miasma
 ```
 

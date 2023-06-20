@@ -5,6 +5,9 @@ export default defineNuxtConfig({
   typescript: {
     shim: false,
   },
+  vite: {
+    envPrefix: 'MIASMA_',
+  },
   app: {
     head: {
       titleTemplate: 'Miasma – %s',

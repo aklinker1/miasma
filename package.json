@@ -15,7 +15,7 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "docker:build": "docker build . -t aklinker1/miasma:local",
-    "docker:run": "env-cmd -- docker run -it --init -p 3000:3000 -v \"${VITE_DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock\" aklinker1/miasma:local"
+    "docker:run": "env-cmd -- docker run -it --init -p 3000:3000 -v \"${MIASMA_DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock\" aklinker1/miasma:local"
   },
   "devDependencies": {
     "@iconify/json": "^2.2.79",

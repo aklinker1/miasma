@@ -4,16 +4,16 @@ Miasma is configured through _environment variables_. Here is a list of all envi
 
 [[toc]]
 
-## `VITE_AUTH`
+## `MIASMA_AUTH`
 
 Setup authentication. See [Authentication](./authentication) for usage details.
 
 Here are the valid options:
 
-- `VITE_AUTH=token:<token>`
-- `VITE_AUTH=basic:<user1>:<pass1>\n<user2>:<pass2>\n...`
+- `MIASMA_AUTH=token:<token>`
+- `MIASMA_AUTH=basic:<user1>:<pass1>\n<user2>:<pass2>\n...`
 
-<!-- ## `VITE_AUTO_UPGRADE_CRON`
+<!-- ## `MIASMA_AUTO_UPGRADE_CRON`
 
 **Default: `"@daily"`**
 

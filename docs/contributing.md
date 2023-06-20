@@ -44,12 +44,12 @@ pnpm docker:run
 
 ### Docker Socket Customization
 
-When running `pnpm dev` or `pnpm docker:run`, you might run into 500 status code errors when attempting to connect to docker. By default, it tries to connect to `/var/run/docker.sock`. But the docker socket isn't always hosted there, like on Windows. To fix this, add a `.env` file to the project root, and fill out the `VITE_DOCKER_SOCKET` variable.
+When running `pnpm dev` or `pnpm docker:run`, you might run into 500 status code errors when attempting to connect to docker. By default, it tries to connect to `/var/run/docker.sock`. But the docker socket isn't always hosted there, like on Windows. To fix this, add a `.env` file to the project root, and fill out the `MIASMA_DOCKER_SOCKET` variable.
 
 For example, if you use Colima on a Macbook, it hosts the docker socket at `$HOME/.colima/default/docker.sock`. So the `.env` would look like this:
 
 ```env
-VITE_DOCKER_SOCKET=/Users/<username>/.colima/default/docker.sock
+MIASMA_DOCKER_SOCKET=/Users/<username>/.colima/default/docker.sock
 ```
 
 ## Docs
