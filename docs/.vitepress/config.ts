@@ -1,4 +1,3 @@
-import { resolve } from 'path';
 import { defineConfig } from 'vitepress';
 
 // https://vitepress.dev/reference/site-config

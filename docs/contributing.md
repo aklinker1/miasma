@@ -48,7 +48,7 @@ When running `pnpm dev` or `pnpm docker:run`, you might run into 500 status code
 
 For example, if you use Colima on a Macbook, it hosts the docker socket at `$HOME/.colima/default/docker.sock`. So the `.env` would look like this:
 
-```env
+```txt
 MIASMA_DOCKER_SOCKET=/Users/<username>/.colima/default/docker.sock
 ```
 
