@@ -1,6 +1,9 @@
 {
   "version": "2.0.2",
   "private": true,
+  "engines": {
+    "pnpm": "8"
+  },
   "scripts": {
     "compile": "nuxi typecheck",
     "format": "prettier --write .",
