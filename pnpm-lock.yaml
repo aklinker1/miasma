@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  h3: 1.8.0
+
 dependencies:
   '@types/node':
     specifier: '18'
@@ -1758,7 +1761,7 @@ packages:
       cookie-es: 1.0.0
       defu: 6.1.2
       destr: 2.0.0
-      h3: 1.6.6
+      h3: 1.8.0
       iron-webcrypto: 0.7.0
       micromatch: 4.0.5
       pathe: 1.1.1
@@ -4392,18 +4395,6 @@ packages:
       duplexer: 0.1.2
     dev: true
 
-  /h3@1.6.6:
-    resolution: {integrity: sha512-DWu2s11OuuO9suEkX99dXaJoxd1RgPXiM4iDmLdrhGV63GLoav13f3Kdd5/Rw7xNKzhzn2+F2dleQjG66SnMPQ==}
-    dependencies:
-      cookie-es: 1.0.0
-      defu: 6.1.2
-      destr: 1.2.2
-      iron-webcrypto: 0.7.0
-      radix3: 1.0.1
-      ufo: 1.1.2
-      uncrypto: 0.1.3
-    dev: true
-
   /h3@1.8.0:
     resolution: {integrity: sha512-057VY83X7Tg5n4XU2GV9M3dsCWUU4jtw2Lc/r4GjAcf9Jb6GI1mD5F8TCQHUcvLMEgtx6lbfobOFu7Vdmejihg==}
     dependencies:
@@ -6430,7 +6421,7 @@ packages:
     resolution: {integrity: sha512-lNeOl38Ws0eNxpO3+wD1I9rkHGQyj1NU1jlzv4go2CtEnEQEUfqnIvZG7W+bC/aXdJ27n5x/yUjb6RoT9tko+Q==}
     dependencies:
       defu: 6.1.2
-      destr: 2.0.0
+      destr: 2.0.1
       flat: 5.0.2
     dev: true
 
