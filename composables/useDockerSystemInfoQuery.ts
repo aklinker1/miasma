@@ -1,3 +1,5 @@
+import { useQuery } from 'vue-query';
+
 export default function () {
   const docker = useDocker();
 

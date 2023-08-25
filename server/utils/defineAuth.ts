@@ -43,9 +43,9 @@ function defineTokenAuth(template: string): Auth {
   return {
     type: 'token',
     getUser(event) {
-      const authHeader = getHeader(event, 'Authorization');
+      const authCookie = getCookie(event, 'Authorization');
 
-      if (authHeader === `Bearer ${token}`) return { username: 'Admin' };
+      if (authCookie === `Bearer ${token}`) return { username: 'Admin' };
       else return undefined;
     },
   };
@@ -71,14 +71,12 @@ function defineBasicAuth(template: string): Auth {
   return {
     type: 'basic',
     getUser(event) {
-      const encodedAuthHeader = getHeader(event, 'Authorization');
-      if (!encodedAuthHeader?.startsWith('Basic ')) return undefined;
+      const encodeAuthCookie = getCookie(event, 'Authorization');
+      if (!encodeAuthCookie?.startsWith('Basic ')) return undefined;
 
-      const decodedAuthHeader = Buffer.from(
-        encodedAuthHeader.replace('Basic ', ''),
-        'base64',
-      ).toString('utf-8');
-      const [username, password] = decodedAuthHeader.split(':', 2);
+      const [username, password] = Buffer.from(encodeAuthCookie.replace('Basic ', ''), 'base64')
+        .toString('utf-8')
+        .split(':', 2);
 
       if (!username || !password) return undefined;
       if (users[username] !== password) return undefined;
