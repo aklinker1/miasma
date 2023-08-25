@@ -1,8 +1,16 @@
 export default function () {
   const router = useRouter();
   const route = useRoute();
+  const authHeader = useAuthHeader();
 
   const fetchWithAuth = $fetch.create({
+    onRequest(ctx) {
+      if (authHeader.value == null) return;
+
+      const headers = new Headers(ctx.options.headers);
+      headers.set('Authorization', authHeader.value);
+      ctx.options.headers = headers;
+    },
     onResponse(context) {
       if (context.response.status === 403 && route.path !== routes.login) {
         router.push({

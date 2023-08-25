@@ -11,9 +11,9 @@ const docker = useDocker();
 const test = useMutation(docker.getSystemInfo);
 
 const router = useRouter();
-const authCookie = useAuthCookie();
+const authHeader = useAuthHeader();
 function login(cookieValue: string) {
-  authCookie.value = cookieValue;
+  authHeader.value = cookieValue;
   test.mutate(undefined, {
     onSuccess() {
       router.push(redirect ?? routes.services);

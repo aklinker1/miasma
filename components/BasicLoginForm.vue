@@ -16,7 +16,8 @@ const submitDisabled = computed(() => !username.value.trim() || !password.value.
 function submit() {
   if (submitDisabled.value) return;
 
-  emit('submit', `Basic ${btoa(username.value + ':' + password.value)}`);
+  const base64 = `Basic ${btoa(username.value + ':' + password.value)}`;
+  emit('submit', base64);
 }
 </script>
 
@@ -51,7 +52,7 @@ function submit() {
       />
     </label>
 
-    <p v-if="loginTest.error.value" class="text-error">Token is not correct</p>
+    <p v-if="loginTest.error.value" class="text-error">Username or password is not correct</p>
 
     <button
       type="submit"
