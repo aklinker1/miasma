@@ -98,7 +98,7 @@ async function createAppWithValues() {
       </div>
 
       <div class="modal-action">
-        <button class="btn" :disabled="isLoading">
+        <button class="btn" :disabled="isLoading" @click.stop.prevent="modal?.close()">
           <span v-if="isLoading" class="loading loading-spinner" />
           Cancel
         </button>
