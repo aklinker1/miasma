@@ -14,10 +14,13 @@ export default function <TModel, TFields extends string>(
   const getPrevValue = (field: TFields) => clone(getPrevValues[field](toRaw(prevModel.value)));
 
   const fieldNames = Object.keys(getPrevValues) as Array<TFields>;
-  const refs = fieldNames.reduce((map, field) => {
-    map[field] = ref(getPrevValue(field));
-    return map;
-  }, {} as Record<TFields, Ref<any>>);
+  const refs = fieldNames.reduce(
+    (map, field) => {
+      map[field] = ref(getPrevValue(field));
+      return map;
+    },
+    {} as Record<TFields, Ref<any>>,
+  );
 
   const discardChanges = () => {
     fieldNames.forEach(field => {
@@ -27,10 +30,13 @@ export default function <TModel, TFields extends string>(
   };
 
   const latestModel = computed(() => {
-    const values = Object.entries(refs).reduce((map, [key, value]) => {
-      map[key as TFields] = (value as Ref<any>).value;
-      return map;
-    }, {} as Record<TFields, any>);
+    const values = Object.entries(refs).reduce(
+      (map, [key, value]) => {
+        map[key as TFields] = (value as Ref<any>).value;
+        return map;
+      },
+      {} as Record<TFields, any>,
+    );
     return getLatestModel(clone(prevModel.value), values);
   });
 
