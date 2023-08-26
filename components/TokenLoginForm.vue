@@ -31,6 +31,7 @@ function submit() {
         :class="{
           'input-error': loginTest.error.value,
         }"
+        type="password"
         placeholder="Enter a token..."
         autocomplete="current-password"
         v-model="token"
