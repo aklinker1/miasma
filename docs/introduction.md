@@ -11,13 +11,13 @@ Miasma is a simple UI wrapping the docker swarm APIs. Miasma was designed as a s
 - Create, manage, and delete services
 - Supports all major CPU architectures (`arm/v7`, `arm64`, `amd64`)
 - Add multiple devices to form a cluster
-- Hidden services
+- Horizontal scaling
 
 ### Future Work
 
 - Built-in hostname and path routing via Traefik
-- Horizontal scaling
 - Automatically managed HTTPS certificates
+- Watchtower plugin for upgrading services
 
 ## Not Features
 

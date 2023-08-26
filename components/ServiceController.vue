@@ -8,7 +8,11 @@ const props = defineProps<{
 const service = toRef(props, 'service');
 
 const status = useServiceStatus(service);
-const desiredTasks = computed(() => service.value.Spec?.Labels?.[MiasmaLabels.InstanceCount] ?? 1);
+const desiredTasks = computed(() => {
+  const label = service.value.Spec?.Labels?.[MiasmaLabels.InstanceCount];
+  if (label != null) return Number(label);
+  return 1;
+});
 
 const { mutate: startService, isLoading: isStarting } = useDockerStartServiceMutation();
 const { mutate: stopService, isLoading: isStopping } = useDockerStopServiceMutation();
@@ -50,12 +54,13 @@ function deleteService() {
         {{ status }}
       </span>
     </li>
-    <li v-if="desiredTasks" :class="{ 'disabled pointer-events-none': isUpdating || true }">
-      <div>
-        <div class="i-mdi-pencil text-2xl"></div>
-        <span>{{ service.ServiceStatus?.RunningTasks ?? 0 }} / {{ desiredTasks }} instances</span>
-      </div>
-    </li>
+    <ScaleServiceMenuItem
+      v-if="desiredTasks"
+      :class="{ 'disabled pointer-events-none': isUpdating }"
+      :service="service"
+      :running-tasks="service.ServiceStatus?.RunningTasks ?? 0"
+      :desired-tasks="desiredTasks"
+    />
     <!-- <li>
       <service-logs-container :service-id="service.id" />
     </li> -->
