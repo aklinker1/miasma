@@ -30,6 +30,5 @@ You shouldn't have to do anything to migrate your v1 apps to v2. As long as you 
 Some features are missing from V2:
 
 - Traefik Plugin (ingress router + automatic HTTPS certs)
-- Hidden apps
 
 I will be adding these with time. I'll probably forget to update this page, so check [Introduction](./introduction#future-work) for a more up-to-date list of all features.
