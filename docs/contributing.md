@@ -19,11 +19,11 @@ Welcome to the contributor's guide! Here you'll find everything you need to know
 
 ## Tech Stack
 
-Miasma uses [Nuxt](https://nuxt.com) to create a Server-side-rendered application (SSR).
+Miasma uses [Nuxt](https://nuxt.com) to create a server-side-rendered web application (SSR).
 
 The CSS framework is [TailwindCSS](https://tailwindcss.com/) + [DaisyUI](https://daisyui.com/).
 
-The UI uses a API proxy (`/api/docker`) for communicating with the docker engine.
+The UI uses an API proxy (`/api/docker`) for communicating with the docker engine.
 
 ```bash
 # Create a swarm on your development computer
@@ -52,7 +52,9 @@ For example, if you use Colima on a Macbook, it hosts the docker socket at `$HOM
 MIASMA_DOCKER_SOCKET=/Users/<username>/.colima/default/docker.sock
 ```
 
-## Docs
+## Documentation Website
+
+The docs are located under `docs/` directory, and can be ran locally with:
 
 ```bash
 pnpm docs:dev
