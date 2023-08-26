@@ -1,8 +1,6 @@
 name: Publish Docker Image
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch:
 
 jobs:
   validate:
@@ -14,6 +12,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+
+      - name: Bump and Tag
+        run: |
+          git config user.email "github-actions@users.noreply.github.com"
+          git config user.name "GitHub Actions"
+          pnpx changelogen@latest --release
+          git push
+          git push --tags
 
       - name: Docker meta
         id: meta
@@ -44,3 +61,6 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: GitHub Release
+        run: pnpx changelogen@latest gh release --token ${{ secrets.GITHUB_TOKEN }}
