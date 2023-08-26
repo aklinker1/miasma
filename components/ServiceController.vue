@@ -56,8 +56,8 @@ function deleteService() {
     </li>
     <ScaleServiceMenuItem
       v-if="desiredTasks"
-      :service="service"
       :class="{ 'disabled pointer-events-none': isUpdating }"
+      :service="service"
       :running-tasks="service.ServiceStatus?.RunningTasks ?? 0"
       :desired-tasks="desiredTasks"
     />
