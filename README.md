@@ -20,4 +20,4 @@ To get started, [checkout the documentation](https://miasma.aklinker1.io).
   <img src="https://contrib.rocks/image?repo=aklinker1/miasma" />
 </a>
 
-To contribute to Miasma, [checkout the contributor's guide](https://miasma.aklinker1.io).
+To contribute to Miasma, [checkout the contributor's guide](https://miasma.aklinker1.io/contributing.html).
