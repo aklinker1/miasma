@@ -2,7 +2,7 @@ import { useQuery } from 'vue-query';
 
 export default function () {
   const docker = useDocker();
-  const auth = useCookie('Authorization');
+  const auth = useAuthCookie();
   const hasAuth = computed(() => !!auth.value);
 
   return useDockerQuery<

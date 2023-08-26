@@ -1,4 +1,5 @@
 import { H3Event } from 'h3';
+import { Cookie } from '~/utils/Cookie';
 
 export default function (template: string | undefined): Auth {
   let auth: Auth;
@@ -43,7 +44,7 @@ function defineTokenAuth(template: string): Auth {
   return {
     type: 'token',
     getUser(event) {
-      const authCookie = getCookie(event, 'Authorization');
+      const authCookie = getCookie(event, Cookie.Auth);
 
       if (authCookie === `Bearer ${token}`) return { username: 'Admin' };
       else return undefined;
@@ -71,7 +72,7 @@ function defineBasicAuth(template: string): Auth {
   return {
     type: 'basic',
     getUser(event) {
-      const encodeAuthCookie = getCookie(event, 'Authorization');
+      const encodeAuthCookie = getCookie(event, Cookie.Auth);
       if (!encodeAuthCookie?.startsWith('Basic ')) return undefined;
 
       const [username, password] = Buffer.from(encodeAuthCookie.replace('Basic ', ''), 'base64')
