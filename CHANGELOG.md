@@ -1,5 +1,15 @@
 # Changelog
 
+## v2.1.0
+
+### 🚀 Enhancements
+
+- Scale services horizontally ([#83](https://github.com/aklinker1/miasma/pull/83))
+
+### ❤️ Contributors
+
+- Aaron <aaronklinker1@gmail.com>
+
 ## v2.0.4
 
 ### 🚀 Enhancements
