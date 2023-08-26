@@ -32,6 +32,7 @@ const joinCommand = computed(() => {
 <template>
   <!-- The button to open modal -->
   <button
+    v-bind="$attrs"
     class="btn btn-outline hover:btn-primary gap-2"
     title="Create Service"
     @click="showModal()"

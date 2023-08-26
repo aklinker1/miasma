@@ -1,5 +1,5 @@
 import { MaybeRef } from 'vue';
-import { UseQueryOptions, useQuery } from 'vue-query';
+import { UseQueryOptions } from 'vue-query';
 
 type Error = H3Error<Docker.GetServiceListResponse500 | Docker.GetServiceListResponse503>;
 type Options = UseQueryOptions<Docker.Service, Error>;

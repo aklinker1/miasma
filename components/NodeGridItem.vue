@@ -17,6 +17,11 @@ const taskFilters = ref<TaskFilters>({
   node: [props.node.ID!],
 });
 const { data: tasks, isLoading } = useDockerTasksQuery(taskFilters);
+
+const applyVisibilityFilter = useApplyVisibilityFilter();
+const visibleTasks = computed(() => {
+  return applyVisibilityFilter(tasks.value ?? [], task => task.Spec?.ContainerSpec?.Labels);
+});
 </script>
 
 <template>
@@ -48,11 +53,11 @@ const { data: tasks, isLoading } = useDockerTasksQuery(taskFilters);
     <div v-if="isLoading" class="h-full p-2 min-h-12 flex box-content">
       <p class="text-center opacity-50 m-auto">Loading...</p>
     </div>
-    <div v-else-if="!tasks?.length" class="h-full p-2 min-h-12 flex box-content">
+    <div v-else-if="!visibleTasks?.length" class="h-full p-2 min-h-12 flex box-content">
       <p class="text-center opacity-50 m-auto">0 containers</p>
     </div>
     <ul v-else class="menu rounded-box p-2">
-      <node-grid-task-item v-for="task of tasks" :key="task.ID" :task="task" />
+      <node-grid-task-item v-for="task of visibleTasks" :key="task.ID" :task="task" />
     </ul>
   </div>
 </template>

@@ -10,8 +10,13 @@ useHead({
     <div class="flex items-center gap-8">
       <service-breadcrumbs />
 
-      <!-- Create Button -->
-      <create-service />
+      <div class="join">
+        <!-- Create Button -->
+        <create-service class="join-item" />
+
+        <!-- Filter -->
+        <filter-button button-class="rounded-l-none" />
+      </div>
     </div>
 
     <!-- Service Lists -->

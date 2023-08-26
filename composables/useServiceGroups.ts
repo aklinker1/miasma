@@ -6,16 +6,17 @@ export interface AppGroup {
 }
 
 export default function (services: Ref<Docker.Service[] | undefined>): Ref<AppGroup[]> {
+  const filterServices = useApplyVisibilityFilter();
+
   return computed(() => {
-    const groupMap = (services.value ?? []).reduce<Record<string, Docker.Service[]>>(
-      (map, service) => {
-        const groupName = service.Spec?.Labels?.[MiasmaLabels.Group]?.toUpperCase() ?? '';
-        map[groupName] ??= [];
-        map[groupName]?.push(service);
-        return map;
-      },
-      {},
-    );
+    const groupMap = filterServices(services.value ?? [], service => service.Spec?.Labels).reduce<
+      Record<string, Docker.Service[]>
+    >((map, service) => {
+      const groupName = service.Spec?.Labels?.[MiasmaLabels.Group]?.toUpperCase() ?? '';
+      map[groupName] ??= [];
+      map[groupName]?.push(service);
+      return map;
+    }, {});
 
     const groups: AppGroup[] = Object.entries(groupMap).map(([group, groupServices]) => ({
       name: group.trim() || undefined,
