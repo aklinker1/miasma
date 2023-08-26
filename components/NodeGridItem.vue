@@ -49,7 +49,7 @@ const { data: tasks, isLoading } = useDockerTasksQuery(taskFilters);
       <p class="text-center opacity-50 m-auto">Loading...</p>
     </div>
     <div v-else-if="!tasks?.length" class="h-full p-2 min-h-12 flex box-content">
-      <p class="text-center opacity-50 m-auto">0 services</p>
+      <p class="text-center opacity-50 m-auto">0 containers</p>
     </div>
     <ul v-else class="menu rounded-box p-2">
       <node-grid-task-item v-for="task of tasks" :key="task.ID" :task="task" />
