@@ -4,17 +4,20 @@ const props = defineProps<{
   name: string;
   image: string;
   group: string;
+  hidden: boolean;
 }>();
 
 const emit = defineEmits<{
   (event: 'update:name', newName: string): void;
   (event: 'update:image', newImage: string): void;
   (event: 'update:group', newGroup: string): void;
+  (event: 'update:hidden', newHidden: boolean): void;
 }>();
 
 const internalName = useInternalValue<'name'>('name', props, emit);
 const internalImage = useInternalValue<'image'>('image', props, emit);
 const internalGroup = useInternalValue<'group'>('group', props, emit);
+const internalHidden = useInternalValue<'hidden'>('hidden', props, emit);
 
 const isShowingNameWarning = computed(() => internalName.value.trim() !== props.currentName);
 </script>
@@ -64,4 +67,10 @@ const isShowingNameWarning = computed(() => internalName.value.trim() !== props.
       </label>
     </div>
   </div>
+
+  <!-- Hidden -->
+  <label class="flex py-2 items-center gap-4">
+    <input type="checkbox" class="checkbox checked:checkbox-primary" v-model="internalHidden" />
+    <span>Hidden</span>
+  </label>
 </template>

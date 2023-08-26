@@ -22,18 +22,22 @@ const {
   mounts,
   name,
   ports,
+  hidden,
 } = useDeepEditable(
-  computed(() => service.value.Spec ?? {}),
+  computed<Docker.ServiceSpec>(() => service.value.Spec ?? {}),
   {
     name: model => model?.Name?.trim() ?? '',
-    image: model => model?.TaskTemplate?.ContainerSpec?.Image,
+    image: model => model?.TaskTemplate?.ContainerSpec?.Image ?? '',
     group: model => model?.Labels?.[MiasmaLabels.Group]?.trim() ?? '',
     env: model => model?.TaskTemplate?.ContainerSpec?.Env ?? [],
     ports: model => model?.EndpointSpec?.Ports ?? [],
     mounts: model => model?.TaskTemplate?.ContainerSpec?.Mounts ?? [],
     constraints: model => model?.TaskTemplate?.Placement?.Constraints ?? [],
+    hidden: model =>
+      model?.Labels?.[MiasmaLabels.Hidden] != null &&
+      model?.TaskTemplate?.ContainerSpec?.Labels?.[MiasmaLabels.Hidden] != null,
   },
-  (base, values): Docker.ServiceSpec => {
+  (base, values) => {
     base.Name = values.name.trim();
 
     base.TaskTemplate!.ContainerSpec!.Image = values.image.trim();
@@ -48,7 +52,7 @@ const {
     if (values.ports.length) {
       base.EndpointSpec ??= {};
       base.EndpointSpec.Ports = values.ports;
-    } else if (base?.EndpointSpec?.Ports) {
+    } else if (base.EndpointSpec?.Ports) {
       delete base.EndpointSpec.Ports;
     }
 
@@ -56,7 +60,7 @@ const {
       base.TaskTemplate ??= {};
       base.TaskTemplate.ContainerSpec ??= {};
       base.TaskTemplate.ContainerSpec.Mounts = values.mounts;
-    } else if (base?.TaskTemplate?.ContainerSpec?.Mounts) {
+    } else if (base.TaskTemplate?.ContainerSpec?.Mounts) {
       delete base.TaskTemplate.ContainerSpec.Mounts;
     }
 
@@ -64,8 +68,26 @@ const {
       base.TaskTemplate ??= {};
       base.TaskTemplate.Placement ??= {};
       base.TaskTemplate.Placement.Constraints = values.constraints;
-    } else if (base?.TaskTemplate?.Placement?.Constraints) {
+    } else if (base.TaskTemplate?.Placement?.Constraints) {
       delete base.TaskTemplate.Placement.Constraints;
+    }
+
+    if (values.hidden) {
+      base ??= {};
+      base.Labels ??= {};
+      base.TaskTemplate ??= {};
+      base.TaskTemplate.ContainerSpec ??= {};
+      base.TaskTemplate.ContainerSpec.Labels ??= {};
+
+      base.Labels[MiasmaLabels.Hidden] = '';
+      base.TaskTemplate.ContainerSpec.Labels[MiasmaLabels.Hidden] = '';
+    } else {
+      if (base.Labels != null) {
+        delete base.Labels[MiasmaLabels.Hidden];
+      }
+      if (base.TaskTemplate?.ContainerSpec?.Labels) {
+        delete base.TaskTemplate.ContainerSpec.Labels[MiasmaLabels.Hidden];
+      }
     }
 
     return base;
@@ -89,6 +111,7 @@ function saveChanges() {
       v-model:name="name"
       v-model:image="image"
       v-model:group="group"
+      v-model:hidden="hidden"
     />
 
     <div class="divider" />

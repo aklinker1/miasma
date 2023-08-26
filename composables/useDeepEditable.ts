@@ -4,22 +4,27 @@ import { MaybeRef } from 'vue';
 
 /**
  * Handles form logic for editing a deep JSON object.
+ *
+ * It aliases deep feilds to simple refs that can be modified, and returns those refs and utils for
+ * reseting or applying all the changes.
  */
-export default function <TModel, TFields extends string>(
+export default function <TModel, TValues extends object>(
   prevModel: Ref<TModel>,
-  getPrevValues: Record<TFields, (model: Readonly<TModel>) => any>,
-  getLatestModel: (base: TModel, values: Record<TFields, any>) => TModel,
+  getPrevValues: { [key in keyof TValues]: (model: Readonly<TModel>) => TValues[key] },
+  getLatestModel: (base: TModel, values: TValues) => TModel,
   onDiscard: MaybeRef<() => void>,
 ) {
-  const getPrevValue = (field: TFields) => clone(getPrevValues[field](toRaw(prevModel.value)));
+  const getPrevValue = <TKey extends keyof TValues>(field: TKey) =>
+    clone(getPrevValues[field](toRaw(prevModel.value)));
 
-  const fieldNames = Object.keys(getPrevValues) as Array<TFields>;
+  const fieldNames = Object.keys(getPrevValues) as Array<keyof TValues>;
   const refs = fieldNames.reduce(
     (map, field) => {
+      // @ts-expect-error
       map[field] = ref(getPrevValue(field));
       return map;
     },
-    {} as Record<TFields, Ref<any>>,
+    {} as { [key in keyof TValues]: Ref<TValues[key]> },
   );
 
   const discardChanges = () => {
@@ -30,13 +35,10 @@ export default function <TModel, TFields extends string>(
   };
 
   const latestModel = computed(() => {
-    const values = Object.entries(refs).reduce(
-      (map, [key, value]) => {
-        map[key as TFields] = (value as Ref<any>).value;
-        return map;
-      },
-      {} as Record<TFields, any>,
-    );
+    const values = Object.entries(refs).reduce((map, [key, value]) => {
+      map[key as keyof TValues] = (value as Ref<any>).value;
+      return map;
+    }, {} as TValues);
     return getLatestModel(clone(prevModel.value), values);
   });
 

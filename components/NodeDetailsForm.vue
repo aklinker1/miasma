@@ -17,11 +17,11 @@ const {
   hasChanges,
   labels,
 } = useDeepEditable(
-  computed(() => node.value.Spec ?? {}),
+  computed<Docker.NodeSpec>(() => node.value.Spec ?? {}),
   {
     labels: model => Object.entries(model.Labels ?? {}),
   },
-  (base, values): Docker.NodeSpec => {
+  (base, values) => {
     base.Labels = Object.fromEntries(values.labels);
     return base;
   },
