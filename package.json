@@ -59,6 +59,9 @@
     "vue-query": "^1.26.0"
   },
   "pnpm": {
+    "overrides": {
+      "node-fetch-native": "1.2.0"
+    },
     "peerDependencyRules": {
       "ignoreMissing": [
         "webpack",
