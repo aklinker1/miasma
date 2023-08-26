@@ -9,7 +9,11 @@ export enum MiasmaLabels {
    */
   InstanceCount = 'miasma.instance-count',
   /**
-   * Whether or not the service should be shown on the main services list
+   * Whether or not the service should be shown on the main services list.
    */
   Hidden = 'miasma.hidden',
+  /**
+   * Whether or not the service is a system app controlled by Miasma.
+   */
+  System = 'miasma.system',
 }
