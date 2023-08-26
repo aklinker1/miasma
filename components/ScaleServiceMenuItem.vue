@@ -38,6 +38,7 @@ const disabled = computed(() => !scaleTo.value);
 
 const modal = ref<HTMLDialogElement>();
 function showModal() {
+  scaleTo.value = props.desiredTasks;
   modal.value?.showModal();
 }
 function dismissModal() {
