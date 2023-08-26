@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { version } from '@@/package.json';
 defineProps<{
   navTitle: string;
 }>();
@@ -33,34 +34,62 @@ defineProps<{
         <slot name="content" />
       </div>
 
-      <div class="bg-neutral-focus w-full p-8 -z-10">
-        <footer class="footer max-w-screen-md mx-auto">
-          <div>
-            <span class="footer-title">Links</span>
-            <a href="https://aklinker1.github.io/miasma" target="_blank" class="link link-hover"
-              >Documentation</a
-            >
-            <a href="https://github.com/aklinker1/miasma" target="_blank" class="link link-hover"
-              >GitHub</a
-            >
-          </div>
-          <div>
-            <span class="footer-title">Help</span>
-            <a
-              href="https://github.com/aklinker1/miasma/discussions/new?category=q-a"
-              target="_blank"
-              class="link link-hover"
-              >Have a question?</a
-            >
-            <a
-              href="https://github.com/aklinker1/miasma/issues/new"
-              target="_blank"
-              class="link link-hover"
-              >Report a Bug</a
-            >
-          </div>
-        </footer>
-      </div>
+      <footer class="footer grid-rows-1 p-10 bg-neutral-focus text-neutral-content">
+        <div>
+          <span class="footer-title">Miasma {{ version }}</span>
+          <a
+            href="https://github.com/aklinker1/miasma"
+            target="_blank"
+            class="link link-hover flex items-center gap-2"
+          >
+            <span class="i-mdi-github text-lg inline-block" />
+            <span>GitHub</span>
+          </a>
+          <a
+            href="https://miasma.aklinker1.io/"
+            target="_blank"
+            class="link link-hover flex items-center gap-2"
+          >
+            <span class="i-mdi-book-open-page-variant text-lg inline-block" />
+            <span>Documentation</span>
+          </a>
+          <a
+            href="https://github.com/aklinker1/miasma"
+            target="_blank"
+            class="link link-hover flex items-center gap-2"
+          >
+            <span class="i-mdi-star text-lg inline-block" />
+            <span>Leave a star!</span>
+          </a>
+        </div>
+        <div>
+          <span class="footer-title">Help</span>
+          <a
+            href="https://github.com/aklinker1/miasma/releases"
+            target="_blank"
+            class="link link-hover flex items-center gap-2"
+          >
+            <span class="i-mdi-creation text-lg inline-block" />
+            <span>Changelog</span>
+          </a>
+          <a
+            href="https://github.com/aklinker1/miasma/discussions/new?category=q-a"
+            target="_blank"
+            class="link link-hover flex items-center gap-2"
+          >
+            <span class="i-mdi-help-circle text-lg inline-block" />
+            <span>Have a question?</span>
+          </a>
+          <a
+            href="https://github.com/aklinker1/miasma/issues/new"
+            target="_blank"
+            class="link link-hover flex items-center gap-2"
+          >
+            <span class="i-mdi-ladybug text-lg inline-block" />
+            <span>Report a bug</span>
+          </a>
+        </div>
+      </footer>
     </div>
     <div class="drawer-side">
       <label for="drawer-toggle" class="drawer-overlay"></label>
