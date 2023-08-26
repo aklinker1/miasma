@@ -99,15 +99,15 @@ async function createAppWithValues() {
       </div>
 
       <div class="modal-action">
-        <p
-          role="button"
+        <button
+          type="button"
           class="btn"
           :class="{ disabled: isLoading }"
           @click.stop.prevent="dismissModal"
         >
           <span v-if="isLoading" class="loading loading-spinner" />
           Cancel
-        </p>
+        </button>
         <button type="submit" class="btn btn-primary" :disabled="isSubmitDisabled">
           <span v-if="isLoading" class="loading loading-spinner" />
           Create
