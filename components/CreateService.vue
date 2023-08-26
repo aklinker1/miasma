@@ -62,7 +62,7 @@ async function createAppWithValues() {
 
   <dialog ref="modal" class="modal">
     <!-- Main form -->
-    <form method="dialog" class="modal-box space-y-4" @submit.prevent="createAppWithValues">
+    <form method="dialog" class="modal-box space-y-4" @submit.prevent.stop="createAppWithValues">
       <h3 class="font-bold text-lg">Create New Service</h3>
 
       <!-- Service Name -->
@@ -99,10 +99,15 @@ async function createAppWithValues() {
       </div>
 
       <div class="modal-action">
-        <button class="btn" :disabled="isLoading" @click.stop.prevent="modal?.close()">
+        <p
+          role="button"
+          class="btn"
+          :class="{ disabled: isLoading }"
+          @click.stop.prevent="dismissModal"
+        >
           <span v-if="isLoading" class="loading loading-spinner" />
           Cancel
-        </button>
+        </p>
         <button type="submit" class="btn btn-primary" :disabled="isSubmitDisabled">
           <span v-if="isLoading" class="loading loading-spinner" />
           Create
