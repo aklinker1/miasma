@@ -4,4 +4,3 @@ pnpm-lock.yaml
 .output
 dist
 docs/.vitepress/cache
-CHANGELOG.md
