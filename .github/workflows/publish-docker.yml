@@ -25,12 +25,14 @@ jobs:
           cache: 'pnpm'
 
       - name: Bump and Tag
+        id: bump
         run: |
           git config user.email "github-actions@users.noreply.github.com"
           git config user.name "GitHub Actions"
           pnpx changelogen@latest --release
           git push
           git push --tags
+          echo "version=$(node -pe 'require("./package.json").version')" >> "$GITHUB_OUTPUT"
 
       - name: Docker meta
         id: meta
@@ -38,8 +40,8 @@ jobs:
         with:
           images: aklinker1/miasma
           tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{version}},value=v${{ steps.bump.outputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=v${{ steps.bump.outputs.version }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
