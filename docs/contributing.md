@@ -66,6 +66,6 @@ The website is made using [VitePress](https://v2.vuepress.vuejs.org/), and publi
 
 The project uses conventional commits, so when PRs are merged, make sure to update their titles or commit titles to a conventional commit.
 
-Then, to preform a release, simply dispatch the "Publish Docker" GitHub Action.
+Then, to preform a release, simply dispatch the ["Publish Docker Image"](https://github.com/aklinker1/miasma/actions/workflows/publish-docker.yml) GitHub Action.
 
 It will bump the version, build the Docker Image, push it to Docker Hub, and create a release with release notes on GitHub.
