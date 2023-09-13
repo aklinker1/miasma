@@ -1,0 +1,1 @@
+import{_ as e,o as t,c as a,S as o}from"./chunks/framework.f15d8f8c.js";const f=JSON.parse('{"title":"Plugins","description":"","frontmatter":{},"headers":[],"relativePath":"plugins.md","filePath":"plugins.md"}'),i={name:"plugins.md"},s=o("",10),n=[s];function r(l,c,d,p,u,h){return t(),a("div",null,n)}const _=e(i,[["render",r]]);export{f as __pageData,_ as default};
