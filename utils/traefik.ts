@@ -24,12 +24,12 @@ export function buildTraefikService(config: TraefikConfig): Docker.ServiceSpec {
 
   const ports: Docker.EndpointPortConfig[] = [
     {
-      PublishedPort: 80,
-      TargetPort: 80,
-    },
-    {
       PublishedPort: 8080,
       TargetPort: 8080,
+    },
+    {
+      PublishedPort: 80,
+      TargetPort: 80,
     },
   ];
   if (config.httpsEnabled) {
@@ -96,4 +96,57 @@ export interface TraefikConfig {
    * Ex: "/root/letsencrypt"
    */
   certsDir?: string;
+}
+
+export function userInputToTraefikRule(input: string): string {
+  if (input === '') return input;
+
+  if (input.includes('(')) return input;
+  if (input.includes('/')) {
+    const slashIndex = input.indexOf('/');
+    const hostname = input.substring(0, slashIndex);
+    const pathPrefix = input.substring(slashIndex + 1);
+    return `Host(\`${hostname}\`) && PathPrefix(\`/${pathPrefix}\`)`;
+  }
+  return `Host(\`${input}\`)`;
+}
+
+export function traefikRuleToUserInput(rule: string): string {
+  let match;
+  if ((match = rule.match(/Host\(`(.+?)`\)\s*&&\s?PathPrefix\(`\/(.+?)`\)/)))
+    return `${match[1]}/${match[2]}`;
+  if ((match = rule.match(/Host\(`(.+?)`\)/))) return match[1];
+  return rule;
+}
+
+export function applyTraefikLabels(
+  labels: Record<string, string>,
+  name: string,
+  rule: string,
+  ports: Docker.EndpointPortConfig[],
+  config: TraefikConfig,
+) {
+  // Remove old labels
+  removeTraefikLabels(labels);
+
+  const hostname = name;
+  const port = ports[0]?.TargetPort;
+
+  labels[`traefik.enable`] = 'true';
+  labels[`traefik.docker.network`] = 'ingress';
+  if (port) {
+    labels[`traefik.http.services.${hostname}.loadbalancer.server.port`] = String(port);
+  }
+  labels[`traefik.http.routers.${hostname}.rule`] = rule;
+
+  if (config.httpsEnabled) {
+    labels[`traefik.http.routers.${hostname}.tls`] = 'true';
+    labels[`traefik.http.routers.${hostname}.tls.certresolver`] = TRAEFIK_CERTS_RESOLVER_NAME;
+  }
+}
+
+export function removeTraefikLabels(labels: Record<string, string>) {
+  Object.keys(labels).forEach(key => {
+    if (key.startsWith('traefik.')) delete labels[key];
+  });
 }

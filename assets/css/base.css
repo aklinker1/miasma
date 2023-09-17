@@ -1,4 +1,8 @@
 @layer base {
+  :root {
+    --traefik: 192 69% 45%;
+  }
+
   h1,
   h2,
   h3,

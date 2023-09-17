@@ -16,4 +16,8 @@ export enum MiasmaLabels {
    * Whether or not the service is a system app controlled by Miasma.
    */
   System = 'miasma.system',
+  /**
+   * Stores the traefik rule to apply when starting the service.
+   */
+  TraefikRule = 'miasma.traefik-rule',
 }

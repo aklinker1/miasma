@@ -10,7 +10,7 @@ const { canToggle: canToggleTraefik, isEnabled: isTraefikEnabled } = useTraefikP
       :to="routes.traefikPlugin"
       v-model:enabled="isTraefikEnabled"
       :disabled="!canToggleTraefik"
-      style="--p: 192 69% 45%"
+      style="--p: var(--traefik)"
       icon="i-devicon-traefikproxy"
       title="Traefik (Reverse Proxy)"
     />
