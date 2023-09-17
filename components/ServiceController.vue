@@ -32,7 +32,7 @@ function deleteService() {
 </script>
 
 <template>
-  <ul class="menu bg-base-300 p-2 rounded-box shadow-2xl">
+  <ul class="menu bg-base-300 p-2 rounded-box shadow-2xl w-full">
     <!-- Status -->
     <li class="menu-title"><span>Status</span></li>
     <li v-if="status" class="font-medium pointer-events-none">
@@ -68,8 +68,8 @@ function deleteService() {
     <!-- URLs -->
     <template v-if="urls?.length">
       <li class="menu-title"><span>URLs</span></li>
-      <li v-for="url of urls" :key="url" class="text-ellipsis overflow-hidden">
-        <a class="link hover:link-primary w-full" :href="url" target="_blank">{{
+      <li v-for="url of urls" :key="url" class="w-full">
+        <a class="link hover:link-primary w-full truncate" :href="url" target="_blank">{{
           url.replace(/https?:\/\//, '')
         }}</a>
       </li>
