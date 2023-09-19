@@ -1,3 +1,7 @@
+Deprecated in favor of Portainer
+
+---
+
 <img src="./.github/assets/readme_branding.png" alt="Miasma - The cloud for your closet" height="50%">
 
 <p align="center">
