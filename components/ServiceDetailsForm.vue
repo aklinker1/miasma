@@ -23,6 +23,7 @@ const {
   name,
   ports,
   hidden,
+  traefikRule,
 } = useDeepEditable(
   computed<Docker.ServiceSpec>(() => service.value.Spec ?? {}),
   {
@@ -36,6 +37,7 @@ const {
     hidden: model =>
       model?.Labels?.[MiasmaLabels.Hidden] != null &&
       model?.TaskTemplate?.ContainerSpec?.Labels?.[MiasmaLabels.Hidden] != null,
+    traefikRule: model => traefikRuleToUserInput(model?.Labels?.[MiasmaLabels.TraefikRule] ?? ''),
   },
   (base, values) => {
     base.Name = values.name.trim();
@@ -90,6 +92,18 @@ const {
       }
     }
 
+    if (values.traefikRule) {
+      const rule = userInputToTraefikRule(values.traefikRule);
+      base.Labels ??= {};
+      base.Labels[MiasmaLabels.TraefikRule] = rule;
+      applyTraefikLabels(base.Labels, values.name, rule, values.ports, {});
+    } else {
+      if (base.Labels != null) {
+        delete base.Labels[MiasmaLabels.TraefikRule];
+        removeTraefikLabels(base.Labels);
+      }
+    }
+
     return base;
   },
   resetSave,
@@ -112,6 +126,7 @@ function saveChanges() {
       v-model:image="image"
       v-model:group="group"
       v-model:hidden="hidden"
+      v-model:traefik-rule="traefikRule"
     />
 
     <div class="divider" />

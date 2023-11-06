@@ -7,6 +7,12 @@ export default defineNuxtConfig({
   },
   vite: {
     envPrefix: 'MIASMA_',
+    vue: {
+      script: {
+        defineModel: true,
+        propsDestructure: true,
+      },
+    },
   },
   app: {
     head: {

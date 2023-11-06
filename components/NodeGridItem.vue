@@ -31,17 +31,17 @@ const visibleTasks = computed(() => {
       <nuxt-link :to="`/nodes/${node.ID}`" class="text-xl link link-primary link-hover block">
         {{ node.Description?.Hostname }}
       </nuxt-link>
-      <p class="text-sm uppercase">
-        <!-- IP -->
-        <span>{{ node.Status?.Addr }}</span>
-        <span>&ensp;</span>
-        <span class="text-base-content text-opacity-30">&bull;</span>
-        <span>&ensp;</span>
+      <p class="text-sm uppercase truncate">
         <!-- OS -->
         <span>{{ node.Description?.Platform?.OS }}</span>
         {{ ' ' }}
         <!-- Architechure -->
         <span>{{ node.Description?.Platform?.Architecture }}</span>
+        <span>&ensp;</span>
+        <span class="text-base-content text-opacity-30">&bull;</span>
+        <span>&ensp;</span>
+        <!-- IP -->
+        <span>{{ node.Status?.Addr }}</span>
       </p>
       <ul class="flex gap-2 flex-wrap">
         <li v-for="label of labels" :key="label" class="badge badge-md font-mono">

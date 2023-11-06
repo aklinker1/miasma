@@ -1,25 +1,17 @@
 <script lang="ts" setup>
 const props = defineProps<{
   currentName: string;
-  name: string;
-  image: string;
-  group: string;
-  hidden: boolean;
 }>();
 
-const emit = defineEmits<{
-  (event: 'update:name', newName: string): void;
-  (event: 'update:image', newImage: string): void;
-  (event: 'update:group', newGroup: string): void;
-  (event: 'update:hidden', newHidden: boolean): void;
-}>();
+const name = defineModel<string>('name', { required: true });
+const image = defineModel<string>('image', { required: true });
+const group = defineModel<string>('group', { required: true });
+const hidden = defineModel<boolean>('hidden', { required: true });
+const traefikRule = defineModel<string>('traefikRule', { required: true });
 
-const internalName = useInternalValue<'name'>('name', props, emit);
-const internalImage = useInternalValue<'image'>('image', props, emit);
-const internalGroup = useInternalValue<'group'>('group', props, emit);
-const internalHidden = useInternalValue<'hidden'>('hidden', props, emit);
+const isShowingNameWarning = computed(() => name.value.trim() !== props.currentName);
 
-const isShowingNameWarning = computed(() => internalName.value.trim() !== props.currentName);
+const { isEnabled: isTraefikEnabled } = useTraefikPlugin();
 </script>
 
 <template>
@@ -29,8 +21,8 @@ const isShowingNameWarning = computed(() => internalName.value.trim() !== props.
       <span class="group-focus-within:text-primary">Name</span>
       <input
         class="input input-lg input-bordered focus:input-primary w-full"
-        :class="{ 'input-error': !internalName.trim() }"
-        v-model="internalName"
+        :class="{ 'input-error': !name.trim() }"
+        v-model="name"
         placeholder="Enter a name..."
       />
     </label>
@@ -48,8 +40,8 @@ const isShowingNameWarning = computed(() => internalName.value.trim() !== props.
         <span class="group-focus-within:text-primary">Image</span>
         <input
           class="input input-bordered focus:input-primary w-full"
-          :class="{ 'input-error': !internalImage.trim() }"
-          v-model="internalImage"
+          :class="{ 'input-error': !image.trim() }"
+          v-model="image"
           placeholder="Enter an image..."
         />
       </label>
@@ -61,16 +53,31 @@ const isShowingNameWarning = computed(() => internalName.value.trim() !== props.
         <span class="group-focus-within:text-primary">Group</span>
         <input
           class="input input-bordered focus:input-primary w-full"
-          v-model="internalGroup"
+          v-model="group"
           placeholder=""
         />
       </label>
     </div>
   </div>
 
+  <!-- Traefik -->
+  <label
+    v-if="isTraefikEnabled"
+    class="input-group group"
+    title="Group related services together on the dashboard"
+    style="--p: var(--traefik)"
+  >
+    <span class="group-focus-within:text-primary"><div class="i-devicon-traefikproxy" /></span>
+    <input
+      class="input input-bordered focus:input-primary w-full"
+      v-model="traefikRule"
+      placeholder="Enter a domain or Traefik rule"
+    />
+  </label>
+
   <!-- Hidden -->
   <label class="flex py-2 items-center gap-4">
-    <input type="checkbox" class="checkbox checked:checkbox-primary" v-model="internalHidden" />
+    <input type="checkbox" class="checkbox checked:checkbox-primary" v-model="hidden" />
     <span>Hidden</span>
   </label>
 </template>

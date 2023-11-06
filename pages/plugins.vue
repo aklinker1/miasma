@@ -8,8 +8,6 @@ useHead({
   <div class="space-y-4">
     <plugin-breadcrumbs />
 
-    <p>Todo</p>
-    <!-- Plugin List -->
-    <!-- <nuxt-page /> -->
+    <nuxt-page />
   </div>
 </template>
